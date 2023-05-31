@@ -7,6 +7,7 @@ import {
 import DriverInfoForm from "@/components/whatPage/driver_information_form";
 import { NextPage } from "next";
 import { AccidentInformation, DriverInformation } from "@/utils/logic";
+import { NavButtons } from "@/components/navigation";
 
 const What: NextPage = () => {
   const [greenCarNumberplate, setgreenCarNumberplate] = useState<string>("");
@@ -43,7 +44,7 @@ const What: NextPage = () => {
     <form className="w-full">
       {/* GreenMobility car numberplate collection */}
       <div>
-        {/* TODO: Make it so you can only type a valid numberplate for the country where the accident took place */}
+        {/* TODO: Make it so you can only type a valid numberplate for the country where the accident took place and get a list from a server with all the green numberplates */}
         <Inputfield
           labelText="Numberplate of GreenMobility car"
           id="greenCarNumberplateInput"
@@ -77,6 +78,7 @@ const What: NextPage = () => {
       </div>
 
       {/* Accident location collection */}
+      <NavButtons />
     </form>
   );
 };

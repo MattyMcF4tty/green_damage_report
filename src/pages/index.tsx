@@ -1,5 +1,5 @@
 import Link from "next/link";
-
+import { NavButtons } from "@/components/navigation";
 const IndexPage = () => {
   return (
     <div>
@@ -48,6 +48,7 @@ const IndexPage = () => {
           </div>
         </div>
       </div>
+      <NavButtons />
     </div>
   );
 };
