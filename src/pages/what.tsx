@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { TimeDateField, Inputfield, YesNo } from "@/components/custom_inputfields";
+import {
+  TimeDateField,
+  Inputfield,
+  YesNo,
+} from "@/components/custom_inputfields";
 import DriverInfoForm from "@/components/whatPage/driver_information_form";
 import { NextPage } from "next";
 import { AccidentInformation, DriverInformation } from "@/utils/logic";
@@ -20,7 +24,11 @@ const What: NextPage = () => {
 
   useEffect(() => {
     const newAccidentInfo = new AccidentInformation(
-      accidentLocation, greenCarNumberplate, accidentTime, accidentDate);
+      accidentLocation,
+      greenCarNumberplate,
+      accidentTime,
+      accidentDate
+    );
 
     setAccidentInfo(newAccidentInfo);
   }, [greenCarNumberplate, accidentLocation, accidentTime, accidentDate]);
@@ -69,9 +77,6 @@ const What: NextPage = () => {
       </div>
 
       {/* Accident location collection */}
-      <div className="w-full h-80">
-        <LocationField setLocation={setAccidentLocation} />
-      </div>
     </form>
   );
 };
