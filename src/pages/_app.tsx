@@ -8,7 +8,6 @@ function MyApp({ Component, pageProps }: AppProps) {
       <Navbar />
       <div className="p-4">
         <Component {...pageProps} />
-        <NavButtons />
       </div>
     </>
   );
