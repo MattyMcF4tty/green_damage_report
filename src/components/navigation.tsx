@@ -5,10 +5,9 @@ import { NextRouter, useRouter } from 'next/router';
 const page1:string = "/what";
 const page2:string = "/how";
 const page3:string = "/where";
-const page4:string = "/when";
 const confirmationPage:string = "/confirmation";
 
-const pageIndex:string[] = [page1, page2, page3, page4, confirmationPage];
+const pageIndex:string[] = [page1, page2, page3, confirmationPage];
 
 export function Navbar() {
   const router = useRouter();
@@ -61,8 +60,8 @@ export function Navbar() {
             3
         </p>
 
-        <hr className={`${ChangeLineColor(page4)} border-[1px] w-10 mx-2`} />
-        <p  className={`${ChangeCircleColor(page4)}
+        <hr className={`${ChangeLineColor(confirmationPage)} border-[1px] w-10 mx-2`} />
+        <p  className={`${ChangeCircleColor(confirmationPage)}
             h-10 w-10 rounded-full text-lg text-center leading-10`}
         >
             4
@@ -89,9 +88,6 @@ export function NavButtons() {
       router.push(page3)
     }
     else if (currentPage.includes(page3)) {
-      router.push(page4)
-    }
-    else if (currentPage.includes(page4)) {
       router.push(confirmationPage)
     }
   }
@@ -103,13 +99,9 @@ export function NavButtons() {
     else if (currentPage.includes(page3)) {
       router.push(page2)
     }
-    else if (currentPage.includes(page4)) {
+    else if (currentPage.includes(confirmationPage)) {
       router.push(page3)
     }
-    else if (currentPage.includes(confirmationPage)) {
-      router.push(page4)
-
-    } 
   };
 
   function ChangePreviousColor() {
