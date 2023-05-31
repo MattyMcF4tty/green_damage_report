@@ -69,9 +69,7 @@ const What: NextPage = () => {
       </div>
 
       {/* Accident location collection */}
-      <div className="w-full h-80">
-        <LocationField setLocation={setAccidentLocation} />
-      </div>
+
     </form>
   );
 };
