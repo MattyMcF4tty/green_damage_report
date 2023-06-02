@@ -1,5 +1,4 @@
 
-/* Driver Information Class: The class with all the information we need about the driver of the GreenMobility Car */
 export class AccidentInformation {
     firstName:string | undefined;
     lastName:string | undefined;
