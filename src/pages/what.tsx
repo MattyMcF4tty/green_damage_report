@@ -6,42 +6,54 @@ import {
 } from "@/components/custom_inputfields";
 import DriverInfoForm from "@/components/whatPage/driver_information_form";
 import { NextPage } from "next";
-import { AccidentInformation, DriverInformation } from "@/utils/logic";
-import { NavButtons } from "@/components/navigation";
+import { handleRequest } from "@/utils/serverUtils";
 
 const What: NextPage = () => {
-  const [greenCarNumberplate, setgreenCarNumberplate] = useState<string>("");
+  const [firstName, setFirstName] = useState<string>();
+  const [lastName, setLastName] = useState<string>();
+  const [address, setAddress] = useState<string>();
+  const [socialSecurityNumber, setSocialSecurityNumber] = useState<string>();
+  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState<string>();
+  const [phoneNumber, setPhoneNumber] = useState<string>();
+  const [email, setEmail] = useState<string>();
+
+  const [greenCarNumberplate, setgreenCarNumberplate] = useState<string>();
   const [showDriverInfoForm, setShowDriverInfoForm] = useState<boolean>(false);
-  const [accidentTime, setAccidentTime] = useState<string>("");
-  const [accidentDate, setAccidentDate] = useState<string>("");
+  const [accidentTime, setAccidentTime] = useState<string>();
+  const [accidentDate, setAccidentDate] = useState<string>();
   const [accidentLocation, setAccidentLocation] = useState<{
     address: string;
     position: { lat: number; lng: number };
   }>();
 
-  /* Defining the classes that the information will be keept in */
-  const [driverInfo, setDriverInfo] = useState<DriverInformation>();
-  const [accidentInfo, setAccidentInfo] = useState<AccidentInformation>();
 
-  useEffect(() => {
-    const newAccidentInfo = new AccidentInformation(
-      accidentLocation,
-      greenCarNumberplate,
-      accidentTime,
-      accidentDate
-    );
 
-    setAccidentInfo(newAccidentInfo);
-  }, [greenCarNumberplate, accidentLocation, accidentTime, accidentDate]);
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
 
-  useEffect(() => {
-    sessionStorage.setItem("driverInfo", JSON.stringify(driverInfo));
-    sessionStorage.setItem("accidentInfo", JSON.stringify(accidentInfo));
-    console.log(accidentInfo);
-  }, [driverInfo, accidentInfo]);
+    const data = {
+      firstName: firstName,
+      lastName: lastName,
+      address: address,
+      socialSecurityNumber: socialSecurityNumber,
+      drivingLicenseNumber: drivingLicenseNumber,
+      phoneNumber: phoneNumber,
+      email: email,
+
+      greenCarNumberplate: greenCarNumberplate,
+      accidentTime: accidentTime,
+      accidentDate: accidentDate,
+      accidentLocation: accidentLocation
+    }
+    handleRequest(data)
+
+  }
 
   return (
-    <form className="w-full">
+    <form 
+    className="w-full"
+    onSubmit={(e) => handleSubmit(e)}
+    >
       {/* GreenMobility car numberplate collection */}
       <div>
         {/* TODO: Make it so you can only type a valid numberplate for the country where the accident took place and get a list from a server with all the green numberplates */}
@@ -63,7 +75,55 @@ const What: NextPage = () => {
           onChange={setShowDriverInfoForm}
         />
 
-        {!showDriverInfoForm && <DriverInfoForm onChange={setDriverInfo} />}
+        {!showDriverInfoForm && 
+          <div className="flex flex-col">
+            <Inputfield
+              labelText="Drivers first name"
+              id="FirstNameInput"
+              required={true}
+              type="text"
+              onChange={setFirstName}
+            />
+
+            <Inputfield
+              labelText="Drivers last name"
+              id="LastNameInput"
+              required={true}
+              type="text"
+              onChange={setLastName}
+            />
+
+            {/* TODO: make google autofill */}
+
+            {/* TODO: Check if its a real phone number */}
+            <Inputfield
+              labelText="Drivers social security number"
+              id="SocialSecurityNumberInput"
+              required={true}
+              type="number"
+              onChange={setSocialSecurityNumber}
+            />
+
+            <Inputfield
+              labelText="Drivers driving license number"
+              id="DrivingLicenseNumberInput"
+              required={true}
+              type="number"
+              onChange={setDrivingLicenseNumber}
+            />
+
+            {/* TODO: Check if its a real phone number */}
+
+            {/* TODO: Check if its a real email */}
+            <Inputfield
+              labelText = "Drivers email"
+              id="FirstNameInput"
+              required={true}
+              type="email"
+              onChange={setEmail}
+            />
+          </div>
+        }
       </div>
 
       {/* Accident time and date collection */}
@@ -76,9 +136,7 @@ const What: NextPage = () => {
           dateChange={setAccidentDate}
         />
       </div>
-
-      {/* Accident location collection */}
-      <NavButtons />
+      <button type="submit">Next</button>
     </form>
   );
 };

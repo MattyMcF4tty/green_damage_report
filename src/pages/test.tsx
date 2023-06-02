@@ -1,41 +1,48 @@
-import React from 'react'
+import { handleRequest } from '@/utils/serverUtils';
+import React, { useState } from 'react'
+
 
 const test = () => {
 
-    function handleSubmit() {
-        try {
-            const https = require("https")
+    const [firstName, setFirstName] = useState<string>("")
+    const [lastName, setLastName] = useState<string>("")
 
-            const data = JSON.stringify({
-            "tissemand": "event",
-            "fuiog": "sdgsd"
-            })
-        
-            const options = {
-            hostname: "eo9ihtbvivfqz7o.m.pipedream.net",
-            port: 443,
-            path: "/",
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Content-Length": data.length,
-            },
-            }
-        
-            const req = https.request(options)
-            req.write(data)
-            req.end()   
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault()
+
+        const data = {
+            firstName: firstName, 
+            lastName: lastName
         }
-        catch (error) {
-            console.log("FUCK DIG")
-        } 
+
+        try {
+            handleRequest(data)
+        }
+        catch ( error ) {
+            console.error("Tried sending:\n", data, "\nERROR:\n", error)
+        }
     }
-  return (
-    <form onSubmit={handleSubmit}>
-        
-        <button type="submit">Submit</button>
-    </form>
-  )
+
+    return (
+        <form 
+        onSubmit={(e) => handleSubmit(e)}
+        >
+            <input 
+            type="text" 
+            name='firstName'
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            />
+            <input 
+            type="text" 
+            name='lastName'
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            />
+
+            <button type='submit'>Submit</button>
+        </form>
+    )
 }
 
 export default test;
