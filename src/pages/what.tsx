@@ -7,6 +7,8 @@ import {
 import DriverInfoForm from "@/components/whatPage/driver_information_form";
 import { NextPage } from "next";
 import { handleRequest } from "@/utils/serverUtils";
+import NextButton from "@/components/buttons/next";
+import BackButton from "@/components/buttons/back";
 
 const What: NextPage = () => {
   const [firstName, setFirstName] = useState<string>();
@@ -30,6 +32,17 @@ const What: NextPage = () => {
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
+
+    /* TODO: Make function that gets information about current driver from server */
+    if (showDriverInfoForm !== true) {
+      setFirstName("John")
+      setLastName("Doe")
+      setAddress("Moon")
+      setSocialSecurityNumber("696969696969")
+      setDrivingLicenseNumber("42424242424242")
+      setPhoneNumber("+45 42 69 21 00")
+      setEmail("JohnDoe@placeholder.com")
+    } 
 
     const data = {
       firstName: firstName,
@@ -136,7 +149,11 @@ const What: NextPage = () => {
           dateChange={setAccidentDate}
         />
       </div>
-      <button type="submit">Next</button>
+
+      <div className="flex justify-between">
+        <BackButton pageName=""/>
+        <NextButton pageName="how"/>
+      </div>
     </form>
   );
 };

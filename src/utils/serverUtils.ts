@@ -1,4 +1,3 @@
-import { AccidentInformation } from "./logic"
 
 export const handleRequest = async (info:object) => {
 
@@ -7,7 +6,7 @@ export const handleRequest = async (info:object) => {
     const data = JSON.stringify({
         "data": info
     })
-
+    
     const options = {
         hostname: "eoqzh1o1zcioyj9.m.pipedream.net",
         port: 443,

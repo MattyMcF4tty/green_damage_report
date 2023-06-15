@@ -14,12 +14,6 @@ export default function HowPage () {
 
     const [accidentInfo, setAccidentInfo] = useState<AccidentInformation>();
 
-    /* Getting data stored in sessionStorage */
-    useEffect(() => {
-        setAccidentInfo(JSON.parse(sessionStorage.getItem('accidentInfo')));
-        console.log(accidentInfo)
-    }, []);
-
     /* Updating the values in accidenInfo */
     useEffect(() => {
         const updateAccidentInfo = new AccidentInformation();
