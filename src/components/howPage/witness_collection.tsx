@@ -42,7 +42,9 @@ const Witness = ({ witnessInfo, index, handleWitnessDelete }: WitnessProps) => {
 };
 
 /* Witness information list */
-interface WitnessListProps {}
+interface WitnessListProps {
+  OnChange: (witnessArray: WitnessInformation[]) => void;
+}
 
 export const WitnessList = ({}: WitnessListProps) => {
   const [witnessArray, setWitnessArray] = useState<WitnessInformation[]>([]);

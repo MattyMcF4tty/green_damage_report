@@ -145,8 +145,8 @@ const What: NextPage = () => {
       </div>
 
       <div className="flex justify-between">
-        <BackButton pageName="" />
-        <NextButton pageName="how" />
+        <BackButton pageName="/"/>
+        <NextButton />
       </div>
     </form>
   );
