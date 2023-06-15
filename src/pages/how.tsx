@@ -8,6 +8,9 @@ import {
 import { AccidentInformation } from "@/utils/logic";
 import { WitnessList } from "@/components/howPage/witness_collection";
 import { NavButtons } from "@/components/navigation";
+import NextButton from "@/components/buttons/next";
+import BackButton from "@/components/buttons/back";
+
 export default function HowPage() {
   const [accidentDescription, setAccidentDescription] = useState<string>("");
   const [greenDriverSpeed, setGreenDriverSpeed] = useState<string>("");
@@ -136,19 +139,16 @@ export default function HowPage() {
           required={true}
           onChange={setWitnessesPresent}
         />
-        {witnessesPresent && (
-          <div>
-            <WitnessList />
-          </div>
-        )}
+        {witnessesPresent && <div></div>}
       </div>
-      <div className="flex flex-row w-full place-content-between h-10 mt-10">
-        <button className="w-2/5 bg-MainGreen-300 text-white" type="submit">
-          Previous
-        </button>
-        <button className="w-2/5 bg-MainGreen-300 text-white" type="submit">
-          Next
-        </button>
+      <div className="flex flex-row justify-between">
+        <div className="flex flex-row w-1/3 justify-start h-12 px-5 ">
+          <BackButton pageName="what" />
+        </div>
+
+        <div className="flex flex-row w-1/3 justify-end px-5 ">
+          <NextButton />
+        </div>
       </div>
     </form>
   );
