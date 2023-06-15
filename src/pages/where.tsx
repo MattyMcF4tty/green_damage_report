@@ -17,6 +17,7 @@ import PedestrianInfoForm from "../components/opposite_information/person_inform
 import ObjectInfoForm, {
   ObjectInformation,
 } from "../components/opposite_information/object_information";
+import { NavButtons } from "@/components/navigation";
 
 function WherePage() {
   const [isVehicleChecked, setIsVehicleChecked] = useState(false);
@@ -36,8 +37,15 @@ function WherePage() {
   const [pedestrianInfo, setPedestrianInfo] = useState<PedestrianInformation>();
   const [objectInfo, setObjectInfo] = useState<ObjectInformation>();
 
+  function handleSubmit() {
+    console.log("fuck dig");
+  }
+
   return (
-    <form className="flex flex-col items-start w-full h-full">
+    <form
+      className="flex flex-col items-start w-full h-full"
+      onSubmit={handleSubmit}
+    >
       <div className="w-full">
         <YesNo
           required={true}
@@ -77,7 +85,6 @@ function WherePage() {
           </div>
         </div>
       )}
-
       {!isVehicleChecked && (
         <YesNo
           id="SingleVehicleAccident"
@@ -86,7 +93,6 @@ function WherePage() {
           onChange={setIsSingleVehicleChecked}
         />
       )}
-
       {!isSingleVehicleChecked && (
         <YesNo
           id="CollisionWithObject"
@@ -95,19 +101,13 @@ function WherePage() {
           onChange={setIsCollisionWithObjectChecked}
         />
       )}
-
       {isCollisionWithObjectChecked && (
         <ObjectInfoForm onchange={setObjectInfo} />
       )}
-
       {isCarChecked && <CarInfoForm onchange={setCarInfo} />}
-
       {isBikeChecked && <Bike onchange={setBikeInfo} />}
-
       {isPersonChecked && <Person onchange={setPedestrianInfo} />}
-
       {isOtherChecked && <Other onchange={setOtherInfo} />}
-
       <div className="flex flex-col justify-center">
         <YesNo
           required={true}
@@ -127,6 +127,14 @@ function WherePage() {
           />
         </div>
       )}
+      <div className="flex flex-row w-full place-content-between h-10 mt-10">
+        <button className="w-2/5 bg-MainGreen-300" type="submit">
+          Previous
+        </button>
+        <button className="w-2/5 bg-MainGreen-300" type="submit">
+          Next
+        </button>
+      </div>{" "}
     </form>
   );
 }

@@ -48,7 +48,10 @@ const IndexPage = () => {
           </div>
         </div>
       </div>
-      <NavButtons />
+      <div className="flex flex-row w-full place-content-between h-10 mt-10">
+        <button className="w-2/5 bg-MainGreen-300">Previous</button>
+        <button className="w-2/5 bg-MainGreen-300">Next</button>
+      </div>
     </div>
   );
 };
