@@ -143,10 +143,10 @@ export default function HowPage() {
         )}
       </div>
       <div className="flex flex-row w-full place-content-between h-10 mt-10">
-        <button className="w-2/5 bg-MainGreen-300" type="submit">
+        <button className="w-2/5 bg-MainGreen-300 text-white" type="submit">
           Previous
         </button>
-        <button className="w-2/5 bg-MainGreen-300" type="submit">
+        <button className="w-2/5 bg-MainGreen-300 text-white" type="submit">
           Next
         </button>
       </div>
