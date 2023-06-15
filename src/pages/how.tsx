@@ -142,11 +142,11 @@ export default function HowPage() {
         {witnessesPresent && <div></div>}
       </div>
       <div className="flex flex-row justify-between">
-        <div className="flex flex-row w-1/3 justify-start h-12 px-5 ">
+        <div className="flex flex-row w-1/3 justify-start h-12  ml-16">
           <BackButton pageName="what" />
         </div>
 
-        <div className="flex flex-row w-1/3 justify-end px-5 ">
+        <div className="flex flex-row w-1/3 justify-end mr-20">
           <NextButton />
         </div>
       </div>
