@@ -28,10 +28,6 @@ export default function HowPage() {
   useEffect(() => {
     const updateAccidentInfo = new AccidentInformation();
 
-    updateAccidentInfo.crashDescription = accidentDescription;
-    updateAccidentInfo.damageDescription = damageDescription;
-    updateAccidentInfo.speed = greenDriverSpeed;
-
     setAccidentInfo(updateAccidentInfo);
   }, [accidentDescription, greenDriverSpeed, damageDescription]);
 
