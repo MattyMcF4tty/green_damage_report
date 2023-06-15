@@ -1,10 +1,7 @@
 
-interface NextButtonProps {
-    pageName: string
-}
 
-const NextButton = ({pageName}: NextButtonProps) => {
 
+const NextButton = () => {
 
     return (
         <button type="submit" className="text-white bg-MainGreen-300 w-full h-full">
