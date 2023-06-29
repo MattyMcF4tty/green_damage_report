@@ -9,8 +9,11 @@ import { NextPage } from "next";
 import { handleRequest } from "@/utils/serverUtils";
 import NextButton from "@/components/buttons/next";
 import BackButton from "@/components/buttons/back";
+import { useRouter } from "next/router";
 
 const What: NextPage = () => {
+  const router = useRouter();
+
   const [firstName, setFirstName] = useState<string>();
   const [lastName, setLastName] = useState<string>();
   const [address, setAddress] = useState<string>();
@@ -28,7 +31,7 @@ const What: NextPage = () => {
     position: { lat: number; lng: number };
   }>();
 
-  function handleSubmit(e: React.FormEvent) {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     /* TODO: Make function that gets information about current driver from server */
@@ -56,7 +59,8 @@ const What: NextPage = () => {
       accidentDate: accidentDate,
       accidentLocation: accidentLocation,
     };
-    handleRequest(data);
+    await handleRequest(data);
+    router.push("/how")
   }
 
   return (
@@ -124,7 +128,7 @@ const What: NextPage = () => {
             {/* TODO: Check if its a real email */}
             <Inputfield
               labelText="Drivers email"
-              id="FirstNameInput"
+              id="EmailInput"
               required={true}
               type="email"
               onChange={setEmail}

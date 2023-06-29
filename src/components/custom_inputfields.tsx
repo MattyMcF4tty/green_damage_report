@@ -69,7 +69,7 @@ export const TimeDateField = ({
 
   return (
     <div className="flex flex-col mb-4">
-      <label htmlFor={id}>{labelText}</label>
+      <label>{labelText}</label>
       <div id={id} className="flex flex-row">
         <input
           className="bg-MainGreen-100 h-10 mr-5 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none"
@@ -127,7 +127,7 @@ export const YesNo = ({ id, labelText, required, onChange }: YesNoProps) => {
 
   return (
     <div className="flex flex-col mb-4">
-      <label htmlFor={id}>{labelText}</label>
+      <label >{labelText}</label>
 
       {/* Yes */}
       <div id={id} className="flex flex-row items-center">
