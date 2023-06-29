@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   TextField,
   Inputfield,
   ImageField,
   YesNo,
 } from "@/components/custom_inputfields";
-import { AccidentInformation } from "@/utils/logic";
-import { WitnessList } from "@/components/howPage/witness_collection";
-import { NavButtons } from "@/components/navigation";
 import NextButton from "@/components/buttons/next";
 import BackButton from "@/components/buttons/back";
+import { handleRequest } from "@/utils/serverUtils";
+import { useRouter } from "next/router";
 
 export default function HowPage() {
+  const router = useRouter();
   const [accidentDescription, setAccidentDescription] = useState<string>("");
   const [greenDriverSpeed, setGreenDriverSpeed] = useState<string>("");
   const [damageDescription, setDamageDescription] = useState<string>("");
@@ -20,26 +20,23 @@ export default function HowPage() {
   const [journalNumber, setJournalNumber] = useState<string>();
   const [witnessesPresent, setWitnessesPresent] = useState<boolean>(false);
 
-  const [accidentInfo, setAccidentInfo] = useState<AccidentInformation>();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  /* Getting data stored in sessionStorage */
-  useEffect(() => {
-    console.log(accidentInfo);
-  }, []);
-
-  /* Updating the values in accidenInfo */
-  useEffect(() => {
-    const updateAccidentInfo = new AccidentInformation();
-
-    setAccidentInfo(updateAccidentInfo);
-  }, [accidentDescription, greenDriverSpeed, damageDescription]);
-
-  function handleSubmit() {
-    console.log("fuck dig");
+    //TODO: Needs to send correct data
+    const data = {
+      accidentDescription: accidentDescription,
+      greenDriverSpeed: greenDriverSpeed,
+      damageDescription: damageDescription,
+      journalNumber: journalNumber
+    };
+    await handleRequest(data);
+    
+    router.push("/where")
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={(e) => handleSubmit(e)}>
       {/* Accident description collection */}
       <div>
         <TextField

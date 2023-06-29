@@ -1,10 +1,6 @@
 import { Navbar } from "@/components/navigation";
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
-<<<<<<< Updated upstream
-=======
-import { Navbar } from "@/components/navigation";
->>>>>>> Stashed changes
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

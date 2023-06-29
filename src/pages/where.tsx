@@ -17,9 +17,15 @@ import PedestrianInfoForm from "../components/opposite_information/person_inform
 import ObjectInfoForm, {
   ObjectInformation,
 } from "../components/opposite_information/object_information";
-import { NavButtons } from "@/components/navigation";
+
+import { useRouter } from "next/router";
+import { handleRequest } from "@/utils/serverUtils";
+import BackButton from "@/components/buttons/back";
+import NextButton from "@/components/buttons/next";
 
 function WherePage() {
+  const router = useRouter();
+
   const [isVehicleChecked, setIsVehicleChecked] = useState(false);
   const [isCarChecked, setIsCarChecked] = useState(false);
   const [isBikeChecked, setIsBikeChecked] = useState(false);
@@ -28,8 +34,7 @@ function WherePage() {
   const [isPersonDamageChecked, setIsPersonDamageChecked] = useState(false);
   const [damageDescription, setDamageDescription] = useState<string>("");
   const [isSingleVehicleChecked, setIsSingleVehicleChecked] = useState(false);
-  const [isCollisionWithObjectChecked, setIsCollisionWithObjectChecked] =
-    useState(false);
+  const [isCollisionWithObjectChecked, setIsCollisionWithObjectChecked] = useState(false);
 
   const [carInfo, setCarInfo] = useState<carInformation>();
   const [bikeInfo, setBikeInfo] = useState<bikeInformation>();
@@ -37,15 +42,30 @@ function WherePage() {
   const [pedestrianInfo, setPedestrianInfo] = useState<PedestrianInformation>();
   const [objectInfo, setObjectInfo] = useState<ObjectInformation>();
 
-  function handleSubmit() {
-    console.log("fuck dig");
+  /* Data that gets sent to server */
+  const data = {
+    
+  };
+
+  /* Logic behind what data needs to get sent to server */
+  useEffect(() => {
+    
+  }, [])
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    await handleRequest(data);
+    
+    router.push("/confirmation")
   }
 
   return (
     <form
       className="flex flex-col items-start w-full h-full"
-      onSubmit={handleSubmit}
+      onSubmit={(e) => handleSubmit(e)}
     >
+
       <div className="w-full">
         <YesNo
           required={true}
@@ -54,6 +74,7 @@ function WherePage() {
           onChange={setIsVehicleChecked}
         />
       </div>
+
       {isVehicleChecked && (
         <div className="flex justify-left text-left w-full mb-4">
           <div id="whatvehicle" className="flex flex-col">
@@ -82,9 +103,14 @@ function WherePage() {
                 onChange={setIsOtherChecked}
               />
             </div>
+          {isCarChecked && <CarInfoForm onchange={setCarInfo} />}
+          {isBikeChecked && <Bike onchange={setBikeInfo} />}
+          {isPersonChecked && <Person onchange={setPedestrianInfo} />}
+          {isOtherChecked && <Other onchange={setOtherInfo} />}
           </div>
         </div>
       )}
+
       {!isVehicleChecked && (
         <YesNo
           id="SingleVehicleAccident"
@@ -93,6 +119,7 @@ function WherePage() {
           onChange={setIsSingleVehicleChecked}
         />
       )}
+
       {!isSingleVehicleChecked && (
         <YesNo
           id="CollisionWithObject"
@@ -101,13 +128,11 @@ function WherePage() {
           onChange={setIsCollisionWithObjectChecked}
         />
       )}
+
       {isCollisionWithObjectChecked && (
         <ObjectInfoForm onchange={setObjectInfo} />
       )}
-      {isCarChecked && <CarInfoForm onchange={setCarInfo} />}
-      {isBikeChecked && <Bike onchange={setBikeInfo} />}
-      {isPersonChecked && <Person onchange={setPedestrianInfo} />}
-      {isOtherChecked && <Other onchange={setOtherInfo} />}
+
       <div className="flex flex-col justify-center">
         <YesNo
           required={true}
@@ -116,6 +141,7 @@ function WherePage() {
           onChange={setIsPersonDamageChecked}
         />
       </div>
+
       {isPersonDamageChecked && (
         <div>
           <TextField
@@ -127,14 +153,17 @@ function WherePage() {
           />
         </div>
       )}
+
       <div className="flex flex-row w-full place-content-between h-10 mt-10">
-        <button className="w-2/5 bg-MainGreen-300" type="submit">
-          Previous
-        </button>
-        <button className="w-2/5 bg-MainGreen-300" type="submit">
-          Next
-        </button>
-      </div>{" "}
+      <div className="flex flex-row w-1/3 justify-start h-12  ml-16">
+          <BackButton pageName="how" />
+        </div>
+
+        <div className="flex flex-row w-1/3 justify-end mr-20">
+          <NextButton />
+        </div>
+      </div>
+
     </form>
   );
 }

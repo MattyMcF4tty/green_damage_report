@@ -60,6 +60,7 @@ const What: NextPage = () => {
       accidentLocation: accidentLocation,
     };
     await handleRequest(data);
+    
     router.push("/how")
   }
 
