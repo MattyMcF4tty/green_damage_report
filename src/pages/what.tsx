@@ -60,9 +60,9 @@ const What: NextPage = () => {
       accidentLocation: accidentLocation,
     };
     await handleRequest(data);
-    
-    router.push("/how")
-  }
+
+    router.push("/how");
+  };
 
   return (
     <form className="w-full" onSubmit={(e) => handleSubmit(e)}>
@@ -149,9 +149,14 @@ const What: NextPage = () => {
         />
       </div>
 
-      <div className="flex justify-between">
-        <BackButton pageName="/"/>
-        <NextButton />
+      <div className="flex flex-row justify-between">
+        <div className="flex flex-row w-1/3 justify-start h-12  ml-10">
+          <BackButton pageName="/" />
+        </div>
+
+        <div className="flex flex-row w-1/3 justify-end mr-10">
+          <NextButton />
+        </div>
       </div>
     </form>
   );

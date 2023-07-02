@@ -34,7 +34,8 @@ function WherePage() {
   const [isPersonDamageChecked, setIsPersonDamageChecked] = useState(false);
   const [damageDescription, setDamageDescription] = useState<string>("");
   const [isSingleVehicleChecked, setIsSingleVehicleChecked] = useState(false);
-  const [isCollisionWithObjectChecked, setIsCollisionWithObjectChecked] = useState(false);
+  const [isCollisionWithObjectChecked, setIsCollisionWithObjectChecked] =
+    useState(false);
 
   const [carInfo, setCarInfo] = useState<carInformation>();
   const [bikeInfo, setBikeInfo] = useState<bikeInformation>();
@@ -43,29 +44,24 @@ function WherePage() {
   const [objectInfo, setObjectInfo] = useState<ObjectInformation>();
 
   /* Data that gets sent to server */
-  const data = {
-    
-  };
+  const data = {};
 
   /* Logic behind what data needs to get sent to server */
-  useEffect(() => {
-    
-  }, [])
+  useEffect(() => {}, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     await handleRequest(data);
-    
-    router.push("/confirmation")
-  }
+
+    router.push("/confirmation");
+  };
 
   return (
     <form
       className="flex flex-col items-start w-full h-full"
       onSubmit={(e) => handleSubmit(e)}
     >
-
       <div className="w-full">
         <YesNo
           required={true}
@@ -103,10 +99,10 @@ function WherePage() {
                 onChange={setIsOtherChecked}
               />
             </div>
-          {isCarChecked && <CarInfoForm onchange={setCarInfo} />}
-          {isBikeChecked && <Bike onchange={setBikeInfo} />}
-          {isPersonChecked && <Person onchange={setPedestrianInfo} />}
-          {isOtherChecked && <Other onchange={setOtherInfo} />}
+            {isCarChecked && <CarInfoForm onchange={setCarInfo} />}
+            {isBikeChecked && <Bike onchange={setBikeInfo} />}
+            {isPersonChecked && <Person onchange={setPedestrianInfo} />}
+            {isOtherChecked && <Other onchange={setOtherInfo} />}
           </div>
         </div>
       )}
@@ -153,17 +149,15 @@ function WherePage() {
           />
         </div>
       )}
-
-      <div className="flex flex-row w-full place-content-between h-10 mt-10">
-      <div className="flex flex-row w-1/3 justify-start h-12  ml-16">
+      <div className="flex items-center justify-between w-full mt-4">
+        <div className="flex flex-row justify-start items-center h-14 ml-7 w-32">
           <BackButton pageName="how" />
         </div>
 
-        <div className="flex flex-row w-1/3 justify-end mr-20">
+        <div className="flex flex-row justify-end items-center h-14 mr-7 w-32">
           <NextButton />
         </div>
       </div>
-
     </form>
   );
 }

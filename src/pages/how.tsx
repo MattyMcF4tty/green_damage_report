@@ -28,12 +28,12 @@ export default function HowPage() {
       accidentDescription: accidentDescription,
       greenDriverSpeed: greenDriverSpeed,
       damageDescription: damageDescription,
-      journalNumber: journalNumber
+      journalNumber: journalNumber,
     };
     await handleRequest(data);
-    
-    router.push("/where")
-  }
+
+    router.push("/where");
+  };
 
   return (
     <form onSubmit={(e) => handleSubmit(e)}>
@@ -139,11 +139,11 @@ export default function HowPage() {
         {witnessesPresent && <div></div>}
       </div>
       <div className="flex flex-row justify-between">
-        <div className="flex flex-row w-1/3 justify-start h-12  ml-16">
+        <div className="flex flex-row w-1/3 justify-start h-12  ml-10">
           <BackButton pageName="what" />
         </div>
 
-        <div className="flex flex-row w-1/3 justify-end mr-20">
+        <div className="flex flex-row w-1/3 justify-end mr-10">
           <NextButton />
         </div>
       </div>

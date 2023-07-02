@@ -1,8 +1,28 @@
 import Link from "next/link";
 import { NavButtons } from "@/components/navigation";
+import { handleRequest } from "@/utils/serverUtils";
+import { useRouter } from "next/router";
+import NextButton from "@/components/buttons/next";
+import BackButton from "@/components/buttons/back";
+
 const IndexPage = () => {
+  const router = useRouter();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const data = {};
+    await handleRequest(data);
+
+    router.push("/what");
+  };
+
+  const handleNextClick = () => {
+    router.push("/what");
+  };
+
   return (
-    <div>
+    <div onSubmit={(e) => handleSubmit(e)}>
       <div className="text-center text-2xl text-MainGreen-300 font-semibold">
         <h1>GreenMobility damage report</h1>
       </div>
@@ -48,9 +68,20 @@ const IndexPage = () => {
           </div>
         </div>
       </div>
-      <div className="flex flex-row w-full place-content-between h-10 mt-10">
-        <button className="w-2/5 bg-MainGreen-300">Previous</button>
-        <button className="w-2/5 bg-MainGreen-300">Next</button>
+      <div className="flex flex-row justify-between">
+        <div className="flex flex-row w-1/3 justify-start h-12  ml-10">
+          <BackButton pageName="" />
+        </div>
+
+        <div className="flex flex-row w-1/3 justify-end mr-10">
+          <button
+            type="button"
+            className="text-white bg-MainGreen-300 w-full h-full"
+            onClick={handleNextClick}
+          >
+            Next
+          </button>
+        </div>
       </div>
     </div>
   );
