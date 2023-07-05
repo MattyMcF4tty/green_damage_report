@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from "react";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
+import { WitnessInformation } from "@/utils/logic";
 
 
 const confirmationPage:NextPage = () => {
@@ -19,13 +20,23 @@ const confirmationPage:NextPage = () => {
     location: {address: "Niels Brocks Gade 11574 København", position:{lat: "55.672685", lng: "12.573920"}},
     time: "12:45",
     date: "02/04/2023",
-    crashDescription: "I drove and then i hit a wall.",    
+    crashDescription: "I drove and then i hit a wall.",
+    policeReport: "",
 
     greenCarNumberPlate: "DC 11 534",
     speed: "50",
     damageDescription: "Car is missing roof",
 
-    policeReport: "",
+    bikerInfo: {name: "Jonas Hansen", phone: "+45 56 12 89 67", mail: "jonashansen@gmail.com", ebike: false, personDamage: ""},
+    vehicleInfo: {name: "Kirsten Fredriksen", phone: "+45 12 56 89 66", mail: "kirstenfredriksen@gmail.com", driversLicenseNumber: "872346287", insurance: "Tryg", numberplate: "CW 89 671", color:"blue", model: "Ford"},
+    
+
+    witnesses: [
+      {name: "Jens Jensen", phone: "+45 89 43 23 09", mail: "jensjensen@gmail.com"},
+      {name: "Martin Johansen", phone: "+45 45 23 87 46", mail: "martinjohansen@gmail.com"},
+      {name: "Martin Johansen", phone: "+45 45 23 87 46", mail: "martinjohansen@gmail.com"},
+      {name: "Martin Johansen", phone: "+45 45 23 87 46", mail: "martinjohansen@gmail.com"},
+    ],
   }
 
   return (
@@ -102,11 +113,22 @@ const confirmationPage:NextPage = () => {
           <p className="text-xs italic">Location:</p>
           <p>{data.location.address}</p>
         </div>
-        
-        {/* Accident description */}
+
+        {/* Police journal */}
         <div className="row-start-3 col-span-2">
+          <p className="text-xs italic">Police journal number:</p>
+          { data.policeReport !== "" ? (
+            <p>{data.policeReport}</p>
+          ) : (
+            <p>No police report was filed</p>
+          )
+          }
+        </div>
+
+        {/* Accident description */}
+        <div className="row-start-4 col-span-2">
           <p className="text-xs italic">Accident description:</p>
-          <p className="break-words">{data.crashDescription}</p>
+          <span className="break-words">{data.crashDescription}</span>
         </div>
       </div>
 
@@ -129,37 +151,155 @@ const confirmationPage:NextPage = () => {
         {/* Damage description */}
         <div className="row-start-2 col-span-2">
           <p className="text-xs italic">Damage description:</p>
-          <p className="break-words">{data.damageDescription}</p>
+          <span className="break-words">{data.damageDescription}</span>
         </div>
-        
       </div>
 
-      {/* Police report information */}
-      <p className="font-bold">Police report</p>
-      <div className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full grid grid-cols-2 gap-y-4 mb-6">
-        
-        {/* Has police report been filed */}
-        <div className="row-start-1 col-start-1">
-          <p className="text-xs italic">Journal number:</p>
-          {data.policeReport !== "" ? (
-            <p>{data.policeReport}</p>
+      {/* TODO: Lige nu er hver modpart type sin egen katagori, lav istedet en type og 
+      gør det muligt at der kan være flere */}
+      {/* Others involved information */}
+      <p className="font-bold">Others involved in crash</p>
+      <div className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
+
+        {/* Bike information */}
+        <div className="w-full">
+          <p className="text-sm font-semibold">Bikers information:</p>
+          {data.bikerInfo.name !== "" ? (
+            <div className="grid grid-cols-2 gap-y-2 pl-4 py-1">
+
+              {/* Name of biker */}
+              <div className="row-start-1 col-start-1">
+                <p className="text-xs italic">Name:</p>
+                <p>{data.bikerInfo.name}</p>
+              </div>
+
+              {/* Was the bike an electric bike */}
+              <div className="row-start-1 col-start-2">
+                <p className="text-xs italic">Electric bike:</p>
+                { data.bikerInfo.ebike ? (
+                  <p>Yes</p>
+                ) : (
+                  <p>No</p>
+                )}
+              </div>
+
+              {/* phone of biker */}
+              <div className="row-start-2 col-start-1">
+                <p className="text-xs italic">phone:</p>
+                <p>{data.bikerInfo.phone}</p>
+              </div>
+
+              {/* mail of biker */}
+              <div className="row-start-3 col-span-2">
+                <p className="text-xs italic">mail:</p>
+                <p>{data.bikerInfo.mail}</p>
+              </div>
+
+              {/* Person damage */}
+              <div className="row-start-4 col-span-2">
+                <p className="text-xs italic">Person damage:</p>
+                {data.bikerInfo.personDamage !== "" ? (
+                  <span>{data.bikerInfo.personDamage}</span>
+                ) : (
+                  <p>No</p>
+                )}
+              </div>
+            </div>
           ) : (
-            <p>Not filed</p>
+            <p>No biker was hit</p>
           )}
         </div>
 
-        {/* Speed */}
-        <div className="row-start-1 col-start-2">
-          <p className="text-xs italic">Speed:</p>
-          <p>{data.speed} km/h</p>
+        {/* Other vechicle information */}
+        <div className="w-full mt-4">
+          <p className="text-sm font-semibold">Vehicle information:</p>
+          {data.vehicleInfo.name !== "" ? (
+            <div className="grid grid-cols-2 gap-y-2 pl-4 py-1">
+
+              {/* Name of vehicles driver */}
+              <div className="row-start-1 col-span-2">
+                <p className="text-xs italic">Name:</p>
+                <p className="break-words">{data.vehicleInfo.name}</p>
+              </div>
+
+              {/* drivers license number of vehicles driver */}
+              <div className="row-start-2 col-start-2">
+                <p className="text-xs italic">Driver license number:</p>
+                <p>{data.vehicleInfo.driversLicenseNumber}</p>
+              </div>
+
+              {/* Phone number of vehicle driver */}
+              <div className="row-start-2 col-start-1">
+                <p className="text-xs italic">Phone number:</p>
+                <p>{data.vehicleInfo.phone}</p>
+              </div>
+
+              {/* Mail of vehicle driver */}
+              <div className="row-start-3 col-span-2">
+                <p className="text-xs italic">mail:</p>
+                <p>{data.vehicleInfo.mail}</p>
+              </div>
+
+              {/* numberplate of vehicle */}
+              <div className="row-start-4 col-start-1">
+                <p className="text-xs italic">Numberplate:</p>
+                <p>{data.vehicleInfo.numberplate}</p>
+              </div>
+
+              {/* insurance of vehicle */}
+              <div className="row-start-4 col-start-2">
+                <p className="text-xs italic">Insurance:</p>
+                <p>{data.vehicleInfo.insurance}</p>
+              </div>
+
+              {/* model of vehicle */}
+              <div className="row-start-5 col-start-1">
+                <p className="text-xs italic">Vehicle model:</p>
+                <p>{data.vehicleInfo.model}</p>
+              </div>
+
+              {/* color of vehicle */}
+              <div className="row-start-5 col-start-2">
+                <p className="text-xs italic">Vehicle color:</p>
+                <p>{data.vehicleInfo.color}</p>
+              </div>
+            </div>
+          ) : (
+            <p>No other vehicles involved</p>
+          )}
         </div>
 
-        {/* Damage description */}
-        <div className="row-start-2 col-span-2">
-          <p className="text-xs italic">Damage description:</p>
-          <p className="break-words">{data.damageDescription}</p>
-        </div>
-        
+      </div>
+
+      {/* Witnesses information */}
+      <p className="font-bold">Witnesses</p>
+      <div className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
+        {data.witnesses.length > 0 ? (
+          data.witnesses.map((witness, index) => (
+            <div key={index} className="grid grid-cols-2 gap-y-2 p-2 border-b-2 border-MainGreen-300">
+
+              {/* Name of witness */}
+              <div className="row-start-1 col-start-1">
+                <p className="text-xs italic">Name:</p>
+                <p className="break-words">{witness.name}</p>
+              </div>
+
+              {/* Phone number of witness */}
+              <div className="row-start-1 col-start-2">
+                <p className="text-xs italic">Phone:</p>
+                <p>{witness.phone}</p>
+              </div>
+
+              {/* Phone number of witness */}
+              <div className="row-start-2 col-span-2">
+                <p className="text-xs italic">Mail:</p>
+                <p className="break-words">{witness.mail}</p>
+              </div>
+            </div>
+          ))
+        ) : (
+          <p>You have not declared any witnesses</p>
+        )}
       </div>
     </div>
   )
