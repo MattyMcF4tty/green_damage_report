@@ -1,11 +1,13 @@
-import React, {useEffect, useState} from "react";
+import React, {useState} from "react";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
-import { WitnessInformation } from "@/utils/logic";
+import BackButton from "@/components/buttons/back";
+import { handleRequest } from "@/utils/serverUtils";
 
 
 const confirmationPage:NextPage = () => {
   const Router = useRouter()
+  let [confirmVis, setConfirmVis] = useState(false)
   
   /* TODO: This is placeholder data, get the data from the server */
   const data = {
@@ -29,7 +31,8 @@ const confirmationPage:NextPage = () => {
 
     bikerInfo: {name: "Jonas Hansen", phone: "+45 56 12 89 67", mail: "jonashansen@gmail.com", ebike: false, personDamage: ""},
     vehicleInfo: {name: "Kirsten Fredriksen", phone: "+45 12 56 89 66", mail: "kirstenfredriksen@gmail.com", driversLicenseNumber: "872346287", insurance: "Tryg", numberplate: "CW 89 671", color:"blue", model: "Ford"},
-    
+    pedestrianInfo: {name: "Fredrik Knudsen", phone: "+45 67 23 87 93", mail: "fredrikknudsen@gmail.com", personDamage: ""},
+    otherObjectInfo : {description: "", information: ""},
 
     witnesses: [
       {name: "Jens Jensen", phone: "+45 89 43 23 09", mail: "jensjensen@gmail.com"},
@@ -39,8 +42,37 @@ const confirmationPage:NextPage = () => {
     ],
   }
 
+  const handleSend = async () => {
+    console.log("Damage Report done")
+    await handleRequest({finished: true})
+
+    /* TODO: Send videre til en ny side */
+  }
+
   return (
     <div className="flex flex-col">
+
+      {/* Confirm information div, overlayed on top and only visible when clicking send */}
+      { confirmVis && 
+        <div className="z-50 fixed ml-[-1rem] mt-[-5rem] w-full h-[100vh] bg-black bg-opacity-25 flex justify-center items-center">
+          <div className="bg-white w-80 py-6 p-4 rounded-md">
+            <p>I hereby confirm that the information provided is true and accurate.</p>
+
+            <div className="flex flex-row pt-4 justify-evenly">
+
+              <button onClick={() => setConfirmVis(false)}
+              className="bg-slate-200 p-1 w-2/5">
+                Cancel
+              </button>
+
+              <button onClick={() => handleSend()}
+              className="bg-MainGreen-300 p-1 w-2/5 text-white">
+                Confirm
+              </button>
+            </div>
+          </div>
+        </div>
+      }
 
       {/* Driver information collected */}
       <p className="font-bold">Driver information</p>
@@ -163,7 +195,7 @@ const confirmationPage:NextPage = () => {
 
         {/* Bike information */}
         <div className="w-full">
-          <p className="text-sm font-semibold">Bikers information:</p>
+          <p className="text-sm font-semibold">Biker information:</p>
           {data.bikerInfo.name !== "" ? (
             <div className="grid grid-cols-2 gap-y-2 pl-4 py-1">
 
@@ -206,13 +238,13 @@ const confirmationPage:NextPage = () => {
               </div>
             </div>
           ) : (
-            <p>No biker was hit</p>
+            <p className="ml-4">No biker was hit</p>
           )}
         </div>
 
         {/* Other vechicle information */}
         <div className="w-full mt-4">
-          <p className="text-sm font-semibold">Vehicle information:</p>
+          <p className="text-sm font-semibold">Other vehicle information:</p>
           {data.vehicleInfo.name !== "" ? (
             <div className="grid grid-cols-2 gap-y-2 pl-4 py-1">
 
@@ -265,10 +297,73 @@ const confirmationPage:NextPage = () => {
               </div>
             </div>
           ) : (
-            <p>No other vehicles involved</p>
+            <p className="ml-4">No other vehicles involved</p>
           )}
         </div>
 
+        {/* Pedestrian information */}
+        <div className="w-full mt-4">
+          <p className="text-sm font-semibold">Pedestrian information:</p>
+          {data.pedestrianInfo.name !== "" ? (
+            <div className="grid grid-cols-2 gap-y-2 pl-4 py-1">
+
+              {/* Name of pedestrian */}
+              <div className="row-start-1 col-start-1">
+                <p className="text-xs italic">Name:</p>
+                <p className="break-words">{data.pedestrianInfo.name}</p>
+              </div>
+
+              {/* Phone number of pedestrian */}
+              <div className="row-start-1 col-start-2">
+                <p className="text-xs italic">Phone number:</p>
+                <p>{data.pedestrianInfo.phone}</p>
+              </div>
+
+              {/* Mail of pedestrian */}
+              <div className="row-start-2 col-span-2">
+                <p className="text-xs italic">Mail:</p>
+                <p>{data.pedestrianInfo.mail}</p>
+              </div>
+
+              {/* Damage of pedestrian */}
+              <div className="row-start-3 col-span-2">
+                <p className="text-xs italic">Damage:</p>
+                { data.pedestrianInfo.personDamage !== "" ? (
+                  <p>{data.pedestrianInfo.personDamage}</p>
+                ) : (
+                  <p>No damage</p>
+                )}
+              </div>
+
+            </div>
+          ) : (
+            <p className="ml-4">No pedestrian was harmed</p>
+          )}
+        </div>
+
+        {/* Pedestrian information */}
+        <div className="w-full mt-4">
+          <p className="text-sm font-semibold">Other object information:</p>
+          {data.otherObjectInfo.description !== "" ? (
+            <div className="grid grid-cols-2 gap-y-2 pl-4 py-1">
+
+              {/* Description */}
+              <div className="row-start-1 col-span-2">
+                <p className="text-xs italic">Description of object:</p>
+                <span className="break-words">{data.damageDescription}</span>
+              </div>
+
+              {/* Information */}
+              <div className="row-start-2 col-span-2">
+                <p className="text-xs italic">Information about object:</p>
+                <span className="break-words">{data.damageDescription}</span>
+              </div>
+
+            </div>
+          ) : (
+            <p className="ml-4">No collision with other object</p>
+          )}
+        </div>
       </div>
 
       {/* Witnesses information */}
@@ -276,7 +371,7 @@ const confirmationPage:NextPage = () => {
       <div className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
         {data.witnesses.length > 0 ? (
           data.witnesses.map((witness, index) => (
-            <div key={index} className="grid grid-cols-2 gap-y-2 p-2 border-b-2 border-MainGreen-300">
+            <div key={index} className="grid grid-cols-2 gap-y-2 p-1 border-l-2 border-MainGreen-300 mb-3">
 
               {/* Name of witness */}
               <div className="row-start-1 col-start-1">
@@ -300,6 +395,14 @@ const confirmationPage:NextPage = () => {
         ) : (
           <p>You have not declared any witnesses</p>
         )}
+      </div>
+
+      <div className="w-full flex flex-row">
+        <BackButton pageName="/where"/>
+
+        <button type="button" onClick={() => setConfirmVis(true)}
+        className="w-1/2"
+        >Send</button>
       </div>
     </div>
   )
