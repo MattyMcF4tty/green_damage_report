@@ -1,8 +1,12 @@
-import Link from "next/link";
-import { NavButtons } from "@/components/navigation";
+import { Inputfield } from "@/components/custom_inputfields";
+import { useState } from "react";
+
+
+
 const IndexPage = () => {
+
   return (
-    <div>
+    <div className="flex flex-col items-center">
       <div className="text-center text-2xl text-MainGreen-300 font-semibold">
         <h1>GreenMobility damage report</h1>
       </div>
@@ -48,6 +52,7 @@ const IndexPage = () => {
           </div>
         </div>
       </div>
+
       <div className="flex flex-row w-full place-content-between h-10 mt-10">
         <button className="w-2/5 bg-MainGreen-300">Previous</button>
         <button className="w-2/5 bg-MainGreen-300">Next</button>

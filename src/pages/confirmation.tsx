@@ -1,13 +1,32 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import BackButton from "@/components/buttons/back";
 import { handleRequest } from "@/utils/serverUtils";
-
+import { db } from "@/firebase/clientApp";
+import { doc, getDoc } from "firebase/firestore";
 
 const confirmationPage:NextPage = () => {
   const Router = useRouter()
-  let [confirmVis, setConfirmVis] = useState(false)
+  const [info, setInfo] = useState();
+  const dataCollectionRef = db.col
+  let [confirmVis, setConfirmVis] = useState(false);
+
+  useEffect(() => {
+    const getData = async () => {
+      const docRef = doc(dataCollectionRef, "finished");
+      const docSnapshot = await getDoc(docRef);
+      if (docSnapshot.exists()) {
+        setInfo(docSnapshot);
+      } else {
+        setInfo(undefined); // or handle the absence of data as desired
+      }
+    };
+  
+    getData();
+  }, []);
+  
+
   
   /* TODO: This is placeholder data, get the data from the server */
   const data = {
