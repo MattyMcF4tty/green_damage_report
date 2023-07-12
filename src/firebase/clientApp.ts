@@ -1,5 +1,6 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { reportDataType } from "@/utils/utils";
+import { initializeApp } from "firebase/app"
+import { collection, doc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -12,4 +13,72 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-export const db = getFirestore(app);
+const db = getFirestore(app);
+
+export const getData = async () => {
+    const dataCol = collection(db, "unfinished");
+    const dataSnapshot = await getDocs(dataCol);
+    const dataList = dataSnapshot.docs.map(doc => {
+        const data = doc.data();
+        const id = doc.id;
+        return {
+            id: id,
+            firstName: data.driverFirstName,
+            lastName: data.driverLastName
+        }
+    });
+
+    return dataList;
+}
+
+export const createDoc = async (id: string, email: string) => {
+
+    const data = {
+        userEmail: email,
+        finished: false,
+
+        driverName: "",
+        driverAddress: "",
+        driverSocialSecurityNumber: "",
+        driverDrivingLicenseNumber: "",
+        driverPhoneNumber: "",
+        driverEmail: "",
+    
+        accidentLocation: {address: "", position: {lat: "", lng: ""}},
+        time: "",
+        date: "",
+        crashDescription: "",
+    
+        greenCarNumberPlate: "",
+        speed: "",
+        damageDescription: "",
+    
+        bikerInfo: [{name: "", phone: "", mail: "", ebike: "", personDamage: ""}],
+        vehicleInfo: [{name: "", phone: "", mail: "", driversLicenseNumber: "", insurance: "", numberplate: "", color: "", model: ""}],
+        pedestrianInfo: [{name: "", phone: "", mail: "", personDamage: ""}],
+        otherObjectInfo : [{description: "", information: ""}],
+    
+        witnesses: [{name: "", phone: "", email: ""}],
+    }
+
+    const dataRef = doc(db, `unfinished/${id}`);
+
+    try {
+        await setDoc(dataRef, data);
+        console.log("Data writing successful")
+    } catch (error) {
+        console.log("An error occurred while writing data");
+    }
+}
+
+export const updateData = async (id:string, data:object) => {
+
+    const dataRef = doc(db, `unfinished/${id}`)
+
+    try {
+        await updateDoc(dataRef, data);
+        console.log("Data updated")
+    } catch (error) {
+        console.log("Something went wrong updating data")
+    }
+}

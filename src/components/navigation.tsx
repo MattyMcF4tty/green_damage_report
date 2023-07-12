@@ -1,5 +1,5 @@
-import React, { useEffect } from "react";
-import { NextRouter, useRouter } from "next/router";
+import React from "react";
+import { useRouter } from "next/router";
 
 /* TODO: Come up with better naming scheme to all the pages */
 const page1: string = "/what";
@@ -72,61 +72,5 @@ export function Navbar() {
         4
       </p>
     </nav>
-  );
-}
-
-/* TODO: make it so that you cant continue without having filled out nessecary information on page
-note: the buttons should not be disabled when this is true, it should tell you which inputfields are missing -
-as if it was a part of the form
-*/
-export function NavButtons() {
-  const router: NextRouter = useRouter();
-  const currentPage: string = router.pathname;
-  const previousDisabled: boolean = currentPage === page1;
-
-  const handleNextPage = () => {
-    if (currentPage.includes(page1)) {
-      router.push(page2);
-    } else if (currentPage.includes(page2)) {
-      router.push(page3);
-    } else if (currentPage.includes(page3)) {
-      router.push(confirmationPage);
-    }
-  };
-
-  const handlePreviousPage = () => {
-    if (currentPage.includes(page2)) {
-      router.push(page1);
-    } else if (currentPage.includes(page3)) {
-      router.push(page2);
-    } else if (currentPage.includes(confirmationPage)) {
-      router.push(page3);
-    }
-  };
-
-  function ChangePreviousColor() {
-    if (previousDisabled) {
-      return "bg-MainGreen-300 text-white bg-opacity-60";
-    } else return "bg-MainGreen-300 text-white";
-  }
-
-  return (
-    <div className="flex flex-row w-full place-content-between h-10 mt-10">
-      <button
-        onClick={handlePreviousPage}
-        disabled={previousDisabled}
-        className={`w-2/5 ${ChangePreviousColor()}`}
-        type="submit"
-      >
-        Previous
-      </button>
-      <button
-        className="w-2/5 bg-MainGreen-300 text-white"
-        onClick={handleNextPage}
-        type="submit"
-      >
-        Next
-      </button>
-    </div>
   );
 }

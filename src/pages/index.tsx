@@ -1,12 +1,28 @@
 import { Inputfield } from "@/components/custom_inputfields";
-import { useState } from "react";
-
-
+import { createDoc, updateData } from "@/firebase/clientApp";
+import { generateId } from "@/utils/utils";
+import { useRouter } from "next/router";
+import React, { useState } from "react";
 
 const IndexPage = () => {
+  const router = useRouter();
+  const [email, setEmail] = useState("")
+
+  const handleStart = async (e: React.FormEvent) => {
+    e.preventDefault();
+  
+  
+    const id = await generateId();
+  
+    await createDoc(id, email);
+    console.log("done:\n" + id + "\n" + email)
+
+    router.push(`/confirmation?id=${id}`)
+  }
 
   return (
-    <div className="flex flex-col items-center">
+    <form onSubmit={(e) => handleStart(e)}
+    className="flex flex-col items-center">
       <div className="text-center text-2xl text-MainGreen-300 font-semibold">
         <h1>GreenMobility damage report</h1>
       </div>
@@ -51,13 +67,20 @@ const IndexPage = () => {
             </h3>
           </div>
         </div>
+        <Inputfield 
+        id="Email" 
+        labelText="Enter your Email" 
+        required={true} 
+        onChange={setEmail} 
+        type="email"
+        />
       </div>
 
       <div className="flex flex-row w-full place-content-between h-10 mt-10">
         <button className="w-2/5 bg-MainGreen-300">Previous</button>
-        <button className="w-2/5 bg-MainGreen-300">Next</button>
+        <button type="submit" className="w-2/5 bg-MainGreen-300">Next</button>
       </div>
-    </div>
+    </form>
   );
 };
 

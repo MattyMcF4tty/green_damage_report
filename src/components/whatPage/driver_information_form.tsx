@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Inputfield } from "../custom_inputfields";
 import PhoneNumber from "../opposite_information/phone_form";
-import { AccidentInformation } from "@/utils/logic";
+import { AccidentInformation } from "@/utils/utils";
 
 interface DriverInfoFormProps {
   onChange: (driverInfo: AccidentInformation) => void;
