@@ -38,7 +38,7 @@ export const generateId = async () => {
     const dataList = await getData();
     let validId = false;
     let id = ""
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!&$%#'
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
 
     while (!validId) {

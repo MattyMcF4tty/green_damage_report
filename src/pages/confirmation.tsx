@@ -1,23 +1,24 @@
 import React, {useEffect, useState} from "react";
-import { NextPage } from "next";
+import { GetServerSidePropsContext, GetStaticPropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
 import BackButton from "@/components/buttons/back";
 import { handleRequest } from "@/utils/serverUtils";
 import { getData } from "@/firebase/clientApp";
 
-export const getStaticProps = async () => {
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+  const id = context.query.id as string
 
-  const data = await getData("23423")
+  /* const data = await getData(id) */
 
-  return {props: {data: data}}
+  return {props: {information: id || null}}
 }
 
-const confirmationPage:NextPage = () => {
+const confirmationPage:NextPage = ( { information } ) => {
   const Router = useRouter()
   const [info, setInfo] = useState();
   let [confirmVis, setConfirmVis] = useState(false);
   
-  
+  console.log("pik\n" + information)
   /* TODO: This is placeholder data, get the data from the server */
   const data = {
     firstName: "John",
