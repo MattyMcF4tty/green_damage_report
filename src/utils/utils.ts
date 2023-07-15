@@ -1,4 +1,4 @@
-import { getData } from "@/firebase/clientApp";
+import { getData, getDocIds } from "@/firebase/clientApp";
 
 export type reportDataType = {
     driverName: string
@@ -16,13 +16,14 @@ export type reportDataType = {
     greenCarNumberPlate: string
     speed: string
     damageDescription: string
+    policeReport: string
 
-    bikerInfo: [{name: string, phone: string, mail: string, ebike: boolean, personDamage: string}]
-    vehicleInfo: [{name: string, phone: string, mail: string, driversLicenseNumber: string, insurance: string, numberplate: string, color: string, model: string}]
-    pedestrianInfo: [{name: string, phone: string, mail: string, personDamage: string}]
-    otherObjectInfo: [{description: string, information: string}]
+    bikerInfo: {name: string, phone: string, email: string, ebike: boolean, personDamage: string}
+    vehicleInfo: {name: string, phone: string, email: string, driversLicenseNumber: string, insurance: string, numberplate: string, color: string, model: string}
+    pedestrianInfo: {name: string, phone: string, email: string, personDamage: string}
+    otherObjectInfo: {description: string, information: string}
 
-    witnesses: [{name: string, phoneNumber: string, email: string}]
+    witnesses: [{name: string, phone: string, email: string}]
 }
 
 
@@ -35,19 +36,18 @@ export const startReport = () => {
 }
 
 export const generateId = async () => {
-    const dataList = await getData();
+    const dataList = await getDocIds();
     let validId = false;
     let id = ""
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 
-
+    /* Generates random id from chars and checks if this id is not already taken */
     while (!validId) {
-
         id = Array.from(crypto.getRandomValues(new Uint16Array(16)))
         .map((randomValue) => chars[randomValue % chars.length])
         .join('');
 
-        const existingData = dataList.find((data) => data.id === id);
+        const existingData = dataList?.find((docId) => docId === id);
 
         if (!existingData) {
           validId = true;

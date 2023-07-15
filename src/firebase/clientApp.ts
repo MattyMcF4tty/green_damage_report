@@ -1,6 +1,7 @@
 import { reportDataType } from "@/utils/utils";
+import { error } from "console";
 import { initializeApp } from "firebase/app"
-import { collection, doc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -15,20 +16,66 @@ const app = initializeApp(firebaseConfig);
 
 const db = getFirestore(app);
 
-export const getData = async () => {
-    const dataCol = collection(db, "unfinished");
-    const dataSnapshot = await getDocs(dataCol);
-    const dataList = dataSnapshot.docs.map(doc => {
-        const data = doc.data();
-        const id = doc.id;
-        return {
-            id: id,
-            firstName: data.driverFirstName,
-            lastName: data.driverLastName
-        }
-    });
+export const getData = async (id: string) => {
+    console.log("ID: " + id)
+    const docRef = doc(db, `unfinished/${id}`);
 
-    return dataList;
+    try {
+        const docSnapshot = await getDoc(docRef)
+
+        if (docSnapshot.exists()) {
+            const data = docSnapshot.data();
+            console.log("returning data")
+
+            return {
+                userEmail: data.userEmail,
+                finished: data.finished,
+        
+                driverName: data.driverName,
+                driverAddress: data.driverAddress,
+                driverSocialSecurityNumber: data.driverSocialSecurityNumber,
+                driverDrivingLicenseNumber: data.driverDrivingLicenseNumber,
+                driverPhoneNumber: data.driverPhoneNumber,
+                driverEmail: data.driverEmail,
+            
+                accidentLocation: data.accidentLocation,
+                time: data.time,
+                date: data.date,
+                crashDescription: data.crashDescription,
+            
+                greenCarNumberPlate: data.greenCarNumberPlate,
+                speed: data.speed,
+                damageDescription: data.damageDescription,
+                policeReport: data.policeReport,
+            
+                bikerInfo: data.bikerInfo,
+                vehicleInfo: data.vehicleInfo,
+                pedestrianInfo: data.pedestrianInfo,
+                otherObjectInfo : data.otherObjectInfo,
+            
+                witnesses: data.witnesses
+            }
+        } 
+        else {
+            throw new Error("Document does not exist");
+        }
+    } catch (error) {
+        console.log("error fetching document" + error)
+    }
+}
+
+export const getDocIds = async () => {
+    const colRef = collection(db, "unfinished")
+
+    try {
+        const docListSnapshot = await getDocs(colRef)
+
+        const docIds = docListSnapshot.docs.map((doc) => doc.id);
+
+        return (docIds)
+    } catch (error) {
+        console.log("Something went wrong fetching document ids: \n" + error)
+    }
 }
 
 export const createDoc = async (id: string, email: string) => {
@@ -52,11 +99,12 @@ export const createDoc = async (id: string, email: string) => {
         greenCarNumberPlate: "",
         speed: "",
         damageDescription: "",
+        policeReport: "",
     
-        bikerInfo: [{name: "", phone: "", mail: "", ebike: "", personDamage: ""}],
-        vehicleInfo: [{name: "", phone: "", mail: "", driversLicenseNumber: "", insurance: "", numberplate: "", color: "", model: ""}],
-        pedestrianInfo: [{name: "", phone: "", mail: "", personDamage: ""}],
-        otherObjectInfo : [{description: "", information: ""}],
+        bikerInfo: {name: "", phone: "", email: "", ebike: false, personDamage: ""},
+        vehicleInfo: {name: "", phone: "", email: "", driversLicenseNumber: "", insurance: "", numberplate: "", color: "", model: ""},
+        pedestrianInfo: {name: "", phone: "", email: "", personDamage: ""},
+        otherObjectInfo : {description: "", information: ""},
     
         witnesses: [{name: "", phone: "", email: ""}],
     }

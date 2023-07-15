@@ -11,7 +11,6 @@ const IndexPage = () => {
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
   
-  
     const id = await generateId();
   
     await createDoc(id, email);
