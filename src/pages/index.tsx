@@ -1,28 +1,27 @@
-import Link from "next/link";
-import { NavButtons } from "@/components/navigation";
-import { handleRequest } from "@/utils/serverUtils";
+import { Inputfield } from "@/components/custom_inputfields";
+import { createDoc, updateData } from "@/firebase/clientApp";
+import { generateId } from "@/utils/utils";
 import { useRouter } from "next/router";
-import NextButton from "@/components/buttons/next";
-import BackButton from "@/components/buttons/back";
+import React, { useState } from "react";
 
 const IndexPage = () => {
   const router = useRouter();
+  const [email, setEmail] = useState("")
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
+  
+    const id = await generateId();
+  
+    await createDoc(id, email);
+    console.log("done:\n" + id + "\n" + email)
 
-    const data = {};
-    await handleRequest(data);
-
-    router.push("/what");
-  };
-
-  const handleNextClick = () => {
-    router.push("/what");
-  };
+    router.push(`/confirmation?id=${id}`)
+  }
 
   return (
-    <div onSubmit={(e) => handleSubmit(e)}>
+    <form onSubmit={(e) => handleStart(e)}
+    className="flex flex-col items-center">
       <div className="text-center text-2xl text-MainGreen-300 font-semibold">
         <h1>GreenMobility damage report</h1>
       </div>
@@ -67,23 +66,20 @@ const IndexPage = () => {
             </h3>
           </div>
         </div>
+        <Inputfield 
+        id="Email" 
+        labelText="Enter your Email" 
+        required={true} 
+        onChange={setEmail} 
+        type="email"
+        />
       </div>
-      <div className="flex flex-row justify-between">
-        <div className="flex flex-row w-1/3 justify-start h-12  ml-10">
-          <BackButton pageName="" />
-        </div>
 
-        <div className="flex flex-row w-1/3 justify-end mr-10">
-          <button
-            type="button"
-            className="text-white bg-MainGreen-300 w-full h-full"
-            onClick={handleNextClick}
-          >
-            Next
-          </button>
-        </div>
+      <div className="flex flex-row w-full place-content-between h-10 mt-10">
+        <button className="w-2/5 bg-MainGreen-300">Previous</button>
+        <button type="submit" className="w-2/5 bg-MainGreen-300">Next</button>
       </div>
-    </div>
+    </form>
   );
 };
 

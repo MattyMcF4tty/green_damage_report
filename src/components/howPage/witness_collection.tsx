@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { WitnessInformation } from "../../utils/logic";
+import { WitnessInformation } from "../../utils/utils";
 import { Inputfield } from "../custom_inputfields";
 import PhoneNumber from "../opposite_information/phone_form";
 
