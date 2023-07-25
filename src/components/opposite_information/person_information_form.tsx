@@ -4,10 +4,10 @@ import PhoneNumber from "./phone_form";
 import { Inputfield } from "../custom_inputfields";
 
 export class PedestrianInformation {
-  name: string;
-  phoneNumber: number;
-  email: string;
-  personDamage: string;
+  name: string | undefined;
+  phoneNumber: number | undefined;
+  email: string | undefined;
+  personDamage: string | undefined;
 }
 interface PedestrianProps {
   onchange: (pedestrianInfo: PedestrianInformation) => void;
@@ -30,7 +30,9 @@ export default function PedestrianInfoForm(props: PedestrianProps) {
   }, [name, phoneNumber, email]);
 
   useEffect(() => {
-    onchange(pedestrianInfo);
+    if (pedestrianInfo) {
+      onchange(pedestrianInfo);
+    }
   }, [pedestrianInfo, onchange]);
 
   return (

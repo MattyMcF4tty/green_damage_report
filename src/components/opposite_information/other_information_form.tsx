@@ -4,8 +4,8 @@ import { info } from "console";
 import { TextField } from "../custom_inputfields";
 
 export class OtherInformation {
-  descripeOther: string;
-  infoOther: string;
+  descripeOther: string | undefined;
+  infoOther: string | undefined;
 }
 
 interface OtherProps {
@@ -27,7 +27,9 @@ export default function OtherInfoForm(props: OtherProps) {
   }, [descripeOther, infoOther]);
 
   useEffect(() => {
-    onchange(otherInfo);
+    if (otherInfo) {
+      onchange(otherInfo);
+    }
   }, [otherInfo, onchange]);
 
   return (

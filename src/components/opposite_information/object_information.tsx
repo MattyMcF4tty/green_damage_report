@@ -4,9 +4,10 @@ import PhoneNumber from "./phone_form";
 import { Inputfield } from "../custom_inputfields";
 
 export class ObjectInformation {
-  descripeObject: string;
-  infoObject: string;
+  descripeObject: string | undefined;
+  infoObject: string | undefined;
 }
+
 interface ObjectProps {
   onchange: (objectInfo: ObjectInformation) => void;
 }
@@ -26,7 +27,9 @@ export default function ObjectInfoForm(props: ObjectProps) {
   }, [descripeObject, infoObject]);
 
   useEffect(() => {
-    onchange(objectInfo);
+    if (objectInfo) {
+      onchange(objectInfo);
+    }
   }, [objectInfo, onchange]);
 
   return (
