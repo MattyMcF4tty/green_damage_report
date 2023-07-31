@@ -44,7 +44,13 @@ function WherePage() {
   const [objectInfo, setObjectInfo] = useState<ObjectInformation>();
 
   /* Data that gets sent to server */
-  const data = {};
+  const data = {
+    carInfo,
+    bikeInfo,
+    otherInfo,
+    pedestrianInfo,
+    objectInfo,
+  };
 
   /* Logic behind what data needs to get sent to server */
   useEffect(() => {}, []);
