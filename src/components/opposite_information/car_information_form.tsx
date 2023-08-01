@@ -8,7 +8,7 @@ export class carInformation {
   model: string | undefined;
   color: string | undefined;
   fullName: string | undefined;
-  phoneNumber: number | undefined;
+  phoneNumber: string | undefined;
   email: string | undefined;
   drivingLicenseNumber: string | undefined;
   insurance: string | undefined;
@@ -28,6 +28,10 @@ export default function CarInfoForm(props: carInfoFormProps) {
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [insurance, setInsurance] = useState<string>("");
+  const [phoneNumberData, setPhoneNumberData] = useState<string>("");
+  const handlePhoneNumberChange = (phoneNumber: string) => {
+    setPhoneNumberData(phoneNumber);
+  };
 
   useEffect(() => {
     const newCarInfo = new carInformation();
@@ -36,7 +40,7 @@ export default function CarInfoForm(props: carInfoFormProps) {
     newCarInfo.color = color;
     newCarInfo.fullName = fullName;
     newCarInfo.drivingLicenseNumber = drivingLicenseNumber;
-    newCarInfo.phoneNumber = Number(phoneNumber); // Convert to number if needed
+    newCarInfo.phoneNumber = phoneNumber; // Convert to number if needed
     newCarInfo.email = email;
     newCarInfo.insurance = insurance;
 
@@ -59,7 +63,7 @@ export default function CarInfoForm(props: carInfoFormProps) {
         labelText="Numberplate on other car"
         id="NumberPlateInput"
         required={true}
-        type="text"
+        type="numberplate"
         onChange={setNumberplate}
       />
       <Inputfield
@@ -83,19 +87,19 @@ export default function CarInfoForm(props: carInfoFormProps) {
         type="text"
         onChange={setFullName}
       />
-      <PhoneNumber onChange={setPhoneNumber} />
+      <PhoneNumber onChangePhoneNumber={handlePhoneNumberChange} />
       <Inputfield
         labelText="Email"
         id="EmailInput"
         required={true}
-        type="text"
+        type="email"
         onChange={setEmail}
       />
       <Inputfield
         labelText="Drivers license number"
         id="DriversLicenseNumberInput"
         required={true}
-        type="text"
+        type="license"
         onChange={setDrivingLicenseNumber}
       />
       <Inputfield

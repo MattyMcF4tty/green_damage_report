@@ -5,7 +5,7 @@ import { Inputfield } from "../custom_inputfields";
 
 export class PedestrianInformation {
   name: string | undefined;
-  phoneNumber: number | undefined;
+  phoneNumber: string | undefined;
   email: string | undefined;
   personDamage: string | undefined;
 }
@@ -16,9 +16,13 @@ interface PedestrianProps {
 export default function PedestrianInfoForm(props: PedestrianProps) {
   const { onchange } = props;
   const [name, setName] = useState<string>();
-  const [phoneNumber, setPhoneNumber] = useState<number>();
+  const [phoneNumber, setPhoneNumber] = useState<string>();
   const [email, setEmail] = useState<string>();
   const [pedestrianInfo, setPedestrianInfo] = useState<PedestrianInformation>();
+  const [phoneNumberData, setPhoneNumberData] = useState<string>("");
+  const handlePhoneNumberChange = (phoneNumber: string) => {
+    setPhoneNumberData(phoneNumber);
+  };
 
   useEffect(() => {
     const newPedestrianInfo = new PedestrianInformation();
@@ -44,7 +48,7 @@ export default function PedestrianInfoForm(props: PedestrianProps) {
         type="text"
         onChange={setName}
       />
-      <PhoneNumber />
+      <PhoneNumber onChangePhoneNumber={handlePhoneNumberChange} />
       <Inputfield
         id="EmailPedestrian"
         labelText="Email of the pedestrian"

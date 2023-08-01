@@ -72,7 +72,7 @@ const What: NextPage = () => {
         <Inputfield
           labelText="Numberplate of GreenMobility car"
           id="greenCarNumberplateInput"
-          type={"text"}
+          type="numberplate"
           required={true}
           onChange={setgreenCarNumberplate}
         />
@@ -120,7 +120,7 @@ const What: NextPage = () => {
               labelText="Drivers driving license number"
               id="DrivingLicenseNumberInput"
               required={true}
-              type="number"
+              type="license"
               onChange={setDrivingLicenseNumber}
             />
 

@@ -11,8 +11,9 @@ interface InputfieldProps {
   id: string;
   labelText: string;
   required: boolean;
-  type: "number" | "text" | "email" | "tel";
+  type: "number" | "text" | "email" | "tel" | "numberplate" | "license";
   onChange: (isValue: string) => void;
+  pattern?: string;
 }
 
 export const Inputfield = ({
@@ -23,10 +24,48 @@ export const Inputfield = ({
   onChange,
 }: InputfieldProps) => {
   const [isValue, setIsValue] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     onChange(isValue);
   }, [isValue]);
+
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    setIsValue(value);
+
+    // If a pattern is provided, check for pattern validity
+    if (pattern) {
+      const isValid = new RegExp(pattern).test(value);
+      setError(isValid ? null : "Invalid input format.");
+    }
+  };
+
+  // Define the pattern based on the input type
+  let pattern = "";
+  switch (type) {
+    case "number":
+      pattern = "[0-9]+"; // Only allow digits
+      break;
+    case "email":
+      pattern = "[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2, 4}$"; //TODO fix the email format so it works.
+      break;
+    case "tel":
+      pattern = "[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}"; // Phone number format (XX-XX-XX-XX)
+      break;
+    case "numberplate":
+      pattern = "[a-zA-Z]{2}\\d{2}\\d{3}"; // Numberplate format
+      break;
+    case "text":
+      pattern = ".*"; // Allow any character, any number of times
+      break;
+    case "license":
+      pattern = "[0-9]{8,}";
+      break;
+    default:
+      pattern = ""; // No pattern for "text" type, it allows any input
+      break;
+  }
 
   return (
     <div className="flex flex-col mb-4">
@@ -38,6 +77,7 @@ export const Inputfield = ({
         required={required}
         value={isValue}
         onChange={(event) => setIsValue(event.target.value)}
+        pattern={pattern}
       />
     </div>
   );
@@ -127,7 +167,7 @@ export const YesNo = ({ id, labelText, required, onChange }: YesNoProps) => {
 
   return (
     <div className="flex flex-col mb-4">
-      <label >{labelText}</label>
+      <label>{labelText}</label>
 
       {/* Yes */}
       <div id={id} className="flex flex-row items-center">
@@ -220,8 +260,8 @@ interface ImageFieldProps {
 /* TODO: make picture upload to server when chosen, if a new picture is chosen the old picture need to get deleted */
 export const ImageField = ({ required, id, labelText }: ImageFieldProps) => {
   function handleImageUpload() {
-/*     Upload picture to server */  
-} 
+    /*     Upload picture to server */
+  }
 
   return (
     <div className="flex flex-col mb-4">

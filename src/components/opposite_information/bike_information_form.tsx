@@ -5,7 +5,7 @@ import PhoneNumber from "./phone_form";
 export class bikeInformation {
   ebike: boolean | undefined;
   personDamage: boolean | undefined;
-  phoneNumber: number | undefined;
+  phoneNumber: string | undefined;
   email: string | undefined;
   fullName: string | undefined;
 }
@@ -17,12 +17,15 @@ interface bikeInfoFormProps {
 export default function BikeInfoForm(props: bikeInfoFormProps) {
   const { onchange } = props;
   const [fullName, setFullName] = useState<string>("");
-  const [phoneNumber, setPhoneNumber] = useState<number>(0);
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [personDamage, setPersonDamage] = useState<boolean>(false);
   const [ebike, setEbike] = useState<boolean>(false);
   const [bikeInfo, setBikeInfo] = useState<bikeInformation>();
-
+  const [phoneNumberData, setPhoneNumberData] = useState<string>("");
+  const handlePhoneNumberChange = (phoneNumber: string) => {
+    setPhoneNumberData(phoneNumber);
+  };
   useEffect(() => {
     const newBikeInfo = new bikeInformation();
     newBikeInfo.fullName = fullName;
@@ -59,7 +62,7 @@ export default function BikeInfoForm(props: bikeInfoFormProps) {
             type="text"
             onChange={setFullName}
           />
-          <PhoneNumber onchange={setPhoneNumber} />
+          <PhoneNumber onChangePhoneNumber={handlePhoneNumberChange} />
           <Inputfield
             labelText="Email"
             id="EmailInput"
@@ -78,7 +81,7 @@ export default function BikeInfoForm(props: bikeInfoFormProps) {
             type="text"
             onChange={setFullName}
           />
-          <PhoneNumber onchange={setPhoneNumber} />
+          <PhoneNumber onChangePhoneNumber={handlePhoneNumberChange} />
           <Inputfield
             labelText="Email"
             id="EmailInput"

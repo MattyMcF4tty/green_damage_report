@@ -175,6 +175,7 @@ function WherePage() {
           />
         </div>
       )}
+
       <div className="flex items-center justify-between w-full mt-4">
         <div className="flex flex-row justify-start items-center h-14 ml-7 w-32">
           <BackButton pageName="how" />
