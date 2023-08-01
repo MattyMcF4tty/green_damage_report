@@ -1,36 +1,33 @@
-import { kMaxLength } from "buffer";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import "react-phone-number-input/style.css";
-import PhoneInput from "react-phone-number-input";
 import PhoneNumber from "./phone_form";
 import { Inputfield } from "../custom_inputfields";
 
 export class carInformation {
-  numberplate: string;
-  model: string;
-  color: string;
-  fullName: string;
-  phoneNumber: number;
-  email: string;
-  drivingLicenseNumber: string;
-  insurance: string;
+  numberplate: string | undefined;
+  model: string | undefined;
+  color: string | undefined;
+  fullName: string | undefined;
+  phoneNumber: number | undefined;
+  email: string | undefined;
+  drivingLicenseNumber: string | undefined;
+  insurance: string | undefined;
 }
 
 interface carInfoFormProps {
-  onchange: (carInfo: carInformation) => void;
+  onChange: (carInfo: carInformation) => void;
 }
 
 export default function CarInfoForm(props: carInfoFormProps) {
-  const { onchange } = props;
-  const [numberplate, setNumberplate] = useState<string>();
-  const [model, setModel] = useState<string>();
-  const [color, setColor] = useState<string>();
-  const [fullName, setFullName] = useState<string>();
-  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState<string>();
-  const [phoneNumber, setPhoneNumber] = useState<number>();
-  const [email, setEmail] = useState<string>();
-  const [insurance, setInsurance] = useState<string>();
-  const [carInfo, setCarInfo] = useState<carInformation>();
+  const { onChange } = props;
+  const [numberplate, setNumberplate] = useState<string>("");
+  const [model, setModel] = useState<string>("");
+  const [color, setColor] = useState<string>("");
+  const [fullName, setFullName] = useState<string>("");
+  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState<string>("");
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  const [insurance, setInsurance] = useState<string>("");
 
   useEffect(() => {
     const newCarInfo = new carInformation();
@@ -39,11 +36,11 @@ export default function CarInfoForm(props: carInfoFormProps) {
     newCarInfo.color = color;
     newCarInfo.fullName = fullName;
     newCarInfo.drivingLicenseNumber = drivingLicenseNumber;
-    newCarInfo.phoneNumber = phoneNumber;
+    newCarInfo.phoneNumber = Number(phoneNumber); // Convert to number if needed
     newCarInfo.email = email;
     newCarInfo.insurance = insurance;
 
-    setCarInfo(newCarInfo);
+    onChange(newCarInfo); // Call onChange with the updated car information
   }, [
     fullName,
     numberplate,
@@ -53,14 +50,11 @@ export default function CarInfoForm(props: carInfoFormProps) {
     phoneNumber,
     email,
     insurance,
+    onChange, // Add onChange as a dependency for useEffect
   ]);
 
-  useEffect(() => {
-    onchange(carInfo);
-  }, [carInfo, onchange]);
-
   return (
-    <div className="flex flex-col ">
+    <div className="flex flex-col">
       <Inputfield
         labelText="Numberplate on other car"
         id="NumberPlateInput"
@@ -89,7 +83,7 @@ export default function CarInfoForm(props: carInfoFormProps) {
         type="text"
         onChange={setFullName}
       />
-      <PhoneNumber />
+      <PhoneNumber onChange={setPhoneNumber} />
       <Inputfield
         labelText="Email"
         id="EmailInput"

@@ -1,29 +1,27 @@
-import { kMaxLength } from "buffer";
-import React, { useState, useRef, useEffect } from "react";
-import { YesNo } from "../custom_inputfields";
-import { Inputfield } from "../custom_inputfields";
+import React, { useState, useEffect } from "react";
+import { YesNo, Inputfield } from "../custom_inputfields";
 import PhoneNumber from "./phone_form";
-import PhoneInput from "react-phone-input-2";
 
 export class bikeInformation {
-  ebike: boolean;
-  personDamage: boolean;
-  fullName: string;
-  phoneNumber: number;
-  email: string;
+  ebike: boolean | undefined;
+  personDamage: boolean | undefined;
+  phoneNumber: number | undefined;
+  email: string | undefined;
+  fullName: string | undefined;
 }
+
 interface bikeInfoFormProps {
-  onchange: (carInfo: bikeInformation) => void;
+  onchange: (bikeInfo: bikeInformation) => void;
 }
 
 export default function BikeInfoForm(props: bikeInfoFormProps) {
   const { onchange } = props;
-  const [fullName, setFullName] = useState<string>();
-  const [phoneNumber, setPhoneNumber] = useState<number>();
-  const [email, setEmail] = useState<string>();
+  const [fullName, setFullName] = useState<string>("");
+  const [phoneNumber, setPhoneNumber] = useState<number>(0);
+  const [email, setEmail] = useState<string>("");
+  const [personDamage, setPersonDamage] = useState<boolean>(false);
+  const [ebike, setEbike] = useState<boolean>(false);
   const [bikeInfo, setBikeInfo] = useState<bikeInformation>();
-  const [personDamage, setPersonDamage] = useState<boolean>();
-  const [ebike, setIsEbike] = useState<boolean>();
 
   useEffect(() => {
     const newBikeInfo = new bikeInformation();
@@ -34,25 +32,25 @@ export default function BikeInfoForm(props: bikeInfoFormProps) {
     newBikeInfo.ebike = ebike;
 
     setBikeInfo(newBikeInfo);
-  }, [ebike, fullName, phoneNumber, email, personDamage]);
+  }, [fullName, phoneNumber, email, personDamage, ebike]);
 
   useEffect(() => {
-    onchange(bikeInfo);
+    if (bikeInfo) {
+      onchange(bikeInfo);
+    }
   }, [bikeInfo, onchange]);
-
-  const [isEbikeChecked, setIsEbikeChecked] = useState(true);
 
   return (
     <div className="flex flex-col items-start">
-      <div className="">
+      <div>
         <YesNo
           required={true}
           id="Ebike"
           labelText="Is it an electric bike?"
-          onChange={setIsEbikeChecked}
+          onChange={setEbike}
         />
       </div>
-      {isEbikeChecked && (
+      {ebike && (
         <div>
           <Inputfield
             labelText="Fullname on the opposite person"
@@ -61,7 +59,7 @@ export default function BikeInfoForm(props: bikeInfoFormProps) {
             type="text"
             onChange={setFullName}
           />
-          <PhoneNumber />
+          <PhoneNumber onchange={setPhoneNumber} />
           <Inputfield
             labelText="Email"
             id="EmailInput"
@@ -71,7 +69,7 @@ export default function BikeInfoForm(props: bikeInfoFormProps) {
           />
         </div>
       )}
-      {!isEbikeChecked && (
+      {!ebike && (
         <div>
           <Inputfield
             labelText="Fullname on the opposite person"
@@ -80,7 +78,7 @@ export default function BikeInfoForm(props: bikeInfoFormProps) {
             type="text"
             onChange={setFullName}
           />
-          <PhoneNumber />
+          <PhoneNumber onchange={setPhoneNumber} />
           <Inputfield
             labelText="Email"
             id="EmailInput"

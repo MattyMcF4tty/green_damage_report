@@ -6,7 +6,7 @@ import { formatPhoneNumberIntl } from "react-phone-number-input";
 import metadata from "libphonenumber-js/metadata.min.json";
 
 function PhoneNumber() {
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState<string>("");
 
   const [formattedPhoneNumber, setFormattedPhoneNumber] = useState("");
 
@@ -26,7 +26,7 @@ function PhoneNumber() {
     }
   }, [country]);
 
-  const handlePhoneNumberChange = (value) => {
+  const handlePhoneNumberChange = (value: string) => {
     if (!value) {
       setPhoneNumber(value);
       return;
@@ -38,6 +38,10 @@ function PhoneNumber() {
       setPhoneNumber(value);
     }
   };
+
+  useEffect(() => {
+    setFormattedPhoneNumber(formatPhoneNumberIntl(phoneNumber));
+  }, [phoneNumber]);
 
   return (
     /* TODO: style input boxen */

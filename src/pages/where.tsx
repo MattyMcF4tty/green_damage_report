@@ -44,13 +44,39 @@ function WherePage() {
   const [objectInfo, setObjectInfo] = useState<ObjectInformation>();
 
   /* Data that gets sent to server */
-  const data = {};
+  const data = {
+    carInfo,
+    bikeInfo,
+    otherInfo,
+    pedestrianInfo,
+    objectInfo,
+  };
 
   /* Logic behind what data needs to get sent to server */
   useEffect(() => {}, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // Log the selected options
+    console.log("Selected Options:");
+    console.log("isVehicleChecked:", isVehicleChecked);
+    console.log("isCarChecked:", isCarChecked);
+    console.log("isBikeChecked:", isBikeChecked);
+    console.log("isPersonChecked:", isPersonChecked);
+    console.log("isOtherChecked:", isOtherChecked);
+    console.log("isPersonDamageChecked:", isPersonDamageChecked);
+    console.log("damageDescription:", damageDescription);
+    console.log("isSingleVehicleChecked:", isSingleVehicleChecked);
+    console.log("isCollisionWithObjectChecked:", isCollisionWithObjectChecked);
+
+    // Log the selected data
+    console.log("Selected Data:");
+    console.log("carInfo:", carInfo);
+    console.log("bikeInfo:", bikeInfo);
+    console.log("otherInfo:", otherInfo);
+    console.log("pedestrianInfo:", pedestrianInfo);
+    console.log("objectInfo:", objectInfo);
 
     await handleRequest(data);
 
@@ -99,7 +125,7 @@ function WherePage() {
                 onChange={setIsOtherChecked}
               />
             </div>
-            {isCarChecked && <CarInfoForm onchange={setCarInfo} />}
+            {isCarChecked && <CarInfoForm onChange={setCarInfo} />}
             {isBikeChecked && <Bike onchange={setBikeInfo} />}
             {isPersonChecked && <Person onchange={setPedestrianInfo} />}
             {isOtherChecked && <Other onchange={setOtherInfo} />}
