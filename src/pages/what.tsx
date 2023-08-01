@@ -4,12 +4,17 @@ import {
   Inputfield,
   YesNo,
 } from "@/components/custom_inputfields";
-import DriverInfoForm from "@/components/whatPage/driver_information_form";
-import { NextPage } from "next";
+import { GetServerSidePropsContext, NextPage } from "next";
 import { handleRequest } from "@/utils/serverUtils";
 import NextButton from "@/components/buttons/next";
 import BackButton from "@/components/buttons/back";
 import { useRouter } from "next/router";
+
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+  const id = context.query.id as string;
+  
+
+}
 
 const What: NextPage = () => {
   const router = useRouter();
