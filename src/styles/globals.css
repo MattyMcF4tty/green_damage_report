@@ -2,10 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-/* If you want to change the color of the text within the input field */
 .PhoneInput {
   @apply text-black;
-  /* Use any tailwind class you want here */
 }
 
 .PhoneInput input:focus {
@@ -14,4 +12,5 @@
 }
 .PhoneInput input {
   background-color: #e6eee5;
+  height: 2.5rem;
 }

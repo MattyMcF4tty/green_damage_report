@@ -28,10 +28,6 @@ export default function CarInfoForm(props: carInfoFormProps) {
   const [phoneNumber, setPhoneNumber] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [insurance, setInsurance] = useState<string>("");
-  const [phoneNumberData, setPhoneNumberData] = useState<string>("");
-  const handlePhoneNumberChange = (phoneNumber: string) => {
-    setPhoneNumberData(phoneNumber);
-  };
 
   useEffect(() => {
     const newCarInfo = new carInformation();
@@ -87,7 +83,7 @@ export default function CarInfoForm(props: carInfoFormProps) {
         type="text"
         onChange={setFullName}
       />
-      <PhoneNumber onChangePhoneNumber={handlePhoneNumberChange} />
+      <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} />
       <Inputfield
         labelText="Email"
         id="EmailInput"

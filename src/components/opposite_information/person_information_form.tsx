@@ -4,9 +4,9 @@ import PhoneNumber from "./phone_form";
 import { Inputfield } from "../custom_inputfields";
 
 export class PedestrianInformation {
-  name: string | undefined;
-  phoneNumber: string | undefined;
-  email: string | undefined;
+  name!: string; // Use non-null assertion operator
+  phoneNumber!: string; // Use non-null assertion operator
+  email!: string; // Use non-null assertion operator
   personDamage: string | undefined;
 }
 interface PedestrianProps {
@@ -19,16 +19,12 @@ export default function PedestrianInfoForm(props: PedestrianProps) {
   const [phoneNumber, setPhoneNumber] = useState<string>();
   const [email, setEmail] = useState<string>();
   const [pedestrianInfo, setPedestrianInfo] = useState<PedestrianInformation>();
-  const [phoneNumberData, setPhoneNumberData] = useState<string>("");
-  const handlePhoneNumberChange = (phoneNumber: string) => {
-    setPhoneNumberData(phoneNumber);
-  };
 
   useEffect(() => {
     const newPedestrianInfo = new PedestrianInformation();
-    newPedestrianInfo.name = name;
-    newPedestrianInfo.phoneNumber = phoneNumber;
-    newPedestrianInfo.email = email;
+    newPedestrianInfo.name = name!;
+    newPedestrianInfo.phoneNumber = phoneNumber!;
+    newPedestrianInfo.email = email!;
 
     setPedestrianInfo(newPedestrianInfo);
   }, [name, phoneNumber, email]);
@@ -48,12 +44,12 @@ export default function PedestrianInfoForm(props: PedestrianProps) {
         type="text"
         onChange={setName}
       />
-      <PhoneNumber onChangePhoneNumber={handlePhoneNumberChange} />
+      <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} />
       <Inputfield
         id="EmailPedestrian"
         labelText="Email of the pedestrian"
         required={true}
-        type="text"
+        type="email"
         onChange={setEmail}
       />
     </div>

@@ -62,12 +62,12 @@ export default function BikeInfoForm(props: bikeInfoFormProps) {
             type="text"
             onChange={setFullName}
           />
-          <PhoneNumber onChangePhoneNumber={handlePhoneNumberChange} />
+          <PhoneNumber value={phoneNumberData} onChange={setPhoneNumber} />
           <Inputfield
             labelText="Email"
             id="EmailInput"
             required={true}
-            type="text"
+            type="email"
             onChange={setEmail}
           />
         </div>
@@ -81,12 +81,12 @@ export default function BikeInfoForm(props: bikeInfoFormProps) {
             type="text"
             onChange={setFullName}
           />
-          <PhoneNumber onChangePhoneNumber={handlePhoneNumberChange} />
+          <PhoneNumber value={phoneNumberData} onChange={setPhoneNumber} />
           <Inputfield
             labelText="Email"
             id="EmailInput"
             required={true}
-            type="text"
+            type="email"
             onChange={setEmail}
           />
         </div>

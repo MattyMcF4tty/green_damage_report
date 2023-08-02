@@ -48,7 +48,7 @@ export const Inputfield = ({
       pattern = "[0-9]+"; // Only allow digits
       break;
     case "email":
-      pattern = "[a-z0-9._%+-]+@[a-z0-9.-]+.[a-z]{2, 4}$"; //TODO fix the email format so it works.
+      pattern = "^[a-zA-Z0-9]{0,100}@[a-zA-Z0-9]{2,10}.(es|com|org)$"; //TODO fix the email format so it works.
       break;
     case "tel":
       pattern = "[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}"; // Phone number format (XX-XX-XX-XX)
