@@ -10,6 +10,7 @@ import { handleRequest } from "@/utils/serverUtils";
 import NextButton from "@/components/buttons/next";
 import BackButton from "@/components/buttons/back";
 import { useRouter } from "next/router";
+import PhoneNumber from "@/components/opposite_information/phone_form";
 
 const What: NextPage = () => {
   const router = useRouter();
@@ -125,6 +126,7 @@ const What: NextPage = () => {
             />
 
             {/* TODO: Check if its a real phone number */}
+            <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} />
 
             {/* TODO: Check if its a real email */}
             <Inputfield
