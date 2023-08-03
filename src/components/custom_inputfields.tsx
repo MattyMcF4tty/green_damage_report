@@ -11,7 +11,7 @@ interface InputfieldProps {
   id: string;
   labelText: string;
   required: boolean;
-  type: "number" | "text" | "email" | "tel" | "numberplate" | "license";
+  type: "number" | "text" | "email" | "tel" | "numberplate" | "license" | "ssn";
   onChange: (isValue: string) => void;
   pattern?: string;
 }
@@ -61,6 +61,9 @@ export const Inputfield = ({
       break;
     case "license":
       pattern = "[0-9]{8,}";
+      break;
+    case "ssn":
+      pattern = "^[0-9]{6}-[0-9]{4}$";
       break;
     default:
       pattern = ""; // No pattern for "text" type, it allows any input

@@ -74,7 +74,7 @@ const DriverInfoForm = ({ onChange }: DriverInfoFormProps) => {
         labelText="Drivers social security number"
         id="SocialSecurityNumberInput"
         required={true}
-        type="number"
+        type="ssn"
         onChange={setSocialSecurityNumber}
       />
 
@@ -87,7 +87,7 @@ const DriverInfoForm = ({ onChange }: DriverInfoFormProps) => {
       />
 
       {/* TODO: Check if its a real phone number */}
-      <PhoneNumber onChangePhoneNumber={handlePhoneNumberChange} />
+      <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} />
 
       {/* TODO: Check if its a real email */}
       <Inputfield

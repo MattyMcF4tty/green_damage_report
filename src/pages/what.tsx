@@ -112,7 +112,7 @@ const What: NextPage = () => {
               labelText="Drivers social security number"
               id="SocialSecurityNumberInput"
               required={true}
-              type="number"
+              type="ssn"
               onChange={setSocialSecurityNumber}
             />
 

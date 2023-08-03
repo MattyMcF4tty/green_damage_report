@@ -55,7 +55,7 @@ export default function HowPage() {
           labelText="Your speed in [km/h]"
           id="GreenDriverSpeed"
           required={true}
-          type="text"
+          type="number"
           onChange={setGreenDriverSpeed}
         />
       </div>
