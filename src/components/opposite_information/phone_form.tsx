@@ -14,23 +14,17 @@ interface PhoneNumberProps {
   onChange: (phoneNumber: string) => void;
 }
 
+// ... (imports)
+
 const PhoneNumber = ({ value, onChange }: PhoneNumberProps) => {
-  const [formattedPhoneNumber, setFormattedPhoneNumber] = useState<string>(
-    value ? formatPhoneNumber(value) : ""
-  );
-
-  const handlePhoneNumberChange = (phoneNumber: string) => {
-    setFormattedPhoneNumber(phoneNumber);
-    onChange(phoneNumber);
-  };
-
+  const [phoneNumber, setPhoneNumber] = useState<string>(value || "");
   const [countryCode, setCountryCode] = useState<string | undefined>();
 
   useEffect(() => {
     if (value) {
-      const phoneNumber = parsePhoneNumberFromString(value);
-      if (phoneNumber) {
-        setCountryCode(phoneNumber.countryCallingCode);
+      const parsedPhoneNumber = parsePhoneNumberFromString(value);
+      if (parsedPhoneNumber) {
+        setCountryCode(parsedPhoneNumber.countryCallingCode);
       } else {
         setCountryCode("");
       }
@@ -39,18 +33,24 @@ const PhoneNumber = ({ value, onChange }: PhoneNumberProps) => {
     }
   }, [value]);
 
+  const handlePhoneNumberChange = (inputPhoneNumber: string) => {
+    const numericPhoneNumber = inputPhoneNumber.replace(/\D/g, ""); // Remove non-numeric characters
+    setPhoneNumber(numericPhoneNumber);
+    onChange(numericPhoneNumber);
+  };
+
   return (
     <div className="mb-4">
       <label htmlFor="phonenumber">Phone number</label>
       <div className="bg-MainGreen-100 border-[1px] border-MainGreen-200 pl-2">
         <PhoneInput
           placeholder="Enter phone number"
-          value={formattedPhoneNumber}
+          value={phoneNumber}
           onChange={handlePhoneNumberChange}
           metadata={metadata}
           country={countryCode}
-          international={false} // We want to format the number without international prefix
-          limitMaxLength // This will restrict the number of digits based on the country code
+          international={false}
+          limitMaxLength
           required={true}
         />
       </div>

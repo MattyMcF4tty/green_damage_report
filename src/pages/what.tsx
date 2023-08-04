@@ -43,9 +43,8 @@ const What: NextPage<pageProps> = ({data, id}) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    /* TODO: Make function that gets information about current driver from green server */
     if (showDriverInfoForm != true) {
-
+/* TODO: Make function that gets information about current driver from green server */
     }
 
     const data = {      
@@ -96,7 +95,7 @@ const What: NextPage<pageProps> = ({data, id}) => {
           onChange={setShowDriverInfoForm}
         />
 
-        {!showDriverInfoForm && (
+        {!showDriverInfoForm && showDriverInfoForm !== null && (
           <div className="flex flex-col">
             <Inputfield
               labelText="Drivers first name"
@@ -117,6 +116,14 @@ const What: NextPage<pageProps> = ({data, id}) => {
             />
 
             {/* TODO: make google autofill */}
+            <Inputfield 
+              id="driverAddress"
+              labelText="Home address"
+              required={true}
+              value={address}
+              onChange={setAddress}
+              type="text"
+            />
 
             {/* TODO: Check if its a real phone number */}
             <Inputfield
@@ -137,8 +144,8 @@ const What: NextPage<pageProps> = ({data, id}) => {
               onChange={setDrivingLicenseNumber}
             />
 
-{/*             <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} />*/}
-
+            <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} />
+            
             <Inputfield
               labelText="Drivers email"
               id="EmailInput"
