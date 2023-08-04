@@ -345,7 +345,7 @@ const confirmationPage:NextPage<pageProps> = ({ data, images, id }) => {
         {/* Witnesses information */}
         <p className="font-bold">Witnesses</p>
         <div className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
-          {data.witnesses.length > 1 ? (
+          {data.witnesses.length > 0 ? (
             data.witnesses.map((witness, index) => (
               <div key={index} className="grid grid-cols-2 gap-y-2 p-1 border-l-2 border-MainGreen-300 mb-3">
   
