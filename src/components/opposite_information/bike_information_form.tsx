@@ -12,15 +12,21 @@ export type bikeInformation = {
 
 interface bikeInfoFormProps {
   value: bikeInformation
-  onchange: (bikeInfo: bikeInformation) => void;
+  onChange: (bikeInfo: bikeInformation) => void;
 }
 
-const BikeInfoForm = ({value, onchange}: bikeInfoFormProps) => {
+const BikeInfoForm = ({value, onChange}: bikeInfoFormProps) => {
   const [name, setName] = useState<string>(value.name);
   const [phoneNumber, setPhoneNumber] = useState<string>(value.phone);
   const [email, setEmail] = useState<string>(value.email);
   const [personDamage, setPersonDamage] = useState<string>(value.personDamage);
   const [ebike, setEbike] = useState<boolean | null>(value.ebike);
+
+/*   const [phoneNumberData, setPhoneNumberData] = useState<string>("");
+  const handlePhoneNumberChange = (phoneNumber: string) => {
+    setPhoneNumberData(phoneNumber);
+  };
+ */
 
   useEffect(() => {
     const newBikeInfo:bikeInformation = {
@@ -31,7 +37,7 @@ const BikeInfoForm = ({value, onchange}: bikeInfoFormProps) => {
       ebike: ebike
     };
 
-    onchange(newBikeInfo);
+    onChange(newBikeInfo);
   }, [name, phoneNumber, email, personDamage, ebike]);
 
   return (
@@ -53,7 +59,7 @@ const BikeInfoForm = ({value, onchange}: bikeInfoFormProps) => {
           onChange={setName}
         />
 
-        {/* TODO: FIX <PhoneNumber onchange={setPhoneNumber} /> */}
+{/* TODO: FIX        <PhoneNumber value={phoneNumber} onChange={setPhoneNumber}/> */}
         <Inputfield
           labelText="Email"
           id="EmailInput"

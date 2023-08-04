@@ -88,7 +88,9 @@ const CarInfoForm = ({value, onChange}: carInfoFormProps) => {
         value={name}
         onChange={setName}
       />
-{/*   TODO: FIX <PhoneNumber onChange={setPhoneNumber} /> */}
+
+{/*   TODO: FIX <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} /> */}
+
       <Inputfield
         labelText="Email"
         id="EmailInput"

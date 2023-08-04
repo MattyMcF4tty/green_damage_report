@@ -119,7 +119,7 @@ const WherePage: NextPage<pageProps> = ({data, id}) => {
 
             </div>
             {isCarChecked && <CarInfoForm value={carInfo} onChange={setCarInfo} />}
-            {isBikeChecked && <Bike value={bikeInfo} onchange={setBikeInfo} />}
+            {isBikeChecked && <Bike value={bikeInfo} onChange={setBikeInfo} />}
             {isPersonChecked && <Person value={pedestrianInfo} onChange={setPedestrianInfo} />}
           </div>
         </div>

@@ -137,10 +137,8 @@ const What: NextPage<pageProps> = ({data, id}) => {
               onChange={setDrivingLicenseNumber}
             />
 
-            {/* TODO: Check if its a real phone number */}
-            <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} />
+{/*             <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} />*/}
 
-            {/* TODO: Check if its a real email */}
             <Inputfield
               labelText="Drivers email"
               id="EmailInput"

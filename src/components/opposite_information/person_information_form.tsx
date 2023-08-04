@@ -27,7 +27,9 @@ const PedestrianInfoForm = ({value, onChange}: PedestrianProps) => {
       email: email,
       personDamage: personDamage,
     }
-  }, [pedestrianInfo, onchange]);
+
+    onChange(newPedestrianInfo)
+  }, [name, phoneNumber, email, personDamage]);
 
   return (
     <div className="flex flex-col">
@@ -39,12 +41,13 @@ const PedestrianInfoForm = ({value, onChange}: PedestrianProps) => {
         value={name}
         onChange={setName}
       />
-      <PhoneNumber />
+{/*       <PhoneNumber value={phoneNumber} onChange={setPhoneNumber}/> */}      
       <Inputfield
         id="EmailPedestrian"
         labelText="Email of the pedestrian"
         required={true}
         type="text"
+        value={email}
         onChange={setEmail}
       />
 
