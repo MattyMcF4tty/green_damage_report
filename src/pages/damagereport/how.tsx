@@ -77,7 +77,7 @@ const HowPage:NextPage<pageProps> = ({data, images, id}) => {
 
     await updateData(id, data);
 
-    router.push(`/where?id=${id}`); 
+    router.push(`where?id=${id}`); 
   }
 
   return (

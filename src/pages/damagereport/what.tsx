@@ -67,7 +67,7 @@ const What: NextPage<pageProps> = ({data, id}) => {
     };
     await updateData(id, data);
 
-    router.push(`/how?id=${id}`);
+    router.push(`how?id=${id}`);
   };
 
   return (

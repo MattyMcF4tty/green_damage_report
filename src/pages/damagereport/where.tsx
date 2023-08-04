@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import Bike from "../components/opposite_information/bike_information_form";
-import Person, { PedestrianInformation } from "../components/opposite_information/person_information_form";
-import { YesNo, Checkbox } from "../components/custom_inputfields";
-import Other from "../components/opposite_information/other_information_form";
-import CarInfoForm, { carInformation } from "../components/opposite_information/car_information_form";
-import { bikeInformation } from "../components/opposite_information/bike_information_form";
-import { OtherInformation } from "../components/opposite_information/other_information_form";
+import Bike from "../../components/opposite_information/bike_information_form";
+import Person, { PedestrianInformation } from "../../components/opposite_information/person_information_form";
+import { YesNo, Checkbox } from "../../components/custom_inputfields";
+import Other from "../../components/opposite_information/other_information_form";
+import CarInfoForm, { carInformation } from "../../components/opposite_information/car_information_form";
+import { bikeInformation } from "../../components/opposite_information/bike_information_form";
+import { OtherInformation } from "../../components/opposite_information/other_information_form";
 
 import { useRouter } from "next/router";
 import BackButton from "@/components/buttons/back";
@@ -71,7 +71,7 @@ const WherePage: NextPage<pageProps> = ({data, id}) => {
 
 
     await updateData(id, data);
-    router.push(`/confirmation?id=${id}`);
+    router.push(`confirmation?id=${id}`);
   };
 
   return (

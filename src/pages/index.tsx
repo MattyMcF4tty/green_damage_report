@@ -16,7 +16,7 @@ const IndexPage = () => {
     await createDoc(id, email);
     console.log("Report created:\n" + "id: " + id + "\n" + "Email: " + email)
 
-    router.push(`/what?id=${id}`)
+    router.push(`damagereport/what?id=${id}`)
   }
 
   return (
