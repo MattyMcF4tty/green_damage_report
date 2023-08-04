@@ -27,7 +27,7 @@ const OtherInfoForm = ({value, onChange}: OtherProps) => {
   }, [descripeOther, infoOther]);
 
   return (
-    <div>
+    <div className="w-full">
       <TextField
         id="descripeOther"
         maxLength={500}

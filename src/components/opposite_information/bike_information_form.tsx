@@ -41,42 +41,44 @@ const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
   }, [name, phoneNumber, email, personDamage, ebike]);
 
   return (
-    <div className="flex flex-col items-start">
-      <YesNo
-        required={true}
-        id="Ebike"
-        labelText="Is it an electric bike?"
-        value={ebike}
-        onChange={setEbike}
-      />
+    <div className="flex flex-col items-start w-full">
+      <div className="w-full">
+        <YesNo
+          required={true}
+          id="Ebike"
+          labelText="Is it an electric bike?"
+          value={ebike}
+          onChange={setEbike}
+        />
 
-      <Inputfield
-        labelText="Fullname on the opposite person"
-        id="nameInput"
-        required={true}
-        type="text"
-        value={name}
-        onChange={setName}
-      />
+        <Inputfield
+          labelText="Fullname on the opposite person"
+          id="nameInput"
+          required={true}
+          type="text"
+          value={name}
+          onChange={setName}
+        />
 
-      <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} />
-      <Inputfield
-        labelText="Email"
-        id="EmailInput"
-        required={true}
-        type="text"
-        value={email}
-        onChange={setEmail}
-      />
+        <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} />
+        <Inputfield
+          labelText="Email"
+          id="EmailInput"
+          required={true}
+          type="text"
+          value={email}
+          onChange={setEmail}
+        />
 
-      <TextField
-        id="BikePersonDamage"
-        maxLength={200}
-        labelText="Descripe the damage to the person"
-        required={true}
-        value={personDamage}
-        onChange={setPersonDamage}
-      />
+        <TextField
+          id="BikePersonDamage"
+          maxLength={200}
+          labelText="Descripe the damage to the person"
+          required={true}
+          value={personDamage}
+          onChange={setPersonDamage}
+        />
+      </div>
     </div>
   );
 };

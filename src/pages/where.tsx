@@ -90,7 +90,7 @@ const WherePage: NextPage<pageProps> = ({data, id}) => {
       </div>
       {isVehicleChecked && (
         <div className="flex justify-left text-left w-full mb-4">
-          <div id="whatvehicle" className="flex flex-col">
+          <div id="whatvehicle" className="flex flex-col w-full">
             <div>
               <label htmlFor="whatvehicle">What vehicle?</label>
             </div>
@@ -118,9 +118,11 @@ const WherePage: NextPage<pageProps> = ({data, id}) => {
               />
 
             </div>
-            {isCarChecked && <CarInfoForm value={carInfo} onChange={setCarInfo} />}
-            {isBikeChecked && <Bike value={bikeInfo} onChange={setBikeInfo} />}
-            {isPersonChecked && <Person value={pedestrianInfo} onChange={setPedestrianInfo} />}
+            <div className="w-full">
+              {isCarChecked && <CarInfoForm value={carInfo} onChange={setCarInfo} />}
+              {isBikeChecked && <Bike value={bikeInfo} onChange={setBikeInfo} />}
+              {isPersonChecked && <Person value={pedestrianInfo} onChange={setPedestrianInfo} />}
+            </div>
           </div>
         </div>
       )}
