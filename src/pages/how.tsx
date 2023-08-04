@@ -101,7 +101,7 @@ const HowPage:NextPage<pageProps> = ({data, images, id}) => {
           labelText="Your speed in [km/h]"
           id="GreenDriverSpeed"
           required={true}
-          type="text"
+          type="number"
           value={greenDriverSpeed}
           onChange={setGreenDriverSpeed}
         />

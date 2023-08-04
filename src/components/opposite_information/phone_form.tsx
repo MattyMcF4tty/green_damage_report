@@ -4,63 +4,58 @@ import "react-phone-number-input/style.css";
 import PhoneInput from "react-phone-number-input";
 import { formatPhoneNumberIntl } from "react-phone-number-input";
 import metadata from "libphonenumber-js/metadata.min.json";
+import { formatPhoneNumber } from "react-phone-number-input";
+import { getCountryCallingCode } from "libphonenumber-js";
+import { CountryCode } from "libphonenumber-js";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 
-function PhoneNumber() {
-  const [phoneNumber, setPhoneNumber] = useState<string>("");
+interface PhoneNumberProps {
+  value?: string;
+  onChange: (phoneNumber: string) => void;
+}
 
-  const [formattedPhoneNumber, setFormattedPhoneNumber] = useState("");
+const PhoneNumber = ({ value, onChange }: PhoneNumberProps) => {
+  const [formattedPhoneNumber, setFormattedPhoneNumber] = useState<string>(
+    value ? formatPhoneNumber(value) : ""
+  );
 
-  const [maxLength, setMaxLength] = useState(null);
-
-  const [country, setCountry] = useState("");
-
-  useEffect(() => {
-    if (country) {
-      const countryMetadata = metadata.countries[country];
-      const maxLength = countryMetadata
-        ? countryMetadata[1] + countryMetadata[2].length
-        : null;
-      setMaxLength(maxLength);
-    } else {
-      setMaxLength(null);
-    }
-  }, [country]);
-
-  const handlePhoneNumberChange = (value: string) => {
-    if (!value) {
-      setPhoneNumber(value);
-      return;
-    }
-
-    if (maxLength && value.replace(/\D+/g, "").length <= maxLength) {
-      setPhoneNumber(value);
-    } else if (!maxLength) {
-      setPhoneNumber(value);
-    }
+  const handlePhoneNumberChange = (phoneNumber: string) => {
+    setFormattedPhoneNumber(phoneNumber);
+    onChange(phoneNumber);
   };
 
+  const [countryCode, setCountryCode] = useState<string | undefined>();
+
   useEffect(() => {
-    setFormattedPhoneNumber(formatPhoneNumberIntl(phoneNumber));
-  }, [phoneNumber]);
+    if (value) {
+      const phoneNumber = parsePhoneNumberFromString(value);
+      if (phoneNumber) {
+        setCountryCode(phoneNumber.countryCallingCode);
+      } else {
+        setCountryCode("");
+      }
+    } else {
+      setCountryCode("");
+    }
+  }, [value]);
 
   return (
-    /* TODO: style input boxen */
-    <div>
-      <p>Drivers phone number</p>
-      <div className="bg-MainGreen-100 h-10 text-lg p-1 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none mb-4">
+    <div className="mb-4">
+      <label htmlFor="phonenumber">Phone number</label>
+      <div className="bg-MainGreen-100 border-[1px] border-MainGreen-200 pl-2">
         <PhoneInput
-          limitMaxLength
-          placeholder="Indtast tlf. nr."
-          value={phoneNumber}
+          placeholder="Enter phone number"
+          value={formattedPhoneNumber}
           onChange={handlePhoneNumberChange}
-          onCountryChange={setCountry}
-          country={country}
-          inputStyle={{ backgroundColor: "lightblue" }}
-          className="border-none"
+          metadata={metadata}
+          country={countryCode}
+          international={false} // We want to format the number without international prefix
+          limitMaxLength // This will restrict the number of digits based on the country code
+          required={true}
         />
       </div>
     </div>
   );
-}
+};
 
 export default PhoneNumber;

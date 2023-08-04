@@ -19,6 +19,10 @@ const DriverInfoForm = ({ onChange }: DriverInfoFormProps) => {
   const [driverInfo, setDriverInfo] = useState<AccidentInformation>(
     new AccidentInformation()
   );
+  const [phoneNumberData, setPhoneNumberData] = useState<string>("");
+  const handlePhoneNumberChange = (phoneNumber: string) => {
+    setPhoneNumberData(phoneNumber);
+  };
 
   useEffect(() => {
     const newDriverInfo = new AccidentInformation();
@@ -70,7 +74,7 @@ const DriverInfoForm = ({ onChange }: DriverInfoFormProps) => {
         labelText="Drivers social security number"
         id="SocialSecurityNumberInput"
         required={true}
-        type="number"
+        type="ssn"
         onChange={setSocialSecurityNumber}
       />
 
@@ -78,12 +82,12 @@ const DriverInfoForm = ({ onChange }: DriverInfoFormProps) => {
         labelText="Drivers driving license number"
         id="DrivingLicenseNumberInput"
         required={true}
-        type="number"
+        type="license"
         onChange={setDrivingLicenseNumber}
       />
 
       {/* TODO: Check if its a real phone number */}
-      <PhoneNumber />
+      <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} />
 
       {/* TODO: Check if its a real email */}
       <Inputfield

@@ -20,6 +20,7 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     }
   }
 }
+import PhoneNumber from "@/components/opposite_information/phone_form";
 
 const What: NextPage<pageProps> = ({data, id}) => {
   const router = useRouter();
@@ -78,7 +79,7 @@ const What: NextPage<pageProps> = ({data, id}) => {
         <Inputfield
           labelText="Numberplate of GreenMobility car"
           id="greenCarNumberplateInput"
-          type={"text"}
+          type="numberplate"
           required={true}
           value={greenCarNumberplate}
           onChange={setgreenCarNumberplate}
@@ -122,7 +123,7 @@ const What: NextPage<pageProps> = ({data, id}) => {
               labelText="Drivers social security number"
               id="SocialSecurityNumberInput"
               required={true}
-              type="number"
+              type="ssn"
               value={socialSecurityNumber}
               onChange={setSocialSecurityNumber}
             />
@@ -131,11 +132,15 @@ const What: NextPage<pageProps> = ({data, id}) => {
               labelText="Drivers driving license number"
               id="DrivingLicenseNumberInput"
               required={true}
-              type="number"
+              type="license"
               value={drivingLicenseNumber}
               onChange={setDrivingLicenseNumber}
             />
 
+            {/* TODO: Check if its a real phone number */}
+            <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} />
+
+            {/* TODO: Check if its a real email */}
             <Inputfield
               labelText="Drivers email"
               id="EmailInput"
