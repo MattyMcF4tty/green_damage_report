@@ -1,93 +1,78 @@
 import React, { useState, useEffect } from "react";
-import { YesNo, Inputfield } from "../custom_inputfields";
+import { YesNo, Inputfield, TextField } from "../custom_inputfields";
 import PhoneNumber from "./phone_form";
 
-export class bikeInformation {
-  ebike: boolean | undefined;
-  personDamage: boolean | undefined;
-  phoneNumber: number | undefined;
-  email: string | undefined;
-  fullName: string | undefined;
+export type bikeInformation = {
+  name: string
+  phone: string
+  email: string
+  ebike: boolean | null
+  personDamage: string
 }
 
 interface bikeInfoFormProps {
+  value: bikeInformation
   onchange: (bikeInfo: bikeInformation) => void;
 }
 
-export default function BikeInfoForm(props: bikeInfoFormProps) {
-  const { onchange } = props;
-  const [fullName, setFullName] = useState<string>("");
-  const [phoneNumber, setPhoneNumber] = useState<number>(0);
-  const [email, setEmail] = useState<string>("");
-  const [personDamage, setPersonDamage] = useState<boolean>(false);
-  const [ebike, setEbike] = useState<boolean>(false);
-  const [bikeInfo, setBikeInfo] = useState<bikeInformation>();
+const BikeInfoForm = ({value, onchange}: bikeInfoFormProps) => {
+  const [name, setName] = useState<string>(value.name);
+  const [phoneNumber, setPhoneNumber] = useState<string>(value.phone);
+  const [email, setEmail] = useState<string>(value.email);
+  const [personDamage, setPersonDamage] = useState<string>(value.personDamage);
+  const [ebike, setEbike] = useState<boolean | null>(value.ebike);
 
   useEffect(() => {
-    const newBikeInfo = new bikeInformation();
-    newBikeInfo.fullName = fullName;
-    newBikeInfo.phoneNumber = phoneNumber;
-    newBikeInfo.email = email;
-    newBikeInfo.personDamage = personDamage;
-    newBikeInfo.ebike = ebike;
+    const newBikeInfo:bikeInformation = {
+      name: name,
+      phone: phoneNumber,
+      email: email,
+      personDamage: personDamage,
+      ebike: ebike
+    };
 
-    setBikeInfo(newBikeInfo);
-  }, [fullName, phoneNumber, email, personDamage, ebike]);
-
-  useEffect(() => {
-    if (bikeInfo) {
-      onchange(bikeInfo);
-    }
-  }, [bikeInfo, onchange]);
+    onchange(newBikeInfo);
+  }, [name, phoneNumber, email, personDamage, ebike]);
 
   return (
     <div className="flex flex-col items-start">
-      <div>
         <YesNo
           required={true}
           id="Ebike"
           labelText="Is it an electric bike?"
+          value={ebike}
           onChange={setEbike}
         />
-      </div>
-      {ebike && (
-        <div>
-          <Inputfield
-            labelText="Fullname on the opposite person"
-            id="FullnameInput"
-            required={true}
-            type="text"
-            onChange={setFullName}
-          />
-          <PhoneNumber onchange={setPhoneNumber} />
-          <Inputfield
-            labelText="Email"
-            id="EmailInput"
-            required={true}
-            type="text"
-            onChange={setEmail}
-          />
-        </div>
-      )}
-      {!ebike && (
-        <div>
-          <Inputfield
-            labelText="Fullname on the opposite person"
-            id="FullnameInput"
-            required={true}
-            type="text"
-            onChange={setFullName}
-          />
-          <PhoneNumber onchange={setPhoneNumber} />
-          <Inputfield
-            labelText="Email"
-            id="EmailInput"
-            required={true}
-            type="text"
-            onChange={setEmail}
-          />
-        </div>
-      )}
+          
+        <Inputfield
+          labelText="Fullname on the opposite person"
+          id="nameInput"
+          required={true}
+          type="text"
+          value={name}
+          onChange={setName}
+        />
+
+        {/* TODO: FIX <PhoneNumber onchange={setPhoneNumber} /> */}
+        <Inputfield
+          labelText="Email"
+          id="EmailInput"
+          required={true}
+          type="text"
+          value={email}
+          onChange={setEmail}
+        />
+
+        <TextField 
+          id="BikePersonDamage"
+          maxLength={200}
+          labelText="Descripe the damage to the person"
+          required={true}
+          value={personDamage}
+          onChange={setPersonDamage}
+        />
     </div>
   );
 }
+
+export default BikeInfoForm;

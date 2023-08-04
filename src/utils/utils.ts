@@ -1,38 +1,62 @@
-import { getData, getDocIds } from "@/firebase/clientApp";
+import { bikeInformation } from "@/components/opposite_information/bike_information_form";
+import { carInformation } from "@/components/opposite_information/car_information_form";
+import { OtherInformation } from "@/components/opposite_information/other_information_form";
+import { PedestrianInformation } from "@/components/opposite_information/person_information_form";
+import { getDocIds } from "@/firebase/clientApp";
+
+export type pageProps = {
+    data: reportDataType | null ;
+    images: Record<string, string>;
+    id: string;
+}
 
 export type reportDataType = {
-    driverName: string
-    driverAddress: string
-    driverSocialSecurityNumber: string
-    driverDrivingLicenseNumber: string
-    driverPhoneNumber: string
-    driverEmail: string
+    userEmail: string,
+    finished: boolean,
 
-    accidentLocation: {address: string, position: {lat: string, lng: string}}
+    driverInfo: {
+        firstName: string,
+        lastName: string,
+        address: string,
+        socialSecurityNumber: string,
+        drivingLicenseNumber: string,
+        phoneNumber: string,
+        email: string
+    },
+
+    accidentLocation: string
     time: string
     date: string
-    crashDescription: string
+    accidentDescription: string
 
     greenCarNumberPlate: string
     speed: string
     damageDescription: string
-    policeReport: string
+    policeReportNumber: string
 
-    bikerInfo: {name: string, phone: string, email: string, ebike: boolean, personDamage: string}
-    vehicleInfo: {name: string, phone: string, email: string, driversLicenseNumber: string, insurance: string, numberplate: string, color: string, model: string}
-    pedestrianInfo: {name: string, phone: string, email: string, personDamage: string}
-    otherObjectInfo: {description: string, information: string}
+    bikerInfo: bikeInformation
+    vehicleInfo: carInformation
+    pedestrianInfo: PedestrianInformation
+    otherObjectInfo: OtherInformation
 
-    witnesses: [{name: string, phone: string, email: string}]
-}
+    witnesses: {name:string, phone:string, email:string}[]
 
+    /* SITE LOGIC */
+    /* What */
+    driverRenter: boolean | null
 
-export const nextPage = () => {
+    /* How */
+    policePresent: boolean | null
+    policeReportExist: boolean | null
+    witnessesPresent: boolean | null
 
-}
-
-export const startReport = () => {
-
+    /* Where */
+    collisionPersonVehicle: boolean | null
+    singleVehicleAccident: boolean | null
+    collisionOther: boolean | null
+    collisionCar: boolean
+    collisionBike: boolean
+    collisionPedestrian: boolean
 }
 
 export const generateId = async () => {

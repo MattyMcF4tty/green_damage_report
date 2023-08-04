@@ -2,32 +2,27 @@ import React, {useState} from "react";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
 import BackButton from "@/components/buttons/back";
-import { getData, updateData } from "@/firebase/clientApp";
-import { reportDataType } from "@/utils/utils";
+import { getData, getImages, updateData } from "@/firebase/clientApp";
+import { pageProps, reportDataType } from "@/utils/utils";
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const id = context.query.id as string;
 
   const data = await getData(id);
+  const images = await getImages(id);
 
   return {
     props: {
       data: data || null,
+      images: images || null,
       id: id
     }
   }
 }
 
-type pageProps = {
-  data: reportDataType | null;
-  id: string;
-}
-
-
-const confirmationPage:NextPage<pageProps> = ({ data, id }) => {
+const confirmationPage:NextPage<pageProps> = ({ data, images, id }) => {
   const Router = useRouter()
   let [confirmVis, setConfirmVis] = useState(false);
-
 
   const handleSend = async () => {
     console.log("Damage Report done")
@@ -71,37 +66,37 @@ const confirmationPage:NextPage<pageProps> = ({ data, id }) => {
             {/* First name */}
             <div className="row-start-1 col-span-2 justify-center">
               <p className="text-xs italic">Name:</p>
-              <p>{data.driverName}</p>
+              <p>{data.driverInfo.firstName} {data.driverInfo.lastName}</p>
             </div>
   
             {/* Phone number */}
             <div className="row-start-2 col-start-1">
               <p className="text-xs italic">Phone number:</p>
-              <p>{data.driverPhoneNumber}</p>
+              <p>{data.driverInfo.phoneNumber}</p>
             </div>
   
             {/* Address */}
             <div className="row-start-2 col-start-2">
               <p className="text-xs italic">Address:</p>
-              <p>{data.driverAddress}</p>
+              <p>{data.driverInfo.address}</p>
             </div>
   
             {/* Email */}
             <div className="row-start-3 col-span-2">
               <p className="text-xs italic">Email:</p>
-              <p>{data.driverEmail}</p>
+              <p>{data.driverInfo.email}</p>
             </div>
   
             {/* Social security number */}
             <div className="row-start-4 col-start-1">
               <p className="text-xs italic">Social Security Number:</p>
-              <p>{data.driverSocialSecurityNumber}</p>
+              <p>{data.driverInfo.socialSecurityNumber}</p>
             </div>
   
             {/* Driving license number */}
             <div className="row-start-4 col-start-2">
               <p className="text-xs italic">Driving License Number:</p>
-              <p>{data.driverDrivingLicenseNumber}</p>
+              <p>{data.driverInfo.drivingLicenseNumber}</p>
             </div>
         </div>
   
@@ -124,14 +119,14 @@ const confirmationPage:NextPage<pageProps> = ({ data, id }) => {
           {/* Location */}
           <div className="row-start-2 col-span-2">
             <p className="text-xs italic">Location:</p>
-            <p>{data.accidentLocation.address}</p>
+            <p>{data.accidentLocation}</p>
           </div>
   
           {/* Police journal */}
           <div className="row-start-3 col-span-2">
             <p className="text-xs italic">Police journal number:</p>
-            { data.policeReport !== "" ? (
-              <p>{data.policeReport}</p>
+            { data.policeReportNumber !== "" ? (
+              <p>{data.policeReportNumber}</p>
             ) : (
               <p>No police report was filed</p>
             )
@@ -141,7 +136,7 @@ const confirmationPage:NextPage<pageProps> = ({ data, id }) => {
           {/* Accident description */}
           <div className="row-start-4 col-span-2">
             <p className="text-xs italic">Accident description:</p>
-            <span className="break-words">{data.crashDescription}</span>
+            <span className="break-words">{data.accidentDescription}</span>
           </div>
         </div>
   
@@ -377,9 +372,31 @@ const confirmationPage:NextPage<pageProps> = ({ data, id }) => {
             <p>You have not declared any witnesses</p>
           )}
         </div>
+
+        {/* Images */}
+        <p className="font-bold">Images of damages</p>
+        <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
+          {images && (
+            <div>
+            <div className="flex flex-row">
+              <img src={images['FRONT']} alt="FrontImage" 
+              className="w-1/2"/>
+              <img src={images['RIGHT']} alt="RightImage" 
+              className="w-1/2"/>
+            </div>
+            <div className="flex flex-row">
+              <img src={images['BACK']} alt="BackImage" 
+              className="w-1/2"/>
+              <img src={images['LEFT']} alt="LeftImage" 
+              className="w-1/2"/>
+            </div>
+          </div>
+          )}
+        </div>
+
   
         <div className="w-full flex flex-row">
-          <BackButton pageName="/where"/>
+          <BackButton pageName={`where?id=${id}`}/>
   
           <button type="button" onClick={() => setConfirmVis(true)}
           className="w-1/2"

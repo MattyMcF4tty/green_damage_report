@@ -14,9 +14,9 @@ const IndexPage = () => {
     const id = await generateId();
   
     await createDoc(id, email);
-    console.log("done:\n" + id + "\n" + email)
+    console.log("Report created:\n" + "id: " + id + "\n" + "Email: " + email)
 
-    router.push(`/confirmation?id=${id}`)
+    router.push(`/what?id=${id}`)
   }
 
   return (
@@ -71,6 +71,7 @@ const IndexPage = () => {
         labelText="Enter your Email" 
         required={true} 
         onChange={setEmail} 
+        value={email}
         type="email"
         />
       </div>

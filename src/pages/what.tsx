@@ -1,72 +1,73 @@
 import React, { useEffect, useState } from "react";
-import {
-  TimeDateField,
-  Inputfield,
-  YesNo,
+import {TimeDateField, Inputfield, YesNo,
 } from "@/components/custom_inputfields";
 import { GetServerSidePropsContext, NextPage } from "next";
-import { handleRequest } from "@/utils/serverUtils";
 import NextButton from "@/components/buttons/next";
 import BackButton from "@/components/buttons/back";
 import { useRouter } from "next/router";
+import { getData, updateData } from "@/firebase/clientApp";
+import { pageProps } from "@/utils/utils";
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const id = context.query.id as string;
-  
 
+  const data = await getData(id);
+
+  return {
+    props: {
+      data: data || null,
+      id: id
+    }
+  }
 }
 
-const What: NextPage = () => {
+const What: NextPage<pageProps> = ({data, id}) => {
   const router = useRouter();
 
-  const [firstName, setFirstName] = useState<string>();
-  const [lastName, setLastName] = useState<string>();
-  const [address, setAddress] = useState<string>();
-  const [socialSecurityNumber, setSocialSecurityNumber] = useState<string>();
-  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState<string>();
-  const [phoneNumber, setPhoneNumber] = useState<string>();
-  const [email, setEmail] = useState<string>();
+  const [firstName, setFirstName] = useState<string>(data?.driverInfo.firstName || "");
+  const [lastName, setLastName] = useState<string>(data?.driverInfo.lastName || "");
+  const [address, setAddress] = useState<string>(data?.driverInfo.address || "");
+  const [socialSecurityNumber, setSocialSecurityNumber] = useState<string>(data?.driverInfo.socialSecurityNumber || "");
+  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState<string>(data?.driverInfo.drivingLicenseNumber || "");
+  const [phoneNumber, setPhoneNumber] = useState<string>(data?.driverInfo.phoneNumber || "");
+  const [email, setEmail] = useState<string>(data?.driverInfo.email || "");
 
-  const [greenCarNumberplate, setgreenCarNumberplate] = useState<string>();
-  const [showDriverInfoForm, setShowDriverInfoForm] = useState<boolean>(false);
-  const [accidentTime, setAccidentTime] = useState<string>();
-  const [accidentDate, setAccidentDate] = useState<string>();
-  const [accidentLocation, setAccidentLocation] = useState<{
-    address: string;
-    position: { lat: number; lng: number };
-  }>();
+  const [greenCarNumberplate, setgreenCarNumberplate] = useState<string>(data?.greenCarNumberPlate || "");
+  const [showDriverInfoForm, setShowDriverInfoForm] = useState<boolean | null>(data!.driverRenter);
+  const [accidentTime, setAccidentTime] = useState<string>(data?.time || "");
+  const [accidentDate, setAccidentDate] = useState<string>(data?.date || "");
+  const [accidentLocation, setAccidentLocation] = useState<string>(data?.accidentLocation || "");
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    /* TODO: Make function that gets information about current driver from server */
-    if (showDriverInfoForm !== true) {
-      setFirstName("John");
-      setLastName("Doe");
-      setAddress("Moon");
-      setSocialSecurityNumber("696969696969");
-      setDrivingLicenseNumber("42424242424242");
-      setPhoneNumber("+45 42 69 21 00");
-      setEmail("JohnDoe@placeholder.com");
+    /* TODO: Make function that gets information about current driver from green server */
+    if (showDriverInfoForm != true) {
+
     }
 
-    const data = {
-      firstName: firstName,
-      lastName: lastName,
-      address: address,
-      socialSecurityNumber: socialSecurityNumber,
-      drivingLicenseNumber: drivingLicenseNumber,
-      phoneNumber: phoneNumber,
-      email: email,
+    const data = {      
+      driverInfo: {
+        firstName: firstName,
+        lastName: lastName,
+        address: address,
+        phoneNumber: phoneNumber,
+        socialSecurityNumber: socialSecurityNumber,
+        drivingLicenseNumber: drivingLicenseNumber,
+        email: email
+      },
 
-      greenCarNumberplate: greenCarNumberplate,
-      accidentTime: accidentTime,
-      accidentDate: accidentDate,
+      greenCarNumberPlate: greenCarNumberplate,
+      time: accidentTime,
+      date: accidentDate,
       accidentLocation: accidentLocation,
-    };
-    await handleRequest(data);
 
-    router.push("/how");
+      driverRenter: showDriverInfoForm,
+    };
+    await updateData(id, data);
+
+    router.push(`/how?id=${id}`);
   };
 
   return (
@@ -79,6 +80,7 @@ const What: NextPage = () => {
           id="greenCarNumberplateInput"
           type={"text"}
           required={true}
+          value={greenCarNumberplate}
           onChange={setgreenCarNumberplate}
         />
       </div>
@@ -89,6 +91,7 @@ const What: NextPage = () => {
           labelText="Was driver and renter the same person?"
           id="ShowDriverInfoForm"
           required={true}
+          value={showDriverInfoForm}
           onChange={setShowDriverInfoForm}
         />
 
@@ -99,6 +102,7 @@ const What: NextPage = () => {
               id="FirstNameInput"
               required={true}
               type="text"
+              value={firstName}
               onChange={setFirstName}
             />
 
@@ -107,6 +111,7 @@ const What: NextPage = () => {
               id="LastNameInput"
               required={true}
               type="text"
+              value={lastName}
               onChange={setLastName}
             />
 
@@ -118,6 +123,7 @@ const What: NextPage = () => {
               id="SocialSecurityNumberInput"
               required={true}
               type="number"
+              value={socialSecurityNumber}
               onChange={setSocialSecurityNumber}
             />
 
@@ -126,17 +132,16 @@ const What: NextPage = () => {
               id="DrivingLicenseNumberInput"
               required={true}
               type="number"
+              value={drivingLicenseNumber}
               onChange={setDrivingLicenseNumber}
             />
 
-            {/* TODO: Check if its a real phone number */}
-
-            {/* TODO: Check if its a real email */}
             <Inputfield
               labelText="Drivers email"
               id="EmailInput"
               required={true}
               type="email"
+              value={email}
               onChange={setEmail}
             />
           </div>
@@ -149,9 +154,23 @@ const What: NextPage = () => {
           labelText="When did the accident occur?"
           id="Accident"
           required={true}
+          timeValue={accidentTime}
+          dateValue={accidentDate}
           timeChange={setAccidentTime}
           dateChange={setAccidentDate}
         />
+      </div>
+
+      {/* Accident location collection */}
+      <div>
+          <Inputfield 
+            labelText="Location of accident"
+            id="location"
+            required={true}
+            type="text"
+            value={accidentLocation}
+            onChange={setAccidentLocation}
+          />
       </div>
 
       <div className="flex flex-row justify-between">

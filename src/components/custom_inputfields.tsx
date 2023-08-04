@@ -1,4 +1,5 @@
 /* import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";*/
+import { uploadImage } from "@/firebase/clientApp";
 import { Address } from "cluster";
 import React, { useEffect, useState, useRef, use } from "react";
 /* import usePlacesAutocomplete, {
@@ -12,21 +13,11 @@ interface InputfieldProps {
   labelText: string;
   required: boolean;
   type: "number" | "text" | "email" | "tel";
+  value: string
   onChange: (isValue: string) => void;
 }
 
-export const Inputfield = ({
-  id,
-  labelText,
-  required,
-  type,
-  onChange,
-}: InputfieldProps) => {
-  const [isValue, setIsValue] = useState<string>("");
-
-  useEffect(() => {
-    onChange(isValue);
-  }, [isValue]);
+export const Inputfield = ({id, labelText, required, type, value, onChange}: InputfieldProps) => {
 
   return (
     <div className="flex flex-col mb-4">
@@ -36,8 +27,8 @@ export const Inputfield = ({
         id={id}
         type={type}
         required={required}
-        value={isValue}
-        onChange={(event) => setIsValue(event.target.value)}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
       />
     </div>
   );
@@ -48,24 +39,13 @@ interface TimeDateProps {
   id: string;
   labelText: string;
   required: boolean;
+  timeValue: string;
+  dateValue: string;
   timeChange: (Value: string) => void;
   dateChange: (Value: string) => void;
 }
 
-export const TimeDateField = ({
-  id,
-  labelText,
-  required,
-  timeChange,
-  dateChange,
-}: TimeDateProps) => {
-  const [time, setTime] = useState<string>("");
-  const [date, setDate] = useState<string>("");
-
-  useEffect(() => {
-    timeChange(time);
-    dateChange(date);
-  }, [time, date]);
+export const TimeDateField = ({id, labelText, required, timeChange, dateChange, timeValue, dateValue}: TimeDateProps) => {
 
   return (
     <div className="flex flex-col mb-4">
@@ -75,18 +55,18 @@ export const TimeDateField = ({
           className="bg-MainGreen-100 h-10 mr-5 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none"
           id={"Time" + id}
           type="time"
-          value={time}
+          value={timeValue}
           required={required}
-          onChange={(event) => setTime(event.target.value)}
+          onChange={(event) => timeChange(event.target.value)}
         />
 
         <input
           className="bg-MainGreen-100 h-10 rounded-none w-32 border-[1px] focus:border-[3px] border-MainGreen-200 outline-none"
           id={"Date" + id}
           type="date"
-          value={date}
+          value={dateValue}
           required={required}
-          onChange={(event) => setDate(event.target.value)}
+          onChange={(event) => dateChange(event.target.value)}
         />
       </div>
     </div>
@@ -98,32 +78,16 @@ interface YesNoProps {
   id: string;
   labelText: string;
   required: boolean;
-  onChange: (checked: boolean) => void;
+  value: boolean | null;
+  onChange: (value: boolean) => void;
 }
 
-export const YesNo = ({ id, labelText, required, onChange }: YesNoProps) => {
-  /* 0 is when the checkbox is first initialized and therefor is not filled, 1 is Yes, 2 is No */
-  const [checked, setChecked] = useState<0 | 1 | 2>(0);
-  const [checkRequired, setCheckRequired] = useState<boolean>();
+export const YesNo = ({ id, labelText, required, onChange, value }: YesNoProps) => {
+  const [checkRequired, setCheckRequired] = useState<boolean>(required);
 
   useEffect(() => {
-    if (required) {
-      setCheckRequired(true);
-    } else {
-      setCheckRequired(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (checked === 1) {
-      onChange(true);
-    } else if (checked === 2) {
-      onChange(false);
-    }
-    if (checked > 0) {
-      setCheckRequired(false);
-    }
-  }, [checked]);
+    setCheckRequired(value === null);
+  }, [value]);
 
   return (
     <div className="flex flex-col mb-4">
@@ -138,9 +102,9 @@ export const YesNo = ({ id, labelText, required, onChange }: YesNoProps) => {
           className="accent-MainGreen-300 scale-125"
           id={"Yes" + id}
           type="checkbox"
-          checked={checked === 1}
+          checked={value !== null && value}
           required={checkRequired}
-          onChange={() => setChecked(1)}
+          onChange={() => onChange(true)}
         />
 
         {/* No  */}
@@ -151,9 +115,9 @@ export const YesNo = ({ id, labelText, required, onChange }: YesNoProps) => {
           className="accent-MainGreen-300 scale-125"
           id={"No" + id}
           type="checkbox"
-          checked={checked === 2}
+          checked={value !== null && !value}
           required={checkRequired}
-          onChange={() => setChecked(2)}
+          onChange={() => onChange(false)}
         />
       </div>
     </div>
@@ -166,24 +130,18 @@ interface TextFieldProps {
   maxLength: number;
   labelText: string;
   required: boolean;
+  value: string;
   onChange: (value: string) => void;
 }
 
-export const TextField = ({
-  id,
-  maxLength,
-  labelText,
-  required,
-  onChange,
-}: TextFieldProps) => {
+export const TextField = ({id, maxLength, labelText, required, onChange, value}: TextFieldProps) => {
   const [text, setText] = useState<string>("");
   const [currentLength, setCurrentLength] = useState<number>(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
-    onChange(text);
-    setCurrentLength(text.length);
-  }, [text]);
+    setCurrentLength(value.length);
+  }, [value]);
 
   useEffect(() => {
     const textarea = textareaRef.current;
@@ -199,8 +157,8 @@ export const TextField = ({
       <textarea
         ref={textareaRef}
         id={id}
-        value={text}
-        onChange={(event) => setText(event.target.value)}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
         maxLength={maxLength}
         required={required}
         className="min-h-10 h-auto resize-none overflow-hidden outline-none focus:border-[3px] border-[1px] border-MainGreen-200 p-1 bg-MainGreen-100"
@@ -212,32 +170,64 @@ export const TextField = ({
 
 /* ----- ImageField ---------------------------------------------------- */
 interface ImageFieldProps {
+  reportID: string;
   id: string;
   required: boolean;
   labelText: string;
+  image: string | null;
+  perspective: 'FRONT' | 'RIGHT' | 'BACK' | 'LEFT';
 }
 
-/* TODO: make picture upload to server when chosen, if a new picture is chosen the old picture need to get deleted */
-export const ImageField = ({ required, id, labelText }: ImageFieldProps) => {
-  function handleImageUpload() {
-/*     Upload picture to server */  
-} 
+export const ImageField = ({ reportID, image, required, id, labelText, perspective }: ImageFieldProps) => {
+  const [isRequired, setIsRequired] = useState<boolean>(required)
+
+
+  useEffect(() => {
+    setIsRequired(image === null);
+  }, [image]);
 
   return (
     <div className="flex flex-col mb-4">
       <label htmlFor={id}>{labelText}</label>
-      <input
-        className=""
-        id={id}
-        type="file"
-        accept="image/*"
-        required={required}
-        capture="environment"
-        onChange={handleImageUpload}
-      />
+        <input
+          className=""
+          id={id}
+          type="file"
+          accept="image/png, image/jpeg"
+          required={isRequired}
+          onChange={(e) => uploadImage(reportID, e.target.files, perspective)}/>
+        {image && (
+          <img src={image} alt={id}  className="w-20"/>
+        )}
     </div>
   );
 };
+
+/* ----- Checkbox ---------------------------------------------------- */
+interface CheckboxProps {
+  id: string;
+  labelText: string;
+  value: boolean;
+  requried: boolean;
+  onChange: (checked: boolean) => void;
+}
+
+export const Checkbox = ({id, labelText, value, onChange, requried}: CheckboxProps) => {
+
+  return (
+    <div className="flex flex-row-reverse items-center mr-4">
+      <label htmlFor={"Checkbox" + id}>{labelText}</label>
+      <input
+        className="accent-MainGreen-300 items-center mr-1 scale-125"
+        id={"Checkbox" + id}
+        type="checkbox"
+        checked={value}
+        required={requried}
+        onChange={(event) => onChange(event.target.checked)}
+      />
+    </div>
+  );
+}
 
 /* ----- Location field ---------------------------------------------------- */
 /* interface LocationFieldProps {}

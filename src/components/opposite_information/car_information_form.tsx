@@ -3,46 +3,47 @@ import "react-phone-number-input/style.css";
 import PhoneNumber from "./phone_form";
 import { Inputfield } from "../custom_inputfields";
 
-export class carInformation {
-  numberplate: string | undefined;
-  model: string | undefined;
-  color: string | undefined;
-  fullName: string | undefined;
-  phoneNumber: number | undefined;
-  email: string | undefined;
-  drivingLicenseNumber: string | undefined;
-  insurance: string | undefined;
+export type carInformation = {
+  name: string
+  phone: string
+  email: string
+  driversLicenseNumber: string
+  insurance: string
+  numberplate: string
+  color: string
+  model: string
 }
 
 interface carInfoFormProps {
+  value: carInformation;
   onChange: (carInfo: carInformation) => void;
 }
 
-export default function CarInfoForm(props: carInfoFormProps) {
-  const { onChange } = props;
-  const [numberplate, setNumberplate] = useState<string>("");
-  const [model, setModel] = useState<string>("");
-  const [color, setColor] = useState<string>("");
-  const [fullName, setFullName] = useState<string>("");
-  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState<string>("");
-  const [phoneNumber, setPhoneNumber] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [insurance, setInsurance] = useState<string>("");
+const CarInfoForm = ({value, onChange}: carInfoFormProps) => {
+  const [numberplate, setNumberplate] = useState<string>(value.numberplate);
+  const [model, setModel] = useState<string>(value.model);
+  const [color, setColor] = useState<string>(value.color);
+  const [name, setName] = useState<string>(value.name);
+  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState<string>(value.driversLicenseNumber);
+  const [phoneNumber, setPhoneNumber] = useState<string>(value.phone);
+  const [email, setEmail] = useState<string>(value.email);
+  const [insurance, setInsurance] = useState<string>(value.insurance);
 
   useEffect(() => {
-    const newCarInfo = new carInformation();
-    newCarInfo.numberplate = numberplate;
-    newCarInfo.model = model;
-    newCarInfo.color = color;
-    newCarInfo.fullName = fullName;
-    newCarInfo.drivingLicenseNumber = drivingLicenseNumber;
-    newCarInfo.phoneNumber = Number(phoneNumber); // Convert to number if needed
-    newCarInfo.email = email;
-    newCarInfo.insurance = insurance;
+    const newCarInfo: carInformation = {
+      name: name,
+      phone: phoneNumber,
+      email: email,
+      insurance: insurance,
+      driversLicenseNumber: drivingLicenseNumber,
+      numberplate: numberplate,
+      color: color,
+      model: model,
+    };
 
-    onChange(newCarInfo); // Call onChange with the updated car information
+    onChange(newCarInfo);
   }, [
-    fullName,
+    name,
     numberplate,
     model,
     color,
@@ -60,6 +61,7 @@ export default function CarInfoForm(props: carInfoFormProps) {
         id="NumberPlateInput"
         required={true}
         type="text"
+        value={numberplate}
         onChange={setNumberplate}
       />
       <Inputfield
@@ -67,6 +69,7 @@ export default function CarInfoForm(props: carInfoFormProps) {
         id="ModelInput"
         required={true}
         type="text"
+        value={model}
         onChange={setModel}
       />
       <Inputfield
@@ -74,6 +77,7 @@ export default function CarInfoForm(props: carInfoFormProps) {
         id="ColorInput"
         required={true}
         type="text"
+        value={color}
         onChange={setColor}
       />
       <Inputfield
@@ -81,14 +85,16 @@ export default function CarInfoForm(props: carInfoFormProps) {
         id="FullnameInput"
         required={true}
         type="text"
-        onChange={setFullName}
+        value={name}
+        onChange={setName}
       />
-      <PhoneNumber onChange={setPhoneNumber} />
+{/*   TODO: FIX <PhoneNumber onChange={setPhoneNumber} /> */}
       <Inputfield
         labelText="Email"
         id="EmailInput"
         required={true}
         type="text"
+        value={email}
         onChange={setEmail}
       />
       <Inputfield
@@ -96,6 +102,7 @@ export default function CarInfoForm(props: carInfoFormProps) {
         id="DriversLicenseNumberInput"
         required={true}
         type="text"
+        value={drivingLicenseNumber}
         onChange={setDrivingLicenseNumber}
       />
       <Inputfield
@@ -103,8 +110,11 @@ export default function CarInfoForm(props: carInfoFormProps) {
         id="InsuranceInput"
         required={true}
         type="text"
+        value={insurance}
         onChange={setInsurance}
       />
     </div>
   );
 }
+
+export default CarInfoForm;

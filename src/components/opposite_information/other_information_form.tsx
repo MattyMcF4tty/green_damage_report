@@ -3,34 +3,28 @@ import React, { useState, useRef, useEffect } from "react";
 import { info } from "console";
 import { TextField } from "../custom_inputfields";
 
-export class OtherInformation {
-  descripeOther: string | undefined;
-  infoOther: string | undefined;
+export type OtherInformation = {
+  description: string
+  information: string
 }
 
 interface OtherProps {
-  onchange: (otherInfo: OtherInformation) => void;
+  value: OtherInformation;
+  onChange: (otherInfo: OtherInformation) => void;
 }
 
-export default function OtherInfoForm(props: OtherProps) {
-  const { onchange } = props;
-  const [descripeOther, setDescripeOther] = useState<string>();
-  const [infoOther, setInfoOther] = useState<string>();
-  const [otherInfo, setOtherInfo] = useState<OtherInformation>();
+const OtherInfoForm = ({value, onChange}: OtherProps) => {
+  const [descripeOther, setDescripeOther] = useState<string>(value.description);
+  const [infoOther, setInfoOther] = useState<string>(value.information);
 
   useEffect(() => {
-    const newOtherInfo = new OtherInformation();
-    newOtherInfo.descripeOther = descripeOther;
-    newOtherInfo.infoOther = infoOther;
+    const newOtherInfo: OtherInformation = {
+      description: descripeOther, 
+      information: infoOther
+    };
 
-    setOtherInfo(newOtherInfo);
+    onChange(newOtherInfo);
   }, [descripeOther, infoOther]);
-
-  useEffect(() => {
-    if (otherInfo) {
-      onchange(otherInfo);
-    }
-  }, [otherInfo, onchange]);
 
   return (
     <div>
@@ -39,6 +33,7 @@ export default function OtherInfoForm(props: OtherProps) {
         maxLength={500}
         labelText="Descripe other"
         required={true}
+        value={descripeOther}
         onChange={setDescripeOther}
       />
       <TextField
@@ -46,8 +41,11 @@ export default function OtherInfoForm(props: OtherProps) {
         maxLength={500}
         labelText="Information on other"
         required={true}
+        value={infoOther}
         onChange={setInfoOther}
       />
     </div>
   );
 }
+
+export default OtherInfoForm;
