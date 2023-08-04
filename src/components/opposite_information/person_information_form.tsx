@@ -3,18 +3,18 @@ import PhoneNumber from "./phone_form";
 import { Inputfield, TextField } from "../custom_inputfields";
 
 export type PedestrianInformation = {
-  name: string, 
-  phone: string, 
-  email: string, 
-  personDamage: string,
-}
+  name: string;
+  phone: string;
+  email: string;
+  personDamage: string;
+};
 
 interface PedestrianProps {
   value: PedestrianInformation;
   onChange: (pedestrianInfo: PedestrianInformation) => void;
 }
 
-const PedestrianInfoForm = ({value, onChange}: PedestrianProps) => {
+const PedestrianInfoForm = ({ value, onChange }: PedestrianProps) => {
   const [name, setName] = useState<string>(value.name);
   const [phoneNumber, setPhoneNumber] = useState<string>(value.phone);
   const [email, setEmail] = useState<string>(value.email);
@@ -22,13 +22,13 @@ const PedestrianInfoForm = ({value, onChange}: PedestrianProps) => {
 
   useEffect(() => {
     const newPedestrianInfo: PedestrianInformation = {
-      name: name, 
-      phone: phoneNumber, 
+      name: name,
+      phone: phoneNumber,
       email: email,
       personDamage: personDamage,
-    }
+    };
 
-    onChange(newPedestrianInfo)
+    onChange(newPedestrianInfo);
   }, [name, phoneNumber, email, personDamage]);
 
   return (
@@ -41,7 +41,7 @@ const PedestrianInfoForm = ({value, onChange}: PedestrianProps) => {
         value={name}
         onChange={setName}
       />
-{/*       <PhoneNumber value={phoneNumber} onChange={setPhoneNumber}/> */}      
+      <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} />
       <Inputfield
         id="EmailPedestrian"
         labelText="Email of the pedestrian"
@@ -51,7 +51,7 @@ const PedestrianInfoForm = ({value, onChange}: PedestrianProps) => {
         onChange={setEmail}
       />
 
-      <TextField 
+      <TextField
         id="personDamage"
         labelText="Descripe the damages to the person"
         maxLength={200}
@@ -61,6 +61,6 @@ const PedestrianInfoForm = ({value, onChange}: PedestrianProps) => {
       />
     </div>
   );
-}
+};
 
 export default PedestrianInfoForm;

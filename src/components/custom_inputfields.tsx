@@ -13,7 +13,7 @@ interface InputfieldProps {
   labelText: string;
   required: boolean;
   type: "number" | "text" | "email" | "tel" | "numberplate" | "license" | "ssn";
-  value: string
+  value: string;
   onChange: (isValue: string) => void;
   pattern?: string;
 }
@@ -33,7 +33,7 @@ export const Inputfield = ({
     onChange(isValue);
   }, [isValue]);
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = event.target;
     setIsValue(value);
 
@@ -47,31 +47,31 @@ export const Inputfield = ({
   // Define the pattern based on the input type
   let pattern = "";
   switch (type) {
-  case "number":
-    pattern = "[0-9]+"; // Only allow digits
-    break;
-  case "email":
-    pattern = "^[a-zA-Z0-9]{0,100}@[a-zA-Z0-9]{2,10}.(es|com|org)$"; //TODO fix the email format so it works.
-    break;
-  case "tel":
-    pattern = "[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}"; // Phone number format (XX-XX-XX-XX)
-    break;
-  case "numberplate":
-    pattern = "[a-zA-Z]{2}\\d{2}\\d{3}"; // Numberplate format
-    break;
-  case "text":
-    pattern = ".*"; // Allow any character, any number of times
-    break;
-  case "license":
-    pattern = "[0-9]{8,}";
-    break;
-  case "ssn":
-    pattern = "^[0-9]{6}-[0-9]{4}$";
-    break;
-  default:
-    pattern = ""; // No pattern for "text" type, it allows any input
-    break;
-  } 
+    case "number":
+      pattern = "[0-9]+"; // Only allow digits
+      break;
+    case "email":
+      pattern = "^[a-zA-Z0-9.]{0,100}@[a-zA-Z0-9]{2,10}.(es|com|org)$"; //TODO fix the email format so it works.
+      break;
+    case "tel":
+      pattern = "[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}"; // Phone number format (XX-XX-XX-XX)
+      break;
+    case "numberplate":
+      pattern = "[a-zA-Z]{2}\\d{2}\\d{3}"; // Numberplate format
+      break;
+    case "text":
+      pattern = ".*"; // Allow any character, any number of times
+      break;
+    case "license":
+      pattern = "[0-9]{8,}";
+      break;
+    case "ssn":
+      pattern = "^[0-9]{6}-[0-9]{4}$";
+      break;
+    default:
+      pattern = ""; // No pattern for "text" type, it allows any input
+      break;
+  }
 
   return (
     <div className="flex flex-col mb-4">
@@ -83,7 +83,7 @@ export const Inputfield = ({
         required={required}
         value={value}
         onChange={(event) => onChange(event.target.value)}
-         pattern={pattern}
+        pattern={pattern}
       />
     </div>
   );
@@ -100,8 +100,15 @@ interface TimeDateProps {
   dateChange: (Value: string) => void;
 }
 
-export const TimeDateField = ({id, labelText, required, timeChange, dateChange, timeValue, dateValue}: TimeDateProps) => {
-
+export const TimeDateField = ({
+  id,
+  labelText,
+  required,
+  timeChange,
+  dateChange,
+  timeValue,
+  dateValue,
+}: TimeDateProps) => {
   return (
     <div className="flex flex-col mb-4">
       <label>{labelText}</label>
@@ -137,7 +144,13 @@ interface YesNoProps {
   onChange: (value: boolean) => void;
 }
 
-export const YesNo = ({ id, labelText, required, onChange, value }: YesNoProps) => {
+export const YesNo = ({
+  id,
+  labelText,
+  required,
+  onChange,
+  value,
+}: YesNoProps) => {
   const [checkRequired, setCheckRequired] = useState<boolean>(required);
 
   useEffect(() => {
@@ -189,7 +202,14 @@ interface TextFieldProps {
   onChange: (value: string) => void;
 }
 
-export const TextField = ({id, maxLength, labelText, required, onChange, value}: TextFieldProps) => {
+export const TextField = ({
+  id,
+  maxLength,
+  labelText,
+  required,
+  onChange,
+  value,
+}: TextFieldProps) => {
   const [text, setText] = useState<string>(value);
   const [currentLength, setCurrentLength] = useState<number>(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -230,12 +250,18 @@ interface ImageFieldProps {
   required: boolean;
   labelText: string;
   image: string | null;
-  perspective: 'FRONT' | 'RIGHT' | 'BACK' | 'LEFT';
+  perspective: "FRONT" | "RIGHT" | "BACK" | "LEFT";
 }
 
-export const ImageField = ({ reportID, image, required, id, labelText, perspective }: ImageFieldProps) => {
-  const [isRequired, setIsRequired] = useState<boolean>(required)
-
+export const ImageField = ({
+  reportID,
+  image,
+  required,
+  id,
+  labelText,
+  perspective,
+}: ImageFieldProps) => {
+  const [isRequired, setIsRequired] = useState<boolean>(required);
 
   useEffect(() => {
     setIsRequired(image === null);
@@ -244,16 +270,15 @@ export const ImageField = ({ reportID, image, required, id, labelText, perspecti
   return (
     <div className="flex flex-col mb-4">
       <label htmlFor={id}>{labelText}</label>
-        <input
-          className=""
-          id={id}
-          type="file"
-          accept="image/png, image/jpeg"
-          required={isRequired}
-          onChange={(e) => uploadImage(reportID, e.target.files, perspective)}/>
-        {image && (
-          <img src={image} alt={id}  className="w-20"/>
-        )}
+      <input
+        className=""
+        id={id}
+        type="file"
+        accept="image/png, image/jpeg"
+        required={isRequired}
+        onChange={(e) => uploadImage(reportID, e.target.files, perspective)}
+      />
+      {image && <img src={image} alt={id} className="w-20" />}
     </div>
   );
 };
@@ -267,8 +292,13 @@ interface CheckboxProps {
   onChange: (checked: boolean) => void;
 }
 
-export const Checkbox = ({id, labelText, value, onChange, requried}: CheckboxProps) => {
-
+export const Checkbox = ({
+  id,
+  labelText,
+  value,
+  onChange,
+  requried,
+}: CheckboxProps) => {
   return (
     <div className="flex flex-row-reverse items-center mr-4">
       <label htmlFor={"Checkbox" + id}>{labelText}</label>
@@ -282,7 +312,7 @@ export const Checkbox = ({id, labelText, value, onChange, requried}: CheckboxPro
       />
     </div>
   );
-}
+};
 
 /* ----- Location field ---------------------------------------------------- */
 /* interface LocationFieldProps {}

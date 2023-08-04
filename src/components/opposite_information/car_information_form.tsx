@@ -4,27 +4,29 @@ import PhoneNumber from "./phone_form";
 import { Inputfield } from "../custom_inputfields";
 
 export type carInformation = {
-  name: string
-  phone: string
-  email: string
-  driversLicenseNumber: string
-  insurance: string
-  numberplate: string
-  color: string
-  model: string
-}
+  name: string;
+  phone: string;
+  email: string;
+  driversLicenseNumber: string;
+  insurance: string;
+  numberplate: string;
+  color: string;
+  model: string;
+};
 
 interface carInfoFormProps {
   value: carInformation;
   onChange: (carInfo: carInformation) => void;
 }
 
-const CarInfoForm = ({value, onChange}: carInfoFormProps) => {
+const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
   const [numberplate, setNumberplate] = useState<string>(value.numberplate);
   const [model, setModel] = useState<string>(value.model);
   const [color, setColor] = useState<string>(value.color);
   const [name, setName] = useState<string>(value.name);
-  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState<string>(value.driversLicenseNumber);
+  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState<string>(
+    value.driversLicenseNumber
+  );
   const [phoneNumber, setPhoneNumber] = useState<string>(value.phone);
   const [email, setEmail] = useState<string>(value.email);
   const [insurance, setInsurance] = useState<string>(value.insurance);
@@ -88,9 +90,7 @@ const CarInfoForm = ({value, onChange}: carInfoFormProps) => {
         value={name}
         onChange={setName}
       />
-
-{/*   TODO: FIX <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} /> */}
-
+      <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} />
       <Inputfield
         labelText="Email"
         id="EmailInput"
@@ -117,6 +117,6 @@ const CarInfoForm = ({value, onChange}: carInfoFormProps) => {
       />
     </div>
   );
-}
+};
 
 export default CarInfoForm;

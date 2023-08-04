@@ -3,38 +3,38 @@ import { YesNo, Inputfield, TextField } from "../custom_inputfields";
 import PhoneNumber from "./phone_form";
 
 export type bikeInformation = {
-  name: string
-  phone: string
-  email: string
-  ebike: boolean | null
-  personDamage: string
-}
+  name: string;
+  phone: string;
+  email: string;
+  ebike: boolean | null;
+  personDamage: string;
+};
 
 interface bikeInfoFormProps {
-  value: bikeInformation
+  value: bikeInformation;
   onChange: (bikeInfo: bikeInformation) => void;
 }
 
-const BikeInfoForm = ({value, onChange}: bikeInfoFormProps) => {
+const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
   const [name, setName] = useState<string>(value.name);
   const [phoneNumber, setPhoneNumber] = useState<string>(value.phone);
   const [email, setEmail] = useState<string>(value.email);
   const [personDamage, setPersonDamage] = useState<string>(value.personDamage);
   const [ebike, setEbike] = useState<boolean | null>(value.ebike);
 
-/*   const [phoneNumberData, setPhoneNumberData] = useState<string>("");
+  /*   const [phoneNumberData, setPhoneNumberData] = useState<string>("");
   const handlePhoneNumberChange = (phoneNumber: string) => {
     setPhoneNumberData(phoneNumber);
   };
  */
 
   useEffect(() => {
-    const newBikeInfo:bikeInformation = {
+    const newBikeInfo: bikeInformation = {
       name: name,
       phone: phoneNumber,
       email: email,
       personDamage: personDamage,
-      ebike: ebike
+      ebike: ebike,
     };
 
     onChange(newBikeInfo);
@@ -42,43 +42,43 @@ const BikeInfoForm = ({value, onChange}: bikeInfoFormProps) => {
 
   return (
     <div className="flex flex-col items-start">
-        <YesNo
-          required={true}
-          id="Ebike"
-          labelText="Is it an electric bike?"
-          value={ebike}
-          onChange={setEbike}
-        />
-          
-        <Inputfield
-          labelText="Fullname on the opposite person"
-          id="nameInput"
-          required={true}
-          type="text"
-          value={name}
-          onChange={setName}
-        />
+      <YesNo
+        required={true}
+        id="Ebike"
+        labelText="Is it an electric bike?"
+        value={ebike}
+        onChange={setEbike}
+      />
 
-{/* TODO: FIX        <PhoneNumber value={phoneNumber} onChange={setPhoneNumber}/> */}
-        <Inputfield
-          labelText="Email"
-          id="EmailInput"
-          required={true}
-          type="text"
-          value={email}
-          onChange={setEmail}
-        />
+      <Inputfield
+        labelText="Fullname on the opposite person"
+        id="nameInput"
+        required={true}
+        type="text"
+        value={name}
+        onChange={setName}
+      />
 
-        <TextField 
-          id="BikePersonDamage"
-          maxLength={200}
-          labelText="Descripe the damage to the person"
-          required={true}
-          value={personDamage}
-          onChange={setPersonDamage}
-        />
+      <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} />
+      <Inputfield
+        labelText="Email"
+        id="EmailInput"
+        required={true}
+        type="text"
+        value={email}
+        onChange={setEmail}
+      />
+
+      <TextField
+        id="BikePersonDamage"
+        maxLength={200}
+        labelText="Descripe the damage to the person"
+        required={true}
+        value={personDamage}
+        onChange={setPersonDamage}
+      />
     </div>
   );
-}
+};
 
 export default BikeInfoForm;
