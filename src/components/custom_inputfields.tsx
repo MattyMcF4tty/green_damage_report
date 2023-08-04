@@ -22,6 +22,7 @@ export const Inputfield = ({
   id,
   labelText,
   required,
+  value,
   type,
   onChange,
 }: InputfieldProps) => {

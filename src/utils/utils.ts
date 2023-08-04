@@ -6,7 +6,7 @@ import { getDocIds } from "@/firebase/clientApp";
 
 export type pageProps = {
     data: reportDataType | null ;
-    images: Record<string, string>;
+    images: Record<string, string> | null;
     id: string;
 }
 
