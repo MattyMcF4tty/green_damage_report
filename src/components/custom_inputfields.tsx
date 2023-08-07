@@ -26,51 +26,81 @@ export const Inputfield = ({
   type,
   onChange,
 }: InputfieldProps) => {
-  const [isValue, setIsValue] = useState<string>(value);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    onChange(isValue);
-  }, [isValue]);
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
-    setIsValue(value);
-
-    // If a pattern is provided, check for pattern validity
-    if (pattern) {
-      const isValid = new RegExp(pattern).test(value);
-      setError(isValid ? null : "Invalid input format.");
-    }
-  };
+  const [currentValue, setCurrentValue] = useState<string>(value);
+  const [isError, setIsError] = useState<boolean>(false);
+  const [isFocused, setIsFocused] = useState<boolean>(false);
 
   // Define the pattern based on the input type
   let pattern = "";
+  let patternError = ""
   switch (type) {
     case "number":
-      pattern = "[0-9]+"; // Only allow digits
+      pattern = "[0-9]+"; /* Only allow digits */
+      patternError = "Please enter digits only";
       break;
     case "email":
-      pattern = "^[a-zA-Z0-9.]{0,100}@[a-zA-Z0-9]{2,10}.(es|com|org)$"; //TODO fix the email format so it works.
+      pattern = "^[a-zA-Z0-9.]{0,100}@[a-zA-Z0-9]{2,10}.(es|com|org)$"; /* Email pattern */
+      patternError = "Please enter a valid Email";
       break;
     case "tel":
-      pattern = "[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}"; // Phone number format (XX-XX-XX-XX)
+      pattern = "[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}"; /* Phone number format (XX-XX-XX-XX) */
+      patternError = "Please enter a valid phone number";
       break;
     case "numberplate":
-      pattern = "[a-zA-Z]{2}\\d{2}\\d{3}"; // Numberplate format
+      pattern = "[a-zA-Z]{2}\\d{2}\\d{3}"; /* Numberplate format */
+      patternError = "Please enter a valid numberplate";
       break;
     case "text":
-      pattern = ".*"; // Allow any character, any number of times
+      pattern = ".*"; /* Allow any character, any number of times */
+      patternError = "Please enter only valid characters";
       break;
     case "license":
       pattern = "[0-9]{8,}";
+      patternError = "Please enter a valid drivers license number";
       break;
     case "ssn":
       pattern = "^[0-9]{6}-[0-9]{4}$";
+      patternError = "Please enter a valid social security number";
       break;
     default:
-      pattern = ""; // No pattern for "text" type, it allows any input
+      pattern = ""; /* No pattern for "text" type, it allows any input */
+      patternError = "Please enter only valid characters";
       break;
+  }
+
+  /* Live check if value matches pattern */
+  useEffect(() => {
+    const isValid = new RegExp(pattern).test(currentValue)
+
+    if (isValid) {
+      setIsError(false)
+      onChange(currentValue)
+    }
+  }, [currentValue]);
+
+  /* Checks if value matches pattern when no longer focused */
+  const handleCheck = () => {
+    const isValid = new RegExp(pattern).test(currentValue)
+
+    if (isValid && isFocused) {
+      setIsError(false)
+      onChange(currentValue)
+    }
+    else {
+      setIsError(true)
+    }
+  }
+
+  const handleLeave = () => {
+    const isValid = new RegExp(pattern).test(currentValue)
+
+    if (isValid) {
+      setIsError(false)
+      onChange(currentValue)
+    }
+    else {
+      setIsError(true)
+    }
   }
 
   return (
@@ -81,10 +111,16 @@ export const Inputfield = ({
         id={id}
         type={type}
         required={required}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
+        value={currentValue}
+        onChange={(e) => setCurrentValue(e.target.value)}
         pattern={pattern}
+        onBlur={() => handleLeave()}
+        onInvalid={() => handleCheck()}
+        onFocus={() => setIsFocused(true)}
       />
+      {isError && (
+        <p className="text-sm text-red-500">{patternError}</p>
+      )}
     </div>
   );
 };
@@ -152,10 +188,14 @@ export const YesNo = ({
   value,
 }: YesNoProps) => {
   const [checkRequired, setCheckRequired] = useState<boolean>(required);
+  const [isError, setIsError] = useState<boolean>(false);
 
   useEffect(() => {
     setCheckRequired(value === null);
+
   }, [value]);
+
+
 
   return (
     <div className="flex flex-col mb-4">
@@ -172,7 +212,8 @@ export const YesNo = ({
           type="checkbox"
           checked={value !== null && value}
           required={checkRequired}
-          onChange={() => onChange(true)}
+          onChange={() => {onChange(true); setIsError(false)}}
+          onInvalid={() => setIsError(true)}
         />
 
         {/* No  */}
@@ -185,9 +226,13 @@ export const YesNo = ({
           type="checkbox"
           checked={value !== null && !value}
           required={checkRequired}
-          onChange={() => onChange(false)}
+          onChange={() => {onChange(false); setIsError(false)}}
+          onInvalid={() => setIsError(true)}
         />
       </div>
+      {isError && (
+        <p className="text-sm text-red-500">Please check one of the boxes.</p>
+      )}
     </div>
   );
 };
