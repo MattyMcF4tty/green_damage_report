@@ -8,35 +8,35 @@ const adminPage = () => {
       <div className="flex flex-row w-full justify-start items-center mb-10">
         <button
           className={`h-20 flex flex-col items-center justify-center text-lg cursor-pointer relative w-24 ${
-            activeSection === "All" ? "text-green-700" : ""
+            activeSection === "All" ? "text-MainGreen-300" : ""
           }`}
           onClick={() => setActiveSection("All")}
         >
           <span>All</span>
           {activeSection === "All" && (
-            <div className="absolute bottom-0 w-full h-1 bg-green-700"></div>
+            <div className="absolute bottom-0 w-full h-1 bg-MainGreen-300"></div>
           )}
         </button>
         <button
           className={`h-20 w-32 flex flex-col items-center justify-center text-lg cursor-pointer relative ${
-            activeSection === "Unfinished" ? "text-green-700" : ""
+            activeSection === "Unfinished" ? "text-MainGreen-300" : ""
           }`}
           onClick={() => setActiveSection("Unfinished")}
         >
           <span>Unfinished</span>
           {activeSection === "Unfinished" && (
-            <div className="absolute bottom-0 w-full h-1 bg-green-700"></div>
+            <div className="absolute bottom-0 w-full h-1 bg-MainGreen-300"></div>
           )}
         </button>
         <button
           className={`h-20 w-32 flex flex-col items-center justify-center text-lg cursor-pointer relative ${
-            activeSection === "Finished" ? "text-green-700" : ""
+            activeSection === "Finished" ? "text-MainGreen-300" : ""
           }`}
           onClick={() => setActiveSection("Finished")}
         >
           <span>Finished</span>
           {activeSection === "Finished" && (
-            <div className="absolute bottom-0 w-full h-1 bg-green-700"></div>
+            <div className="absolute bottom-0 w-full h-1 bg-MainGreen-300"></div>
           )}
         </button>
       </div>
@@ -55,20 +55,27 @@ const adminPage = () => {
             Print
           </button>
         </div>
+
         <div className="relative flex flex-row items-center">
           <input
             type="search"
-            className="relative h-10 m-0 block w-[400px] rounded border border-solid border-green-500 bg-transparent bg-clip-padding pl-10 pr-[0.75rem] py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:border-green-500 focus:shadow-[inset_0_0_0_1px_rgb(59,113,202)] focus:outline-none dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200 dark:focus:border-green-500"
+            style={{
+              borderColor: "#3EA635", // Green border color
+            }}
+            className="relative h-10 m-0 block w-[400px] rounded border border-solid border-neutral-300 bg-transparent bg-clip-padding pl-10 pr-[2.5rem] py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:ring-0 focus:border-[#3EA635] dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200"
             placeholder="Search"
             aria-label="Search"
             aria-describedby="button-addon2"
           />
-          <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-green-500 dark:text-green-400">
+          <span className="absolute left-2 top-1/2 transform -translate-y-1/2 text-[#3EA635] dark:text-neutral-400 cursor-pointer">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 20 20"
-              fill="currentColor"
+              fill="#3EA635" // Change the fill color to green
               className="h-5 w-5"
+              onClick={() => {
+                // Handle clear action here
+              }}
             >
               <path
                 fillRule="evenodd"
