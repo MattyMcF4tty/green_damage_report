@@ -57,7 +57,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
   ]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col w-full">
       <Inputfield
         labelText="Numberplate on other car"
         id="NumberPlateInput"

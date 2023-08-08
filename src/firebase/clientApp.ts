@@ -1,6 +1,7 @@
+import { promises } from "dns";
 import { initializeApp } from "firebase/app"
 import { collection, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
-import { StorageReference, deleteObject, getDownloadURL, getStorage, listAll, ref, uploadBytes } from "firebase/storage"
+import { ListResult, StorageReference, deleteObject, getDownloadURL, getStorage, listAll, ref, uploadBytes } from "firebase/storage"
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -202,32 +203,79 @@ export const uploadImage = async (id:string, image:FileList | null, perspective:
     }
 }
 
-export const getImages = async (id:string) => {
-    const imageFolderRef = ref(storage, id);
-    var imageURLs: Record<string, string> = {};
-
+export const UpdateImages = async(id:string, images:FileList | null, imageType:'GreenMobility' | 'OtherParty') => {
+    const storageRef = ref(storage, `${id}/${imageType}`)
 
     try {
-        const imageList = await listAll(imageFolderRef);
+        if (images) {
+            DeleteAllImages(storageRef)
+            for (let i = 0; i < images.length; i++ ) {
+                const image = images[i];
+                const imageRef = ref(storageRef, image.name)
+                const imageBlob = new Blob([image, image.type])
 
-        /* Makes sure that the images is in the right order */
-        for (const item of imageList.items) {
-            const imageRef: StorageReference = ref(storage, item.fullPath)
-            if (item.name.startsWith('FRONT')) {
-                imageURLs['FRONT'] = await getDownloadURL(imageRef);
-            } else if (item.name.startsWith('RIGHT')) {
-                imageURLs['RIGHT'] = await getDownloadURL(imageRef);
-            } else if (item.name.startsWith('BACK')) {
-                imageURLs['BACK'] = await getDownloadURL(imageRef);
-            } else if (item.name.startsWith('LEFT')) {
-                imageURLs['LEFT'] = await getDownloadURL(imageRef);
+                await uploadBytes(imageRef, imageBlob)
             }
+        } else {
+            DeleteAllImages(storageRef)
         }
-
-        console.log("Image url fetching done")
-    } catch(error) {
-        console.error(`Something went wrong downloading the image urls:\n${error}\n`)
+        console.log("Images updated")
+    } 
+    catch (error) {
+        console.error(`Something went wrong updating images at ${id}/${imageType}:\n${error}\n`)
     }
+}
 
-    return(imageURLs)
+const DeleteAllImages = async(StorageRef: StorageReference) => {
+    try {
+        const storedImages:ListResult = await listAll(StorageRef);
+
+        const deletedImages:Promise<void>[] = storedImages.items.map(async (image) => {
+            await deleteObject(image);
+        })
+
+        await Promise.all(deletedImages)
+        console.log(`All images in ${StorageRef.name} has been deleted`)
+    }
+    catch ( error ) {
+        console.error(`Something went wrong deleting all images in ${StorageRef.name}:\n${error}\n`)
+    }
+}
+
+export const getImages = async (id: string) => {
+    const greenStorageRef = ref(storage, `${id}/GreenMobility`);
+    const otherPartyStorageRef = ref(storage, `${id}/OtherParty`)
+
+    try {
+        const greenImageList: ListResult = await listAll(greenStorageRef);
+        const otherPartyImageList: ListResult = await listAll(otherPartyStorageRef);
+        const imageURLs: Record<string, string[]> = {'GreenMobility': [], 'OtherParty': []};
+
+        /* Get images of GreenMobility car */
+        const greenImageURLs: string[] = [];
+        for (const image of greenImageList.items) {
+            const imageRef: StorageReference = ref(greenStorageRef, image.fullPath);
+            const imageURL: string = await getDownloadURL(imageRef);
+
+            greenImageURLs.push(imageURL);
+        }
+        imageURLs['GreenMobility'] = greenImageURLs;
+
+        /* Get images of OtherPartys */
+        const otherPartyImageURLs: string[] = [];
+        for (const image of otherPartyImageList.items) {
+            const imageRef: StorageReference = ref(otherPartyStorageRef, image.fullPath);
+            const imageURL: string = await getDownloadURL(imageRef);
+
+            otherPartyImageURLs.push(imageURL);
+        }
+        imageURLs['OtherParty'] = otherPartyImageURLs;
+
+        console.log("Image url fetching completed")
+        return imageURLs;
+    } 
+    catch (error) {
+        console.error(`Something went wrong fetching images:\n${error}\n`);
+        return null;
+    }
 }

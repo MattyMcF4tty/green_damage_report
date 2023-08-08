@@ -1,5 +1,5 @@
 /* import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";*/
-import { uploadImage } from "@/firebase/clientApp";
+import { UpdateImages } from "@/firebase/clientApp";
 import { Address } from "cluster";
 import React, { useEffect, useState, useRef, use } from "react";
 /* import usePlacesAutocomplete, {
@@ -145,6 +145,9 @@ export const TimeDateField = ({
   timeValue,
   dateValue,
 }: TimeDateProps) => {
+  const [dateError, setDateError] = useState<boolean>(false);
+  const [timeError, setTimeError] = useState<boolean>(false);
+
   return (
     <div className="flex flex-col mb-4">
       <label>{labelText}</label>
@@ -155,7 +158,8 @@ export const TimeDateField = ({
           type="time"
           value={timeValue}
           required={required}
-          onChange={(event) => timeChange(event.target.value)}
+          onChange={(event) => {timeChange(event.target.value); setTimeError(false)}}
+          onInvalid={() => setTimeError(true)}
         />
 
         <input
@@ -164,9 +168,19 @@ export const TimeDateField = ({
           type="date"
           value={dateValue}
           required={required}
-          onChange={(event) => dateChange(event.target.value)}
+          onChange={(event) => {dateChange(event.target.value); setDateError(false)}}
+          onInvalid={() => setDateError(true)}
         />
       </div>
+      {dateError && timeError && (
+        <p className="text-sm text-red-500">Please choose a time and a date</p>
+      )}
+      {dateError && !timeError && (
+        <p className="text-sm text-red-500">Please choose a date</p>
+      )}
+      {timeError && !dateError && (
+        <p className="text-sm text-red-500">Please choose a time</p>
+      )}
     </div>
   );
 };
@@ -194,8 +208,6 @@ export const YesNo = ({
     setCheckRequired(value === null);
 
   }, [value]);
-
-
 
   return (
     <div className="flex flex-col mb-4">
@@ -231,7 +243,7 @@ export const YesNo = ({
         />
       </div>
       {isError && (
-        <p className="text-sm text-red-500">Please check one of the boxes.</p>
+        <p className="text-sm text-red-500">Please check one of the boxes</p>
       )}
     </div>
   );
@@ -258,12 +270,12 @@ export const TextField = ({
   const [text, setText] = useState<string>(value);
   const [currentLength, setCurrentLength] = useState<number>(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [isError, setIsError] = useState<boolean>(false);
 
   useEffect(() => {
-    setCurrentLength(value.length);
-  }, [value]);
+    setCurrentLength(text.length);
+    onChange(text)
 
-  useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = "auto";
@@ -277,13 +289,17 @@ export const TextField = ({
       <textarea
         ref={textareaRef}
         id={id}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
+        value={text}
+        onChange={(event) => {setText(event.target.value); setIsError(false)}}
         maxLength={maxLength}
         required={required}
         className="min-h-10 h-auto resize-none overflow-hidden outline-none focus:border-[3px] border-[1px] border-MainGreen-200 p-1 bg-MainGreen-100"
+        onInvalid={() => setIsError(true)}
       />
       <p>{`${currentLength.toString()}/${maxLength.toString()}`}</p>
+      {isError && (
+        <p className="text-sm text-red-500">Please enter only valid characters</p>
+      )}
     </div>
   );
 };
@@ -294,23 +310,30 @@ interface ImageFieldProps {
   id: string;
   required: boolean;
   labelText: string;
-  image: string | null;
-  perspective: "FRONT" | "RIGHT" | "BACK" | "LEFT";
+  images: string[] | null;
+  imageType: 'GreenMobility' | 'OtherParty'
+  multiple: boolean;
 }
 
 export const ImageField = ({
   reportID,
-  image,
+  images,
   required,
   id,
   labelText,
-  perspective,
+  imageType,
+  multiple,
 }: ImageFieldProps) => {
   const [isRequired, setIsRequired] = useState<boolean>(required);
+  const [isError, setIsError] = useState<boolean>(false);
 
   useEffect(() => {
-    setIsRequired(image === null);
-  }, [image]);
+    setIsRequired(images === null);
+  }, [images]);
+
+  const handleChange = async(images: FileList | null) => {
+    await UpdateImages(reportID, images, imageType)
+  }
 
   return (
     <div className="flex flex-col mb-4">
@@ -321,9 +344,16 @@ export const ImageField = ({
         type="file"
         accept="image/png, image/jpeg"
         required={isRequired}
-        onChange={(e) => uploadImage(reportID, e.target.files, perspective)}
+        onChange={(e) => {handleChange(e.target.files); setIsError(false)}}
+        onInvalid={() => setIsError(true)}
+        multiple={multiple}
       />
-      {image && <img src={image} alt={id} className="w-20" />}
+      {images?.map((image) => (
+        <img src={image} alt={`${image}`} className="w-20"/>
+      ))}
+      {isError && (
+        <p className="text-sm text-red-500">Please choose one or more pictures</p>
+      )}
     </div>
   );
 };

@@ -16,14 +16,25 @@ import WitnessList from "@/components/witnessList";
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const id = context.query.id as string;
 
-  const data = await getData(id);
-  const images = await getImages(id);
+  try {
+    const data = await getData(id);
+    const images = await getImages(id);
 
-  return {
-    props: {
-      data: data || null,
-      images: images || null,
-      id: id
+    return {props: {
+      data: data,
+      images: images || {'GreenMobility': [], 'OtherParty': []},
+      id: id,
+    }}
+  }
+  catch (error) {
+    console.error(`Something went wrong fetching data:\n${error}\n`)
+
+    return {
+      props: {
+        data: null,
+        images: {'GreenMobility': [], 'OtherParty': []},
+        id: id
+      }
     }
   }
 }
@@ -40,10 +51,7 @@ const HowPage:NextPage<pageProps> = ({data, images, id}) => {
   const [witnessesPresent, setWitnessesPresent] = useState<boolean | null>(data!.witnessesPresent);
   const [witnesses, setWitnesses] = useState<{name:string, phone:string, email:string}[]>(data?.witnesses || [])
 
-  const [frontImage, setFrontImage] = useState<string | null>(images!['FRONT']);
-  const [rightImage, setRightImage] = useState<string | null>(images!['RIGHT']);
-  const [backImage, setBackImage] = useState<string | null>(images!['BACK']);
-  const [leftImage, setLeftImage] = useState<string | null>(images!['LEFT']);
+  const [greenImages, setGreenImages] = useState<string[] | null>(images!['GreenMobility']);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -111,38 +119,22 @@ const HowPage:NextPage<pageProps> = ({data, images, id}) => {
       <div>
         <ImageField
           reportID={id}
-          perspective="FRONT"
           id="FrontImage"
-          labelText="Take picture of the front of the GreenMobility car"
+          labelText="Take pictures of damages on GreenMobility car"
           required={true}
-          image={frontImage}
+          images={greenImages}
+          imageType='GreenMobility'
+          multiple={true}
         />
 
         <ImageField
           reportID={id}
-          perspective="RIGHT"
-          id="RightImage"
-          labelText="Take picture of the right side of the GreenMobility car"
-          required={true}
-          image={rightImage}
-        />
-
-        <ImageField
-          reportID={id}
-          perspective="BACK"
-          id="BackImage"
-          labelText="Take picture of the back of the GreenMobility car"
-          required={true}
-          image={backImage}
-        />
-
-        <ImageField
-          reportID={id}
-          perspective="LEFT"
           id="LeftImage"
-          labelText="Take picture of the left side of the GreenMobility car"
+          labelText="Take pictures of damages to other partys"
           required={true}
-          image={leftImage}
+          images={greenImages}
+          imageType='GreenMobility'
+          multiple={true}
         />
       </div>
 
