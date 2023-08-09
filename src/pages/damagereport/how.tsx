@@ -10,31 +10,20 @@ import BackButton from "@/components/buttons/back";
 import { useRouter } from "next/router";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { pageProps } from "@/utils/utils";
-import { getData, getImages, updateData, uploadImage } from "@/firebase/clientApp";
+import { getData, getImages, updateData } from "@/firebase/clientApp";
 import WitnessList from "@/components/witnessList";
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const id = context.query.id as string;
 
-  try {
-    const data = await getData(id);
-    const images = await getImages(id);
+  const data = await getData(id);
+  const images = await getImages(id);
 
-    return {props: {
-      data: data,
-      images: images || {'GreenMobility': [], 'OtherParty': []},
-      id: id,
-    }}
-  }
-  catch (error) {
-    console.error(`Something went wrong fetching data:\n${error}\n`)
-
-    return {
-      props: {
-        data: null,
-        images: {'GreenMobility': [], 'OtherParty': []},
-        id: id
-      }
+  return {
+    props: {
+      data: data || null,
+      images: images || null,
+      id: id
     }
   }
 }
@@ -51,11 +40,13 @@ const HowPage:NextPage<pageProps> = ({data, images, id}) => {
   const [witnessesPresent, setWitnessesPresent] = useState<boolean | null>(data!.witnessesPresent);
   const [witnesses, setWitnesses] = useState<{name:string, phone:string, email:string}[]>(data?.witnesses || [])
 
-  const [greenImages, setGreenImages] = useState<string[] | null>(images!['GreenMobility']);
+  const [greenImages, setGreenImages] = useState<string[] | null>(images?.['GreenMobility'] || null);
+  const [otherPartyImages, setOtherPartyImages] = useState<string[] |null>(images?.['OtherParty'] || null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    console.log(greenImages);
     /* Making witnesses to the correct datatype and securing only correct data is sent to server */
     const witnessesData = witnesses.map((witness) => ({
       name: witness.name,
@@ -103,7 +94,6 @@ const HowPage:NextPage<pageProps> = ({data, images, id}) => {
       </div>
 
       {/* Accident speed collection */}
-      {/* TODO: Make it collect involved parties and request speed from every party */}
       <div>
         <Inputfield
           labelText="Your speed in [km/h]"
@@ -132,8 +122,8 @@ const HowPage:NextPage<pageProps> = ({data, images, id}) => {
           id="LeftImage"
           labelText="Take pictures of damages to other partys"
           required={true}
-          images={greenImages}
-          imageType='GreenMobility'
+          images={otherPartyImages}
+          imageType='OtherParty'
           multiple={true}
         />
       </div>

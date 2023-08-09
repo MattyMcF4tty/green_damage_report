@@ -373,27 +373,29 @@ const confirmationPage:NextPage<pageProps> = ({ data, images, id }) => {
           )}
         </div>
 
-        {/* Images */}
-        <p className="font-bold">Images of damages</p>
+        {/* Images of damages to GreenMobility car*/}
+        <p className="font-bold">Damages to GreenMobility car</p>
         <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
-          {images && (
-            <div>
-            <div className="flex flex-row">
-              <img src={images['FRONT']} alt="FrontImage" 
-              className="w-1/2"/>
-              <img src={images['RIGHT']} alt="RightImage" 
-              className="w-1/2"/>
-            </div>
-            <div className="flex flex-row">
-              <img src={images['BACK']} alt="BackImage" 
-              className="w-1/2"/>
-              <img src={images['LEFT']} alt="LeftImage" 
-              className="w-1/2"/>
-            </div>
-          </div>
+          {images && images['GreenMobility'] && images['GreenMobility'].length > 0 ? (
+            images['GreenMobility'].map((image) => (
+              <img key={image} src={image} alt={image} className="w-20" />
+            ))
+          ) : (
+            <p>No images</p>
           )}
         </div>
 
+        {/* Images of damages to other partys */}
+        <p className="font-bold">Damages to OtherPartys</p>
+        <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
+          {images && images['OtherParty'] && images['OtherParty'].length > 0 ? (
+            images['OtherParty'].map((image) => (
+              <img key={image} src={image} alt={image} className="w-20" />
+            ))
+          ) : (
+            <p>No images</p>
+          )}
+        </div>
   
         <div className="w-full flex flex-row">
           <BackButton pageName={`where?id=${id}`}/>

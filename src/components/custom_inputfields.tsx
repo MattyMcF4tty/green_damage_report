@@ -1,7 +1,7 @@
 /* import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";*/
-import { UpdateImages } from "@/firebase/clientApp";
+import { updateImages } from "@/firebase/clientApp";
 import { Address } from "cluster";
-import React, { useEffect, useState, useRef, use } from "react";
+import React, { useEffect, useState, useRef } from "react";
 /* import usePlacesAutocomplete, {
   getGeocode,
   getLatLng,
@@ -327,19 +327,24 @@ export const ImageField = ({
   const [isRequired, setIsRequired] = useState<boolean>(required);
   const [isError, setIsError] = useState<boolean>(false);
 
+  console.log(images);
+
   useEffect(() => {
+    if (images === null)
     setIsRequired(images === null);
   }, [images]);
 
-  const handleChange = async(images: FileList | null) => {
-    await UpdateImages(reportID, images, imageType)
+  const handleChange = async(newImages: FileList | null) => {
+    await updateImages(reportID, newImages, imageType)
   }
+
+  console.log(`${id}: ${isRequired}`)
 
   return (
     <div className="flex flex-col mb-4">
       <label htmlFor={id}>{labelText}</label>
       <input
-        className=""
+        className="cursor-pointer"
         id={id}
         type="file"
         accept="image/png, image/jpeg"
@@ -348,9 +353,11 @@ export const ImageField = ({
         onInvalid={() => setIsError(true)}
         multiple={multiple}
       />
-      {images?.map((image) => (
-        <img src={image} alt={`${image}`} className="w-20"/>
-      ))}
+      <div className="flex flex-wrap gap-[2px] mt-1">
+        {images && images.map((image) => (
+          <img src={image} alt={image} className="w-20" />
+        ))}
+      </div>
       {isError && (
         <p className="text-sm text-red-500">Please choose one or more pictures</p>
       )}
@@ -374,6 +381,8 @@ export const Checkbox = ({
   onChange,
   requried,
 }: CheckboxProps) => {
+  const [isError, setIsError] = useState<boolean>(false);
+
   return (
     <div className="flex flex-row-reverse items-center mr-4">
       <label htmlFor={"Checkbox" + id}>{labelText}</label>
@@ -383,8 +392,12 @@ export const Checkbox = ({
         type="checkbox"
         checked={value}
         required={requried}
-        onChange={(event) => onChange(event.target.checked)}
+        onChange={(event) => {onChange(event.target.checked); setIsError(false)}}
+        onInvalid={() => setIsError(true)}
       />
+      {isError && (
+        <p className="text-sm text-red-500">Please check this box</p>
+      )}
     </div>
   );
 };

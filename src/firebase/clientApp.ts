@@ -174,59 +174,30 @@ export const updateData = async (id:string, data:object) => {
     }
 }
 
-export const uploadImage = async (id:string, image:FileList | null, perspective:'FRONT' | 'RIGHT' | 'BACK' | 'LEFT') => {
+export const updateImages = async (id: string, images: FileList | null, imageType: 'GreenMobility' | 'OtherParty') => {
+  const storageRef = ref(storage, `${id}/${imageType}`);
 
-    /* Checks if there already is a image from that perspectiv */
-    const imageList = await listAll(ref(storage, id));
-    for (const item of imageList.items) {
-        if (item.name.startsWith(perspective)) {
-            /* Delete image if it exist */
-            await deleteObject(ref(storage, item.fullPath));
-        };
-    };
+  try {
+    if (images) {
+      deleteAllImages(storageRef);
+      for (let i = 0; i < images.length; i++) {
+        const image = images[i];
+        const imageRef = ref(storageRef, image.name);
+        const imageBlob = new Blob([image], { type: image.type });
 
-    if (image) {
-        const imageName = `${perspective}_${image[0].name}`;
-        const imageRef = ref(storage, `${id}/${imageName}`);
-        const imgBlob = new Blob([image[0], image[0].type]);
-    
-        try {
-            await uploadBytes(imageRef, imgBlob)
-            console.log("Image uploaded")
-        }
-        catch(error) {
-            console.error(`Error uploading image:\n${error}`)
-        }
+        await uploadBytes(imageRef, imageBlob);
+      }
+    } else {
+      deleteAllImages(storageRef);
     }
-    else {
-        console.log("No image selected")
-    }
+    console.log("Images updated");
+  } catch (error) {
+    console.error(`Something went wrong updating images at ${id}/${imageType}:\n${error}\n`);
+  }
 }
 
-export const UpdateImages = async(id:string, images:FileList | null, imageType:'GreenMobility' | 'OtherParty') => {
-    const storageRef = ref(storage, `${id}/${imageType}`)
 
-    try {
-        if (images) {
-            DeleteAllImages(storageRef)
-            for (let i = 0; i < images.length; i++ ) {
-                const image = images[i];
-                const imageRef = ref(storageRef, image.name)
-                const imageBlob = new Blob([image, image.type])
-
-                await uploadBytes(imageRef, imageBlob)
-            }
-        } else {
-            DeleteAllImages(storageRef)
-        }
-        console.log("Images updated")
-    } 
-    catch (error) {
-        console.error(`Something went wrong updating images at ${id}/${imageType}:\n${error}\n`)
-    }
-}
-
-const DeleteAllImages = async(StorageRef: StorageReference) => {
+const deleteAllImages = async(StorageRef: StorageReference) => {
     try {
         const storedImages:ListResult = await listAll(StorageRef);
 
@@ -244,8 +215,9 @@ const DeleteAllImages = async(StorageRef: StorageReference) => {
 
 export const getImages = async (id: string) => {
     const greenStorageRef = ref(storage, `${id}/GreenMobility`);
-    const otherPartyStorageRef = ref(storage, `${id}/OtherParty`)
+    const otherPartyStorageRef = ref(storage, `${id}/OtherParty`);
 
+    console.log(greenStorageRef.fullPath)
     try {
         const greenImageList: ListResult = await listAll(greenStorageRef);
         const otherPartyImageList: ListResult = await listAll(otherPartyStorageRef);
@@ -254,7 +226,7 @@ export const getImages = async (id: string) => {
         /* Get images of GreenMobility car */
         const greenImageURLs: string[] = [];
         for (const image of greenImageList.items) {
-            const imageRef: StorageReference = ref(greenStorageRef, image.fullPath);
+            const imageRef: StorageReference = ref(greenStorageRef, image.name);
             const imageURL: string = await getDownloadURL(imageRef);
 
             greenImageURLs.push(imageURL);
@@ -264,7 +236,7 @@ export const getImages = async (id: string) => {
         /* Get images of OtherPartys */
         const otherPartyImageURLs: string[] = [];
         for (const image of otherPartyImageList.items) {
-            const imageRef: StorageReference = ref(otherPartyStorageRef, image.fullPath);
+            const imageRef: StorageReference = ref(otherPartyStorageRef, image.name);
             const imageURL: string = await getDownloadURL(imageRef);
 
             otherPartyImageURLs.push(imageURL);

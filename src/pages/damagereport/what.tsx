@@ -7,6 +7,8 @@ import BackButton from "@/components/buttons/back";
 import { useRouter } from "next/router";
 import { getData, updateData } from "@/firebase/clientApp";
 import { pageProps } from "@/utils/utils";
+import PhoneNumber from "@/components/opposite_information/phone_form";
+
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const id = context.query.id as string;
@@ -20,7 +22,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     }
   }
 }
-import PhoneNumber from "@/components/opposite_information/phone_form";
 
 const What: NextPage<pageProps> = ({data, id}) => {
   const router = useRouter();

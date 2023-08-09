@@ -1,12 +1,12 @@
 
-const ErrorPage = ({ statusCode  }) => {
+const ErrorPage = ({ statusCode }) => {
 
     return (
         <div className="flex w-full h-[calc(100vh-6rem)] bg-MainGreen-100 rounded-lg items-center flex-col"> 
             {statusCode && (
                 <p className="text-8xl mt-40 font-extraboldbold">{statusCode}</p>
             )}
-            <p className="text-6xl mb-5">Oops something went wrong :(</p>
+            <p className="text-6xl mb-5">{`Oops something went wrong :(`}</p>
             {statusCode ? (
                 <div className="">
                     {statusCode === 404 && (
