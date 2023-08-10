@@ -67,7 +67,6 @@ const ReportList = ({
               onClick={() => onPageChange(currentPage - 1)}
               disabled={currentPage === 1} // Disable the button when on the first page
             >
-              {/* ... (left arrow icon) */}
               Previous
             </button>
             <span className="flex items-center">
@@ -78,7 +77,6 @@ const ReportList = ({
               onClick={() => onPageChange(currentPage + 1)}
               disabled={currentPage === totalPages} // Disable the button when on the last page
             >
-              {/* ... (right arrow icon) */}
               Next
             </button>
           </div>
