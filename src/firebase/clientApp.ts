@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app"
 import { collection, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
 import { StorageReference, deleteObject, getDownloadURL, getStorage, listAll, ref, uploadBytes } from "firebase/storage"
+import { reportDataType } from "@/utils/utils";
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -231,3 +232,29 @@ export const getImages = async (id:string) => {
 
     return(imageURLs)
 }
+
+const getReportIds = async () => {
+    const reportColRef = collection(db, "unfinished/")
+    const querySnapshot = await getDocs(reportColRef);
+    const idList = querySnapshot.docs.map((doc) => doc.id);
+
+    return idList;
+}
+
+export const getReports = async () => {
+    const idList = await getReportIds();
+    
+    const reportList: { id: string; data: reportDataType }[] = [];
+  
+    await Promise.all(
+      idList.map(async (id) => {
+        const docData = await getData(id);
+        if (docData !== undefined) {
+            reportList.push({ id: id, data: docData });
+        }
+      })
+    );
+    
+    return reportList;
+  };
+  
