@@ -76,13 +76,10 @@ const adminPage: NextPage<pageProps> = ({ data, images }) => {
     }
 
     if (activeSection === "All") {
-      console.log("Report added: All");
       return true;
     } else if (activeSection === "Unfinished") {
-      console.log("Report added: Unfinished");
       return !report.finished;
     } else if (activeSection === "Finished") {
-      console.log("Report added: Finished");
       return report.finished;
     }
     return false;
