@@ -69,6 +69,25 @@ const adminPage: NextPage<pageProps> = ({ data, images }) => {
   const endIndex = startIndex + reportsPerPage;
   const currentReports = reportList.slice(startIndex, endIndex);
 
+  // Apply filtering based on activeSection
+  const reportsToShow = reportList.filter((report) => {
+    if (report === null) {
+      return false;
+    }
+
+    if (activeSection === "All") {
+      console.log("Report added: All");
+      return true;
+    } else if (activeSection === "Unfinished") {
+      console.log("Report added: Unfinished");
+      return !report.finished;
+    } else if (activeSection === "Finished") {
+      console.log("Report added: Finished");
+      return report.finished;
+    }
+    return false;
+  });
+
   return (
     <div className="w-full h-full bg-white rounded-md overflow-hidden">
       {/* Top section */}
@@ -167,7 +186,7 @@ const adminPage: NextPage<pageProps> = ({ data, images }) => {
       {/* Table section */}
       <div className="bg-white w-full h-[calc(100vh-12rem)]">
         <ReportList
-          reportList={reportList}
+          reportList={reportsToShow}
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={handlePageChange} // Pass the onPageChange handler
