@@ -1,13 +1,80 @@
 import React, { useState } from "react";
+import adminNavbar from "@/components/admin/adminNav";
+import ReportList from "@/components/admin/reportList";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faTrashCan,
+  faPrint,
+  faCloudArrowDown,
+} from "@fortawesome/free-solid-svg-icons";
+import { getData, getImages } from "@/firebase/clientApp";
+import { GetServerSidePropsContext, NextPage } from "next";
+import { pageProps, reportDataType } from "@/utils/utils";
 
-const adminPage = () => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  const data = await getData("dQvpvpXS1m6zZQU6");
+  const images = await getImages("dQvpvpXS1m6zZQU6");
+
+  return {
+    props: {
+      data: data || null,
+      images: images || null,
+    },
+  };
+};
+
+const adminPage: NextPage<pageProps> = ({ data, images }) => {
   const [activeSection, setActiveSection] = useState("All");
+  const [reportList, setReportList] = useState<(reportDataType | null)[]>([
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+    data,
+  ]);
+  const reportsPerPage = 20;
+  const totalPages = Math.ceil(reportList.length / reportsPerPage);
+  const [currentPage, setCurrentPage] = useState(1);
+
+  // Function to handle changing the page
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
+  // Calculate the range of reports to display based on current page
+  const startIndex = (currentPage - 1) * reportsPerPage;
+  const endIndex = startIndex + reportsPerPage;
+  const currentReports = reportList.slice(startIndex, endIndex);
 
   return (
-    <div className="w-full h-[calc(100vh-6rem)] bg-white rounded-md">
-      <div className="flex flex-row w-full justify-start items-center mb-10">
+    <div className="w-full h-full bg-white rounded-md overflow-hidden">
+      {/* Top section */}
+      <div className="flex flex-row w-full justify-start items-center border-b border-gray-300">
         <button
-          className={`h-20 flex flex-col items-center justify-center text-lg cursor-pointer relative w-24 ${
+          className={`h-14 flex flex-col items-center justify-center text-lg cursor-pointer relative w-24 ${
             activeSection === "All" ? "text-MainGreen-300" : ""
           }`}
           onClick={() => setActiveSection("All")}
@@ -18,7 +85,7 @@ const adminPage = () => {
           )}
         </button>
         <button
-          className={`h-20 w-32 flex flex-col items-center justify-center text-lg cursor-pointer relative ${
+          className={`h-14 w-32 flex flex-col items-center justify-center text-lg cursor-pointer relative ${
             activeSection === "Unfinished" ? "text-MainGreen-300" : ""
           }`}
           onClick={() => setActiveSection("Unfinished")}
@@ -29,7 +96,7 @@ const adminPage = () => {
           )}
         </button>
         <button
-          className={`h-20 w-32 flex flex-col items-center justify-center text-lg cursor-pointer relative ${
+          className={`h-14 w-32 flex flex-col items-center justify-center text-lg cursor-pointer relative ${
             activeSection === "Finished" ? "text-MainGreen-300" : ""
           }`}
           onClick={() => setActiveSection("Finished")}
@@ -40,19 +107,29 @@ const adminPage = () => {
           )}
         </button>
       </div>
-      <div className="flex flex-row items-center justify-between mb-8">
-        <div className="flex flex-row w-1/6 justify-between">
+      {/* middle section */}
+      <div className="flex flex-row justify-between my-4 items-baseline ">
+        <div className="flex flex-row w-1/3 justify-between ml-8">
           <button
             type="button"
-            className="bg-white border-gray-300 border-[1px] rounded-lg w-1/3"
+            className="bg-white border-gray-300 border-[1px] rounded-xl w-32  hover:bg-red-600 hover:text-white duration-150"
           >
-            Delete
+            <FontAwesomeIcon icon={faTrashCan} />
+            {" Delete"}
           </button>
           <button
             type="button"
-            className="bg-white border-gray-300 border-[1px] rounded-lg w-1/3"
+            className="bg-white border-gray-300 border-[1px] rounded-xl w-32 hover:bg-MainGreen-300 hover:text-white duration-150"
           >
-            Print
+            <FontAwesomeIcon icon={faPrint} />
+            {" Print"}
+          </button>
+          <button
+            type="button"
+            className="bg-white border-gray-300 border-[1px] rounded-xl w-32 hover:bg-blue-500 hover:text-white duration-150"
+          >
+            <FontAwesomeIcon icon={faCloudArrowDown} />
+            {" Download"}
           </button>
         </div>
 
@@ -61,8 +138,9 @@ const adminPage = () => {
             type="search"
             style={{
               borderColor: "#3EA635", // Green border color
+              marginRight: "2rem",
             }}
-            className="relative h-10 m-0 block w-[400px] rounded border border-solid border-neutral-300 bg-transparent bg-clip-padding pl-10 pr-[2.5rem] py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:ring-0 focus:border-[#3EA635] dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200"
+            className="relative h-8 m-0 block w-[400px] rounded-lg border border-solid border-neutral-300 bg-transparent bg-clip-padding pl-10 pr-[1rem] py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:ring-0 focus:border-[#3EA635] dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200"
             placeholder="Search"
             aria-label="Search"
             aria-describedby="button-addon2"
@@ -86,9 +164,14 @@ const adminPage = () => {
           </span>
         </div>
       </div>
-      <div className="bg-gray-200 h-[calc(100vh-15rem)]">
-        <p>liste</p>
-        {/* Other list items */}
+      {/* Table section */}
+      <div className="bg-white w-full h-[calc(100vh-12rem)]">
+        <ReportList
+          reportList={reportList}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange} // Pass the onPageChange handler
+        />
       </div>
     </div>
   );

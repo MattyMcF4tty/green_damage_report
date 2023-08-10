@@ -2,12 +2,12 @@ import { Navbar } from "@/components/navigation";
 import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import { useRouter } from "next/router";
+import AdminNavbar from "@/components/admin/adminNav";
 
 function MyApp({ Component, pageProps }: AppProps) {
-
   const { pathname } = useRouter();
-  
-  if (pathname.startsWith('/damagereport')) {
+
+  if (pathname.startsWith("/damagereport")) {
     return (
       <>
         <Navbar />
@@ -19,6 +19,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   } else {
     return (
       <>
+        <AdminNavbar />
         <div>
           <Component {...pageProps} />
         </div>
