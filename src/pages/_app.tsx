@@ -6,32 +6,31 @@ import AdminNavbar from "@/components/admin/adminNav";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const { pathname } = useRouter();
+  console.log(pathname)
 
-  if (pathname.startsWith("/damagereport")) {
-    return (
+  return (
       <>
-        <Navbar />
-        <div className="p-4">
-          <Component {...pageProps} />
-        </div>
+        {pathname.startsWith("/damagereport") ? (
+          <div>
+            <Navbar />
+            <div className="p-4">
+              <Component {...pageProps} />
+            </div>
+          </div>
+        ) : pathname.startsWith("/admin") ? (
+          <div>
+            <AdminNavbar />
+            <div className="p-4">
+              <Component {...pageProps} />
+            </div>
+          </div>
+        ) : (
+          <div className="p-4">
+            <Component {...pageProps} />
+          </div>
+        )}
       </>
-    );
-  } else if (pathname.startsWith("/admin")) {
-    return (
-      <>
-        <AdminNavbar />
-        <div>
-          <Component {...pageProps} />
-        </div>
-      </>
-    );
-  } else {
-    <>
-      <div>
-        <Component {...pageProps} />
-      </div>
-    </>
-  }
+  )
 }
 
 export default MyApp;
