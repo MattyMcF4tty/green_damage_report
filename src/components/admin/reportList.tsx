@@ -7,7 +7,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 interface reportListProps {
-  reportList: (reportDataType | null)[];
+  reportList: { id: string; data: reportDataType }[] | null;
   currentPage: number;
   totalPages: number;
   onPageChange: (newPage: number) => void; // Add this line
@@ -21,7 +21,7 @@ const ReportList = ({
 }: reportListProps) => {
   const reportsPerPage = 20;
   const startIndex = (currentPage - 1) * reportsPerPage;
-  const endIndex = Math.min(startIndex + reportsPerPage, reportList.length);
+  const endIndex = Math.min(startIndex + reportsPerPage, reportList!.length);
 
   return (
     <div className="w-full px-6">
@@ -43,20 +43,24 @@ const ReportList = ({
         <div className="w-full">
           <table className="w-full">
             <tbody>
-              {reportList.slice(startIndex, endIndex).map((report, index) => (
-                <tr
-                  className="even:bg-blue-50 odd:bg-white text-center"
-                  key={index}
-                >
-                  <td className="w-1/5 py-2">dQvpvpXS1m6zZQU6</td>
-                  <td className="w-1/5">
-                    {report?.driverInfo.firstName} {report?.driverInfo.lastName}
-                  </td>
-                  <td className="w-1/5">{report?.greenCarNumberPlate}</td>
-                  <td className="w-1/5">{`${report?.finished}`}</td>
-                  <td className="w-1/5">{report?.date}</td>
-                </tr>
-              ))}
+              {reportList &&
+                reportList.slice(startIndex, endIndex).map((report, index) => (
+                  <tr
+                    className="even:bg-blue-50 odd:bg-white text-center"
+                    key={index}
+                  >
+                    <td className="w-1/5 py-2">dQvpvpXS1m6zZQU6</td>
+                    <td className="w-1/5">
+                      {report?.data?.driverInfo?.firstName}{" "}
+                      {report?.data?.driverInfo?.lastName}
+                    </td>
+                    <td className="w-1/5">
+                      {report?.data?.greenCarNumberPlate}
+                    </td>
+                    <td className="w-1/5">{`${report?.data?.finished}`}</td>
+                    <td className="w-1/5">{report?.data?.date}</td>
+                  </tr>
+                ))}
             </tbody>
           </table>
           {/* Pagination buttons */}

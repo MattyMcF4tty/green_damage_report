@@ -7,80 +7,64 @@ import {
   faPrint,
   faCloudArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
-import { getData, getImages } from "@/firebase/clientApp";
+import { getData, getImages, getReports } from "@/firebase/clientApp";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { pageProps, reportDataType } from "@/utils/utils";
+import ReportList2 from "@/components/admin/reportList2";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  const data = await getData("dQvpvpXS1m6zZQU6");
-  const images = await getImages("dQvpvpXS1m6zZQU6");
+  const data = await getReports();
 
   return {
     props: {
       data: data || null,
-      images: images || null,
     },
   };
 };
 
-const adminPage: NextPage<pageProps> = ({ data, images }) => {
+type Props = {
+  data: { id: string; data: reportDataType }[] | null;
+};
+
+const adminPage: NextPage<Props> = ({ data }) => {
   const [activeSection, setActiveSection] = useState("All");
-  const [reportList, setReportList] = useState<(reportDataType | null)[]>([
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-    data,
-  ]);
-  const reportsPerPage = 20;
-  const totalPages = Math.ceil(reportList.length / reportsPerPage);
+  const [reportList, setReportList] = useState<
+    { id: string; data: reportDataType }[] | null
+  >(data || null);
   const [currentPage, setCurrentPage] = useState(1);
+
+  const reportsPerPage = 20;
+  const startIndex = (currentPage - 1) * reportsPerPage;
+  const endIndex = startIndex + reportsPerPage;
+
+  let totalPages: number = 0;
+  let currentReports: {
+    id: string;
+    data: reportDataType;
+  }[] = [];
+
+  if (reportList) {
+    totalPages = Math.ceil(reportList.length / reportsPerPage);
+    currentReports = reportList.slice(startIndex, endIndex);
+  }
 
   // Function to handle changing the page
   const handlePageChange = (newPage: number) => {
     setCurrentPage(newPage);
   };
-  // Calculate the range of reports to display based on current page
-  const startIndex = (currentPage - 1) * reportsPerPage;
-  const endIndex = startIndex + reportsPerPage;
-  const currentReports = reportList.slice(startIndex, endIndex);
 
   // Apply filtering based on activeSection
-  const reportsToShow = reportList.filter((report) => {
+  const reportsToShow = reportList!.filter((report) => {
     if (report === null) {
       return false;
-    }
-
-    if (activeSection === "All") {
+    } else if (activeSection === "All") {
       return true;
     } else if (activeSection === "Unfinished") {
-      return !report.finished;
+      return !report.data.finished;
     } else if (activeSection === "Finished") {
-      return report.finished;
+      return report.data.finished;
     }
     return false;
   });
@@ -182,10 +166,9 @@ const adminPage: NextPage<pageProps> = ({ data, images }) => {
       </div>
       {/* Table section */}
       <div className="bg-white w-full shadow-lg h-[calc(100vh-13rem)]">
-        <ReportList
+        <ReportList2
           reportList={reportsToShow}
-          currentPage={currentPage}
-          totalPages={totalPages}
+          itemsPerPage={20}
           onPageChange={handlePageChange} // Pass the onPageChange handler
         />
       </div>
