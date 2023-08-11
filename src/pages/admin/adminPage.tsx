@@ -124,7 +124,7 @@ const adminPage: NextPage<pageProps> = ({ data, images }) => {
         </button>
       </div>
       {/* middle section */}
-      <div className="flex flex-row justify-between my-4 items-baseline ">
+      <div className="flex flex-row justify-between my-6 items-baseline ">
         <div className="flex flex-row w-1/3 justify-between ml-8">
           <button
             type="button"
@@ -153,10 +153,10 @@ const adminPage: NextPage<pageProps> = ({ data, images }) => {
           <input
             type="search"
             style={{
-              borderColor: "#3EA635", // Green border color
+              borderColor: "#808080", // Green border color
               marginRight: "2rem",
             }}
-            className="relative h-8 m-0 block w-[400px] rounded-lg border border-solid border-neutral-300 bg-transparent bg-clip-padding pl-10 pr-[1rem] py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:ring-0 focus:border-[#3EA635] dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200"
+            className="relative h-8 m-0 block w-[400px] rounded-lg shadow-md border border-solid border-neutral-300 bg-transparent bg-clip-padding pl-10 pr-[1rem] py-[0.25rem] text-base font-normal leading-[1.6] text-neutral-700 outline-none transition duration-200 ease-in-out focus:z-[3] focus:ring-0 focus:border-[#3EA635] dark:border-neutral-600 dark:text-neutral-200 dark:placeholder:text-neutral-200"
             placeholder="Search"
             aria-label="Search"
             aria-describedby="button-addon2"
@@ -181,7 +181,7 @@ const adminPage: NextPage<pageProps> = ({ data, images }) => {
         </div>
       </div>
       {/* Table section */}
-      <div className="bg-white w-full h-[calc(100vh-12rem)]">
+      <div className="bg-white w-full shadow-lg h-[calc(100vh-13rem)]">
         <ReportList
           reportList={reportsToShow}
           currentPage={currentPage}

@@ -29,17 +29,17 @@ const ReportList = ({
         <table className="w-full">
           <thead className="sticky top-0 bg-MainGreen-300 text-white">
             <tr className="text-center">
-              <th className="w-1/5">ID</th>
-              <th className="w-1/5">Name</th>
-              <th className="w-1/5">Numberplate</th>
-              <th className="w-1/5">Status</th>
-              <th className="w-1/5">Date</th>
+              <th className="w-1/5 font-normal">ID</th>
+              <th className="w-1/5 font-normal">Name</th>
+              <th className="w-1/5 font-normal">Numberplate</th>
+              <th className="w-1/5 font-normal">Status</th>
+              <th className="w-1/5 font-normal">Date</th>
             </tr>
           </thead>
         </table>
       </div>
       {/* Table body container with fixed height */}
-      <div className="max-h-[calc(100vh-14rem)] overflow-y-auto">
+      <div className="max-h-[calc(100vh-15rem)] overflow-y-auto">
         <div className="w-full">
           <table className="w-full">
             <tbody>
@@ -48,10 +48,9 @@ const ReportList = ({
                   className="even:bg-blue-50 odd:bg-white text-center"
                   key={index}
                 >
-                  <td className="w-1/5">dQvpvpXS1m6zZQU6</td>
+                  <td className="w-1/5 py-2">dQvpvpXS1m6zZQU6</td>
                   <td className="w-1/5">
-                    {index} {report?.driverInfo.firstName}{" "}
-                    {report?.driverInfo.lastName}
+                    {report?.driverInfo.firstName} {report?.driverInfo.lastName}
                   </td>
                   <td className="w-1/5">{report?.greenCarNumberPlate}</td>
                   <td className="w-1/5">{`${report?.finished}`}</td>
