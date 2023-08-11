@@ -52,7 +52,7 @@ const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
         />
 
         <Inputfield
-          labelText="Fullname on the opposite person"
+          labelText="Fullname of the other person involved"
           id="nameInput"
           required={true}
           type="text"
@@ -60,9 +60,9 @@ const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
           onChange={setName}
         />
 
-        <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} />
+        <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} labelText="Phone number of the other person involved"/>
         <Inputfield
-          labelText="Email"
+          labelText="Email address of the other person"
           id="EmailInput"
           required={true}
           type="text"
@@ -73,7 +73,8 @@ const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
         <TextField
           id="BikePersonDamage"
           maxLength={200}
-          labelText="Descripe the damage to the person"
+          labelText="
+          If any personal injury has occurred, please describe the injury"
           required={true}
           value={personDamage}
           onChange={setPersonDamage}

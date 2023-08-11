@@ -86,7 +86,7 @@ const HowPage:NextPage<pageProps> = ({data, images, id}) => {
       <div>
         <TextField
           id="accidentDescription"
-          labelText="Describe what happened"
+          labelText="Description of the incident"
           maxLength={200}
           required={true}
           value={accidentDescription}
@@ -100,7 +100,7 @@ const HowPage:NextPage<pageProps> = ({data, images, id}) => {
         <Inputfield
           labelText="Your speed in [km/h]"
           id="GreenDriverSpeed"
-          required={true}
+          required={false}
           type="number"
           value={greenDriverSpeed}
           onChange={setGreenDriverSpeed}
@@ -114,7 +114,7 @@ const HowPage:NextPage<pageProps> = ({data, images, id}) => {
           perspective="FRONT"
           id="FrontImage"
           labelText="Take picture of the front of the GreenMobility car"
-          required={true}
+          required={false}
           image={frontImage}
         />
 
@@ -123,7 +123,7 @@ const HowPage:NextPage<pageProps> = ({data, images, id}) => {
           perspective="RIGHT"
           id="RightImage"
           labelText="Take picture of the right side of the GreenMobility car"
-          required={true}
+          required={false}
           image={rightImage}
         />
 
@@ -132,7 +132,7 @@ const HowPage:NextPage<pageProps> = ({data, images, id}) => {
           perspective="BACK"
           id="BackImage"
           labelText="Take picture of the back of the GreenMobility car"
-          required={true}
+          required={false}
           image={backImage}
         />
 
@@ -141,7 +141,7 @@ const HowPage:NextPage<pageProps> = ({data, images, id}) => {
           perspective="LEFT"
           id="LeftImage"
           labelText="Take picture of the left side of the GreenMobility car"
-          required={true}
+          required={false}
           image={leftImage}
         />
       </div>
@@ -150,7 +150,8 @@ const HowPage:NextPage<pageProps> = ({data, images, id}) => {
       <div>
         <TextField
           id="damageDescription"
-          labelText="Describe the damages to involved parties"
+          labelText="
+          Please provide a description of the damages incurred to the parties involved"
           maxLength={500}
           required={true}
           value={damageDescription}
@@ -170,7 +171,9 @@ const HowPage:NextPage<pageProps> = ({data, images, id}) => {
         {policePresent && (
           <div>
             <YesNo
-              labelText="Has a police report been made?"
+              labelText="
+
+              Is there a police report recorded?"
               id="PoliceReport"
               required={true}
               value={policeReport}
@@ -178,9 +181,10 @@ const HowPage:NextPage<pageProps> = ({data, images, id}) => {
             />
             {policeReport && (
               <Inputfield
-                labelText="enter the journal number"
+                labelText="
+                Please enter the police report number"
                 id="JournalNumber"
-                required={true}
+                required={false}
                 type="number"
                 value={journalNumber}
                 onChange={setJournalNumber}
@@ -195,7 +199,8 @@ const HowPage:NextPage<pageProps> = ({data, images, id}) => {
       <div>
         <YesNo
           id="WitnessesPresent"
-          labelText="Were there witnesses present?"
+          labelText="
+          Were any witnesses present?"
           required={true}
           value={witnessesPresent}
           onChange={setWitnessesPresent}

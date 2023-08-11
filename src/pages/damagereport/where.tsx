@@ -43,7 +43,7 @@ const WherePage: NextPage<pageProps> = ({data, id}) => {
   const [damageDescription, setDamageDescription] = useState<string>("");
 
   /* Data */
-  const [carInfo, setCarInfo] = useState<carInformation>(data?.vehicleInfo || {name: "", phone: "", email: "", driversLicenseNumber: "", insurance: "", numberplate: "", color: "", model: ""});
+  const [carInfo, setCarInfo] = useState<carInformation>(data?.vehicleInfo || {name: "", phone: "", email: "", driversLicenseNumber: "", insurance: "", numberplate: "", model: ""});
   const [bikeInfo, setBikeInfo] = useState<bikeInformation>(data?.bikerInfo || {name:"", phone:"", email:"", ebike:null, personDamage: ""});
   const [otherInfo, setOtherInfo] = useState<OtherInformation>(data?.otherObjectInfo || {description: "", information: ""});
   const [pedestrianInfo, setPedestrianInfo] = useState<PedestrianInformation>(data?.pedestrianInfo || {name: "", phone: "", email: "", personDamage: ""});
@@ -83,7 +83,7 @@ const WherePage: NextPage<pageProps> = ({data, id}) => {
         <YesNo
           required={true}
           id="whatvehicle"
-          labelText="Collision with another vehicle/person?"
+          labelText="Collision with another object?"
           value={isVehicleChecked}
           onChange={setIsVehicleChecked}
         />
@@ -92,7 +92,7 @@ const WherePage: NextPage<pageProps> = ({data, id}) => {
         <div className="flex justify-left text-left w-full mb-4">
           <div id="whatvehicle" className="flex flex-col w-full">
             <div>
-              <label htmlFor="whatvehicle">What vehicle?</label>
+              <label htmlFor="whatvehicle">What object?</label>
             </div>
             <div className="flex flex-row">
               <Checkbox
@@ -116,12 +116,20 @@ const WherePage: NextPage<pageProps> = ({data, id}) => {
                 value={isPersonChecked}
                 onChange={setIsPersonChecked}
               />
+              <Checkbox
+              id="Other"
+              labelText="Other"
+              requried={false}
+              value={isOtherChecked}
+              onChange={setIsOtherChecked}
+              />
 
             </div>
             <div className="w-full">
               {isCarChecked && <CarInfoForm value={carInfo} onChange={setCarInfo} />}
               {isBikeChecked && <Bike value={bikeInfo} onChange={setBikeInfo} />}
               {isPersonChecked && <Person value={pedestrianInfo} onChange={setPedestrianInfo} />}
+              {isOtherChecked && <Other value={otherInfo} onChange={setOtherInfo}/>}
             </div>
           </div>
         </div>
@@ -137,16 +145,6 @@ const WherePage: NextPage<pageProps> = ({data, id}) => {
         />
       )}
 
-      <YesNo
-        id="CollisionWithObject"
-        labelText="Collision with other"
-        required={true}
-        value={isCollisionWithObjectChecked}
-        onChange={setIsCollisionWithObjectChecked}
-      />
-      {isCollisionWithObjectChecked && (
-        <Other value={otherInfo} onChange={setOtherInfo} />
-      )}
 
 {/*       {isCollisionWithObjectChecked && (
         <ObjectInfoForm onchange={setObjectInfo} />

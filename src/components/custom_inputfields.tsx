@@ -51,13 +51,13 @@ export const Inputfield = ({
       pattern = "[0-9]+"; // Only allow digits
       break;
     case "email":
-      pattern = "^[a-zA-Z0-9.]{0,100}@[a-zA-Z0-9]{2,10}.(es|com|org)$"; //TODO fix the email format so it works.
+      pattern = "^[a-zA-Z0-9.]{0,100}@[a-zA-Z0-9]{2,20}.(es|com|org)$"; //TODO fix the email format so it works.
       break;
     case "tel":
       pattern = "[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}"; // Phone number format (XX-XX-XX-XX)
       break;
     case "numberplate":
-      pattern = "[a-zA-Z]{2}\\d{2}\\d{3}"; // Numberplate format
+      pattern = "([a-zA-Z]{2}\\s?\\d{2}\\s?\\d{3})|([a-zA-Z]{2}\\d{2}\\d{3})"; // Updated Numberplate format
       break;
     case "text":
       pattern = ".*"; // Allow any character, any number of times
@@ -113,16 +113,8 @@ export const TimeDateField = ({
     <div className="flex flex-col mb-4">
       <label>{labelText}</label>
       <div id={id} className="flex flex-row">
-        <input
-          className="bg-MainGreen-100 h-10 mr-5 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none"
-          id={"Time" + id}
-          type="time"
-          value={timeValue}
-          required={required}
-          onChange={(event) => timeChange(event.target.value)}
-        />
 
-        <input
+      <input
           className="bg-MainGreen-100 h-10 rounded-none w-32 border-[1px] focus:border-[3px] border-MainGreen-200 outline-none"
           id={"Date" + id}
           type="date"
@@ -130,6 +122,16 @@ export const TimeDateField = ({
           required={required}
           onChange={(event) => dateChange(event.target.value)}
         />
+        <input
+          className="bg-MainGreen-100 h-10 ml-5 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none"
+          id={"Time" + id}
+          type="time"
+          value={timeValue}
+          required={required}
+          onChange={(event) => timeChange(event.target.value)}
+        />
+
+       
       </div>
     </div>
   );
