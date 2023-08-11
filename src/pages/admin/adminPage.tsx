@@ -167,7 +167,6 @@ const adminPage: NextPage<Props> = ({ data }) => {
       {/* Table section */}
       <div className="bg-white w-full shadow-lg h-[calc(100vh-13rem)]">
         <ReportList2
-          reportList={reportsToShow}
           itemsPerPage={20}
           onPageChange={handlePageChange} // Pass the onPageChange handler
         />

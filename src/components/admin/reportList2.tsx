@@ -1,4 +1,6 @@
+import { getReports } from "@/firebase/clientApp";
 import { reportDataType } from "@/utils/utils";
+import { GetServerSidePropsContext } from "next";
 import { useEffect, useState } from "react";
 
 interface reportListProps {
@@ -7,7 +9,19 @@ interface reportListProps {
   onPageChange: (newPage: number) => void; // Add this line
 }
 
-const ReportList2 = ({ reportList, itemsPerPage }: reportListProps) => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  const data = await getReports();
+
+  return {
+    props: {
+      reportList: data || null,
+    },
+  };
+};
+
+const ReportList2 = ({ reportList, itemsPerPage: reportListProps }: reportListProps) => {
   return (
     <div className="w-full px-6">
       <div className="rounded-t-md w-full shadow-lg overflow-x-auto">
@@ -35,14 +49,26 @@ const ReportList2 = ({ reportList, itemsPerPage }: reportListProps) => {
                     key={index}
                   >
                     <td className="w-1/5 py-2">{report.id}</td>
-                    <td className="w-1/5">
-                      {`${report.data.driverInfo.firstName} ${report.data.driverInfo.lastName}`}
+                    <td className="w-1/5"> 
+                    {report.data.driverInfo.firstName !== "" ? (
+                      `${report.data.driverInfo.firstName} ${report.data.driverInfo.lastName}`
+                    ) : (
+                      '-'
+                    )}
                     </td>
                     <td className="w-1/5">
-                      {report.data?.greenCarNumberPlate.toUpperCase()}
+                      {report.data.greenCarNumberPlate !== "" ? (
+                      `${report.data?.greenCarNumberPlate.toUpperCase()}`
+                      ) : (
+                        '-'
+                      )}
                     </td>
                     <td className="w-1/5">{`${report?.data?.finished}`}</td>
-                    <td className="w-1/5">{report?.data?.date}</td>
+                    <td className="w-1/5">{report.data.date !== "" ? (
+                      `${report.data.date}`
+                    ) : (
+                      '-'
+                    )}</td>
                   </tr>
                 ))
               ) : (

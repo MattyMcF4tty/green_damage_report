@@ -16,7 +16,7 @@ function MyApp({ Component, pageProps }: AppProps) {
         </div>
       </>
     );
-  } else {
+  } else if (pathname.startsWith("/admin")) {
     return (
       <>
         <AdminNavbar />
@@ -25,6 +25,12 @@ function MyApp({ Component, pageProps }: AppProps) {
         </div>
       </>
     );
+  } else {
+    <>
+      <div>
+        <Component {...pageProps} />
+      </div>
+    </>
   }
 }
 
