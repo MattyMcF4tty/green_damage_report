@@ -1,27 +1,37 @@
-import { getReports } from "@/firebase/clientApp";
+import { getData, getReports, searchReports } from "@/firebase/clientApp";
 import { reportDataType } from "@/utils/utils";
 import { GetServerSidePropsContext } from "next";
 import { useEffect, useState } from "react";
+import Loading from "../loading";
 
 interface reportListProps {
-  reportList: { id: string; data: reportDataType }[] | null;
+  status: 'all' | 'finished' | 'unfinished'
+  filter: 'id' | 'driver' | 'numberplate' | 'date' ;
+  search: string;
   itemsPerPage: number;
-  onPageChange: (newPage: number) => void; // Add this line
 }
 
-export const getServerSideProps = async (
-  context: GetServerSidePropsContext
-) => {
-  const data = await getReports();
+const ReportList2 = ({ status, filter, search, itemsPerPage }: reportListProps) => {
+  const [reportList, setReportList] = useState<{ id: string; data: reportDataType }[] | null>(null); // Initialize with null
 
-  return {
-    props: {
-      reportList: data || null,
-    },
-  };
-};
+  /* Load server data */
+  useEffect(() => {
+    const fetchReportList = async () => {
+      try {
+        const data = await searchReports(status, filter, search, itemsPerPage);
+        setReportList(data || null);
+      } catch (error) {
+          console.error(`Something went wrong fetching data for reportList:\n${error}\n`)
+      }
+    };
 
-const ReportList2 = ({ reportList, itemsPerPage: reportListProps }: reportListProps) => {
+    fetchReportList();
+  }, [status, filter, search, itemsPerPage]);
+
+  useEffect(() => {
+   console.log("LIST:", reportList)
+  }, [reportList])
+
   return (
     <div className="w-full px-6">
       <div className="rounded-t-md w-full shadow-lg overflow-x-auto">
@@ -63,7 +73,7 @@ const ReportList2 = ({ reportList, itemsPerPage: reportListProps }: reportListPr
                         '-'
                       )}
                     </td>
-                    <td className="w-1/5">{`${report?.data?.finished}`}</td>
+                    <td className="w-1/5">{`${report.data.finished}`}</td>
                     <td className="w-1/5">{report.data.date !== "" ? (
                       `${report.data.date}`
                     ) : (
@@ -72,8 +82,11 @@ const ReportList2 = ({ reportList, itemsPerPage: reportListProps }: reportListPr
                   </tr>
                 ))
               ) : (
-                <tr>
-                  <td>No reports</td>
+                /* LOADING  */
+                <tr className="flex justify-center">
+                  <td>
+                    <Loading/>
+                  </td>
                 </tr>
               )}
             </tbody>

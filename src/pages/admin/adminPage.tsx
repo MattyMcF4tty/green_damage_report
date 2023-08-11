@@ -12,27 +12,12 @@ import { GetServerSidePropsContext, NextPage } from "next";
 import { pageProps, reportDataType } from "@/utils/utils";
 import ReportList2 from "@/components/admin/reportList2";
 
-export const getServerSideProps = async (
-  context: GetServerSidePropsContext
-) => {
-  const data = await getReports();
 
-  return {
-    props: {
-      data: data || null,
-    },
-  };
-};
 
-type Props = {
-  data: { id: string; data: reportDataType }[] | null;
-};
+const adminPage: NextPage = () => {
+  const [currentStatusFilter, setCurrentStatusFilter] = useState<'all' | 'finished' | 'unfinished'>('all');
 
-const adminPage: NextPage<Props> = ({ data }) => {
   const [activeSection, setActiveSection] = useState("All");
-  const [reportList, setReportList] = useState<
-    { id: string; data: reportDataType }[] | null
-  >(data || null);
   const [currentPage, setCurrentPage] = useState(1);
 
   const reportsPerPage = 20;
@@ -45,10 +30,10 @@ const adminPage: NextPage<Props> = ({ data }) => {
     data: reportDataType;
   }[] = [];
 
-  if (reportList) {
+/*   if (reportList) {
     totalPages = Math.ceil(reportList.length / reportsPerPage);
     currentReports = reportList.slice(startIndex, endIndex);
-  }
+  } */
 
   // Function to handle changing the page
   const handlePageChange = (newPage: number) => {
@@ -56,7 +41,7 @@ const adminPage: NextPage<Props> = ({ data }) => {
   };
 
   // Apply filtering based on activeSection
-  const reportsToShow = reportList!.filter((report) => {
+/*   const reportsToShow = reportList!.filter((report) => {
     if (report === null) {
       return false;
     } else if (activeSection === "All") {
@@ -68,16 +53,16 @@ const adminPage: NextPage<Props> = ({ data }) => {
     }
     return false;
   });
-
+ */
   return (
     <div className="w-full h-full bg-white rounded-md overflow-hidden">
-      {/* Top section */}
+      {/* Report status selection */}
       <div className="flex flex-row w-full justify-start items-center border-b border-gray-300">
         <button
           className={`h-14 flex flex-col items-center justify-center text-lg cursor-pointer relative w-24 ${
-            activeSection === "All" ? "text-MainGreen-300" : ""
+            currentStatusFilter === 'all' ? "text-MainGreen-300" : ""
           }`}
-          onClick={() => setActiveSection("All")}
+          onClick={() => setCurrentStatusFilter('all')}
         >
           <span>All</span>
           {activeSection === "All" && (
@@ -86,9 +71,9 @@ const adminPage: NextPage<Props> = ({ data }) => {
         </button>
         <button
           className={`h-14 w-32 flex flex-col items-center justify-center text-lg cursor-pointer relative ${
-            activeSection === "Unfinished" ? "text-MainGreen-300" : ""
+            currentStatusFilter === 'unfinished' ? "text-MainGreen-300" : ""
           }`}
-          onClick={() => setActiveSection("Unfinished")}
+          onClick={() => setCurrentStatusFilter('unfinished')}
         >
           <span>Unfinished</span>
           {activeSection === "Unfinished" && (
@@ -97,9 +82,9 @@ const adminPage: NextPage<Props> = ({ data }) => {
         </button>
         <button
           className={`h-14 w-32 flex flex-col items-center justify-center text-lg cursor-pointer relative ${
-            activeSection === "Finished" ? "text-MainGreen-300" : ""
+            currentStatusFilter === "finished" ? "text-MainGreen-300" : ""
           }`}
-          onClick={() => setActiveSection("Finished")}
+          onClick={() => setCurrentStatusFilter('finished')}
         >
           <span>Finished</span>
           {activeSection === "Finished" && (
@@ -167,8 +152,10 @@ const adminPage: NextPage<Props> = ({ data }) => {
       {/* Table section */}
       <div className="bg-white w-full shadow-lg h-[calc(100vh-13rem)]">
         <ReportList2
+          status={currentStatusFilter}
+          filter="driver"
+          search=""
           itemsPerPage={20}
-          onPageChange={handlePageChange} // Pass the onPageChange handler
         />
       </div>
     </div>

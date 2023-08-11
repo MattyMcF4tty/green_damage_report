@@ -1,5 +1,5 @@
 import { initializeApp } from "firebase/app"
-import { collection, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, getFirestore, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { StorageReference, deleteObject, getDownloadURL, getStorage, listAll, ref, uploadBytes } from "firebase/storage"
 import { reportDataType } from "@/utils/utils";
 
@@ -17,11 +17,11 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-
+const collectionName = "unfinished"
 
 export const getData = async (id: string) => {
     console.log("fetchind docID: " + id)
-    const docRef = doc(db, `unfinished/${id}`);
+    const docRef = doc(db, `${collectionName}/${id}`);
 
     try {
         const docSnapshot = await getDoc(docRef)
@@ -88,7 +88,7 @@ export const getData = async (id: string) => {
 }
 
 export const getDocIds = async () => {
-    const colRef = collection(db, "unfinished")
+    const colRef = collection(db, `${collectionName}`)
 
     try {
         const docListSnapshot = await getDocs(colRef)
@@ -152,7 +152,7 @@ export const createDoc = async (id: string, email: string) => {
         collisionPedestrian: false,
     }
 
-    const dataRef = doc(db, `unfinished/${id}`);
+    const dataRef = doc(db, `${collectionName}/${id}`);
 
     try {
         await setDoc(dataRef, data);
@@ -164,7 +164,7 @@ export const createDoc = async (id: string, email: string) => {
 
 export const updateData = async (id:string, data:object) => {
 
-    const dataRef = doc(db, `unfinished/${id}`)
+    const dataRef = doc(db, `${collectionName}/${id}`)
 
     try {
         await updateDoc(dataRef, data);
@@ -234,7 +234,7 @@ export const getImages = async (id:string) => {
 }
 
 const getReportIds = async () => {
-    const reportColRef = collection(db, "unfinished/")
+    const reportColRef = collection(db, "Reports/")
     const querySnapshot = await getDocs(reportColRef);
     const idList = querySnapshot.docs.map((doc) => doc.id);
 
@@ -256,5 +256,54 @@ export const getReports = async () => {
     );
     
     return reportList;
-  };
-  
+};
+
+export const searchReports = async (
+    status: 'all' | 'finished' | 'unfinished',
+    filter: 'id' | 'driver' | 'numberplate' | 'date' ,
+    search: string,
+    itemsPerPage : number,
+) => {
+    let fullReportList: {id: string, data: reportDataType}[] = [];
+    const collectionRef = collection(db, collectionName)
+
+    try {
+        switch (status) {
+            case 'all':
+                fullReportList = await getReports();
+            break;
+    
+            case 'finished':
+                const finishedQuery = query(collectionRef, where("finished", "==", true));
+                const finishedDocs = await getDocs(finishedQuery);
+    
+                finishedDocs.forEach(async doc => {
+                    const id = doc.id;
+                    const data = await getData(doc.id);
+                    if (data) {
+                        fullReportList.push({ id: id, data: data });
+                    }
+                });
+            break;
+    
+            case 'unfinished':
+                const unfinishedQuery = query(collectionRef, where("finished", "==", false));
+                const unfinishedDocs = await getDocs(unfinishedQuery);
+    
+                unfinishedDocs.forEach(async doc => {
+                    const id = doc.id;
+                    const data = await getData(doc.id);
+                    if (data) {
+                        fullReportList.push({ id: id, data: data });
+                    }
+                });
+            break;
+        }
+    } catch (error) {
+        console.error(`Something went wrong fetching ${status} documents:\n${error}`)
+    }
+
+
+    console.log(fullReportList)
+    return(fullReportList)
+}
