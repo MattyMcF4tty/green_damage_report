@@ -6,22 +6,24 @@ import React, { useState } from "react";
 
 const IndexPage = () => {
   const router = useRouter();
-  const [email, setEmail] = useState("")
+  const [email, setEmail] = useState("");
 
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
-  
-    const id = await generateId();
-  
-    await createDoc(id, email);
-    console.log("Report created:\n" + "id: " + id + "\n" + "Email: " + email)
 
-    router.push(`damagereport/what?id=${id}`)
-  }
+    const id = await generateId();
+
+    await createDoc(id, email);
+    console.log("Report created:\n" + "id: " + id + "\n" + "Email: " + email);
+
+    router.push(`damagereport/what?id=${id}`);
+  };
 
   return (
-    <form onSubmit={(e) => handleStart(e)}
-    className="flex flex-col items-center">
+    <form
+      onSubmit={(e) => handleStart(e)}
+      className="flex flex-col items-center"
+    >
       <div className="text-center text-2xl text-MainGreen-300 font-semibold">
         <h1>GreenMobility damage report</h1>
       </div>
@@ -66,19 +68,21 @@ const IndexPage = () => {
             </h3>
           </div>
         </div>
-        <Inputfield 
-        id="Email" 
-        labelText="Enter your Email" 
-        required={true} 
-        onChange={setEmail} 
-        value={email}
-        type="email"
+        <Inputfield
+          id="Email"
+          labelText="Enter your Email"
+          required={true}
+          onChange={setEmail}
+          value={email}
+          type="email"
         />
       </div>
 
       <div className="flex flex-row w-full place-content-between h-10 mt-10">
-        <button className="w-2/5 bg-MainGreen-300">Previous</button>
-        <button type="submit" className="w-2/5 bg-MainGreen-300">Next</button>
+        <button className="w-2/5 bg-MainGreen-300 text-white">Previous</button>
+        <button type="submit" className="w-2/5 bg-MainGreen-300 text-white">
+          Next
+        </button>
       </div>
     </form>
   );
