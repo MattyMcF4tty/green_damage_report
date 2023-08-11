@@ -24,45 +24,78 @@ const IndexPage = () => {
       onSubmit={(e) => handleStart(e)}
       className="flex flex-col items-center"
     >
-      <div className="text-center text-2xl text-MainGreen-300 font-semibold">
-        <h1>GreenMobility damage report</h1>
-      </div>
+      <div className="text-center text-2xl text-MainGreen-300 font-semibold"></div>
       <div className="container mx-auto p-8">
         <h2 className="text-[16px] font-semibold mb-4">
-
-        What you can anticipate in this damage report        </h2>
-        <div className="border-[8px] border-MainGreen-200 shadow-lg ">
+          What to anticipate in this damage report{" "}
+        </h2>
+        <div className="mb-4">
           <div className="flex flex-col">
-            
-            <h3 className="mb-2 text-left font-bold">
-           1. Initial Event Inquiry:
+            <h3 className="mb-2 text-left  text-MainGreen-300 flex flex-row items-center">
+              <img
+                src="../GreenLogos/GreenLogo-gray-1.png"
+                alt="greengraylogo"
+                className="h-8 mr-2"
+              />
+              Initial Event Inquiry
             </h3>
-            <h3 className="ml-1"> We initiate by exploring the events that took place.</h3>             
+            <h3 className="ml-1">
+              {" "}
+              We initiate by collecting the essential information about the
+              incident
+            </h3>
           </div>
           <div className="flex flex-col ">
-            <h3 className="mb-2 text-left font-bold">
-           2. Incident Occurrence Details: </h3> <h3 className="ml-1"> The second segment delves into the specifics of how the incident unfolded.
+            <h3 className="mb-2 text-left  text-MainGreen-300 flex flex-row items-center">
+              <img
+                src="../GreenLogos/GreenLogo-gray-2.png"
+                alt="greengraylogo"
+                className="h-8 mr-2"
+              />
+              Incident Occurrence Details{" "}
+            </h3>{" "}
+            <h3 className="ml-1">
+              {" "}
+              The second segment delves into the specifics of how the incident
+              unfolded.
             </h3>
           </div>
           <div className="flex flex-col">
-            <h3 className="mb-2 text-left font-bold">
-           3. Vital Information:</h3><h3 className="ml-1"> In the third section, we collect essential data crucial to completing the report.
+            <h3 className="mb-2 text-left text-MainGreen-300 flex flex-row items-center">
+              <img
+                src="../GreenLogos/GreenLogo-gray-3.png"
+                alt="greengraylogo"
+                className="h-8 mr-2"
+              />
+              Vital Information
+            </h3>
+            <h3 className="ml-1">
+              {" "}
+              In the third section, we collect essential data on parties
+              involved
             </h3>
           </div>
           <div className="flex flex-col">
-            <h3 className="mb-2 text-left font-bold">
-           4. Personal Particulars:</h3><h3 className="ml-1"> On the fourth part, we kindly request certain personal details from you.
+            <h3 className="mb-2 text-left text-MainGreen-300 flex flex-row items-center">
+              <img
+                src="../GreenLogos/GreenLogo-gray-4.png"
+                alt="greengraylogo"
+                className="h-8 mr-2"
+              />
+              Response Review{" "}
             </h3>
-          </div>
-          <div className="flex flex-col">
-            <h3 className="mb-2 text-left font-bold">
-           5. Response Review:</h3><h3 className="ml-1"> Lastly, the fifth section involves carefully reviewing your responses for accuracy and accepting the declaration.
+            <h3 className="ml-1">
+              {" "}
+              Lastly, the fourth section involves carefully reviewing your
+              responses for accuracy and accepting the declaration.
             </h3>
           </div>
         </div>
         <Inputfield
           id="Email"
-          labelText="Enter your Email"
+          labelText="
+
+          To access the damage report, please enter your email"
           required={true}
           onChange={setEmail}
           value={email}
