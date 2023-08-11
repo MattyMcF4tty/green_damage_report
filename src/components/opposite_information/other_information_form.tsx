@@ -4,30 +4,30 @@ import { info } from "console";
 import { TextField } from "../custom_inputfields";
 
 export type OtherInformation = {
-  description: string
-  information: string
-}
+  description: string;
+  information: string;
+};
 
 interface OtherProps {
   value: OtherInformation;
   onChange: (otherInfo: OtherInformation) => void;
 }
 
-const OtherInfoForm = ({value, onChange}: OtherProps) => {
+const OtherInfoForm = ({ value, onChange }: OtherProps) => {
   const [descripeOther, setDescripeOther] = useState<string>(value.description);
   const [infoOther, setInfoOther] = useState<string>(value.information);
 
   useEffect(() => {
     const newOtherInfo: OtherInformation = {
-      description: descripeOther, 
-      information: infoOther
+      description: descripeOther,
+      information: infoOther,
     };
 
     onChange(newOtherInfo);
   }, [descripeOther, infoOther]);
 
   return (
-    <div className="w-full">
+    <div className="w-full mt-4">
       <TextField
         id="descripeOther"
         maxLength={500}
@@ -46,6 +46,6 @@ const OtherInfoForm = ({value, onChange}: OtherProps) => {
       />
     </div>
   );
-}
+};
 
 export default OtherInfoForm;

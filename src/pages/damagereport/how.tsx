@@ -10,10 +10,17 @@ import BackButton from "@/components/buttons/back";
 import { useRouter } from "next/router";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { pageProps } from "@/utils/utils";
-import { getData, getImages, updateData, uploadImage } from "@/firebase/clientApp";
+import {
+  getData,
+  getImages,
+  updateData,
+  uploadImage,
+} from "@/firebase/clientApp";
 import WitnessList from "@/components/witnessList";
 
-export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const id = context.query.id as string;
 
   const data = await getData(id);
@@ -23,27 +30,43 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
     props: {
       data: data || null,
       images: images || null,
-      id: id
-    }
-  }
-}
+      id: id,
+    },
+  };
+};
 
-const HowPage:NextPage<pageProps> = ({data, images, id}) => {
+const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
   const router = useRouter();
 
-  const [accidentDescription, setAccidentDescription] = useState<string>(data?.accidentDescription || "");
-  const [greenDriverSpeed, setGreenDriverSpeed] = useState<string>(data?.speed || "");
-  const [damageDescription, setDamageDescription] = useState<string>(data?.damageDescription || "");
-  const [policePresent, setPolicePresent] = useState<boolean | null>(data!.policePresent);
-  const [policeReport, setPoliceReport] = useState<boolean | null>(data!.policeReportExist);
-  const [journalNumber, setJournalNumber] = useState<string>(data?.policeReportNumber || "");
-  const [witnessesPresent, setWitnessesPresent] = useState<boolean | null>(data!.witnessesPresent);
-  const [witnesses, setWitnesses] = useState<{name:string, phone:string, email:string}[]>(data?.witnesses || [])
+  const [accidentDescription, setAccidentDescription] = useState<string>(
+    data?.accidentDescription || ""
+  );
+  const [greenDriverSpeed, setGreenDriverSpeed] = useState<string>(
+    data?.speed || ""
+  );
+  const [damageDescription, setDamageDescription] = useState<string>(
+    data?.damageDescription || ""
+  );
+  const [policePresent, setPolicePresent] = useState<boolean | null>(
+    data!.policePresent
+  );
+  const [policeReport, setPoliceReport] = useState<boolean | null>(
+    data!.policeReportExist
+  );
+  const [journalNumber, setJournalNumber] = useState<string>(
+    data?.policeReportNumber || ""
+  );
+  const [witnessesPresent, setWitnessesPresent] = useState<boolean | null>(
+    data!.witnessesPresent
+  );
+  const [witnesses, setWitnesses] = useState<
+    { name: string; phone: string; email: string }[]
+  >(data?.witnesses || []);
 
-  const [frontImage, setFrontImage] = useState<string | null>(images!['FRONT']);
-  const [rightImage, setRightImage] = useState<string | null>(images!['RIGHT']);
-  const [backImage, setBackImage] = useState<string | null>(images!['BACK']);
-  const [leftImage, setLeftImage] = useState<string | null>(images!['LEFT']);
+  const [frontImage, setFrontImage] = useState<string | null>(images!["FRONT"]);
+  const [rightImage, setRightImage] = useState<string | null>(images!["RIGHT"]);
+  const [backImage, setBackImage] = useState<string | null>(images!["BACK"]);
+  const [leftImage, setLeftImage] = useState<string | null>(images!["LEFT"]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,10 +80,10 @@ const HowPage:NextPage<pageProps> = ({data, images, id}) => {
 
     /* Make sure to clear typed data if police or witnesses were not present */
     if (witnessesPresent) {
-      setWitnesses([])
+      setWitnesses([]);
     }
     if (!policePresent || !policeReport) {
-      setJournalNumber("")
+      setJournalNumber("");
     }
 
     const data = {
@@ -77,13 +100,16 @@ const HowPage:NextPage<pageProps> = ({data, images, id}) => {
 
     await updateData(id, data);
 
-    router.push(`where?id=${id}`); 
-  }
+    router.push(`where?id=${id}`);
+  };
 
   return (
     <form className="w-full" onSubmit={(e) => handleSubmit(e)}>
       {/* Accident description collection */}
       <div>
+        <p className="text-MainGreen-300 mb-8 flex justify-start font-bold text-[20px]">
+          Incident Occurrence Details
+        </p>
         <TextField
           id="accidentDescription"
           labelText="Description of the incident"
@@ -205,19 +231,21 @@ const HowPage:NextPage<pageProps> = ({data, images, id}) => {
           value={witnessesPresent}
           onChange={setWitnessesPresent}
         />
-        {witnessesPresent && <WitnessList value={witnesses} onChange={setWitnesses}/>}
+        {witnessesPresent && (
+          <WitnessList value={witnesses} onChange={setWitnesses} />
+        )}
       </div>
       <div className="flex flex-row justify-between">
-        <div className="flex flex-row w-1/3 justify-start h-12  ml-16">
+        <div className="flex flex-row w-16 justify-start h-14  ml-10">
           <BackButton pageName={`what?id=${id}`} />
         </div>
 
-        <div className="flex flex-row w-1/3 justify-end mr-20">
+        <div className="flex flex-row w-16 justify-end h-14 mr-10">
           <NextButton />
         </div>
       </div>
     </form>
   );
-}
+};
 
 export default HowPage;

@@ -97,9 +97,11 @@ const What: NextPage<pageProps> = ({ data, id }) => {
       {/* GreenMobility car numberplate collection */}
       <div>
         {/* TODO: Make it so you can only type a valid numberplate for the country where the accident took place and get a list from a server with all the green numberplates */}
+        <p className="text-MainGreen-300 mb-8 flex justify-start font-bold text-[20px]">
+          Initial Event Inquiry
+        </p>
         <Inputfield
           labelText="
-
           The license plate of the GreenMobility car"
           id="greenCarNumberplateInput"
           type="numberplate"
@@ -216,11 +218,11 @@ const What: NextPage<pageProps> = ({ data, id }) => {
       </div>
 
       <div className="flex flex-row justify-between">
-        <div className="flex flex-row w-1/3 justify-start h-12  ml-10">
+        <div className="flex flex-row w-16 justify-start h-14 mt-4 ml-10">
           <BackButton pageName="/" />
         </div>
 
-        <div className="flex flex-row w-1/3 justify-end mr-10">
+        <div className="flex flex-row h-14 mt-4 w-16 justify-end mr-10">
           <NextButton />
         </div>
       </div>

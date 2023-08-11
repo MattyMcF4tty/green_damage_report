@@ -1,4 +1,6 @@
 import { NextRouter, useRouter } from "next/router";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowLeftLong } from "@fortawesome/free-solid-svg-icons";
 
 interface BackButtonProps {
   pageName: string;
@@ -15,9 +17,9 @@ const BackButton = ({ pageName }: BackButtonProps) => {
     <button
       type="button"
       onClick={handleBack}
-      className="text-white bg-MainGreen-300 w-full h-full"
+      className="text-white bg-MainGreen-300 w-full h-full rounded-full"
     >
-      Previous
+      <FontAwesomeIcon icon={faArrowLeftLong} className="text-xl w-full" />
     </button>
   );
 };

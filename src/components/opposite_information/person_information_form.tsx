@@ -32,7 +32,7 @@ const PedestrianInfoForm = ({ value, onChange }: PedestrianProps) => {
   }, [name, phoneNumber, email, personDamage]);
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex flex-col w-full mt-4">
       <Inputfield
         id="NamePedestrian"
         labelText="Fullname of the other person involved"

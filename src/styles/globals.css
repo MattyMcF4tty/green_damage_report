@@ -6,11 +6,17 @@
   @apply text-black;
 }
 
-.PhoneInput input:focus {
+.PhoneInput {
   outline: none;
   box-shadow: none;
-}
-.PhoneInput input {
-  background-color: #e6eee5;
+  border-radius: 0;
+  border-width: 1px;
+  --tw-border-opacity: 1;
+  border-color: rgb(187 214 160 / var(--tw-border-opacity));
   height: 2.5rem;
+  padding-left: 0.5rem;
+}
+.PhoneInput input:focus {
+  height: 2.4rem;
+  border-radius: 0;
 }

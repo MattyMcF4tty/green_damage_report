@@ -28,6 +28,7 @@ export const Inputfield = ({
 }: InputfieldProps) => {
   const [isValue, setIsValue] = useState<string>(value);
   const [error, setError] = useState<string | null>(null);
+  const [bgColor, setBgColor] = useState("bg-white");
 
   useEffect(() => {
     onChange(isValue);
@@ -73,11 +74,21 @@ export const Inputfield = ({
       break;
   }
 
+  useEffect(() => {
+    if (value === "" || value === null) {
+      setBgColor("bg-white");
+    } else {
+      setBgColor("bg-MainGreen-100");
+    }
+  }, [value]);
+
   return (
     <div className="flex flex-col mb-4">
-      <label htmlFor={id}>{labelText}</label>
+      <label htmlFor={id} className="mb-2">
+        {labelText}
+      </label>
       <input
-        className="bg-MainGreen-100 h-10 text-lg p-1 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none"
+        className={`${bgColor} h-10 text-lg p-1 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none`}
         id={id}
         type={type}
         required={required}
@@ -111,10 +122,9 @@ export const TimeDateField = ({
 }: TimeDateProps) => {
   return (
     <div className="flex flex-col mb-4">
-      <label>{labelText}</label>
+      <label className="mb-2">{labelText}</label>
       <div id={id} className="flex flex-row">
-
-      <input
+        <input
           className="bg-MainGreen-100 h-10 rounded-none w-32 border-[1px] focus:border-[3px] border-MainGreen-200 outline-none"
           id={"Date" + id}
           type="date"
@@ -130,8 +140,6 @@ export const TimeDateField = ({
           required={required}
           onChange={(event) => timeChange(event.target.value)}
         />
-
-       
       </div>
     </div>
   );
@@ -164,7 +172,7 @@ export const YesNo = ({
       <label>{labelText}</label>
 
       {/* Yes */}
-      <div id={id} className="flex flex-row items-center">
+      <div id={id} className="flex flex-row items-center mt-2">
         <label htmlFor={"Yes" + id} className="mr-2">
           Yes
         </label>

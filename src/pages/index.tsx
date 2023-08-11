@@ -3,6 +3,9 @@ import { createDoc, updateData } from "@/firebase/clientApp";
 import { generateId } from "@/utils/utils";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
+import { text } from "stream/consumers";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faArrowRightLong } from "@fortawesome/free-solid-svg-icons";
 
 const IndexPage = () => {
   const router = useRouter();
@@ -24,11 +27,7 @@ const IndexPage = () => {
       onSubmit={(e) => handleStart(e)}
       className="flex flex-col items-center"
     >
-      <div className="text-center text-2xl text-MainGreen-300 font-semibold"></div>
       <div className="container mx-auto p-8">
-        <h2 className="text-[16px] font-semibold mb-4">
-          What to anticipate in this damage report{" "}
-        </h2>
         <div className="mb-4">
           <div className="flex flex-col">
             <h3 className="mb-2 text-left  text-MainGreen-300 flex flex-row items-center">
@@ -39,11 +38,10 @@ const IndexPage = () => {
               />
               Initial Event Inquiry
             </h3>
-            <h3 className="ml-1">
-              {" "}
+            <p className="ml-1 mb-3">
               We initiate by collecting the essential information about the
-              incident
-            </h3>
+              incident.
+            </p>
           </div>
           <div className="flex flex-col ">
             <h3 className="mb-2 text-left  text-MainGreen-300 flex flex-row items-center">
@@ -52,13 +50,12 @@ const IndexPage = () => {
                 alt="greengraylogo"
                 className="h-8 mr-2"
               />
-              Incident Occurrence Details{" "}
-            </h3>{" "}
-            <h3 className="ml-1">
-              {" "}
+              Incident Occurrence Details
+            </h3>
+            <p className="ml-1 mb-3">
               The second segment delves into the specifics of how the incident
               unfolded.
-            </h3>
+            </p>
           </div>
           <div className="flex flex-col">
             <h3 className="mb-2 text-left text-MainGreen-300 flex flex-row items-center">
@@ -69,11 +66,10 @@ const IndexPage = () => {
               />
               Vital Information
             </h3>
-            <h3 className="ml-1">
-              {" "}
+            <p className="ml-1 mb-3">
               In the third section, we collect essential data on parties
-              involved
-            </h3>
+              involved.
+            </p>
           </div>
           <div className="flex flex-col">
             <h3 className="mb-2 text-left text-MainGreen-300 flex flex-row items-center">
@@ -84,11 +80,11 @@ const IndexPage = () => {
               />
               Response Review{" "}
             </h3>
-            <h3 className="ml-1">
+            <p className="ml-1 mb-3">
               {" "}
               Lastly, the fourth section involves carefully reviewing your
               responses for accuracy and accepting the declaration.
-            </h3>
+            </p>
           </div>
         </div>
         <Inputfield
@@ -103,10 +99,12 @@ const IndexPage = () => {
         />
       </div>
 
-      <div className="flex flex-row w-full place-content-between h-10 mt-10">
-        <button className="w-2/5 bg-MainGreen-300 text-white">Previous</button>
-        <button type="submit" className="w-2/5 bg-MainGreen-300 text-white">
-          Next
+      <div className="flex flex-row w-full place-content-between h-10 justify-end">
+        <button
+          type="submit"
+          className="w-16 h-14 mr-6 rounded-full bg-MainGreen-300 text-white"
+        >
+          <FontAwesomeIcon icon={faArrowRightLong} className="w-full text-xl" />
         </button>
       </div>
     </form>

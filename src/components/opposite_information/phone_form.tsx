@@ -26,6 +26,7 @@ const PhoneNumber = ({ value, onChange, labelText }: PhoneNumberProps) => {
   };
 
   const [countryCode, setCountryCode] = useState<string | undefined>();
+  const [bgColor, setBgColor] = useState("bg-white");
 
   useEffect(() => {
     if (value) {
@@ -40,10 +41,20 @@ const PhoneNumber = ({ value, onChange, labelText }: PhoneNumberProps) => {
     }
   }, [value]);
 
+  useEffect(() => {
+    if (value === "" || value === null) {
+      setBgColor("bg-white");
+    } else {
+      setBgColor("bg-MainGreen-100");
+    }
+  }, [value]);
+
   return (
     <div className="mb-4">
-      <label htmlFor="phonenumber">{labelText}</label>
-      <div className="bg-MainGreen-100 border-[1px] border-MainGreen-200 pl-2">
+      <label htmlFor="phonenumber" className="">
+        {labelText}
+      </label>
+      <div className={`${bgColor}  h-10 mt-2`}>
         <PhoneInput
           placeholder="Enter phone number"
           value={formattedPhoneNumber}

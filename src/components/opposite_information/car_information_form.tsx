@@ -53,7 +53,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
   ]);
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col mt-4">
       <Inputfield
         labelText="
         The license plate of the counterparty"

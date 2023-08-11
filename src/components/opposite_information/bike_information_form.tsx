@@ -41,7 +41,7 @@ const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
   }, [name, phoneNumber, email, personDamage, ebike]);
 
   return (
-    <div className="flex flex-col items-start w-full">
+    <div className="flex flex-col items-start w-full mt-4">
       <div className="w-full">
         <YesNo
           required={true}
