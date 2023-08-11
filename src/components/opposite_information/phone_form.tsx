@@ -11,10 +11,11 @@ import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 interface PhoneNumberProps {
   value?: string;
+  labelText: string;
   onChange: (phoneNumber: string) => void;
 }
 
-const PhoneNumber = ({ value, onChange }: PhoneNumberProps) => {
+const PhoneNumber = ({ value, onChange, labelText }: PhoneNumberProps) => {
   const [formattedPhoneNumber, setFormattedPhoneNumber] = useState<string>(
     value ? formatPhoneNumber(value) : ""
   );
@@ -41,7 +42,7 @@ const PhoneNumber = ({ value, onChange }: PhoneNumberProps) => {
 
   return (
     <div className="mb-4">
-      <label htmlFor="phonenumber">Phone number</label>
+      <label htmlFor="phonenumber">{labelText}</label>
       <div className="bg-MainGreen-100 border-[1px] border-MainGreen-200 pl-2">
         <PhoneInput
           placeholder="Enter phone number"

@@ -76,7 +76,9 @@ const What: NextPage<pageProps> = ({data, id}) => {
       <div>
         {/* TODO: Make it so you can only type a valid numberplate for the country where the accident took place and get a list from a server with all the green numberplates */}
         <Inputfield
-          labelText="Numberplate of GreenMobility car"
+          labelText="
+
+          The license plate of the GreenMobility car"
           id="greenCarNumberplateInput"
           type="numberplate"
           required={true}
@@ -88,7 +90,9 @@ const What: NextPage<pageProps> = ({data, id}) => {
       {/* Driver information collection */}
       <div className="">
         <YesNo
-          labelText="Was driver and renter the same person?"
+          labelText="
+
+          Was the driver the same person as the renter?"
           id="ShowDriverInfoForm"
           required={true}
           value={showDriverInfoForm}
@@ -98,7 +102,7 @@ const What: NextPage<pageProps> = ({data, id}) => {
         {!showDriverInfoForm && showDriverInfoForm !== null && (
           <div className="flex flex-col">
             <Inputfield
-              labelText="Drivers first name"
+              labelText="First name of the driver"
               id="FirstNameInput"
               required={true}
               type="text"
@@ -107,7 +111,7 @@ const What: NextPage<pageProps> = ({data, id}) => {
             />
 
             <Inputfield
-              labelText="Drivers last name"
+              labelText="Last name of the driver"
               id="LastNameInput"
               required={true}
               type="text"
@@ -118,7 +122,7 @@ const What: NextPage<pageProps> = ({data, id}) => {
             {/* TODO: make google autofill */}
             <Inputfield 
               id="driverAddress"
-              labelText="Home address"
+              labelText="Home address of the driver"
               required={true}
               value={address}
               onChange={setAddress}
@@ -127,7 +131,7 @@ const What: NextPage<pageProps> = ({data, id}) => {
 
             {/* TODO: Check if its a real phone number */}
             <Inputfield
-              labelText="Drivers social security number"
+              labelText="Social security number of the driver"
               id="SocialSecurityNumberInput"
               required={true}
               type="ssn"
@@ -136,7 +140,7 @@ const What: NextPage<pageProps> = ({data, id}) => {
             />
 
             <Inputfield
-              labelText="Drivers driving license number"
+              labelText="Driving license number of the driver"
               id="DrivingLicenseNumberInput"
               required={true}
               type="license"
@@ -144,10 +148,10 @@ const What: NextPage<pageProps> = ({data, id}) => {
               onChange={setDrivingLicenseNumber}
             />
 
-            <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} />
+            <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} labelText="Phonenumber of the driver" />
             
             <Inputfield
-              labelText="Drivers email"
+              labelText="Email of the driver"
               id="EmailInput"
               required={true}
               type="email"
@@ -164,17 +168,20 @@ const What: NextPage<pageProps> = ({data, id}) => {
           labelText="When did the accident occur?"
           id="Accident"
           required={true}
-          timeValue={accidentTime}
-          dateValue={accidentDate}
           timeChange={setAccidentTime}
           dateChange={setAccidentDate}
+          timeValue={accidentTime}
+          dateValue={accidentDate}
+          
         />
       </div>
 
       {/* Accident location collection */}
       <div>
           <Inputfield 
-            labelText="Location of accident"
+            labelText="
+
+            Please enter the location where the accident occurred"
             id="location"
             required={true}
             type="text"

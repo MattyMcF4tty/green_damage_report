@@ -35,16 +35,16 @@ const PedestrianInfoForm = ({ value, onChange }: PedestrianProps) => {
     <div className="flex flex-col w-full">
       <Inputfield
         id="NamePedestrian"
-        labelText="Name of the pedestrian"
+        labelText="Fullname of the other person involved"
         required={true}
         type="text"
         value={name}
         onChange={setName}
       />
-      <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} />
+      <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} labelText="Phone number of the other person involved"/>
       <Inputfield
         id="EmailPedestrian"
-        labelText="Email of the pedestrian"
+        labelText="Email adress of the other person"
         required={true}
         type="text"
         value={email}
@@ -53,7 +53,8 @@ const PedestrianInfoForm = ({ value, onChange }: PedestrianProps) => {
 
       <TextField
         id="personDamage"
-        labelText="Descripe the damages to the person"
+        labelText="
+        If any personal injury has occurred, please describe the injury"
         maxLength={200}
         required={true}
         value={personDamage}

@@ -10,7 +10,6 @@ export type carInformation = {
   driversLicenseNumber: string;
   insurance: string;
   numberplate: string;
-  color: string;
   model: string;
 };
 
@@ -22,7 +21,6 @@ interface carInfoFormProps {
 const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
   const [numberplate, setNumberplate] = useState<string>(value.numberplate);
   const [model, setModel] = useState<string>(value.model);
-  const [color, setColor] = useState<string>(value.color);
   const [name, setName] = useState<string>(value.name);
   const [drivingLicenseNumber, setDrivingLicenseNumber] = useState<string>(
     value.driversLicenseNumber
@@ -39,7 +37,6 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
       insurance: insurance,
       driversLicenseNumber: drivingLicenseNumber,
       numberplate: numberplate,
-      color: color,
       model: model,
     };
 
@@ -48,7 +45,6 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
     name,
     numberplate,
     model,
-    color,
     drivingLicenseNumber,
     phoneNumber,
     email,
@@ -59,7 +55,8 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
   return (
     <div className="flex flex-col">
       <Inputfield
-        labelText="Numberplate on other car"
+        labelText="
+        The license plate of the counterparty"
         id="NumberPlateInput"
         required={true}
         type="text"
@@ -67,7 +64,8 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
         onChange={setNumberplate}
       />
       <Inputfield
-        labelText="Model of the car"
+        labelText="
+        Counterpart's car model"
         id="ModelInput"
         required={true}
         type="text"
@@ -75,24 +73,17 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
         onChange={setModel}
       />
       <Inputfield
-        labelText="Color of the car"
-        id="ColorInput"
-        required={true}
-        type="text"
-        value={color}
-        onChange={setColor}
-      />
-      <Inputfield
-        labelText="Fullname on the opposite person"
+        labelText="
+        Full name of the other person involved"
         id="FullnameInput"
         required={true}
         type="text"
         value={name}
         onChange={setName}
       />
-      <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} />
+      <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} labelText="Phone number of the other person involved" />
       <Inputfield
-        labelText="Email"
+        labelText="Email of the other person involved"
         id="EmailInput"
         required={true}
         type="text"
@@ -100,7 +91,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
         onChange={setEmail}
       />
       <Inputfield
-        labelText="Drivers license number"
+        labelText="License number of the other person involved"
         id="DriversLicenseNumberInput"
         required={true}
         type="text"
@@ -108,7 +99,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
         onChange={setDrivingLicenseNumber}
       />
       <Inputfield
-        labelText="Insurance"
+        labelText="Insurance details of the other person"
         id="InsuranceInput"
         required={true}
         type="text"
