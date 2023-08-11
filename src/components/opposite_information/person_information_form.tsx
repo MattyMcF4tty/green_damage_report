@@ -41,11 +41,15 @@ const PedestrianInfoForm = ({ value, onChange }: PedestrianProps) => {
         value={name}
         onChange={setName}
       />
-      <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} labelText="Phone number of the other person involved"/>
+      <PhoneNumber
+        value={phoneNumber}
+        onChange={setPhoneNumber}
+        labelText="Phone number of the other person involved"
+      />
       <Inputfield
         id="EmailPedestrian"
         labelText="Email adress of the other person"
-        required={true}
+        required={false}
         type="text"
         value={email}
         onChange={setEmail}
@@ -56,7 +60,7 @@ const PedestrianInfoForm = ({ value, onChange }: PedestrianProps) => {
         labelText="
         If any personal injury has occurred, please describe the injury"
         maxLength={200}
-        required={true}
+        required={false}
         value={personDamage}
         onChange={setPersonDamage}
       />

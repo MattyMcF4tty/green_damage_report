@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
-import {TimeDateField, Inputfield, YesNo,
+import {
+  TimeDateField,
+  Inputfield,
+  YesNo,
 } from "@/components/custom_inputfields";
 import { GetServerSidePropsContext, NextPage } from "next";
 import NextButton from "@/components/buttons/next";
@@ -8,7 +11,9 @@ import { useRouter } from "next/router";
 import { getData, updateData } from "@/firebase/clientApp";
 import { pageProps } from "@/utils/utils";
 
-export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
   const id = context.query.id as string;
 
   const data = await getData(id);
@@ -16,38 +21,55 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   return {
     props: {
       data: data || null,
-      id: id
-    }
-  }
-}
+      id: id,
+    },
+  };
+};
 import PhoneNumber from "@/components/opposite_information/phone_form";
 
-const What: NextPage<pageProps> = ({data, id}) => {
+const What: NextPage<pageProps> = ({ data, id }) => {
   const router = useRouter();
 
-  const [firstName, setFirstName] = useState<string>(data?.driverInfo.firstName || "");
-  const [lastName, setLastName] = useState<string>(data?.driverInfo.lastName || "");
-  const [address, setAddress] = useState<string>(data?.driverInfo.address || "");
-  const [socialSecurityNumber, setSocialSecurityNumber] = useState<string>(data?.driverInfo.socialSecurityNumber || "");
-  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState<string>(data?.driverInfo.drivingLicenseNumber || "");
-  const [phoneNumber, setPhoneNumber] = useState<string>(data?.driverInfo.phoneNumber || "");
+  const [firstName, setFirstName] = useState<string>(
+    data?.driverInfo.firstName || ""
+  );
+  const [lastName, setLastName] = useState<string>(
+    data?.driverInfo.lastName || ""
+  );
+  const [address, setAddress] = useState<string>(
+    data?.driverInfo.address || ""
+  );
+  const [socialSecurityNumber, setSocialSecurityNumber] = useState<string>(
+    data?.driverInfo.socialSecurityNumber || ""
+  );
+  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState<string>(
+    data?.driverInfo.drivingLicenseNumber || ""
+  );
+  const [phoneNumber, setPhoneNumber] = useState<string>(
+    data?.driverInfo.phoneNumber || ""
+  );
   const [email, setEmail] = useState<string>(data?.driverInfo.email || "");
 
-  const [greenCarNumberplate, setgreenCarNumberplate] = useState<string>(data?.greenCarNumberPlate || "");
-  const [showDriverInfoForm, setShowDriverInfoForm] = useState<boolean | null>(data!.driverRenter);
+  const [greenCarNumberplate, setgreenCarNumberplate] = useState<string>(
+    data?.greenCarNumberPlate || ""
+  );
+  const [showDriverInfoForm, setShowDriverInfoForm] = useState<boolean | null>(
+    data!.driverRenter
+  );
   const [accidentTime, setAccidentTime] = useState<string>(data?.time || "");
   const [accidentDate, setAccidentDate] = useState<string>(data?.date || "");
-  const [accidentLocation, setAccidentLocation] = useState<string>(data?.accidentLocation || "");
-
+  const [accidentLocation, setAccidentLocation] = useState<string>(
+    data?.accidentLocation || ""
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (showDriverInfoForm != true) {
-/* TODO: Make function that gets information about current driver from green server */
+      /* TODO: Make function that gets information about current driver from green server */
     }
 
-    const data = {      
+    const data = {
       driverInfo: {
         firstName: firstName,
         lastName: lastName,
@@ -55,7 +77,7 @@ const What: NextPage<pageProps> = ({data, id}) => {
         phoneNumber: phoneNumber,
         socialSecurityNumber: socialSecurityNumber,
         drivingLicenseNumber: drivingLicenseNumber,
-        email: email
+        email: email,
       },
 
       greenCarNumberPlate: greenCarNumberplate,
@@ -120,10 +142,10 @@ const What: NextPage<pageProps> = ({data, id}) => {
             />
 
             {/* TODO: make google autofill */}
-            <Inputfield 
+            <Inputfield
               id="driverAddress"
               labelText="Home address of the driver"
-              required={true}
+              required={false}
               value={address}
               onChange={setAddress}
               type="text"
@@ -133,7 +155,7 @@ const What: NextPage<pageProps> = ({data, id}) => {
             <Inputfield
               labelText="Social security number of the driver"
               id="SocialSecurityNumberInput"
-              required={true}
+              required={false}
               type="ssn"
               value={socialSecurityNumber}
               onChange={setSocialSecurityNumber}
@@ -142,14 +164,18 @@ const What: NextPage<pageProps> = ({data, id}) => {
             <Inputfield
               labelText="Driving license number of the driver"
               id="DrivingLicenseNumberInput"
-              required={true}
+              required={false}
               type="license"
               value={drivingLicenseNumber}
               onChange={setDrivingLicenseNumber}
             />
 
-            <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} labelText="Phonenumber of the driver" />
-            
+            <PhoneNumber
+              value={phoneNumber}
+              onChange={setPhoneNumber}
+              labelText="Phonenumber of the driver"
+            />
+
             <Inputfield
               labelText="Email of the driver"
               id="EmailInput"
@@ -172,22 +198,21 @@ const What: NextPage<pageProps> = ({data, id}) => {
           dateChange={setAccidentDate}
           timeValue={accidentTime}
           dateValue={accidentDate}
-          
         />
       </div>
 
       {/* Accident location collection */}
       <div>
-          <Inputfield 
-            labelText="
+        <Inputfield
+          labelText="
 
             Please enter the location where the accident occurred"
-            id="location"
-            required={true}
-            type="text"
-            value={accidentLocation}
-            onChange={setAccidentLocation}
-          />
+          id="location"
+          required={true}
+          type="text"
+          value={accidentLocation}
+          onChange={setAccidentLocation}
+        />
       </div>
 
       <div className="flex flex-row justify-between">

@@ -60,11 +60,15 @@ const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
           onChange={setName}
         />
 
-        <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} labelText="Phone number of the other person involved"/>
+        <PhoneNumber
+          value={phoneNumber}
+          onChange={setPhoneNumber}
+          labelText="Phone number of the other person involved"
+        />
         <Inputfield
           labelText="Email address of the other person"
           id="EmailInput"
-          required={true}
+          required={false}
           type="text"
           value={email}
           onChange={setEmail}
@@ -75,7 +79,7 @@ const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
           maxLength={200}
           labelText="
           If any personal injury has occurred, please describe the injury"
-          required={true}
+          required={false}
           value={personDamage}
           onChange={setPersonDamage}
         />

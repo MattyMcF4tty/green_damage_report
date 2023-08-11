@@ -81,19 +81,23 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
         value={name}
         onChange={setName}
       />
-      <PhoneNumber value={phoneNumber} onChange={setPhoneNumber} labelText="Phone number of the other person involved" />
+      <PhoneNumber
+        value={phoneNumber}
+        onChange={setPhoneNumber}
+        labelText="Phone number of the other person involved"
+      />
       <Inputfield
         labelText="Email of the other person involved"
         id="EmailInput"
-        required={true}
+        required={false}
         type="text"
         value={email}
         onChange={setEmail}
       />
       <Inputfield
-        labelText="License number of the other person involved"
+        labelText="Driver license number of the other person involved"
         id="DriversLicenseNumberInput"
-        required={true}
+        required={false}
         type="text"
         value={drivingLicenseNumber}
         onChange={setDrivingLicenseNumber}
@@ -101,7 +105,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
       <Inputfield
         labelText="Insurance details of the other person"
         id="InsuranceInput"
-        required={true}
+        required={false}
         type="text"
         value={insurance}
         onChange={setInsurance}
