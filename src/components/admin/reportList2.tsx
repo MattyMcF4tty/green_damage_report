@@ -1,5 +1,5 @@
-import { getData, getReports, searchReports } from "@/firebase/clientApp";
-import { reportDataType } from "@/utils/utils";
+import { getData, getReports } from "@/firebase/clientApp";
+import { reportDataType, reportSearch } from "@/utils/utils";
 import { GetServerSidePropsContext } from "next";
 import { useEffect, useState } from "react";
 import Loading from "../loading";
@@ -12,25 +12,32 @@ interface reportListProps {
 }
 
 const ReportList2 = ({ status, filter, search, itemsPerPage }: reportListProps) => {
-  const [reportList, setReportList] = useState<{ id: string; data: reportDataType }[] | null>(null); // Initialize with null
+  const [reportList, setReportList] = useState<{ id: string; data: reportDataType }[]>(); // Initialize with null
+  const [filteredReportList, setFilteredReportList] = useState<{ id: string; data: reportDataType }[] >(); // Initialize with null
+  const [currentPage, setCurrentPage] = useState<number>(1)
 
   /* Load server data */
   useEffect(() => {
     const fetchReportList = async () => {
       try {
-        const data = await searchReports(status, filter, search, itemsPerPage);
-        setReportList(data || null);
+        const data = await getReports();
+        setReportList(data);
+        setFilteredReportList(data);
       } catch (error) {
           console.error(`Something went wrong fetching data for reportList:\n${error}\n`)
       }
     };
 
     fetchReportList();
-  }, [status, filter, search, itemsPerPage]);
+  }, []);
 
   useEffect(() => {
-   console.log("LIST:", reportList)
-  }, [reportList])
+    if (reportList) {
+      const filteredList = reportSearch(reportList, status, filter, search);
+      setFilteredReportList(filteredList);
+    }
+  }, [status, filter, search, reportList]);
+
 
   return (
     <div className="w-full px-6">
@@ -51,46 +58,56 @@ const ReportList2 = ({ status, filter, search, itemsPerPage }: reportListProps) 
       <div className="max-h-[calc(100vh-15rem)] overflow-y-auto">
         <div className="w-full">
           <table className="w-full">
-            <tbody>
-              {reportList ? (
-                reportList.map((report, index) => (
-                  <tr
-                    className="even:bg-blue-50 odd:bg-white text-center"
-                    key={index}
-                  >
-                    <td className="w-1/5 py-2">{report.id}</td>
-                    <td className="w-1/5"> 
-                    {report.data.driverInfo.firstName !== "" ? (
-                      `${report.data.driverInfo.firstName} ${report.data.driverInfo.lastName}`
-                    ) : (
-                      '-'
-                    )}
+            <tbody>              
+                {!filteredReportList ? (
+                  /* LOADING  */
+                  <tr className="flex justify-center">
+                    <td>
+                      <Loading />
                     </td>
-                    <td className="w-1/5">
-                      {report.data.greenCarNumberPlate !== "" ? (
-                      `${report.data?.greenCarNumberPlate.toUpperCase()}`
+                  </tr>
+                ) 
+                : filteredReportList.length > 0 ? (
+                  filteredReportList.map((report, index) => (
+                    <tr key={index}
+                      className="even:bg-blue-50 odd:bg-white text-center"
+                    >
+                      <td className="w-1/5 py-2">{report.id}</td>
+                      <td className="w-1/5"> 
+                      {report.data.driverInfo.firstName !== "" ? (
+                        `${report.data.driverInfo.firstName} ${report.data.driverInfo.lastName}`
                       ) : (
                         '-'
                       )}
+                      </td>
+                      <td className="w-1/5">
+                        {report.data.greenCarNumberPlate !== "" ? (
+                        `${report.data?.greenCarNumberPlate.toUpperCase()}`
+                        ) : (
+                          '-'
+                        )}
+                      </td>
+                      <td className="w-1/5">{`${report.data.finished}`}</td>
+                      <td className="w-1/5">{report.data.date !== "" ? (
+                        `${report.data.date}`
+                      ) : (
+                        '-'
+                      )}</td>
+                    </tr>
+                  ))
+                ) : filteredReportList.length <= 0 && (
+                  /* No matches  */
+                  <tr className="flex justify-center">
+                    <td>
+                      No Matches
                     </td>
-                    <td className="w-1/5">{`${report.data.finished}`}</td>
-                    <td className="w-1/5">{report.data.date !== "" ? (
-                      `${report.data.date}`
-                    ) : (
-                      '-'
-                    )}</td>
                   </tr>
-                ))
-              ) : (
-                /* LOADING  */
-                <tr className="flex justify-center">
-                  <td>
-                    <Loading/>
-                  </td>
-                </tr>
-              )}
+                )}
             </tbody>
           </table>
+          <div className="flex flex-row text-sm">
+            <p>/{filteredReportList ? (`${filteredReportList.length}`) : ("0")}</p>
+          </div>
 
           {/* Pagination buttons */}
           {/* <div className="flex justify-center mt-2">

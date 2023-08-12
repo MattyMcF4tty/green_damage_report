@@ -87,20 +87,6 @@ export const getData = async (id: string) => {
     }
 }
 
-export const getDocIds = async () => {
-    const colRef = collection(db, `${collectionName}`)
-
-    try {
-        const docListSnapshot = await getDocs(colRef)
-
-        const docIds = docListSnapshot.docs.map((doc) => doc.id);
-
-        return (docIds)
-    } catch (error) {
-        console.log("Something went wrong fetching document ids: \n" + error)
-    }
-}
-
 export const createDoc = async (id: string, email: string) => {
     console.log("Creating doc")
     const data = {
@@ -233,10 +219,19 @@ export const getImages = async (id:string) => {
     return(imageURLs)
 }
 
-const getReportIds = async () => {
-    const reportColRef = collection(db, "Reports/")
-    const querySnapshot = await getDocs(reportColRef);
-    const idList = querySnapshot.docs.map((doc) => doc.id);
+export const getReportIds = async () => {
+    const reportColRef = collection(db, "unfinished/")
+    const idList: string[] = [];
+
+    try {
+        const querySnapshot = await getDocs(reportColRef);
+        for (const doc of querySnapshot.docs) { 
+            const id = doc.id;
+            idList.push(id)
+        }
+    } catch (error) {
+        console.error(`Something went wrong fetching document ids:\n${error}\n`)
+    }
 
     return idList;
 }
@@ -257,53 +252,3 @@ export const getReports = async () => {
     
     return reportList;
 };
-
-export const searchReports = async (
-    status: 'all' | 'finished' | 'unfinished',
-    filter: 'id' | 'driver' | 'numberplate' | 'date' ,
-    search: string,
-    itemsPerPage : number,
-) => {
-    let fullReportList: {id: string, data: reportDataType}[] = [];
-    const collectionRef = collection(db, collectionName)
-
-    try {
-        switch (status) {
-            case 'all':
-                fullReportList = await getReports();
-            break;
-    
-            case 'finished':
-                const finishedQuery = query(collectionRef, where("finished", "==", true));
-                const finishedDocs = await getDocs(finishedQuery);
-    
-                finishedDocs.forEach(async doc => {
-                    const id = doc.id;
-                    const data = await getData(doc.id);
-                    if (data) {
-                        fullReportList.push({ id: id, data: data });
-                    }
-                });
-            break;
-    
-            case 'unfinished':
-                const unfinishedQuery = query(collectionRef, where("finished", "==", false));
-                const unfinishedDocs = await getDocs(unfinishedQuery);
-    
-                unfinishedDocs.forEach(async doc => {
-                    const id = doc.id;
-                    const data = await getData(doc.id);
-                    if (data) {
-                        fullReportList.push({ id: id, data: data });
-                    }
-                });
-            break;
-        }
-    } catch (error) {
-        console.error(`Something went wrong fetching ${status} documents:\n${error}`)
-    }
-
-
-    console.log(fullReportList)
-    return(fullReportList)
-}
