@@ -124,9 +124,9 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
       {/* TODO: Make it collect involved parties and request speed from every party */}
       <div>
         <Inputfield
-          labelText="Your speed in [km/h]"
-          id="GreenDriverSpeed"
-          required={false}
+          id="speedcollection"
+          labelText="km/h"
+          required={true}
           type="number"
           value={greenDriverSpeed}
           onChange={setGreenDriverSpeed}

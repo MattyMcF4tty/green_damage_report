@@ -19,11 +19,28 @@ const PhoneNumber = ({ value, onChange, labelText }: PhoneNumberProps) => {
   const [formattedPhoneNumber, setFormattedPhoneNumber] = useState<string>(
     value ? formatPhoneNumber(value) : ""
   );
-
+  const [selectedCountry, setSelectedCountry] = useState<
+    CountryCode | undefined
+  >(undefined);
   const handlePhoneNumberChange = (phoneNumber: string) => {
     setFormattedPhoneNumber(phoneNumber);
     onChange(phoneNumber);
   };
+
+  const handleCountryChange = (country: CountryCode) => {
+    setSelectedCountry(country);
+  };
+  useEffect(() => {
+    if (formattedPhoneNumber && selectedCountry) {
+      const phoneNumber = parsePhoneNumberFromString(
+        formattedPhoneNumber,
+        selectedCountry
+      );
+      if (phoneNumber) {
+        setFormattedPhoneNumber(phoneNumber.formatNational());
+      }
+    }
+  }, [formattedPhoneNumber, selectedCountry]);
 
   const [countryCode, setCountryCode] = useState<string | undefined>();
   const [bgColor, setBgColor] = useState("bg-white");
@@ -54,13 +71,13 @@ const PhoneNumber = ({ value, onChange, labelText }: PhoneNumberProps) => {
       <label htmlFor="phonenumber" className="">
         {labelText}
       </label>
-      <div className={`${bgColor}  h-10 mt-2`}>
+      <div className={`${bgColor}  h-10  mt-2`}>
         <PhoneInput
           placeholder="Enter phone number"
           value={formattedPhoneNumber}
           onChange={handlePhoneNumberChange}
           metadata={metadata}
-          country={countryCode}
+          country={selectedCountry}
           international={false} // We want to format the number without international prefix
           limitMaxLength // This will restrict the number of digits based on the country code
           required={true}

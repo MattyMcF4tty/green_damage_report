@@ -221,7 +221,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
       )} */}
       <div className="flex flex-row justify-between w-full mt-4">
         <div className="flex flex-row w-16 justify-start h-14 ml-10 ">
-          <BackButton pageName={`what?id=${id}`} />
+          <BackButton pageName={`how?id=${id}`} />
         </div>
 
         <div className="flex flex-row w-16 justify-end h-14 mr-10">

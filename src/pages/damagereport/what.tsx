@@ -93,7 +93,12 @@ const What: NextPage<pageProps> = ({ data, id }) => {
   };
 
   return (
-    <form className="w-full" onSubmit={(e) => handleSubmit(e)}>
+    <form
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+      className="w-full"
+      onSubmit={(e) => handleSubmit(e)}
+    >
       {/* GreenMobility car numberplate collection */}
       <div>
         {/* TODO: Make it so you can only type a valid numberplate for the country where the accident took place and get a list from a server with all the green numberplates */}
