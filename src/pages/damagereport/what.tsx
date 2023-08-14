@@ -150,14 +150,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
             />
 
             {/* TODO: make google autofill */}
-            <Inputfield
-              id="driverAddress"
-              labelText="Home address of the driver"
-              required={false}
-              value={address}
-              onChange={setAddress}
-              type="text"
-            />
+            <AddressField labelText="Home address of the driver" />
 
             {/* TODO: Check if its a real phone number */}
             <Inputfield
@@ -211,7 +204,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
 
       {/* Accident location collection */}
       <div>
-        <AddressField />
+        <AddressField labelText="Where did the accident occur?" />
       </div>
 
       <div className="flex flex-row justify-between">
