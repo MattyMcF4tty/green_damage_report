@@ -58,8 +58,12 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
     { name: string; phone: string; email: string }[]
   >(data?.witnesses || []);
 
-  const [greenImages, setGreenImages] = useState<string[] | null>(images?.['GreenMobility'] || null);
-  const [otherPartyImages, setOtherPartyImages] = useState<string[] |null>(images?.['OtherParty'] || null);
+  const [greenImages, setGreenImages] = useState<string[] | null>(
+    images?.["GreenMobility"] || null
+  );
+  const [otherPartyImages, setOtherPartyImages] = useState<string[] | null>(
+    images?.["OtherParty"] || null
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -132,9 +136,9 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
           reportID={id}
           id="FrontImage"
           labelText="Take pictures of damages on GreenMobility car"
-          required={true}
+          required={false}
           images={greenImages}
-          imageType='GreenMobility'
+          imageType="GreenMobility"
           multiple={true}
         />
 
@@ -142,9 +146,9 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
           reportID={id}
           id="LeftImage"
           labelText="Take pictures of damages to other partys"
-          required={true}
+          required={false}
           images={otherPartyImages}
-          imageType='OtherParty'
+          imageType="OtherParty"
           multiple={true}
         />
       </div>

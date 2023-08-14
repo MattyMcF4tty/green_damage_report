@@ -39,25 +39,27 @@ export const Inputfield = ({
   const [bgColor, setBgColor] = useState("bg-white");
   const [isFocused, setIsFocused] = useState<boolean>(false);
 
-
   // Define the pattern based on the input type
   let pattern = "";
-  let patternError = ""
+  let patternError = "";
   switch (type) {
     case "number":
       pattern = "[0-9]+"; /* Only allow digits */
       patternError = "Please enter digits only";
       break;
     case "email":
-      pattern = "^[a-zA-Z0-9.]{0,100}@[a-zA-Z0-9]{2,20}.(es|com|org|dk)$"; /* Email pattern */
+      pattern =
+        "^[a-zA-Z0-9.]{0,100}@[a-zA-Z0-9]{2,20}.(es|com|org|dk)$"; /* Email pattern */
       patternError = "Please enter a valid Email";
       break;
     case "tel":
-      pattern = "[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}"; /* Phone number format (XX-XX-XX-XX) */
+      pattern =
+        "[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}"; /* Phone number format (XX-XX-XX-XX) */
       patternError = "Please enter a valid phone number";
       break;
     case "numberplate":
-      pattern = "([a-zA-Z]{2}\\s?\\d{2}\\s?\\d{3})|([a-zA-Z]{2}\\d{2}\\d{3})"; /* Updated Numberplate format */
+      pattern =
+        "([a-zA-Z]{2}\\s?\\d{2}\\s?\\d{3})|([a-zA-Z]{2}\\d{2}\\d{3})"; /* Updated Numberplate format */
       patternError = "Please enter a valid numberplate";
       break;
     case "text":
@@ -91,38 +93,36 @@ export const Inputfield = ({
 
   /* Live check if value matches pattern */
   useEffect(() => {
-    const isValid = new RegExp(pattern).test(currentValue)
+    const isValid = new RegExp(pattern).test(currentValue);
 
     if (isValid) {
-      setIsError(false)
-      onChange(currentValue)
+      setIsError(false);
+      onChange(currentValue);
     }
   }, [currentValue]);
 
   /* Checks if value matches pattern when no longer focused */
   const handleCheck = () => {
-    const isValid = new RegExp(pattern).test(currentValue)
+    const isValid = new RegExp(pattern).test(currentValue);
 
     if (isValid && isFocused) {
-      setIsError(false)
-      onChange(currentValue)
+      setIsError(false);
+      onChange(currentValue);
+    } else {
+      setIsError(true);
     }
-    else {
-      setIsError(true)
-    }
-  }
+  };
 
   const handleLeave = () => {
-    const isValid = new RegExp(pattern).test(currentValue)
+    const isValid = new RegExp(pattern).test(currentValue);
 
     if (isValid) {
-      setIsError(false)
-      onChange(currentValue)
+      setIsError(false);
+      onChange(currentValue);
+    } else {
+      setIsError(true);
     }
-    else {
-      setIsError(true)
-    }
-  }
+  };
 
   return (
     <div className="flex flex-col mb-4">
@@ -141,9 +141,7 @@ export const Inputfield = ({
         onInvalid={() => handleCheck()}
         onFocus={() => setIsFocused(true)}
       />
-      {isError && (
-        <p className="text-sm text-red-500">{patternError}</p>
-      )}
+      {isError && <p className="text-sm text-red-500">{patternError}</p>}
     </div>
   );
 };
@@ -216,18 +214,11 @@ export const TimeDateField = ({
           type="time"
           value={timeValue}
           required={required}
-          onChange={(event) => {timeChange(event.target.value); setTimeError(false)}}
+          onChange={(event) => {
+            timeChange(event.target.value);
+            setTimeError(false);
+          }}
           onInvalid={() => setTimeError(true)}
-        />
-
-        <input
-          className="bg-MainGreen-100 h-10 rounded-none w-32 border-[1px] focus:border-[3px] border-MainGreen-200 outline-none"
-          id={"Date" + id}
-          type="date"
-          value={dateValue}
-          required={required}
-          onChange={(event) => {dateChange(event.target.value); setDateError(false)}}
-          onInvalid={() => setDateError(true)}
         />
       </div>
       {dateError && timeError && (
@@ -264,7 +255,6 @@ export const YesNo = ({
 
   useEffect(() => {
     setCheckRequired(value === null);
-
   }, [value]);
 
   return (
@@ -282,7 +272,10 @@ export const YesNo = ({
           type="checkbox"
           checked={value !== null && value}
           required={checkRequired}
-          onChange={() => {onChange(true); setIsError(false)}}
+          onChange={() => {
+            onChange(true);
+            setIsError(false);
+          }}
           onInvalid={() => setIsError(true)}
         />
 
@@ -296,7 +289,10 @@ export const YesNo = ({
           type="checkbox"
           checked={value !== null && !value}
           required={checkRequired}
-          onChange={() => {onChange(false); setIsError(false)}}
+          onChange={() => {
+            onChange(false);
+            setIsError(false);
+          }}
           onInvalid={() => setIsError(true)}
         />
       </div>
@@ -338,7 +334,7 @@ export const TextField = ({
 
   useEffect(() => {
     setCurrentLength(text.length);
-    onChange(text)
+    onChange(text);
 
     const textarea = textareaRef.current;
     if (textarea) {
@@ -362,7 +358,10 @@ export const TextField = ({
         ref={textareaRef}
         id={id}
         value={text}
-        onChange={(event) => {setText(event.target.value); setIsError(false)}}
+        onChange={(event) => {
+          setText(event.target.value);
+          setIsError(false);
+        }}
         maxLength={maxLength}
         required={required}
         className={`${bgColor} min-h-10 h-auto resize-none overflow-hidden outline-none focus:border-[3px] border-[1px] border-MainGreen-200 p-1`}
@@ -370,7 +369,9 @@ export const TextField = ({
       />
       <p>{`${currentLength.toString()}/${maxLength.toString()}`}</p>
       {isError && (
-        <p className="text-sm text-red-500">Please enter only valid characters</p>
+        <p className="text-sm text-red-500">
+          Please enter only valid characters
+        </p>
       )}
     </div>
   );
@@ -383,7 +384,7 @@ interface ImageFieldProps {
   required: boolean;
   labelText: string;
   images: string[] | null;
-  imageType: 'GreenMobility' | 'OtherParty'
+  imageType: "GreenMobility" | "OtherParty";
   multiple: boolean;
 }
 
@@ -402,15 +403,14 @@ export const ImageField = ({
   console.log(images);
 
   useEffect(() => {
-    if (images === null)
-    setIsRequired(images === null);
+    if (images === null) setIsRequired(images === null);
   }, [images]);
 
-  const handleChange = async(newImages: FileList | null) => {
-    await updateImages(reportID, newImages, imageType)
-  }
+  const handleChange = async (newImages: FileList | null) => {
+    await updateImages(reportID, newImages, imageType);
+  };
 
-  console.log(`${id}: ${isRequired}`)
+  console.log(`${id}: ${isRequired}`);
 
   return (
     <div className="flex flex-col mb-4">
@@ -421,17 +421,23 @@ export const ImageField = ({
         type="file"
         accept="image/png, image/jpeg"
         required={isRequired}
-        onChange={(e) => {handleChange(e.target.files); setIsError(false)}}
+        onChange={(e) => {
+          handleChange(e.target.files);
+          setIsError(false);
+        }}
         onInvalid={() => setIsError(true)}
         multiple={multiple}
       />
       <div className="flex flex-wrap gap-[2px] mt-1">
-        {images && images.map((image) => (
-          <img src={image} alt={image} className="w-20" />
-        ))}
+        {images &&
+          images.map((image) => (
+            <img src={image} alt={image} className="w-20" />
+          ))}
       </div>
       {isError && (
-        <p className="text-sm text-red-500">Please choose one or more pictures</p>
+        <p className="text-sm text-red-500">
+          Please choose one or more pictures
+        </p>
       )}
     </div>
   );
@@ -464,12 +470,13 @@ export const Checkbox = ({
         type="checkbox"
         checked={value}
         required={requried}
-        onChange={(event) => {onChange(event.target.checked); setIsError(false)}}
+        onChange={(event) => {
+          onChange(event.target.checked);
+          setIsError(false);
+        }}
         onInvalid={() => setIsError(true)}
       />
-      {isError && (
-        <p className="text-sm text-red-500">Please check this box</p>
-      )}
+      {isError && <p className="text-sm text-red-500">Please check this box</p>}
     </div>
   );
 };

@@ -64,7 +64,7 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
         )}
 
         {/* Driver information collected */}
-        <p className="font-bold">Driver information</p>
+        <p className="font-bold text-MainGreen-300 mb-2">Driver information</p>
         <div
           className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full grid grid-cols-2 gap-y-4 mb-6"
           onClick={() => Router.push("/what")}
@@ -109,7 +109,9 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
         </div>
 
         {/* Information about accident */}
-        <p className="font-bold">Accident information</p>
+        <p className="font-bold text-MainGreen-300 mb-2">
+          Accident information
+        </p>
         <div className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full grid grid-cols-2 gap-y-4 mb-6">
           {/* Date of accident */}
           <div className="row-start-1 col-start-1">
@@ -147,7 +149,7 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
         </div>
 
         {/* Information about the damage done */}
-        <p className="font-bold">Damage information</p>
+        <p className="font-bold text-MainGreen-300 mb-2">Damage information</p>
         <div className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full grid grid-cols-2 gap-y-4 mb-6">
           {/* Green car numberplate */}
           <div className="row-start-1 col-start-1">
@@ -171,7 +173,9 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
         {/* TODO: Lige nu er hver modpart type sin egen katagori, lav istedet en type og 
         gør det muligt at der kan være flere */}
         {/* Others involved information */}
-        <p className="font-bold">Others involved in crash</p>
+        <p className="font-bold text-MainGreen-300 mb-2">
+          Others involved in crash
+        </p>
         <div className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
           {/* Bike information */}
           <div className="w-full">
@@ -331,7 +335,7 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
         </div>
 
         {/* Witnesses information */}
-        <p className="font-bold">Witnesses</p>
+        <p className="font-bold text-MainGreen-300 mb-2">Witnesses</p>
         <div className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
           {data.witnesses.length > 0 ? (
             data.witnesses.map((witness, index) => (
@@ -364,24 +368,44 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
         </div>
 
         {/* Images of damages to GreenMobility car*/}
-        <p className="font-bold">Damages to GreenMobility car</p>
+        <p className="font-bold text-MainGreen-300 mb-2">
+          Damages to GreenMobility car
+        </p>
         <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
-          {images && images['GreenMobility'] && images['GreenMobility'].length > 0 ? (
-            images['GreenMobility'].map((image) => (
+          {images &&
+          images["GreenMobility"] &&
+          images["GreenMobility"].length > 0 ? (
+            images["GreenMobility"].map((image) => (
               <img key={image} src={image} alt={image} className="w-20" />
             ))
           ) : (
             <p>No images</p>
           )}
         </div>
-
-  
-        <div className="w-full flex flex-row">
-          <BackButton pageName={`where?id=${id}`}/>
-  
-          <button type="button" onClick={() => setConfirmVis(true)}
-          className="w-1/2"
-          >Send</button>
+        {/* Images of damages to otherparty car*/}
+        <p className="font-bold text-MainGreen-300 mb-2">
+          Damages to other party car
+        </p>
+        <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
+          {images && images["OtherParty"] && images["OtherParty"].length > 0 ? (
+            images["OtherParty"].map((image) => (
+              <img key={image} src={image} alt={image} className="w-20" />
+            ))
+          ) : (
+            <p>No images</p>
+          )}
+        </div>
+        <div className="w-full h-full flex flex-row justify-between rounded-full mt-4">
+          <div className="w-16 h-14 ml-10">
+            <BackButton pageName={`where?id=${id}`} />
+          </div>
+          <button
+            type="button"
+            onClick={() => setConfirmVis(true)}
+            className="w-16 bg-MainGreen-300 rounded-full text-white mr-10"
+          >
+            Send
+          </button>
         </div>
       </div>
     );
