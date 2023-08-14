@@ -482,18 +482,3 @@ export const Checkbox = ({
     </div>
   );
 };
-
-/* interface AddressfieldProps {}
-
-export const AddressField = () => {
-  return (
-    <div className="flex flex-col mb-4">
-      <Autocomplete
-        apiKey={"AIzaSyBMoAhMlHJ5lKV4Jlpk_NsOxPN6XrSdXqk"}
-        onPlaceSelected={(place) => {
-          console.log(place);
-        }}
-      />
-    </div>
-  );
-}; */
