@@ -1,18 +1,14 @@
-import React, { use, useState } from "react";
-import adminNavbar from "@/components/admin/adminNav";
-import ReportList from "@/components/admin/reportList";
+import React, { useState } from "react";
+import ReportList from "@/components/admin/reportList copy";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faTrashCan,
   faPrint,
   faCloudArrowDown,
-  faMagnifyingGlass,
 } from "@fortawesome/free-solid-svg-icons";
-import { getData, getImages, getReports } from "@/firebase/clientApp";
-import { GetServerSidePropsContext, NextPage } from "next";
-import { pageProps, reportDataType } from "@/utils/utils";
-import ReportList2 from "@/components/admin/reportList2";
-
+import { NextPage } from "next";
+import { reportDataType } from "@/utils/utils";
+import ExpandedReport from "@/components/admin/expandedReport";
 
 
 const adminPage: NextPage = () => {
@@ -20,7 +16,6 @@ const adminPage: NextPage = () => {
   const [currentFilter, setCurrentFilter] = useState<'id' | 'driver' |'numberplate' | 'date'>('id')
   const [currentSearch, setCurrentSearch] = useState<string>("")
 
-  const [activeSection, setActiveSection] = useState("All");
   const [currentPage, setCurrentPage] = useState(1);
 
   const reportsPerPage = 20;
@@ -49,7 +44,7 @@ const adminPage: NextPage = () => {
           onClick={() => setCurrentStatus('all')}
         >
           <span>All</span>
-          {activeSection === "All" && (
+          {currentStatus === 'all' && (
             <div className="absolute bottom-0 w-full h-1 bg-MainGreen-300"></div>
           )}
         </button>
@@ -60,7 +55,7 @@ const adminPage: NextPage = () => {
           onClick={() => setCurrentStatus('unfinished')}
         >
           <span>Unfinished</span>
-          {activeSection === "Unfinished" && (
+          {currentStatus === 'unfinished' && (
             <div className="absolute bottom-0 w-full h-1 bg-MainGreen-300"></div>
           )}
         </button>
@@ -71,7 +66,7 @@ const adminPage: NextPage = () => {
           onClick={() => setCurrentStatus('finished')}
         >
           <span>Finished</span>
-          {activeSection === "Finished" && (
+          {currentStatus === 'finished' && (
             <div className="absolute bottom-0 w-full h-1 bg-MainGreen-300"></div>
           )}
         </button>
@@ -124,8 +119,8 @@ const adminPage: NextPage = () => {
         </div>
       </div>
       {/* Table section */}
-      <div className="bg-white w-full shadow-lg h-[calc(100vh-13rem)]">
-        <ReportList2
+      <div className="bg-white w-full shadow-lg h-full">
+        <ReportList
           status={currentStatus}
           filter={currentFilter}
           search={currentSearch}

@@ -40,9 +40,8 @@ const ReportList2 = ({ status, filter, search, itemsPerPage }: reportListProps) 
 
 
   return (
-    <div className="w-full px-6">
-      <div className="rounded-t-md w-full shadow-lg overflow-x-auto">
-        <table className="w-full">
+    <div className="px-6 h-full rounded-t-md w-full shadow-lg overflow-x-auto">
+        <table className="w-full rounded-t-lg">
           <thead className="sticky top-0 bg-MainGreen-300 text-white">
             <tr className="text-center">
               <th className="w-1/5 font-normal">ID</th>
@@ -53,7 +52,6 @@ const ReportList2 = ({ status, filter, search, itemsPerPage }: reportListProps) 
             </tr>
           </thead>
         </table>
-      </div>
       {/* Table body container with fixed height */}
       <div className="max-h-[calc(100vh-15rem)] overflow-y-auto">
         <div className="w-full">

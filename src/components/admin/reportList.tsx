@@ -1,30 +1,46 @@
-import React from "react";
-import { reportDataType } from "@/utils/utils";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faChevronLeft,
-  faChevronRight,
-} from "@fortawesome/free-solid-svg-icons";
+import { getData, getReports } from "@/firebase/clientApp";
+import { reportDataType, reportSearch } from "@/utils/utils";
+import { GetServerSidePropsContext } from "next";
+import { useEffect, useState } from "react";
+import Loading from "../loading";
 
 interface reportListProps {
-  reportList: { id: string; data: reportDataType }[] | null;
-  currentPage: number;
-  totalPages: number;
-  onPageChange: (newPage: number) => void; // Add this line
+  status: 'all' | 'finished' | 'unfinished'
+  filter: 'id' | 'driver' | 'numberplate' | 'date' ;
+  search: string;
+  itemsPerPage: number;
 }
 
-const ReportList = ({
-  reportList,
-  currentPage,
-  totalPages,
-  onPageChange,
-}: reportListProps) => {
-  const reportsPerPage = 20;
-  const startIndex = (currentPage - 1) * reportsPerPage;
-  const endIndex = Math.min(startIndex + reportsPerPage, reportList!.length);
+const ReportList2 = ({ status, filter, search, itemsPerPage }: reportListProps) => {
+  const [reportList, setReportList] = useState<{ id: string; data: reportDataType }[]>(); // Initialize with null
+  const [filteredReportList, setFilteredReportList] = useState<{ id: string; data: reportDataType }[] >(); // Initialize with null
+  const [currentPage, setCurrentPage] = useState<number>(1)
+
+  /* Load server data */
+  useEffect(() => {
+    const fetchReportList = async () => {
+      try {
+        const data = await getReports();
+        setReportList(data);
+        setFilteredReportList(data);
+      } catch (error) {
+          console.error(`Something went wrong fetching data for reportList:\n${error}\n`)
+      }
+    };
+
+    fetchReportList();
+  }, []);
+
+  useEffect(() => {
+    if (reportList) {
+      const filteredList = reportSearch(reportList, status, filter, search);
+      setFilteredReportList(filteredList);
+    }
+  }, [status, filter, search, reportList]);
+
 
   return (
-    <div className="w-full px-6">
+    <div className="w-full px-6 h-full">
       <div className="rounded-t-md w-full shadow-lg overflow-x-auto">
         <table className="w-full">
           <thead className="sticky top-0 bg-MainGreen-300 text-white">
@@ -42,51 +58,81 @@ const ReportList = ({
       <div className="max-h-[calc(100vh-15rem)] overflow-y-auto">
         <div className="w-full">
           <table className="w-full">
-            <tbody>
-              {reportList &&
-                reportList.slice(startIndex, endIndex).map((report, index) => (
-                  <tr
-                    className="even:bg-blue-50 odd:bg-white text-center"
-                    key={index}
-                  >
-                    <td className="w-1/5 py-2">dQvpvpXS1m6zZQU6</td>
-                    <td className="w-1/5">
-                      {report?.data?.driverInfo?.firstName}{" "}
-                      {report?.data?.driverInfo?.lastName}
+            <tbody>              
+                {!filteredReportList ? (
+                  /* LOADING  */
+                  <tr className="flex justify-center">
+                    <td>
+                      <Loading />
                     </td>
-                    <td className="w-1/5">
-                      {report?.data?.greenCarNumberPlate}
-                    </td>
-                    <td className="w-1/5">{`${report?.data?.finished}`}</td>
-                    <td className="w-1/5">{report?.data?.date}</td>
                   </tr>
-                ))}
+                ) 
+                : filteredReportList.length > 0 ? (
+                  filteredReportList.map((report, index) => (
+                    <tr key={index}
+                      className="even:bg-blue-50 odd:bg-white text-center"
+                    >
+                      <td className="w-1/5 py-2">{report.id}</td>
+                      <td className="w-1/5"> 
+                      {report.data.driverInfo.firstName !== "" ? (
+                        `${report.data.driverInfo.firstName} ${report.data.driverInfo.lastName}`
+                      ) : (
+                        '-'
+                      )}
+                      </td>
+                      <td className="w-1/5">
+                        {report.data.greenCarNumberPlate !== "" ? (
+                        `${report.data?.greenCarNumberPlate.toUpperCase()}`
+                        ) : (
+                          '-'
+                        )}
+                      </td>
+                      <td className="w-1/5">{`${report.data.finished}`}</td>
+                      <td className="w-1/5">{report.data.date !== "" ? (
+                        `${report.data.date}`
+                      ) : (
+                        '-'
+                      )}</td>
+                    </tr>
+                  ))
+                ) : filteredReportList.length <= 0 && (
+                  /* No matches  */
+                  <tr className="flex justify-center">
+                    <td>
+                      No Matches
+                    </td>
+                  </tr>
+                )}
             </tbody>
           </table>
-          {/* Pagination buttons */}
-          <div className="flex justify-center mt-2">
-            <button
-              className="mr-2 px-4 py-2 bg-MainGreen-300 rounded-md w-20 flex items-center justify-center text-white"
-              onClick={() => onPageChange(currentPage - 1)}
-              disabled={currentPage === 1} // Disable the button when on the first page
-            >
-              Previous
-            </button>
-            <span className="flex items-center">
-              Page {currentPage} of {totalPages}
-            </span>
-            <button
-              className="ml-2 px-4 py-2 bg-MainGreen-300 rounded-md w-20 flex items-center justify-center text-white"
-              onClick={() => onPageChange(currentPage + 1)}
-              disabled={currentPage === totalPages} // Disable the button when on the last page
-            >
-              Next
-            </button>
+          <div className="flex flex-row text-sm">
+            <p>/{filteredReportList ? (`${filteredReportList.length}`) : ("0")}</p>
           </div>
+
+          {/* Pagination buttons */}
+          {/* <div className="flex justify-center mt-2">
+                <button
+                  className="mr-2 px-4 py-2 bg-MainGreen-300 rounded-md w-20 flex items-center justify-center text-white"
+                  onClick={() => onPageChange(currentPage - 1)}
+                  disabled={currentPage === 1} // Disable the button when on the first page
+                >
+                  Previous
+                </button>
+                <span className="flex items-center">
+                  Page {currentPage} of {totalPages}
+                </span>
+                <button
+                  className="ml-2 px-4 py-2 bg-MainGreen-300 rounded-md w-20 flex items-center justify-center text-white"
+                  onClick={() => onPageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages} // Disable the button when on the last page
+                >
+                  Next
+                </button>
+          </div> */}
         </div>
       </div>
     </div>
   );
 };
 
-export default ReportList;
+export default ReportList2;
