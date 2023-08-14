@@ -10,11 +10,14 @@ import { NextPage } from "next";
 import { reportDataType } from "@/utils/utils";
 import ExpandedReport from "@/components/admin/expandedReport";
 
-
 const adminPage: NextPage = () => {
-  const [currentStatus, setCurrentStatus] = useState<'all' | 'finished' | 'unfinished'>('all');
-  const [currentFilter, setCurrentFilter] = useState<'id' | 'driver' |'numberplate' | 'date'>('id')
-  const [currentSearch, setCurrentSearch] = useState<string>("")
+  const [currentStatus, setCurrentStatus] = useState<
+    "all" | "finished" | "unfinished"
+  >("all");
+  const [currentFilter, setCurrentFilter] = useState<
+    "id" | "driver" | "numberplate" | "date"
+  >("id");
+  const [currentSearch, setCurrentSearch] = useState<string>("");
 
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -39,23 +42,23 @@ const adminPage: NextPage = () => {
       <div className="flex flex-row w-full justify-start items-center border-b border-gray-300">
         <button
           className={`h-14 flex flex-col items-center justify-center text-lg cursor-pointer relative w-24 ${
-            currentStatus === 'all' ? "text-MainGreen-300" : ""
+            currentStatus === "all" ? "text-MainGreen-300" : ""
           }`}
-          onClick={() => setCurrentStatus('all')}
+          onClick={() => setCurrentStatus("all")}
         >
           <span>All</span>
-          {currentStatus === 'all' && (
+          {currentStatus === "all" && (
             <div className="absolute bottom-0 w-full h-1 bg-MainGreen-300"></div>
           )}
         </button>
         <button
           className={`h-14 w-32 flex flex-col items-center justify-center text-lg cursor-pointer relative ${
-            currentStatus === 'unfinished' ? "text-MainGreen-300" : ""
+            currentStatus === "unfinished" ? "text-MainGreen-300" : ""
           }`}
-          onClick={() => setCurrentStatus('unfinished')}
+          onClick={() => setCurrentStatus("unfinished")}
         >
           <span>Unfinished</span>
-          {currentStatus === 'unfinished' && (
+          {currentStatus === "unfinished" && (
             <div className="absolute bottom-0 w-full h-1 bg-MainGreen-300"></div>
           )}
         </button>
@@ -63,10 +66,10 @@ const adminPage: NextPage = () => {
           className={`h-14 w-32 flex flex-col items-center justify-center text-lg cursor-pointer relative ${
             currentStatus === "finished" ? "text-MainGreen-300" : ""
           }`}
-          onClick={() => setCurrentStatus('finished')}
+          onClick={() => setCurrentStatus("finished")}
         >
           <span>Finished</span>
-          {currentStatus === 'finished' && (
+          {currentStatus === "finished" && (
             <div className="absolute bottom-0 w-full h-1 bg-MainGreen-300"></div>
           )}
         </button>
@@ -98,22 +101,36 @@ const adminPage: NextPage = () => {
           </button>
         </div>
 
-        <div className="w-1/3 relative flex flex-row items-center">
-          <select className="h-8 border border-neutral-500 rounded-l-lg shadow-md outline-none" 
-          id="FilterOptions" value={currentFilter} onChange={(e) => setCurrentFilter(e.target.value as 'id' | 'driver' | 'numberplate' | 'date')}>
-            <option value='id'>Id</option>
-            <option value='driver'>Driver</option>
-            <option value='numberplate'>Numberplate</option>
-            <option value='date'>Date</option>
+        <div className="w-1/3 relative flex flex-row items-center ">
+          <select
+            className="h-8 border border-neutral-500 rounded-l-lg shadow-md outline-none"
+            id="FilterOptions"
+            value={currentFilter}
+            onChange={(e) =>
+              setCurrentFilter(
+                e.target.value as "id" | "driver" | "numberplate" | "date"
+              )
+            }
+          >
+            <option value="id">Id</option>
+            <option value="driver">Driver</option>
+            <option value="numberplate">Numberplate</option>
+            <option value="date">Date</option>
           </select>
-          {currentFilter === 'date' ? (
-            <input className="pl-2 w-[400px] relative h-8 rounded-r-lg shadow-md border border-neutral-500 outline-none"
-            type="date" value={currentSearch} onChange={(e) => setCurrentSearch(e.target.value)} 
+          {currentFilter === "date" ? (
+            <input
+              className="pl-2 w-[400px] relative h-8 rounded-r-lg shadow-md border border-neutral-500 outline-none"
+              type="date"
+              value={currentSearch}
+              onChange={(e) => setCurrentSearch(e.target.value)}
             />
           ) : (
-            <input className="pl-2 w-[400px] relative h-8 rounded-r-lg shadow-md border border-neutral-500 outline-none"
-            type="text" value={currentSearch} onChange={(e) => setCurrentSearch(e.target.value)}
-            placeholder="Search"
+            <input
+              className="pl-2 w-[400px] relative h-8 rounded-r-lg shadow-md border border-neutral-500 outline-none"
+              type="text"
+              value={currentSearch}
+              onChange={(e) => setCurrentSearch(e.target.value)}
+              placeholder="Search"
             />
           )}
         </div>

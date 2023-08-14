@@ -5,16 +5,23 @@ import { useEffect, useState } from "react";
 import Loading from "../loading";
 
 interface reportListProps {
-  status: 'all' | 'finished' | 'unfinished'
-  filter: 'id' | 'driver' | 'numberplate' | 'date' ;
+  status: "all" | "finished" | "unfinished";
+  filter: "id" | "driver" | "numberplate" | "date";
   search: string;
   itemsPerPage: number;
 }
 
-const ReportList2 = ({ status, filter, search, itemsPerPage }: reportListProps) => {
-  const [reportList, setReportList] = useState<{ id: string; data: reportDataType }[]>(); // Initialize with null
-  const [filteredReportList, setFilteredReportList] = useState<{ id: string; data: reportDataType }[] >(); // Initialize with null
-  const [currentPage, setCurrentPage] = useState<number>(1)
+const ReportList2 = ({
+  status,
+  filter,
+  search,
+  itemsPerPage,
+}: reportListProps) => {
+  const [reportList, setReportList] =
+    useState<{ id: string; data: reportDataType }[]>(); // Initialize with null
+  const [filteredReportList, setFilteredReportList] =
+    useState<{ id: string; data: reportDataType }[]>(); // Initialize with null
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   /* Load server data */
   useEffect(() => {
@@ -24,7 +31,9 @@ const ReportList2 = ({ status, filter, search, itemsPerPage }: reportListProps) 
         setReportList(data);
         setFilteredReportList(data);
       } catch (error) {
-          console.error(`Something went wrong fetching data for reportList:\n${error}\n`)
+        console.error(
+          `Something went wrong fetching data for reportList:\n${error}\n`
+        );
       }
     };
 
@@ -38,6 +47,9 @@ const ReportList2 = ({ status, filter, search, itemsPerPage }: reportListProps) 
     }
   }, [status, filter, search, reportList]);
 
+  const onPageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+  };
 
   return (
     <div className="w-full px-6 h-full">
@@ -55,80 +67,78 @@ const ReportList2 = ({ status, filter, search, itemsPerPage }: reportListProps) 
         </table>
       </div>
       {/* Table body container with fixed height */}
-      <div className="max-h-[calc(100vh-15rem)] overflow-y-auto">
+      <div className="max-h-[calc(100vh-15rem)] overflow-y-auto rounded-t-md">
         <div className="w-full">
           <table className="w-full">
-            <tbody>              
-                {!filteredReportList ? (
-                  /* LOADING  */
-                  <tr className="flex justify-center">
-                    <td>
-                      <Loading />
+            <tbody>
+              {!filteredReportList ? (
+                /* LOADING  */
+                <tr className="flex justify-center">
+                  <td>
+                    <Loading />
+                  </td>
+                </tr>
+              ) : filteredReportList.length > 0 ? (
+                filteredReportList.map((report, index) => (
+                  <tr
+                    key={index}
+                    className="even:bg-blue-50 odd:bg-white text-center"
+                  >
+                    <td className="w-1/5 py-2">{report.id}</td>
+                    <td className="w-1/5">
+                      {report.data.driverInfo.firstName !== ""
+                        ? `${report.data.driverInfo.firstName} ${report.data.driverInfo.lastName}`
+                        : "-"}
+                    </td>
+                    <td className="w-1/5">
+                      {report.data.greenCarNumberPlate !== ""
+                        ? `${report.data?.greenCarNumberPlate.toUpperCase()}`
+                        : "-"}
+                    </td>
+                    <td className="w-1/5">{`${report.data.finished}`}</td>
+                    <td className="w-1/5">
+                      {report.data.date !== "" ? `${report.data.date}` : "-"}
                     </td>
                   </tr>
-                ) 
-                : filteredReportList.length > 0 ? (
-                  filteredReportList.map((report, index) => (
-                    <tr key={index}
-                      className="even:bg-blue-50 odd:bg-white text-center"
-                    >
-                      <td className="w-1/5 py-2">{report.id}</td>
-                      <td className="w-1/5"> 
-                      {report.data.driverInfo.firstName !== "" ? (
-                        `${report.data.driverInfo.firstName} ${report.data.driverInfo.lastName}`
-                      ) : (
-                        '-'
-                      )}
-                      </td>
-                      <td className="w-1/5">
-                        {report.data.greenCarNumberPlate !== "" ? (
-                        `${report.data?.greenCarNumberPlate.toUpperCase()}`
-                        ) : (
-                          '-'
-                        )}
-                      </td>
-                      <td className="w-1/5">{`${report.data.finished}`}</td>
-                      <td className="w-1/5">{report.data.date !== "" ? (
-                        `${report.data.date}`
-                      ) : (
-                        '-'
-                      )}</td>
-                    </tr>
-                  ))
-                ) : filteredReportList.length <= 0 && (
+                ))
+              ) : (
+                filteredReportList.length <= 0 && (
                   /* No matches  */
                   <tr className="flex justify-center">
-                    <td>
-                      No Matches
-                    </td>
+                    <td>No Matches</td>
                   </tr>
-                )}
+                )
+              )}
             </tbody>
           </table>
           <div className="flex flex-row text-sm">
-            <p>/{filteredReportList ? (`${filteredReportList.length}`) : ("0")}</p>
+            <p>/{filteredReportList ? `${filteredReportList.length}` : "0"}</p>
           </div>
 
           {/* Pagination buttons */}
-          {/* <div className="flex justify-center mt-2">
-                <button
-                  className="mr-2 px-4 py-2 bg-MainGreen-300 rounded-md w-20 flex items-center justify-center text-white"
-                  onClick={() => onPageChange(currentPage - 1)}
-                  disabled={currentPage === 1} // Disable the button when on the first page
-                >
-                  Previous
-                </button>
-                <span className="flex items-center">
-                  Page {currentPage} of {totalPages}
-                </span>
-                <button
-                  className="ml-2 px-4 py-2 bg-MainGreen-300 rounded-md w-20 flex items-center justify-center text-white"
-                  onClick={() => onPageChange(currentPage + 1)}
-                  disabled={currentPage === totalPages} // Disable the button when on the last page
-                >
-                  Next
-                </button>
-          </div> */}
+          <div className="flex justify-center mt-2">
+            <button
+              className="mr-2 px-4 py-2 bg-MainGreen-300 rounded-md w-20 flex items-center justify-center text-white"
+              onClick={() => onPageChange(currentPage - 1)}
+              disabled={currentPage === 1} // Disable the button when on the first page
+            >
+              Previous
+            </button>
+            <span className="flex items-center">
+              Page {currentPage} of
+              {Math.ceil((filteredReportList?.length || 0) / itemsPerPage)}
+            </span>
+            <button
+              className="ml-2 px-4 py-2 bg-MainGreen-300 rounded-md w-20 flex items-center justify-center text-white"
+              onClick={() => onPageChange(currentPage + 1)}
+              disabled={
+                currentPage ===
+                Math.ceil((filteredReportList?.length || 0) / itemsPerPage)
+              } // Disable the button when on the last page
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </div>
