@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 import { getData, updateData } from "@/firebase/clientApp";
 import { pageProps } from "@/utils/utils";
 import PhoneNumber from "@/components/opposite_information/phone_form";
-
+import AddressField from "@/components/google_autofill";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -23,10 +23,10 @@ export const getServerSideProps = async (
   return {
     props: {
       data: data || null,
-      id: id
-    }
-  }
-}
+      id: id,
+    },
+  };
+};
 
 const What: NextPage<pageProps> = ({ data, id }) => {
   const router = useRouter();
@@ -211,16 +211,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
 
       {/* Accident location collection */}
       <div>
-        <Inputfield
-          labelText="
-
-            Please enter the location where the accident occurred"
-          id="location"
-          required={true}
-          type="text"
-          value={accidentLocation}
-          onChange={setAccidentLocation}
-        />
+        <AddressField />
       </div>
 
       <div className="flex flex-row justify-between">
