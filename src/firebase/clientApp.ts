@@ -1,6 +1,7 @@
+import { promises } from "dns";
 import { initializeApp } from "firebase/app"
 import { collection, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
-import { StorageReference, deleteObject, getDownloadURL, getStorage, listAll, ref, uploadBytes } from "firebase/storage"
+import { ListResult, StorageReference, deleteObject, getDownloadURL, getStorage, listAll, ref, uploadBytes } from "firebase/storage"
 import { reportDataType } from "@/utils/utils";
 
 const firebaseConfig = {
@@ -174,63 +175,82 @@ export const updateData = async (id:string, data:object) => {
     }
 }
 
-export const uploadImage = async (id:string, image:FileList | null, perspective:'FRONT' | 'RIGHT' | 'BACK' | 'LEFT') => {
+export const updateImages = async (id: string, images: FileList | null, imageType: 'GreenMobility' | 'OtherParty') => {
+  const storageRef = ref(storage, `${id}/${imageType}`);
 
-    /* Checks if there already is a image from that perspectiv */
-    const imageList = await listAll(ref(storage, id));
-    for (const item of imageList.items) {
-        if (item.name.startsWith(perspective)) {
-            /* Delete image if it exist */
-            await deleteObject(ref(storage, item.fullPath));
-        };
-    };
+  try {
+    if (images) {
+      deleteAllImages(storageRef);
+      for (let i = 0; i < images.length; i++) {
+        const image = images[i];
+        const imageRef = ref(storageRef, image.name);
+        const imageBlob = new Blob([image], { type: image.type });
 
-    if (image) {
-        const imageName = `${perspective}_${image[0].name}`;
-        const imageRef = ref(storage, `${id}/${imageName}`);
-        const imgBlob = new Blob([image[0], image[0].type]);
-    
-        try {
-            await uploadBytes(imageRef, imgBlob)
-            console.log("Image uploaded")
-        }
-        catch(error) {
-            console.error(`Error uploading image:\n${error}`)
-        }
+        await uploadBytes(imageRef, imageBlob);
+      }
+    } else {
+      deleteAllImages(storageRef);
     }
-    else {
-        console.log("No image selected")
+    console.log("Images updated");
+  } catch (error) {
+    console.error(`Something went wrong updating images at ${id}/${imageType}:\n${error}\n`);
+  }
+}
+
+
+const deleteAllImages = async(StorageRef: StorageReference) => {
+    try {
+        const storedImages:ListResult = await listAll(StorageRef);
+
+        const deletedImages:Promise<void>[] = storedImages.items.map(async (image) => {
+            await deleteObject(image);
+        })
+
+        await Promise.all(deletedImages)
+        console.log(`All images in ${StorageRef.name} has been deleted`)
+    }
+    catch ( error ) {
+        console.error(`Something went wrong deleting all images in ${StorageRef.name}:\n${error}\n`)
     }
 }
 
-export const getImages = async (id:string) => {
-    const imageFolderRef = ref(storage, id);
-    var imageURLs: Record<string, string> = {};
+export const getImages = async (id: string) => {
+    const greenStorageRef = ref(storage, `${id}/GreenMobility`);
+    const otherPartyStorageRef = ref(storage, `${id}/OtherParty`);
 
-
+    console.log(greenStorageRef.fullPath)
     try {
-        const imageList = await listAll(imageFolderRef);
+        const greenImageList: ListResult = await listAll(greenStorageRef);
+        const otherPartyImageList: ListResult = await listAll(otherPartyStorageRef);
+        const imageURLs: Record<string, string[]> = {'GreenMobility': [], 'OtherParty': []};
 
-        /* Makes sure that the images is in the right order */
-        for (const item of imageList.items) {
-            const imageRef: StorageReference = ref(storage, item.fullPath)
-            if (item.name.startsWith('FRONT')) {
-                imageURLs['FRONT'] = await getDownloadURL(imageRef);
-            } else if (item.name.startsWith('RIGHT')) {
-                imageURLs['RIGHT'] = await getDownloadURL(imageRef);
-            } else if (item.name.startsWith('BACK')) {
-                imageURLs['BACK'] = await getDownloadURL(imageRef);
-            } else if (item.name.startsWith('LEFT')) {
-                imageURLs['LEFT'] = await getDownloadURL(imageRef);
-            }
+        /* Get images of GreenMobility car */
+        const greenImageURLs: string[] = [];
+        for (const image of greenImageList.items) {
+            const imageRef: StorageReference = ref(greenStorageRef, image.name);
+            const imageURL: string = await getDownloadURL(imageRef);
+
+            greenImageURLs.push(imageURL);
         }
+        imageURLs['GreenMobility'] = greenImageURLs;
 
-        console.log("Image url fetching done")
-    } catch(error) {
-        console.error(`Something went wrong downloading the image urls:\n${error}\n`)
+        /* Get images of OtherPartys */
+        const otherPartyImageURLs: string[] = [];
+        for (const image of otherPartyImageList.items) {
+            const imageRef: StorageReference = ref(otherPartyStorageRef, image.name);
+            const imageURL: string = await getDownloadURL(imageRef);
+
+            otherPartyImageURLs.push(imageURL);
+        }
+        imageURLs['OtherParty'] = otherPartyImageURLs;
+
+        console.log("Image url fetching completed")
+        return imageURLs;
+    } 
+    catch (error) {
+        console.error(`Something went wrong fetching images:\n${error}\n`);
+        return null;
     }
-
-    return(imageURLs)
 }
 
 const getReportIds = async () => {

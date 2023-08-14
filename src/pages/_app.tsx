@@ -4,6 +4,7 @@ import type { AppProps } from "next/app";
 import { useRouter } from "next/router";
 import AdminNavbar from "@/components/admin/adminNav";
 
+
 function MyApp({ Component, pageProps }: AppProps) {
   const { pathname } = useRouter();
   console.log(pathname);

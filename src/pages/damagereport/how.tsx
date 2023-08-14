@@ -10,12 +10,7 @@ import BackButton from "@/components/buttons/back";
 import { useRouter } from "next/router";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { pageProps } from "@/utils/utils";
-import {
-  getData,
-  getImages,
-  updateData,
-  uploadImage,
-} from "@/firebase/clientApp";
+import { getData, getImages, updateData } from "@/firebase/clientApp";
 import WitnessList from "@/components/witnessList";
 
 export const getServerSideProps = async (
@@ -63,14 +58,13 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
     { name: string; phone: string; email: string }[]
   >(data?.witnesses || []);
 
-  const [frontImage, setFrontImage] = useState<string | null>(images!["FRONT"]);
-  const [rightImage, setRightImage] = useState<string | null>(images!["RIGHT"]);
-  const [backImage, setBackImage] = useState<string | null>(images!["BACK"]);
-  const [leftImage, setLeftImage] = useState<string | null>(images!["LEFT"]);
+  const [greenImages, setGreenImages] = useState<string[] | null>(images?.['GreenMobility'] || null);
+  const [otherPartyImages, setOtherPartyImages] = useState<string[] |null>(images?.['OtherParty'] || null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    console.log(greenImages);
     /* Making witnesses to the correct datatype and securing only correct data is sent to server */
     const witnessesData = witnesses.map((witness) => ({
       name: witness.name,
@@ -121,7 +115,6 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
       </div>
 
       {/* Accident speed collection */}
-      {/* TODO: Make it collect involved parties and request speed from every party */}
       <div>
         <Inputfield
           id="speedcollection"
@@ -137,38 +130,22 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
       <div>
         <ImageField
           reportID={id}
-          perspective="FRONT"
           id="FrontImage"
-          labelText="Take picture of the front of the GreenMobility car"
-          required={false}
-          image={frontImage}
+          labelText="Take pictures of damages on GreenMobility car"
+          required={true}
+          images={greenImages}
+          imageType='GreenMobility'
+          multiple={true}
         />
 
         <ImageField
           reportID={id}
-          perspective="RIGHT"
-          id="RightImage"
-          labelText="Take picture of the right side of the GreenMobility car"
-          required={false}
-          image={rightImage}
-        />
-
-        <ImageField
-          reportID={id}
-          perspective="BACK"
-          id="BackImage"
-          labelText="Take picture of the back of the GreenMobility car"
-          required={false}
-          image={backImage}
-        />
-
-        <ImageField
-          reportID={id}
-          perspective="LEFT"
           id="LeftImage"
-          labelText="Take picture of the left side of the GreenMobility car"
-          required={false}
-          image={leftImage}
+          labelText="Take pictures of damages to other partys"
+          required={true}
+          images={otherPartyImages}
+          imageType='OtherParty'
+          multiple={true}
         />
       </div>
 

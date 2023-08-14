@@ -1,7 +1,7 @@
 /* import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";*/
-import { uploadImage } from "@/firebase/clientApp";
+import { updateImages } from "@/firebase/clientApp";
 import { Address } from "cluster";
-import React, { useEffect, useState, useRef, use } from "react";
+import React, { useEffect, useState, useRef } from "react";
 /* import usePlacesAutocomplete, {
   getGeocode,
   getLatLng,
@@ -34,54 +34,50 @@ export const Inputfield = ({
   type,
   onChange,
 }: InputfieldProps) => {
-  const [isValue, setIsValue] = useState<string>(value);
-  const [error, setError] = useState<string | null>(null);
+  const [currentValue, setCurrentValue] = useState<string>(value);
+  const [isError, setIsError] = useState<boolean>(false);
   const [bgColor, setBgColor] = useState("bg-white");
+  const [isFocused, setIsFocused] = useState<boolean>(false);
 
-  useEffect(() => {
-    onChange(isValue);
-  }, [isValue]);
-
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
-    setIsValue(value);
-
-    // If a pattern is provided, check for pattern validity
-    if (pattern) {
-      const isValid = new RegExp(pattern).test(value);
-      setError(isValid ? null : "Invalid input format.");
-    }
-  };
 
   // Define the pattern based on the input type
   let pattern = "";
+  let patternError = ""
   switch (type) {
     case "number":
-      pattern = "[0-9]{3}"; // Only allow digits
+      pattern = "[0-9]+"; /* Only allow digits */
+      patternError = "Please enter digits only";
       break;
     case "email":
-      pattern = "^[a-zA-Z0-9.]{0,100}@[a-zA-Z0-9]{2,20}.(es|com|org|dk)$"; //TODO fix the email format so it works.
+      pattern = "^[a-zA-Z0-9.]{0,100}@[a-zA-Z0-9]{2,20}.(es|com|org|dk)$"; /* Email pattern */
+      patternError = "Please enter a valid Email";
       break;
     case "tel":
-      pattern = "[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}"; // Phone number format (XX-XX-XX-XX)
+      pattern = "[0-9]{2}-[0-9]{2}-[0-9]{2}-[0-9]{2}"; /* Phone number format (XX-XX-XX-XX) */
+      patternError = "Please enter a valid phone number";
       break;
     case "numberplate":
-      pattern = "([a-zA-Z]{2}\\s?\\d{2}\\s?\\d{3})|([a-zA-Z]{2}\\d{2}\\d{3})"; // Updated Numberplate format
+      pattern = "([a-zA-Z]{2}\\s?\\d{2}\\s?\\d{3})|([a-zA-Z]{2}\\d{2}\\d{3})"; /* Updated Numberplate format */
+      patternError = "Please enter a valid numberplate";
       break;
     case "text":
-      pattern = ".*"; // Allow any character, any number of times
+      pattern = ".*"; /* Allow any character, any number of times */
+      patternError = "Please enter only valid characters";
       break;
     case "license":
       pattern = "[0-9]{8,}";
+      patternError = "Please enter a valid drivers license number";
       break;
     case "ssn":
       pattern = "^[0-9]{6}-[0-9]{4}$";
+      patternError = "Please enter a valid social security number";
       break;
     case "speed":
       pattern = "[0-9]{3}";
       break;
     default:
-      pattern = ""; // No pattern for "text" type, it allows any input
+      pattern = ""; /* No pattern for "text" type, it allows any input */
+      patternError = "Please enter only valid characters";
       break;
   }
 
@@ -93,6 +89,41 @@ export const Inputfield = ({
     }
   }, [value]);
 
+  /* Live check if value matches pattern */
+  useEffect(() => {
+    const isValid = new RegExp(pattern).test(currentValue)
+
+    if (isValid) {
+      setIsError(false)
+      onChange(currentValue)
+    }
+  }, [currentValue]);
+
+  /* Checks if value matches pattern when no longer focused */
+  const handleCheck = () => {
+    const isValid = new RegExp(pattern).test(currentValue)
+
+    if (isValid && isFocused) {
+      setIsError(false)
+      onChange(currentValue)
+    }
+    else {
+      setIsError(true)
+    }
+  }
+
+  const handleLeave = () => {
+    const isValid = new RegExp(pattern).test(currentValue)
+
+    if (isValid) {
+      setIsError(false)
+      onChange(currentValue)
+    }
+    else {
+      setIsError(true)
+    }
+  }
+
   return (
     <div className="flex flex-col mb-4">
       <label htmlFor={id} className="mb-2">
@@ -103,10 +134,16 @@ export const Inputfield = ({
         id={id}
         type={type}
         required={required}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
+        value={currentValue}
+        onChange={(e) => setCurrentValue(e.target.value)}
         pattern={pattern}
+        onBlur={() => handleLeave()}
+        onInvalid={() => handleCheck()}
+        onFocus={() => setIsFocused(true)}
       />
+      {isError && (
+        <p className="text-sm text-red-500">{patternError}</p>
+      )}
     </div>
   );
 };
@@ -131,6 +168,9 @@ export const TimeDateField = ({
   timeValue,
   dateValue,
 }: TimeDateProps) => {
+  const [dateError, setDateError] = useState<boolean>(false);
+  const [timeError, setTimeError] = useState<boolean>(false);
+
   const [timeBgColor, setTimeBgColor] = useState("bg-white");
   const [dateBgColor, setDateBgColor] = useState("bg-white");
 
@@ -176,9 +216,29 @@ export const TimeDateField = ({
           type="time"
           value={timeValue}
           required={required}
-          onChange={(event) => timeChange(event.target.value)}
+          onChange={(event) => {timeChange(event.target.value); setTimeError(false)}}
+          onInvalid={() => setTimeError(true)}
+        />
+
+        <input
+          className="bg-MainGreen-100 h-10 rounded-none w-32 border-[1px] focus:border-[3px] border-MainGreen-200 outline-none"
+          id={"Date" + id}
+          type="date"
+          value={dateValue}
+          required={required}
+          onChange={(event) => {dateChange(event.target.value); setDateError(false)}}
+          onInvalid={() => setDateError(true)}
         />
       </div>
+      {dateError && timeError && (
+        <p className="text-sm text-red-500">Please choose a time and a date</p>
+      )}
+      {dateError && !timeError && (
+        <p className="text-sm text-red-500">Please choose a date</p>
+      )}
+      {timeError && !dateError && (
+        <p className="text-sm text-red-500">Please choose a time</p>
+      )}
     </div>
   );
 };
@@ -200,9 +260,11 @@ export const YesNo = ({
   value,
 }: YesNoProps) => {
   const [checkRequired, setCheckRequired] = useState<boolean>(required);
+  const [isError, setIsError] = useState<boolean>(false);
 
   useEffect(() => {
     setCheckRequired(value === null);
+
   }, [value]);
 
   return (
@@ -220,7 +282,8 @@ export const YesNo = ({
           type="checkbox"
           checked={value !== null && value}
           required={checkRequired}
-          onChange={() => onChange(true)}
+          onChange={() => {onChange(true); setIsError(false)}}
+          onInvalid={() => setIsError(true)}
         />
 
         {/* No  */}
@@ -233,9 +296,13 @@ export const YesNo = ({
           type="checkbox"
           checked={value !== null && !value}
           required={checkRequired}
-          onChange={() => onChange(false)}
+          onChange={() => {onChange(false); setIsError(false)}}
+          onInvalid={() => setIsError(true)}
         />
       </div>
+      {isError && (
+        <p className="text-sm text-red-500">Please check one of the boxes</p>
+      )}
     </div>
   );
 };
@@ -261,6 +328,7 @@ export const TextField = ({
   const [text, setText] = useState<string>(value);
   const [currentLength, setCurrentLength] = useState<number>(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [isError, setIsError] = useState<boolean>(false);
   const [bgColor, setBgColor] = useState("bg-white");
   const [isValue, setIsValue] = useState<string>(value);
 
@@ -269,10 +337,9 @@ export const TextField = ({
   }, [isValue]);
 
   useEffect(() => {
-    setCurrentLength(value.length);
-  }, [value]);
+    setCurrentLength(text.length);
+    onChange(text)
 
-  useEffect(() => {
     const textarea = textareaRef.current;
     if (textarea) {
       textarea.style.height = "auto";
@@ -294,13 +361,17 @@ export const TextField = ({
       <textarea
         ref={textareaRef}
         id={id}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
+        value={text}
+        onChange={(event) => {setText(event.target.value); setIsError(false)}}
         maxLength={maxLength}
         required={required}
         className={`${bgColor} min-h-10 h-auto resize-none overflow-hidden outline-none focus:border-[3px] border-[1px] border-MainGreen-200 p-1`}
+        onInvalid={() => setIsError(true)}
       />
       <p>{`${currentLength.toString()}/${maxLength.toString()}`}</p>
+      {isError && (
+        <p className="text-sm text-red-500">Please enter only valid characters</p>
+      )}
     </div>
   );
 };
@@ -311,36 +382,57 @@ interface ImageFieldProps {
   id: string;
   required: boolean;
   labelText: string;
-  image: string | null;
-  perspective: "FRONT" | "RIGHT" | "BACK" | "LEFT";
+  images: string[] | null;
+  imageType: 'GreenMobility' | 'OtherParty'
+  multiple: boolean;
 }
 
 export const ImageField = ({
   reportID,
-  image,
+  images,
   required,
   id,
   labelText,
-  perspective,
+  imageType,
+  multiple,
 }: ImageFieldProps) => {
   const [isRequired, setIsRequired] = useState<boolean>(required);
+  const [isError, setIsError] = useState<boolean>(false);
+
+  console.log(images);
 
   useEffect(() => {
-    setIsRequired(image === null);
-  }, [image]);
+    if (images === null)
+    setIsRequired(images === null);
+  }, [images]);
+
+  const handleChange = async(newImages: FileList | null) => {
+    await updateImages(reportID, newImages, imageType)
+  }
+
+  console.log(`${id}: ${isRequired}`)
 
   return (
     <div className="flex flex-col mb-4">
       <label htmlFor={id}>{labelText}</label>
       <input
-        className=""
+        className="cursor-pointer"
         id={id}
         type="file"
         accept="image/png, image/jpeg"
         required={isRequired}
-        onChange={(e) => uploadImage(reportID, e.target.files, perspective)}
+        onChange={(e) => {handleChange(e.target.files); setIsError(false)}}
+        onInvalid={() => setIsError(true)}
+        multiple={multiple}
       />
-      {image && <img src={image} alt={id} className="w-20" />}
+      <div className="flex flex-wrap gap-[2px] mt-1">
+        {images && images.map((image) => (
+          <img src={image} alt={image} className="w-20" />
+        ))}
+      </div>
+      {isError && (
+        <p className="text-sm text-red-500">Please choose one or more pictures</p>
+      )}
     </div>
   );
 };
@@ -361,6 +453,8 @@ export const Checkbox = ({
   onChange,
   requried,
 }: CheckboxProps) => {
+  const [isError, setIsError] = useState<boolean>(false);
+
   return (
     <div className="flex flex-row-reverse items-center mr-4">
       <label htmlFor={"Checkbox" + id}>{labelText}</label>
@@ -370,8 +464,12 @@ export const Checkbox = ({
         type="checkbox"
         checked={value}
         required={requried}
-        onChange={(event) => onChange(event.target.checked)}
+        onChange={(event) => {onChange(event.target.checked); setIsError(false)}}
+        onInvalid={() => setIsError(true)}
       />
+      {isError && (
+        <p className="text-sm text-red-500">Please check this box</p>
+      )}
     </div>
   );
 };
