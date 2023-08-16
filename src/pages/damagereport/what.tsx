@@ -204,7 +204,10 @@ const What: NextPage<pageProps> = ({ data, id }) => {
 
       {/* Accident location collection */}
       <div>
-        <AddressField labelText="Where did the accident occur?" />
+        <AddressField
+          labelText="
+Please enter the location where the accident occurred."
+        />
       </div>
 
       <div className="flex flex-row justify-between">

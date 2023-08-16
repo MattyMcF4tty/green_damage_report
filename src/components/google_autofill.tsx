@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import usePlacesService from "react-google-autocomplete/lib/usePlacesAutocompleteService";
 
 interface AddressFieldProps {
-  labelText: string; // Add labelText prop
+  labelText: string;
 }
 
 declare global {
@@ -46,7 +46,6 @@ const AddressField: React.FC<AddressFieldProps> = ({ labelText }) => {
     service.getDetails(request, (result: any, status: any) => {
       if (status === window.google.maps.places.PlacesServiceStatus.OK) {
         console.log("Selected Address:", result.formatted_address);
-        // Access other details from the result object
       } else {
         console.error("Error fetching place details:", status);
       }
