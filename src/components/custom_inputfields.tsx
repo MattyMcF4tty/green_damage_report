@@ -3,6 +3,15 @@ import { updateImages } from "@/firebase/clientApp";
 import { Address } from "cluster";
 import React, { useEffect, useState, useRef } from "react";
 import Autocomplete from "react-google-autocomplete";
+import {
+  GoogleMap,
+  LoadScript,
+  Marker,
+  useLoadScript,
+} from "@react-google-maps/api";
+import { map } from "mathjs";
+import { type } from "os";
+import usePlacesService from "react-google-autocomplete/lib/usePlacesAutocompleteService";
 
 /* import usePlacesAutocomplete, {
   getGeocode,
@@ -482,3 +491,126 @@ export const Checkbox = ({
     </div>
   );
 };
+
+interface LocationAdressProps {
+  value: any; // Change this type as needed
+  type: "address" | "location";
+  onChange: (value: any) => void; // Change this type as needed
+  labelText: string;
+}
+
+declare global {
+  interface Window {
+    google: any;
+  }
+}
+
+const LocationAdress: React.FC<LocationAdressProps> = ({
+  value,
+  type,
+  onChange,
+  labelText,
+}) => {
+  if (type === "location") {
+    const containerStyle = {
+      width: "100%",
+      height: "400px",
+    };
+
+    const Center = {
+      lat: 55.676098,
+      lng: 12.568337,
+    };
+
+    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
+
+    const [markerLocation, setMarkerLocation] = useState(Center);
+
+    const handleMarkerDragEnd = (event: any) => {
+      if (event.latLng) {
+        const newPosition = {
+          lat: event.latLng.lat(),
+          lng: event.latLng.lng(),
+        };
+        setMarkerLocation(newPosition);
+      }
+    };
+    return (
+      <div>
+        <LoadScript googleMapsApiKey={apiKey || ""}>
+          <GoogleMap
+            mapContainerStyle={containerStyle}
+            center={Center}
+            zoom={10}
+          ></GoogleMap>
+        </LoadScript>
+      </div>
+    );
+  } else if (type === "address") {
+    const {
+      placesService,
+      placePredictions,
+      getPlacePredictions,
+      isPlacePredictionsLoading,
+    } = usePlacesService({
+      apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
+    });
+
+    const [bgColor, setBgColor] = useState<string>("bg-white");
+
+    useEffect(() => {
+      if (value === "" || value === null) {
+        setBgColor("bg-white");
+      } else {
+        setBgColor("bg-MainGreen-100");
+      }
+    }, [value]);
+
+    const handlePlaceSelect = (place: any) => {
+      onChange(place.description);
+      getPlacePredictions({ input: "" });
+
+      const request = {
+        placeId: place.place_id,
+        fields: ["formatted_address", "geometry.location"],
+      };
+      const service = new window.google.maps.places.PlacesService(
+        document.createElement("div")
+      );
+      service.getDetails(request, (result: any, status: any) => {
+        if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+          console.log("Selected Address:", result.formatted_address);
+        } else {
+          console.error("Error fetching place details:", status);
+        }
+      });
+    };
+
+    return (
+      <div className="mb-4">
+        <label className="mb-2 block">{labelText}</label>
+        <input
+          value={value}
+          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+            onChange(evt.target.value);
+            getPlacePredictions({ input: evt.target.value });
+          }}
+          className={`w-full h-10 text-lg p-1 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none ${bgColor}`}
+        />
+        {placePredictions.map((item) => (
+          <div
+            key={item.place_id}
+            onClick={() => handlePlaceSelect(item)}
+            className="cursor-pointer"
+          >
+            {item.description}
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  return null; // Default return if the type is neither 'location' nor 'address'
+};
+
+export default LocationAdress;

@@ -1,8 +1,11 @@
-import React, { useState, useEffect } from "react";
+/* import React, { useState, useEffect } from "react";
 import usePlacesService from "react-google-autocomplete/lib/usePlacesAutocompleteService";
+import { LoadScript, GoogleMap } from "@react-google-maps/api";
 
 interface AddressFieldProps {
   labelText: string;
+  value: string;
+  onChange: (address: string) => void;
 }
 
 declare global {
@@ -11,7 +14,11 @@ declare global {
   }
 }
 
-const AddressField: React.FC<AddressFieldProps> = ({ labelText }) => {
+const AddressLocation: React.FC<AddressFieldProps> = ({
+  labelText,
+  value,
+  onChange,
+}) => {
   const {
     placesService,
     placePredictions,
@@ -21,19 +28,18 @@ const AddressField: React.FC<AddressFieldProps> = ({ labelText }) => {
     apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
   });
 
-  const [inputValue, setInputValue] = useState<string>("");
   const [bgColor, setBgColor] = useState<string>("bg-white");
 
   useEffect(() => {
-    if (inputValue === "" || inputValue === null) {
+    if (value === "" || value === null) {
       setBgColor("bg-white");
     } else {
       setBgColor("bg-MainGreen-100");
     }
-  }, [inputValue]);
+  }, [value]);
 
   const handlePlaceSelect = (place: any) => {
-    setInputValue(place.description);
+    onChange(place.description);
     getPlacePredictions({ input: "" });
 
     const request = {
@@ -57,9 +63,9 @@ const AddressField: React.FC<AddressFieldProps> = ({ labelText }) => {
       <div className="mb-4">
         <label className="mb-2 block">{labelText}</label>
         <input
-          value={inputValue}
+          value={value}
           onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
-            setInputValue(evt.target.value);
+            onChange(evt.target.value);
             getPlacePredictions({ input: evt.target.value });
           }}
           className={`w-full h-10 text-lg p-1 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none ${bgColor}`}
@@ -78,4 +84,5 @@ const AddressField: React.FC<AddressFieldProps> = ({ labelText }) => {
   );
 };
 
-export default AddressField;
+export default AddressLocation;
+ */
