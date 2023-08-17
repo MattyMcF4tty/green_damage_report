@@ -9,6 +9,7 @@ interface reportListProps {
   filter: "id" | "driver" | "numberplate" | "date";
   search: string;
   itemsPerPage: number;
+  currentPage: number; // Add currentPage to the interface
 }
 
 const ReportList2 = ({
@@ -48,8 +49,19 @@ const ReportList2 = ({
   }, [status, filter, search, reportList]);
 
   const onPageChange = (newPage: number) => {
-    setCurrentPage(newPage);
+    if (filteredReportList) {
+      newPage = Math.max(
+        1,
+        Math.min(newPage, Math.ceil(filteredReportList.length / itemsPerPage))
+      );
+      setCurrentPage(newPage);
+    }
   };
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = filteredReportList
+    ? Math.min(startIndex + itemsPerPage, filteredReportList.length)
+    : 0;
 
   return (
     <div className="w-full px-6 h-full">
@@ -67,7 +79,7 @@ const ReportList2 = ({
         </table>
       </div>
       {/* Table body container with fixed height */}
-      <div className="max-h-[calc(100vh-15rem)] overflow-y-auto rounded-t-md">
+      <div className="max-h-[calc(100vh-16rem)] overflow-y-auto rounded-t-md">
         <div className="w-full">
           <table className="w-full">
             <tbody>
@@ -79,28 +91,30 @@ const ReportList2 = ({
                   </td>
                 </tr>
               ) : filteredReportList.length > 0 ? (
-                filteredReportList.map((report, index) => (
-                  <tr
-                    key={index}
-                    className="even:bg-blue-50 odd:bg-white text-center"
-                  >
-                    <td className="w-1/5 py-2">{report.id}</td>
-                    <td className="w-1/5">
-                      {report.data.driverInfo.firstName !== ""
-                        ? `${report.data.driverInfo.firstName} ${report.data.driverInfo.lastName}`
-                        : "-"}
-                    </td>
-                    <td className="w-1/5">
-                      {report.data.greenCarNumberPlate !== ""
-                        ? `${report.data?.greenCarNumberPlate.toUpperCase()}`
-                        : "-"}
-                    </td>
-                    <td className="w-1/5">{`${report.data.finished}`}</td>
-                    <td className="w-1/5">
-                      {report.data.date !== "" ? `${report.data.date}` : "-"}
-                    </td>
-                  </tr>
-                ))
+                filteredReportList
+                  .slice(startIndex, endIndex) // Slice based on current page
+                  .map((report, index) => (
+                    <tr
+                      key={index}
+                      className="even:bg-blue-50 odd:bg-white text-center"
+                    >
+                      <td className="w-1/5 py-2">{report.id}</td>
+                      <td className="w-1/5">
+                        {report.data.driverInfo.firstName !== ""
+                          ? `${report.data.driverInfo.firstName} ${report.data.driverInfo.lastName}`
+                          : "-"}
+                      </td>
+                      <td className="w-1/5">
+                        {report.data.greenCarNumberPlate !== ""
+                          ? `${report.data?.greenCarNumberPlate.toUpperCase()}`
+                          : "-"}
+                      </td>
+                      <td className="w-1/5">{`${report.data.finished}`}</td>
+                      <td className="w-1/5">
+                        {report.data.date !== "" ? `${report.data.date}` : "-"}
+                      </td>
+                    </tr>
+                  ))
               ) : (
                 filteredReportList.length <= 0 && (
                   /* No matches  */
@@ -111,9 +125,6 @@ const ReportList2 = ({
               )}
             </tbody>
           </table>
-          <div className="flex flex-row text-sm">
-            <p>/{filteredReportList ? `${filteredReportList.length}` : "0"}</p>
-          </div>
 
           {/* Pagination buttons */}
           <div className="flex justify-center mt-2">
@@ -124,9 +135,11 @@ const ReportList2 = ({
             >
               Previous
             </button>
-            <span className="flex items-center">
+            <span className="flex items-center justify-between">
               Page {currentPage} of
-              {Math.ceil((filteredReportList?.length || 0) / itemsPerPage)}
+              <span className="ml-1">
+                {Math.ceil((filteredReportList?.length || 0) / itemsPerPage)}
+              </span>
             </span>
             <button
               className="ml-2 px-4 py-2 bg-MainGreen-300 rounded-md w-20 flex items-center justify-center text-white"

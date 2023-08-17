@@ -9,6 +9,7 @@ import {
 import { NextPage } from "next";
 import { reportDataType } from "@/utils/utils";
 import ExpandedReport from "@/components/admin/expandedReport";
+import ReportList2 from "@/components/admin/reportList";
 
 const adminPage: NextPage = () => {
   const [currentStatus, setCurrentStatus] = useState<
@@ -136,12 +137,13 @@ const adminPage: NextPage = () => {
         </div>
       </div>
       {/* Table section */}
-      <div className="bg-white w-full shadow-lg h-full">
-        <ReportList
+      <div className="bg-white w-full max-h-[calc(100vh-13.5rem)] block shadow-lg overflow-hidden">
+        <ReportList2
           status={currentStatus}
           filter={currentFilter}
           search={currentSearch}
           itemsPerPage={20}
+          currentPage={currentPage} // Pass the currentPage prop
         />
       </div>
     </div>
