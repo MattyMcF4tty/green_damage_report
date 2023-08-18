@@ -3,6 +3,7 @@ import { reportDataType, reportSearch } from "@/utils/utils";
 import { GetServerSidePropsContext } from "next";
 import { useEffect, useState } from "react";
 import Loading from "../loading";
+import ExpandedReport from "./expandedReport";
 
 interface reportListProps {
   status: "all" | "finished" | "unfinished";
@@ -19,10 +20,12 @@ const ReportList2 = ({
   itemsPerPage,
 }: reportListProps) => {
   const [reportList, setReportList] =
-    useState<{ id: string; data: reportDataType }[]>(); // Initialize with null
+    useState<{ id: string; data: reportDataType }[]>([]);
   const [filteredReportList, setFilteredReportList] =
-    useState<{ id: string; data: reportDataType }[]>(); // Initialize with null
+    useState<{ id: string; data: reportDataType }[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [selectedReport, setSelectedReport] = useState<string | null >(null)
+
 
   /* Load server data */
   useEffect(() => {
@@ -69,11 +72,13 @@ const ReportList2 = ({
         <table className="w-full">
           <thead className="sticky top-0 bg-MainGreen-300 text-white">
             <tr className="text-center">
-              <th className="w-1/5 font-normal">ID</th>
-              <th className="w-1/5 font-normal">Name</th>
-              <th className="w-1/5 font-normal">Numberplate</th>
-              <th className="w-1/5 font-normal">Status</th>
-              <th className="w-1/5 font-normal">Date</th>
+              <th className="w-1/6 font-normal"><button type="button">
+                </button></th>
+              <th className="w-1/6 font-normal">ID</th>
+              <th className="w-1/6 font-normal">Name</th>
+              <th className="w-1/6 font-normal">Numberplate</th>
+              <th className="w-1/6 font-normal">Status</th>
+              <th className="w-1/6 font-normal">Date</th>
             </tr>
           </thead>
         </table>
@@ -83,7 +88,7 @@ const ReportList2 = ({
         <div className="w-full">
           <table className="w-full">
             <tbody>
-              {!filteredReportList ? (
+              {reportList.length <= 0 ? (
                 /* LOADING  */
                 <tr className="flex justify-center">
                   <td>
@@ -96,7 +101,8 @@ const ReportList2 = ({
                   .map((report, index) => (
                     <tr
                       key={index}
-                      className="even:bg-blue-50 odd:bg-white text-center"
+                      className="even:bg-blue-50 odd:bg-white text-center "
+                    onClick={() => setSelectedReport(report.id)}
                     >
                       <td className="w-1/5 py-2">{report.id}</td>
                       <td className="w-1/5">
@@ -125,6 +131,15 @@ const ReportList2 = ({
               )}
             </tbody>
           </table>
+          <div>
+            {selectedReport && (
+              <ExpandedReport
+              visible={true} 
+              id={selectedReport} 
+              report={reportList.find(report => report.id === selectedReport)?.data}
+              />
+            )}
+          </div>
 
           {/* Pagination buttons */}
           <div className="flex justify-center mt-2">

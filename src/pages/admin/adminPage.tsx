@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import ReportList from "@/components/admin/reportList copy";
+import ReportList from "@/components/admin/reportList";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faTrashCan,
