@@ -1,9 +1,7 @@
-import { getData, getReports } from "@/firebase/clientApp";
+import { getReports } from "@/firebase/clientApp";
 import { reportDataType, reportSearch } from "@/utils/utils";
-import { GetServerSidePropsContext } from "next";
 import { useEffect, useState } from "react";
 import Loading from "../loading";
-import ExpandedReport from "./expandedReport";
 
 interface reportListProps {
   status: "all" | "finished" | "unfinished";
@@ -11,21 +9,27 @@ interface reportListProps {
   search: string;
   itemsPerPage: number;
   currentPage: number; // Add currentPage to the interface
+  currentSelectedReports: (selected: {id: string, data: reportDataType}[]) => void;
 }
 
-const ReportList2 = ({
+const ReportList = ({
   status,
   filter,
   search,
   itemsPerPage,
+  currentSelectedReports,
 }: reportListProps) => {
   const [reportList, setReportList] =
     useState<{ id: string; data: reportDataType }[]>([]);
   const [filteredReportList, setFilteredReportList] =
     useState<{ id: string; data: reportDataType }[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [selectedReport, setSelectedReport] = useState<string | null >(null)
+  const [selectedReports, setSelectedReports] = useState<{id: string, data: reportDataType}[]>([]);
+  const [loaded, setLoaded] = useState<boolean>(false);
 
+  useEffect(() => {
+    currentSelectedReports(selectedReports)
+  }, [selectedReports])
 
   /* Load server data */
   useEffect(() => {
@@ -34,6 +38,7 @@ const ReportList2 = ({
         const data = await getReports();
         setReportList(data);
         setFilteredReportList(data);
+        setLoaded(true);
       } catch (error) {
         console.error(
           `Something went wrong fetching data for reportList:\n${error}\n`
@@ -65,20 +70,30 @@ const ReportList2 = ({
   const endIndex = filteredReportList
     ? Math.min(startIndex + itemsPerPage, filteredReportList.length)
     : 0;
-
   return (
     <div className="w-full px-6 h-full">
       <div className="rounded-t-md w-full shadow-lg overflow-x-auto">
         <table className="w-full">
           <thead className="sticky top-0 bg-MainGreen-300 text-white">
             <tr className="text-center">
-              <th className="w-1/6 font-normal"><button type="button">
-                </button></th>
-              <th className="w-1/6 font-normal">ID</th>
-              <th className="w-1/6 font-normal">Name</th>
-              <th className="w-1/6 font-normal">Numberplate</th>
-              <th className="w-1/6 font-normal">Status</th>
-              <th className="w-1/6 font-normal">Date</th>
+              <th className="w-1/12 font-normal">
+                <input type="checkbox" className="scale-150"
+                  onChange={(e) => {
+                      const isChecked = e.target.checked;
+
+                      if (isChecked) {
+                        setSelectedReports(filteredReportList);
+                      } else {
+                        setSelectedReports([]);
+                      }
+                    }}
+                  />
+              </th>
+              <th className="w-2/12 font-normal">ID</th>
+              <th className="w-2/12 font-normal">Name</th>
+              <th className="w-2/12 font-normal">Numberplate</th>
+              <th className="w-1/12 font-normal">Status</th>
+              <th className="w-2/12 font-normal">Date</th>
             </tr>
           </thead>
         </table>
@@ -88,7 +103,7 @@ const ReportList2 = ({
         <div className="w-full">
           <table className="w-full">
             <tbody>
-              {reportList.length <= 0 ? (
+              {!loaded ? (
                 /* LOADING  */
                 <tr className="flex justify-center">
                   <td>
@@ -97,26 +112,47 @@ const ReportList2 = ({
                 </tr>
               ) : filteredReportList.length > 0 ? (
                 filteredReportList
-                  .slice(startIndex, endIndex) // Slice based on current page
+                  .slice(startIndex, endIndex)
                   .map((report, index) => (
                     <tr
                       key={index}
-                      className="even:bg-blue-50 odd:bg-white text-center "
-                    onClick={() => setSelectedReport(report.id)}
+                      className="even:bg-blue-50 odd:bg-white text-center"
                     >
-                      <td className="w-1/5 py-2">{report.id}</td>
-                      <td className="w-1/5">
+                      <td className="w-1/12 py-2">
+                        <input type="checkbox" name={`${index}check`} id={`${index}check`} className="scale-150" 
+                          checked={selectedReports.some(selected => selected.id === report.id)}
+                          onChange={(e) => {
+                            const isChecked = e.target.checked;
+
+                            if (isChecked) {
+                              setSelectedReports((prevReports) => [
+                                ...prevReports,
+                                { id: report.id, data: report.data },
+                              ]);
+                            } else {
+                              setSelectedReports((prevReports) =>
+                                prevReports.filter((prevReport) => prevReport.id !== report.id)
+                              );
+                            }
+                          }}
+                        />
+                      </td>
+                      <td className="w-2/12">{report.id}</td>
+                      <td className="w-2/12">
                         {report.data.driverInfo.firstName !== ""
                           ? `${report.data.driverInfo.firstName} ${report.data.driverInfo.lastName}`
                           : "-"}
                       </td>
-                      <td className="w-1/5">
+                      <td  className="w-2/12">
                         {report.data.greenCarNumberPlate !== ""
                           ? `${report.data?.greenCarNumberPlate.toUpperCase()}`
                           : "-"}
                       </td>
-                      <td className="w-1/5">{`${report.data.finished}`}</td>
-                      <td className="w-1/5">
+                      <td className="w-1/12">
+                        {report.data.finished ? ("Finished") : 
+                        ("Unfinished")}
+                      </td>
+                      <td className="w-2/12">
                         {report.data.date !== "" ? `${report.data.date}` : "-"}
                       </td>
                     </tr>
@@ -131,15 +167,6 @@ const ReportList2 = ({
               )}
             </tbody>
           </table>
-          <div>
-            {selectedReport && (
-              <ExpandedReport
-              visible={true} 
-              id={selectedReport} 
-              report={reportList.find(report => report.id === selectedReport)?.data}
-              />
-            )}
-          </div>
 
           {/* Pagination buttons */}
           <div className="flex justify-center mt-2">
@@ -173,4 +200,4 @@ const ReportList2 = ({
   );
 };
 
-export default ReportList2;
+export default ReportList;

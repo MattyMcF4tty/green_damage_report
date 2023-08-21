@@ -1,15 +1,16 @@
 import React, { useState } from "react";
-import ReportList from "@/components/admin/reportList";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faTrashCan,
   faPrint,
   faCloudArrowDown,
+  faEye,
 } from "@fortawesome/free-solid-svg-icons";
 import { NextPage } from "next";
 import { reportDataType } from "@/utils/utils";
 import ExpandedReport from "@/components/admin/expandedReport";
-import ReportList2 from "@/components/admin/reportList";
+import ReportList from "@/components/admin/reportList";
+import ReportControls from "@/components/admin/reportControls";
 
 const adminPage: NextPage = () => {
   const [currentStatus, setCurrentStatus] = useState<
@@ -19,8 +20,9 @@ const adminPage: NextPage = () => {
     "id" | "driver" | "numberplate" | "date"
   >("id");
   const [currentSearch, setCurrentSearch] = useState<string>("");
-
+  const [selectedReports, setSelectedReports] = useState<{id: string, data: reportDataType}[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [showExpandedReports, setShowExpandedReports] = useState<boolean>(false);
 
   const reportsPerPage = 20;
   const startIndex = (currentPage - 1) * reportsPerPage;
@@ -76,32 +78,8 @@ const adminPage: NextPage = () => {
         </button>
       </div>
 
-      {/* Search and control panel */}
       <div className="flex flex-row justify-between my-6 items-baseline ">
-        <div className="flex flex-row w-1/3 justify-between ml-8">
-          <button
-            type="button"
-            className="bg-white border-gray-300 border-[1px] rounded-xl w-32  hover:bg-red-600 hover:text-white duration-150"
-          >
-            <FontAwesomeIcon icon={faTrashCan} />
-            {" Delete"}
-          </button>
-          <button
-            type="button"
-            className="bg-white border-gray-300 border-[1px] rounded-xl w-32 hover:bg-MainGreen-300 hover:text-white duration-150"
-          >
-            <FontAwesomeIcon icon={faPrint} />
-            {" Print"}
-          </button>
-          <button
-            type="button"
-            className="bg-white border-gray-300 border-[1px] rounded-xl w-32 hover:bg-blue-500 hover:text-white duration-150"
-          >
-            <FontAwesomeIcon icon={faCloudArrowDown} />
-            {" Download"}
-          </button>
-        </div>
-
+        <ReportControls selectedReports={selectedReports}/>
         <div className="w-1/3 relative flex flex-row items-center ">
           <select
             className="h-8 border border-neutral-500 rounded-l-lg shadow-md outline-none"
@@ -136,14 +114,16 @@ const adminPage: NextPage = () => {
           )}
         </div>
       </div>
+
       {/* Table section */}
       <div className="bg-white w-full max-h-[calc(100vh-13.5rem)] block shadow-lg overflow-hidden">
-        <ReportList2
+        <ReportList
           status={currentStatus}
           filter={currentFilter}
           search={currentSearch}
           itemsPerPage={20}
-          currentPage={currentPage} // Pass the currentPage prop
+          currentPage={currentPage}
+          currentSelectedReports={setSelectedReports}
         />
       </div>
     </div>
