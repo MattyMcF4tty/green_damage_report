@@ -268,13 +268,15 @@ export const deleteReports = async (reportsToDelete: string[]) => {
         const reportRef = doc(db, `${collectionName}/${report}`)
 
         try {
-            await Promise.all(
-                reportsToDelete.map(async (report) => {
-                    const reportRef = doc(db, `${collectionName}/${report}`);
-                    await deleteDoc(reportRef);
-                    console.log(`${reportRef.path} deleted successfully.`);
-                })
-            );
+            if (reportsToDelete.length === 0) {
+                throw Error("No reports to delete")
+            }
+
+            for (const report of reportsToDelete) {
+                const reportRef = doc(db, `${collectionName}/${report}`);
+                await deleteDoc(reportRef);
+                console.log(`${reportRef.path} deleted successfully.`);
+            }
         } catch (error) {
             console.error(`Error deleting ${reportRef.path}: ${error}`);
         }

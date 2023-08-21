@@ -16,18 +16,18 @@ const ExpandedReport = ({setVisible, reports}: ExpandedReportProps) => {
     <div className="absolute flex flex-col h-[100vh] w-full z-40 bg-white left-0 top-0">
       <div className="flex flex-row w-full h-14 bg-MainGreen-300 items-start overflow-x-auto overflow-y-hidden no-scrollbar">
         <button onClick={() => setVisible(false)}
-        className={`border-b-[1px] border-gray-200 mt-auto h-3/4 bg-white hover:bg-MainGreen-100 duration-100 
+        className={`border-b-[1px] border-gray-200 mt-auto h-3/4 bg-white hover:bg-red-400 duration-100 
         ${reports.length > 1 ? "rounded-tl-lg" : "rounded-t-lg"}`}>
-          <FontAwesomeIcon icon={faX} className="text-xl p-2 px-4"/>
+          <FontAwesomeIcon icon={faX} className="text-lg flex justify-center items-center w-16"/>
         </button>
 
         {reports.length > 1 && (
           <div className="flex flex-row mt-auto h-3/4">
             {reports.map((report, index) => (
               <button type="button" key={index} onClick={() => setCurrentReport(report)}
-              className={`w-52 hover:bg-MainGreen-100 duration-100 border-b-[1px] flex justify-center items-center
-              ${report.id === currentReport.id ? ("bg-MainGreen-100 drop-shadow-md border-MainGreen-100") : ("bg-white border-gray-200")}
-              ${reports.length-1 === index && "rounded-tr-lg"}`}>
+              className={`w-52 hover:bg-gray-100 duration-100 border-b-[1px] flex justify-center items-center
+              ${report.id === currentReport.id ? ("bg-gray-100 font-semibold drop-shadow-lg border-gray-100") : ("bg-white border-gray-200")}
+              ${reports.length-1 === index && "rounded-tr-lg mr-2"}`}>
                 {report.id}
                 <button type="button" onClick={() => setCurrentReport(reports[index-1])}
                 className="ml-1 hover:bg-MainGreen-200 w-6 h-6 flex justify-center items-center rounded-md duration-100">
@@ -40,7 +40,7 @@ const ExpandedReport = ({setVisible, reports}: ExpandedReportProps) => {
       </div>
 
       {/* Current report data */}
-      <div className="grid grid-cols-4 gap-x-8 gap-y-4 w-full px-10 py-6 bg-MainGreen-100">
+      <div className="grid grid-cols-4 gap-x-8 gap-y-4 w-full px-10 py-6 bg-gray-100">
         
         {/* Displays current reports info */}
         <div className="row-start-1 row-span-4 col-span-1">
@@ -150,9 +150,9 @@ const ExpandedReport = ({setVisible, reports}: ExpandedReportProps) => {
         </div>
 
         {/* Displays current reports police info */}
-        <div className="row-start-1 col-start-4 row-span-3">
+        <div className="row-start-1 col-start-4 row-span-4">
           <h1 className="text-xs">Police Info</h1>
-          <div className="p-4 bg-white grid grid-cols-1 grid-rows-3 gap-4 shadow-md">
+          <div className="p-4 bg-white grid grid-cols-1 grid-rows-4 gap-4 shadow-md">
 
             <div onClick={() => navigator.clipboard.writeText(currentReport.data.policePresent === null ? ("Unknown") : currentReport.data.policePresent ? ("Police were present") : ("Police were not present"))}
             className="row-start-1 col-span-1 hover:bg-gray-50 hover:shadow-md flex flex-col justify-center hover:cursor-pointer">

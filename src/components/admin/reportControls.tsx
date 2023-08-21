@@ -13,16 +13,16 @@ const ReportControls = ({selectedReports}: ReportControls) => {
     const [showExpandedReports, setShowExpandedReports] = useState<boolean>(false);
 
     const handleDelete = async () => {
-        console.log("hjefs")
         /* Delete reports on server */
         const selectedReportIDs: string[] = []
-        selectedReports.forEach((report) => {
+        selectedReports.map((report) => {
             selectedReportIDs.push(report.id)
         })
 
         await deleteReports(selectedReportIDs);
 
         /* TODO: Reload Page after deletions */
+        location.reload();
     }
 
     return (
