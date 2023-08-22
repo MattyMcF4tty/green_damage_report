@@ -12,9 +12,14 @@ import { getData, updateData } from "@/firebase/clientApp";
 import { pageProps } from "@/utils/utils";
 import PhoneNumber from "@/components/opposite_information/phone_form";
 /* import AddressField from "@/components/google_autofill";
- */ import { LoadScript } from "@react-google-maps/api"; // Import LoadScript
 /* import AddressLocation from "@/components/google_autofill";
  */ import LocationAdress from "@/components/custom_inputfields";
+import {
+  GoogleMap,
+  LoadScript,
+  Marker,
+  useLoadScript,
+} from "@react-google-maps/api";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -155,7 +160,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
             />
             {/* TODO: make google autofill */}
             <LocationAdress
-              labelText="Accident Location"
+              labelText="Home address of the driver"
               value={address}
               onChange={setAddress}
               type={"address"} // Pass the appropriate type
@@ -212,12 +217,6 @@ const What: NextPage<pageProps> = ({ data, id }) => {
       </div>
 
       {/* Accident location collection */}
-      <LocationAdress
-        labelText="Please mark where the accident occurred"
-        value={accidentLocation}
-        onChange={setAccidentLocation}
-        type="location"
-      />
 
       <div className="flex flex-row justify-between">
         <div className="flex flex-row w-16 justify-start h-14 mt-4 ml-10">

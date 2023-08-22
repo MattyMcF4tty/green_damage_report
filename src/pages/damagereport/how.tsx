@@ -135,7 +135,7 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
         <ImageField
           reportID={id}
           id="FrontImage"
-          labelText="Take pictures of damages on GreenMobility car"
+          labelText="Take pictures of damages to the GreenMobility car"
           required={false}
           images={greenImages}
           imageType="GreenMobility"
