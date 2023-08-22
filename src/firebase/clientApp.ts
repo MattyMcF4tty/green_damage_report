@@ -1,6 +1,6 @@
 import { promises } from "dns";
 import { initializeApp } from "firebase/app"
-import { collection, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
+import { collection, deleteDoc, doc, getDoc, getDocs, getFirestore, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { ListResult, StorageReference, deleteObject, getDownloadURL, getStorage, listAll, ref, uploadBytes } from "firebase/storage"
 import { reportDataType } from "@/utils/utils";
 
@@ -18,15 +18,14 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-
+const collectionName = "Reports"
 
 export const getData = async (id: string) => {
     console.log("fetchind docID: " + id)
-    const docRef = doc(db, `unfinished/${id}`);
+    const docRef = doc(db, `${collectionName}/${id}`);
 
     try {
         const docSnapshot = await getDoc(docRef)
-
         if (docSnapshot.exists()) {
             const data = docSnapshot.data();
             console.log("Data received from server:", data)
@@ -88,20 +87,6 @@ export const getData = async (id: string) => {
     }
 }
 
-export const getDocIds = async () => {
-    const colRef = collection(db, "unfinished")
-
-    try {
-        const docListSnapshot = await getDocs(colRef)
-
-        const docIds = docListSnapshot.docs.map((doc) => doc.id);
-
-        return (docIds)
-    } catch (error) {
-        console.log("Something went wrong fetching document ids: \n" + error)
-    }
-}
-
 export const createDoc = async (id: string, email: string) => {
     console.log("Creating doc")
     const data = {
@@ -153,7 +138,7 @@ export const createDoc = async (id: string, email: string) => {
         collisionPedestrian: false,
     }
 
-    const dataRef = doc(db, `unfinished/${id}`);
+    const dataRef = doc(db, `${collectionName}/${id}`);
 
     try {
         await setDoc(dataRef, data);
@@ -165,7 +150,7 @@ export const createDoc = async (id: string, email: string) => {
 
 export const updateData = async (id:string, data:object) => {
 
-    const dataRef = doc(db, `unfinished/${id}`)
+    const dataRef = doc(db, `${collectionName}/${id}`)
 
     try {
         await updateDoc(dataRef, data);
@@ -217,12 +202,13 @@ const deleteAllImages = async(StorageRef: StorageReference) => {
 export const getImages = async (id: string) => {
     const greenStorageRef = ref(storage, `${id}/GreenMobility`);
     const otherPartyStorageRef = ref(storage, `${id}/OtherParty`);
+    const imageURLs: Record<string, string[]> = {'GreenMobility': [], 'OtherParty': []};
+
 
     console.log(greenStorageRef.fullPath)
     try {
         const greenImageList: ListResult = await listAll(greenStorageRef);
         const otherPartyImageList: ListResult = await listAll(otherPartyStorageRef);
-        const imageURLs: Record<string, string[]> = {'GreenMobility': [], 'OtherParty': []};
 
         /* Get images of GreenMobility car */
         const greenImageURLs: string[] = [];
@@ -243,38 +229,74 @@ export const getImages = async (id: string) => {
             otherPartyImageURLs.push(imageURL);
         }
         imageURLs['OtherParty'] = otherPartyImageURLs;
-
-        console.log("Image url fetching completed")
-        return imageURLs;
-    } 
+    }
     catch (error) {
         console.error(`Something went wrong fetching images:\n${error}\n`);
-        return null;
     }
+    return imageURLs;
 }
 
-const getReportIds = async () => {
-    const reportColRef = collection(db, "unfinished/")
-    const querySnapshot = await getDocs(reportColRef);
-    const idList = querySnapshot.docs.map((doc) => doc.id);
+export const getReportIds = async () => {
+    const reportColRef = collection(db, `${collectionName}/`)
+    const idList: string[] = [];
+
+    try {
+        const querySnapshot = await getDocs(reportColRef);
+
+        if (querySnapshot.docs.length > 0) {
+            for (const doc of querySnapshot.docs) { 
+                const id = doc.id;
+                idList.push(id)
+            }
+        } else {
+            throw Error(`No documents exist in path ${reportColRef.path}`)
+        }
+    } catch (error) {
+        console.error(`Something went wrong fetching document ids:\n${error}\n`)
+    }
 
     return idList;
 }
 
 export const getReports = async () => {
     const idList = await getReportIds();
-    
     const reportList: { id: string; data: reportDataType }[] = [];
-  
-    await Promise.all(
-      idList.map(async (id) => {
-        const docData = await getData(id);
-        if (docData !== undefined) {
-            reportList.push({ id: id, data: docData });
+
+    console.log(idList)
+    if (idList.length > 0) {  
+        try {
+            await Promise.all(
+                idList.map(async (id) => {
+                  const docData = await getData(id);
+                  if (docData !== undefined) {
+                      reportList.push({ id: id, data: docData });
+                  }
+                })
+            );
+        } catch(error) {
+            console.error(`Something went wrong fecthing reports:\n${error}\n`)
         }
-      })
-    );
-    
+    }
+
     return reportList;
-  };
-  
+};
+
+export const deleteReports = async (reportsToDelete: string[]) => {
+    reportsToDelete.map(async (report) => {
+        const reportRef = doc(db, `${collectionName}/${report}`)
+
+        try {
+            if (reportsToDelete.length === 0) {
+                throw Error("No reports to delete")
+            }
+
+            for (const report of reportsToDelete) {
+                const reportRef = doc(db, `${collectionName}/${report}`);
+                await deleteDoc(reportRef);
+                console.log(`${reportRef.path} deleted successfully.`);
+            }
+        } catch (error) {
+            console.error(`Error deleting ${reportRef.path}: ${error}`);
+        }
+    })
+}

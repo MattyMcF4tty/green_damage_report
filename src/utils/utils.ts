@@ -2,7 +2,8 @@ import { bikeInformation } from "@/components/opposite_information/bike_informat
 import { carInformation } from "@/components/opposite_information/car_information_form";
 import { OtherInformation } from "@/components/opposite_information/other_information_form";
 import { PedestrianInformation } from "@/components/opposite_information/person_information_form";
-import { getDocIds } from "@/firebase/clientApp";
+import { getReportIds } from "@/firebase/clientApp";
+
 
 export type pageProps = {
     data: reportDataType | null ;
@@ -60,7 +61,7 @@ export type reportDataType = {
 }
 
 export const generateId = async () => {
-    const dataList = await getDocIds();
+    const dataList = await getReportIds();
     let validId = false;
     let id = ""
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -79,4 +80,43 @@ export const generateId = async () => {
     }
 
     return id;
+}
+
+export const reportSearch = (reportList: {id: string; data: reportDataType;}[], status: 'all' | 'finished' | 'unfinished', filter: 'id' | 'driver' | 'numberplate' | 'date', search: string) => {
+    let updatedFilteredList = [...reportList];
+
+    switch (status) {
+        case 'finished':
+        updatedFilteredList = reportList.filter(report => report.data.finished === true);
+        break;
+        case 'unfinished':
+        updatedFilteredList = reportList.filter(report => report.data.finished === false);
+        break;
+    }
+
+    if (search !== "") {
+        switch (filter) {
+        case 'id':
+            updatedFilteredList = updatedFilteredList.filter(report => report.id.includes(search));
+            break;
+        case 'driver':
+            updatedFilteredList = updatedFilteredList.filter(report =>
+            report.data.driverInfo.firstName !== undefined &&
+            `${report.data.driverInfo.firstName.toLowerCase()} ${report.data.driverInfo.lastName.toLowerCase()}`.includes(search.toLowerCase())
+            );
+            break;
+        case 'numberplate':
+            updatedFilteredList = updatedFilteredList.filter(report =>
+            report.data.greenCarNumberPlate.toLowerCase().includes(search.toLowerCase())
+            );
+            break;
+        case 'date':
+            updatedFilteredList = updatedFilteredList.filter(report =>
+            report.data.date.toLowerCase().includes(search.toLowerCase())
+            );
+            break;
+        };
+    };
+
+    return updatedFilteredList;
 }
