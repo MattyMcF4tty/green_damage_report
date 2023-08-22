@@ -21,7 +21,7 @@ const ReportControls = ({selectedReports}: ReportControls) => {
 
         await deleteReports(selectedReportIDs);
 
-        /* TODO: Reload Page after deletions */
+        /* TODO: Reloads before documents are deleted */
         location.reload();
     }
 

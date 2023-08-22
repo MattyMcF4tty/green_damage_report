@@ -7,6 +7,7 @@ import AdminNavbar from "@/components/admin/adminNav";
 
 function MyApp({ Component, pageProps }: AppProps) {
   const { pathname } = useRouter();
+  console.log(pathname);
 
   return (
     <>
