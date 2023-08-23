@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import Bike from "../../components/opposite_information/bike_information_form";
 import Person, {
   PedestrianInformation,
@@ -128,16 +128,6 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
   };
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
 
-  const handleSingleVehicleChange = (newValue: boolean) => {
-    setIsSingleVehicleChecked(newValue);
-    setShowAutocomplete(newValue);
-  };
-
-  const handleCollisionWithObjectChange = (newValue: boolean) => {
-    setIsCollisionWithObjectChecked(newValue);
-    setShowGoogle(newValue);
-  };
-
   return (
     <LoadScript googleMapsApiKey={apiKey || ""} libraries={["places"]}>
       <form
@@ -153,10 +143,10 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
             id="whatvehicle"
             labelText="Collision with another object?"
             value={isVehicleChecked}
-            onChange={handleCollisionWithObjectChange}
+            onChange={setIsVehicleChecked}
           />
         </div>
-        {isCollisionWithObjectChecked && showGoogle && (
+        {isVehicleChecked && (
           <div className="flex flex-col justify-left text-left w-full mb-4">
             <div id="whatvehicle" className="flex flex-col w-full">
               <div>
@@ -223,18 +213,18 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
         )}
 
         {!isVehicleChecked && (
-          <div>
+          <div className="w-full">
             <div>
               <YesNo
                 id="SingleVehicleAccident"
                 labelText="Single vehicle accident"
                 required={true}
                 value={isSingleVehicleChecked}
-                onChange={handleSingleVehicleChange} // Update the handler
+                onChange={setIsSingleVehicleChecked} // Update the handler
               />
             </div>
-            <div>
-              {showAutocomplete && (
+            <div className="w-full">
+              {isSingleVehicleChecked && (
                 <Google show={false} showAutocomplete={true} />
               )}
             </div>

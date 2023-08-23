@@ -256,21 +256,25 @@ function Google({
           </Autocomplete>
         </div>
       )}
-      <button
-        className="add-line-button border-[1px] border-MainGreen-200 rounded-md mb-2 bg-MainGreen-100 w-1/2"
-        onClick={addDraggableLine}
-        type="button"
-      >
-        Add Draggable Line
-      </button>
+
       {show && (
-        <div className="mb-4">
-          <GoogleMap
-            onLoad={handleMapLoad}
-            center={Center}
-            zoom={Zoom}
-            mapContainerClassName="w-full h-[400px] border-[1px] border-MainGreen-200 rounded-lg"
-          />
+        <div>
+          <button
+            className="add-line-button border-[1px] border-MainGreen-200 rounded-md mb-2 bg-MainGreen-100 w-1/2"
+            onClick={addDraggableLine}
+            type="button"
+          >
+            Add Draggable Line
+          </button>
+
+          <div className="mb-4">
+            <GoogleMap
+              onLoad={handleMapLoad}
+              center={Center}
+              zoom={Zoom}
+              mapContainerClassName="w-full h-[400px] border-[1px] border-MainGreen-200 rounded-lg"
+            />
+          </div>
         </div>
       )}
     </div>
