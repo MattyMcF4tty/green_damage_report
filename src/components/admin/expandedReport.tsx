@@ -71,13 +71,11 @@ const ExpandedReport = ({setVisible, reports}: ExpandedReportProps) => {
               </span>
             </div>
 
-            <div onClick={() => navigator.clipboard.writeText(`${currentReport.data.time ? `${currentReport.data.time}` : "Unknown"} - ${currentReport.data.date ? `${currentReport.data.date}` : "Unknown"}`)}
+            <div onClick={() => navigator.clipboard.writeText(`${currentReport.data.lastChange.time} - ${currentReport.data.lastChange.date}`)}
             className="row-start-4 col-span-1 hover:bg-gray-50 hover:shadow-md flex flex-col justify-center hover:cursor-pointer">
-              <h1 className="text-sm">Time and date of report start</h1>
+              <h1 className="text-sm">Updated</h1>
               <span className="text-2xl">
-                {currentReport.data.time ? `${currentReport.data.time}` : ""}
-                {" - "}
-                {currentReport.data.date ? `${currentReport.data.date}` : ""}
+                {`${currentReport.data.lastChange.time} - ${currentReport.data.lastChange.date}`}
               </span>
             </div>
           </div>

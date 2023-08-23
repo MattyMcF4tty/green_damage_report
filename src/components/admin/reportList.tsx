@@ -93,7 +93,7 @@ const ReportList = ({
               <th className="w-2/12 font-normal">Name</th>
               <th className="w-2/12 font-normal">Numberplate</th>
               <th className="w-1/12 font-normal">Status</th>
-              <th className="w-2/12 font-normal">Date</th>
+              <th className="w-2/12 font-normal">Updated</th>
             </tr>
           </thead>
         </table>
@@ -153,7 +153,7 @@ const ReportList = ({
                         ("Unfinished")}
                       </td>
                       <td className="w-2/12">
-                        {report.data.date !== "" ? `${report.data.date}` : "-"}
+                        {report.data.lastChange.date}
                       </td>
                     </tr>
                   ))

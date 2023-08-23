@@ -14,6 +14,7 @@ export type pageProps = {
 export type reportDataType = {
     userEmail: string,
     finished: boolean,
+    lastChange: {time: string, date: string},
 
     driverInfo: {
         firstName: string,

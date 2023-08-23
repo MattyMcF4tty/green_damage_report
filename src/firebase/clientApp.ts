@@ -33,6 +33,7 @@ export const getData = async (id: string) => {
             return {
                 userEmail: data.userEmail,
                 finished: data.finished,
+                lastChange: data.lastChange,
                 
                 driverInfo: {
                     firstName: data.driverInfo.firstName,
@@ -89,9 +90,12 @@ export const getData = async (id: string) => {
 
 export const createDoc = async (id: string, email: string) => {
     console.log("Creating doc")
-    const data = {
+    const currentDate = new Date();
+
+    const data: reportDataType = {
         userEmail: email,
         finished: false,
+        lastChange: {time: `${currentDate.getHours()}:${currentDate.getMinutes()}`, date: `${currentDate.getDay()}/${currentDate.getMonth()}/${currentDate.getFullYear()}`},
 
         driverInfo: {
             firstName: "",
@@ -149,11 +153,13 @@ export const createDoc = async (id: string, email: string) => {
 }
 
 export const updateData = async (id:string, data:object) => {
+    const dataRef = doc(db, `${collectionName}/${id}`);
+    const currentDate = new Date();
 
-    const dataRef = doc(db, `${collectionName}/${id}`)
 
     try {
         await updateDoc(dataRef, data);
+        await updateDoc(dataRef, {lastChange: `${currentDate.getHours()}:${currentDate.getMinutes()} - ${currentDate.getDay()}/${currentDate.getMonth()}/${currentDate.getFullYear()}`})
         console.log("Data updated")
     } catch (error) {
         console.log(`Something went wrong updating data:\n${error}`)
