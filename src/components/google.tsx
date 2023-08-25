@@ -1,126 +1,284 @@
-/* import React, { useState, useEffect } from "react";
-import { LoadScript } from "@react-google-maps/api";
+import React from "react";
+import { useState, useEffect } from "react";
+import {
+  useJsApiLoader,
+  GoogleMap,
+  Autocomplete,
+  Marker,
+} from "@react-google-maps/api";
+import ImageUrlRed from "../rødbil.png";
+import ImageUrlGreen from "../grønbil.png";
+import { start } from "repl";
 
-const Google: React.FC = () => {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
+const Center = { lat: 55.676098, lng: 12.568337 };
+const Zoom = 17;
+
+function Google({
+  show,
+  showAutocomplete,
+}: {
+  show: boolean;
+  showAutocomplete: boolean;
+}) {
+  const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "";
+  const { isLoaded, loadError } = useJsApiLoader({
+    googleMapsApiKey: googleApiKey,
+  });
 
   const [autocomplete, setAutocomplete] =
     useState<google.maps.places.Autocomplete | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [selectedPlace, setSelectedPlace] =
-    useState<google.maps.places.PlaceResult | null>(null);
-  const [marker1, setMarker1] = useState<google.maps.Marker | null>(null);
-  const [marker2, setMarker2] = useState<google.maps.Marker | null>(null);
+  const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
+  const [lines, setLines] = useState<google.maps.Polyline[]>([]);
 
-  // Load Google Maps API and initialize Autocomplete and Map
-  useEffect(() => {
-    (window as any).initMap = () => {}; // Define a dummy initMap function
-
-    const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&callback=initMap`;
-    script.onload = () => {
-      const autocompleteInput = document.getElementById(
-        "autocomplete-input"
-      ) as HTMLInputElement;
-      const mapDiv = document.getElementById("map") as HTMLDivElement;
-
-      const autocompleteInstance = new google.maps.places.Autocomplete(
-        autocompleteInput
-      );
-      const mapOptions: google.maps.MapOptions = {
-        center: { lat: 55.676098, lng: 12.568337 },
-        zoom: 17,
-      };
-      const mapInstance = new google.maps.Map(mapDiv, mapOptions);
-
-      setAutocomplete(autocompleteInstance);
-      setMap(mapInstance);
-    };
-    document.body.appendChild(script);
-
-    // Note: No need for the cleanup here
-  }, []);
+  const [autocompleteValue, setAutocompleteValue] = useState<string>("");
+  const [autocompleteBgColor, setAutocompleteBgColor] =
+    useState<string>("bg-white"); // Default background color
 
   useEffect(() => {
-    if (autocomplete && map) {
-      // Sync Autocomplete selection with the map
+    if (autocompleteValue === "" || autocompleteValue === null) {
+      setAutocompleteBgColor("bg-white");
+    } else {
+      setAutocompleteBgColor("bg-MainGreen-100");
+    }
+  }, [autocompleteValue]);
+
+  useEffect(() => {
+    if (map && autocomplete) {
+      autocomplete.bindTo("bounds", map);
       autocomplete.addListener("place_changed", () => {
         const place = autocomplete.getPlace();
-        if (place.geometry && place.geometry.location) {
-          map.setCenter(place.geometry.location);
+        if (!place.geometry) {
+          console.error("No geometry available for selected place.");
+          return;
+        }
 
-          // Clear existing markers if a different place is selected
-          if (selectedPlace && place.place_id !== selectedPlace.place_id) {
-            if (marker1) marker1.setMap(null);
-            if (marker2) marker2.setMap(null);
-          }
+        // Update the map's center to the selected place's geometry
+        const location = place.geometry.location;
+        if (location && map.panTo) {
+          map.panTo(location);
 
-          // Update marker positions if they already exist
-          if (
-            marker1 &&
-            marker2 &&
-            selectedPlace &&
-            place.place_id === selectedPlace.place_id
-          ) {
-            marker1.setPosition(place.geometry.location);
-            marker2.setPosition(place.geometry.location);
-          } else {
-            // Clear existing markers
-            if (marker1) marker1.setMap(null);
-            if (marker2) marker2.setMap(null);
+          // Clear existing markers
+          markers.forEach((marker) => marker.setMap(null));
 
-            // Create draggable markers
-            const newMarker1 = new google.maps.Marker({
-              position: place.geometry.location,
-              map: map,
-              draggable: true,
-            });
+          const startLocation = new google.maps.LatLng(
+            location.lat() + 0.0001, // Slightly adjust latitude for the second start marker
+            location.lng()
+          );
 
-            const newMarker2 = new google.maps.Marker({
-              position: place.geometry.location,
-              map: map,
-              draggable: true,
-            });
+          const redIcon = {
+            url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png", // Use the red marker icon URL
+            scaledSize: new google.maps.Size(32, 32),
+          };
 
-            setMarker1(newMarker1);
-            setMarker2(newMarker2);
-          }
+          const greenIcon = {
+            url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", // Use the green marker icon URL
+            scaledSize: new google.maps.Size(32, 32),
+          };
 
-          setSelectedPlace(place);
+          const redMarker = new google.maps.Marker({
+            position: startLocation,
+            map: map,
+            title: place.name,
+            draggable: true,
+            icon: redIcon,
+          });
+
+          const greenMarker = new google.maps.Marker({
+            position: location,
+            map: map,
+            title: place.name,
+            draggable: true,
+            icon: greenIcon,
+          });
+
+          setMarkers([redMarker, greenMarker]);
         }
       });
     }
-  }, [autocomplete, map, marker1, marker2, selectedPlace]);
+  }, [map, autocomplete]);
+
+  const calculateMiddlePosition = (
+    start: google.maps.LatLng,
+    end: google.maps.LatLng
+  ): google.maps.LatLng => {
+    return new google.maps.LatLng(
+      (start.lat() + end.lat()) / 2,
+      (start.lng() + end.lng()) / 2
+    );
+  };
+
+  const addDraggableLine = () => {
+    if (map) {
+      const center = map.getCenter();
+      if (!center) {
+        return;
+      }
+
+      const position = new google.maps.LatLng(center.lat(), center.lng());
+
+      const startPosition = new google.maps.LatLng(
+        position.lat() + 0.00005, // Slightly adjust latitude for the second start marker
+        position.lng()
+      );
+
+      const startMarker = new google.maps.Marker({
+        position: position,
+        map: map,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          fillColor: "green",
+          fillOpacity: 1,
+          strokeWeight: 0,
+        },
+        draggable: true,
+      });
+
+      const endMarker = new google.maps.Marker({
+        position: startPosition,
+        map: map,
+
+        draggable: true,
+      });
+
+      const middleMarkerPosition = calculateMiddlePosition(
+        startMarker.getPosition()!,
+        endMarker.getPosition()!
+      );
+
+      const middleMarker = new google.maps.Marker({
+        position: middleMarkerPosition,
+        map: map,
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 8,
+          fillColor: "yellow",
+          fillOpacity: 1,
+          strokeWeight: 0,
+        },
+        draggable: true,
+        zIndex: 2,
+      });
+
+      const line = new google.maps.Polyline({
+        path: [
+          startMarker.getPosition()!,
+          middleMarker.getPosition()!,
+          endMarker.getPosition()!,
+        ],
+        map: map,
+      });
+
+      startMarker.addListener("drag", () => {
+        const startMarkerPosition = startMarker.getPosition();
+        const endMarkerPosition = endMarker.getPosition();
+        if (startMarkerPosition && endMarkerPosition) {
+          line.setPath([
+            startMarkerPosition,
+            middleMarker.getPosition()!,
+            endMarkerPosition,
+          ]);
+          const newMiddleMarkerPosition = calculateMiddlePosition(
+            startMarkerPosition,
+            endMarkerPosition
+          );
+          middleMarker.setPosition(newMiddleMarkerPosition);
+        }
+      });
+
+      endMarker.addListener("drag", () => {
+        const startMarkerPosition = startMarker.getPosition();
+        const endMarkerPosition = endMarker.getPosition();
+        if (startMarkerPosition && endMarkerPosition) {
+          line.setPath([
+            startMarkerPosition,
+            middleMarker.getPosition()!,
+            endMarkerPosition,
+          ]);
+          const newMiddleMarkerPosition = calculateMiddlePosition(
+            startMarkerPosition,
+            endMarkerPosition
+          );
+          middleMarker.setPosition(newMiddleMarkerPosition);
+        }
+      });
+
+      middleMarker.addListener("drag", () => {
+        const startMarkerPosition = startMarker.getPosition();
+        const endMarkerPosition = endMarker.getPosition();
+        if (startMarkerPosition && endMarkerPosition) {
+          const middlePosition =
+            middleMarker.getPosition() as google.maps.LatLng;
+          line.setPath([
+            startMarkerPosition,
+            middlePosition,
+            endMarkerPosition,
+          ]);
+        }
+      });
+
+      setMarkers((prevMarkers) => [
+        ...prevMarkers,
+        startMarker,
+        middleMarker,
+        endMarker,
+      ]);
+      setLines((prevLines) => [...prevLines, line]);
+    }
+  };
+
+  const handleMapLoad = (mapInstance: google.maps.Map) => {
+    setMap(mapInstance);
+  };
+
+  if (loadError) {
+    return <div>Error loading Google Maps</div>;
+  }
+
+  if (!isLoaded) {
+    return <div>Loading Google Maps...</div>;
+  }
 
   return (
     <div>
+      {showAutocomplete && (
+        <div className="mb-2">
+          {/* Container with spacing */}
+          <Autocomplete onLoad={setAutocomplete}>
+            <input
+              type="text"
+              placeholder="Enter the location of the incident"
+              className={`w-full h-10 text-lg p-1 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none ${autocompleteBgColor}`} // Apply the dynamic background color
+              value={autocompleteValue}
+              onChange={(e) => setAutocompleteValue(e.target.value)}
+            />
+          </Autocomplete>
+        </div>
+      )}
 
-      <label htmlFor="">
-        Please enter the location of where the accident occurred
-      </label>
-      <input
-        id="autocomplete-input"
-        type="text"
-        placeholder="Search for a location"
-        className={`w-full h-10 mt-2 text-lg p-1 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none ${
-          selectedPlace ? "bg-MainGreen-100" : "bg-white"
-        }`}
-      />
+      {show && (
+        <div>
+          <button
+            className="add-line-button border-[1px] border-MainGreen-200 rounded-md mb-2 bg-MainGreen-100 w-1/2"
+            onClick={addDraggableLine}
+            type="button"
+          >
+            Add Draggable Line
+          </button>
 
-      <div id="map" style={{ width: "100%", height: "400px" }}></div>
+          <div className="mb-4">
+            <GoogleMap
+              onLoad={handleMapLoad}
+              center={Center}
+              zoom={Zoom}
+              mapContainerClassName="w-full h-[400px] border-[1px] border-MainGreen-200 rounded-lg"
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
-};
+}
 
-const GoogleWrapper: React.FC = () => {
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
-
-  return (
-    <LoadScript googleMapsApiKey={apiKey || ""} libraries={["places"]}>
-      <Google />
-    </LoadScript>
-  );
-};
-
-export default GoogleWrapper;
- */
+export default Google;

@@ -128,10 +128,10 @@ export const createDoc = async (id: string, email: string) => {
         damageDescription: "",
         policeReportNumber: "",
     
-        bikerInfo: {name: "", phone: "", email: "", ebike: null, personDamage: ""},
-        vehicleInfo: {name: "", phone: "", email: "", driversLicenseNumber: "", insurance: "", numberplate: "", model: ""},
-        pedestrianInfo: {name: "", phone: "", email: "", personDamage: ""},
-        otherObjectInfo : {description: "", information: ""},
+        bikerInfo: [],
+        vehicleInfo: [],
+        pedestrianInfo: [],
+        otherObjectInfo : [],
     
         witnesses: [],
 

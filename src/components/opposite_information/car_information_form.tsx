@@ -3,7 +3,7 @@ import "react-phone-number-input/style.css";
 import PhoneNumber from "./phone_form";
 import { Inputfield } from "../custom_inputfields";
 
-export type carInformation = {
+export class carInformation {
   name: string;
   phone: string;
   email: string;
@@ -11,6 +11,24 @@ export type carInformation = {
   insurance: string;
   numberplate: string;
   model: string;
+
+  constructor(
+    name: string,
+    phone: string,
+    email: string,
+    driversLicenseNumber: string,
+    insurance: string,
+    numberplate: string,
+    model: string
+  ) {
+    this.name = name;
+    this.phone = phone;
+    this.email = email;
+    this.driversLicenseNumber = driversLicenseNumber;
+    this.insurance = insurance;
+    this.numberplate = numberplate;
+    this.model = model;
+  } 
 };
 
 interface carInfoFormProps {

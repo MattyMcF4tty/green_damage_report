@@ -11,7 +11,7 @@ import { useRouter } from "next/router";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { pageProps } from "@/utils/utils";
 import { getData, getImages, updateData } from "@/firebase/clientApp";
-import WitnessList from "@/components/witnessList";
+import WitnessList from "@/components/otherPartys/witnessList";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext

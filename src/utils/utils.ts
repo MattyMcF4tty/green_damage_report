@@ -34,10 +34,10 @@ export type reportDataType = {
     damageDescription: string
     policeReportNumber: string
 
-    bikerInfo: bikeInformation
-    vehicleInfo: carInformation
-    pedestrianInfo: PedestrianInformation
-    otherObjectInfo: OtherInformation
+    bikerInfo: bikeInformation[]
+    vehicleInfo: carInformation[]
+    pedestrianInfo: PedestrianInformation[]
+    otherObjectInfo: OtherInformation[]
 
     witnesses: {name:string, phone:string, email:string}[]
 

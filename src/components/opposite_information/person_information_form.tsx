@@ -2,11 +2,23 @@ import React, { useState, useEffect } from "react";
 import PhoneNumber from "./phone_form";
 import { Inputfield, TextField } from "../custom_inputfields";
 
-export type PedestrianInformation = {
+export class PedestrianInformation {
   name: string;
   phone: string;
   email: string;
   personDamage: string;
+
+  constructor (
+    name: string,
+    phone: string,
+    email: string,
+    personDamage: string,
+  ) {
+    this.name = name;
+    this.phone = phone;
+    this.email = email;
+    this.personDamage = personDamage;
+  }
 };
 
 interface PedestrianProps {

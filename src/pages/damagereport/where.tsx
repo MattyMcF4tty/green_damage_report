@@ -21,9 +21,9 @@ import NextButton from "@/components/buttons/next";
 import { getData, updateData } from "@/firebase/clientApp";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { pageProps } from "@/utils/utils";
-import Google from "@/components/googlev3";
+import Google from "@/components/google";
 import { LoadScript } from "@react-google-maps/api";
-import { Autocomplete } from "@react-google-maps/api";
+import { OtherPartyList } from "@/components/otherPartys/otherPartyList";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -42,8 +42,6 @@ export const getServerSideProps = async (
 
 const WherePage: NextPage<pageProps> = ({ data, id }) => {
   const router = useRouter();
-  const [showGoogle, setShowGoogle] = useState<boolean>(false);
-  const [showAutocomplete, setShowAutocomplete] = useState<boolean>(false);
 
   /* logic */
   const [isVehicleChecked, setIsVehicleChecked] = useState<boolean | null>(
@@ -73,31 +71,17 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
   const [damageDescription, setDamageDescription] = useState<string>("");
 
   /* Data */
-  const [carInfo, setCarInfo] = useState<carInformation>(
-    data?.vehicleInfo || {
-      name: "",
-      phone: "",
-      email: "",
-      driversLicenseNumber: "",
-      insurance: "",
-      numberplate: "",
-      model: "",
-    }
+  const [carInfo, setCarInfo] = useState<carInformation[]>(
+    data?.vehicleInfo || []
   );
-  const [bikeInfo, setBikeInfo] = useState<bikeInformation>(
-    data?.bikerInfo || {
-      name: "",
-      phone: "",
-      email: "",
-      ebike: null,
-      personDamage: "",
-    }
+  const [bikeInfo, setBikeInfo] = useState<bikeInformation[]>(
+    data?.bikerInfo || []
   );
-  const [otherInfo, setOtherInfo] = useState<OtherInformation>(
-    data?.otherObjectInfo || { description: "", information: "" }
+  const [otherInfo, setOtherInfo] = useState<OtherInformation[]>(
+    data?.otherObjectInfo || []
   );
-  const [pedestrianInfo, setPedestrianInfo] = useState<PedestrianInformation>(
-    data?.pedestrianInfo || { name: "", phone: "", email: "", personDamage: "" }
+  const [pedestrianInfo, setPedestrianInfo] = useState<PedestrianInformation[]>(
+    data?.pedestrianInfo || []
   );
   /*   const [objectInfo, setObjectInfo] = useState<ObjectInformation>(data?.otherObjectInfo || {description: "", information: ""}); */
 
@@ -153,54 +137,22 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
                 <label htmlFor="whatvehicle">What object?</label>
               </div>
               <div className="flex flex-row justify-between">
-                <Checkbox
-                  id="vehicleCar"
-                  labelText="Car"
-                  requried={false}
-                  value={isCarChecked}
-                  onChange={setIsCarChecked}
+                <OtherPartyList 
+                bikeValue={bikeInfo}
+                setBikeValue={setBikeInfo}
+                vehicleValue={carInfo}
+                setVehicleValue={setCarInfo}
+                pedestrianValue={pedestrianInfo}
+                setPedestrianValue={setPedestrianInfo}
+                otherObjectInfoValue={otherInfo}
+                setOtherInfoValue={setOtherInfo}
                 />
-                <Checkbox
-                  id="vehicleBike"
-                  labelText="Bike"
-                  requried={false}
-                  value={isBikeChecked}
-                  onChange={setIsBikeChecked}
-                />
-                <Checkbox
-                  id="vehiclePerson"
-                  labelText="Pedestrian"
-                  requried={false}
-                  value={isPersonChecked}
-                  onChange={setIsPersonChecked}
-                />
-                <Checkbox
-                  id="Other"
-                  labelText="Other"
-                  requried={false}
-                  value={isOtherChecked}
-                  onChange={setIsOtherChecked}
-                />
-              </div>
-              <div className="w-full">
-                {isCarChecked && (
-                  <CarInfoForm value={carInfo} onChange={setCarInfo} />
-                )}
-                {isBikeChecked && (
-                  <Bike value={bikeInfo} onChange={setBikeInfo} />
-                )}
-                {isPersonChecked && (
-                  <Person value={pedestrianInfo} onChange={setPedestrianInfo} />
-                )}
-                {isOtherChecked && (
-                  <Other value={otherInfo} onChange={setOtherInfo} />
-                )}
               </div>
             </div>
-            <div className="mb-4 mt-4 flex flex-col">
+            <div className="my-4">
               <p>
                 Please indicate on the map where the GreenMobility car was
-                located, as well as the location of the other party, by using
+                located, as well as the location of the other partys, by using
                 the markers. Please use the draggable line to mark the car's
                 trajectory leading to the collision.
               </p>
@@ -268,7 +220,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
           </div>
         </div>
       </form>
-    </LoadScript>
+     </LoadScript>
   );
 };
 

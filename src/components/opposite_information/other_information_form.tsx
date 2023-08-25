@@ -3,9 +3,18 @@ import React, { useState, useRef, useEffect } from "react";
 import { info } from "console";
 import { TextField } from "../custom_inputfields";
 
-export type OtherInformation = {
+export class OtherInformation {
   description: string;
   information: string;
+
+  constructor 
+  (
+    description: string, 
+    information: string
+  ) {
+    this.description = description;
+    this.information = information;
+  }
 };
 
 interface OtherProps {
