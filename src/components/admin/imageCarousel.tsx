@@ -18,9 +18,6 @@ const ImageCarousel = ({
   imageIndex,
   setImageIndex,
 }: ImageCarouselProps) => {
-  if (images.length <= 0) {
-    return <div>No Images</div>;
-  }
   const [showButtons, setShowButtons] = useState(false);
   const [showImages, setShowImages] = useState(false);
 
@@ -51,12 +48,12 @@ const ImageCarousel = ({
   if (imageIndex && setImageIndex) {
     return (
       <div
-        className="flex flex-row w-full relative on"
+        className="flex flex-row w-full relative"
         onMouseEnter={() => setShowButtons(true)}
         onMouseLeave={() => setShowButtons(false)}
       >
         <img
-          className={`w-[full] `}
+          className="w-full"
           src={images[imageIndex]}
           alt={`image${imageIndex}`}
           onClick={() => setShowImages(true)}
@@ -101,12 +98,12 @@ const ImageCarousel = ({
   } else {
     return (
       <div
-        className="flex flex-row w-full relative on"
+        className="flex flex-row w-full relative"
         onMouseEnter={() => setShowButtons(true)}
         onMouseLeave={() => setShowButtons(false)}
       >
         <img
-          className={`w-[full] `}
+          className="w-full"
           src={images[localImageIndex]}
           alt={`image${localImageIndex}`}
           onClick={() => setShowImages(true)}
@@ -153,6 +150,7 @@ const ImageCarousel = ({
 
 export default ImageCarousel;
 
+/* ---------- POP UP ------------------------------------------ */
 interface ImagesFullScreenProps {
   images: string[];
   setVisibility: (visiblity: boolean) => void;

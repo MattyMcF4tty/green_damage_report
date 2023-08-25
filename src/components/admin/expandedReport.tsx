@@ -2,7 +2,6 @@ import { reportDataType } from "@/utils/utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import { divide } from "mathjs";
 import { getImages } from "@/firebase/clientApp";
 import Loading from "../loading";
 import ImageCarousel from "./imageCarousel";
@@ -77,7 +76,7 @@ const ExpandedReport = ({ setVisible, reports }: ExpandedReportProps) => {
       {/* Current report data */}
       <div className="grid grid-cols-4 gap-x-8 gap-y-4 w-full px-10 py-6 bg-gray-100">
         {/* Displays current reports info */}
-        <div className="row-start-1 row-span-4 col-span-1">
+        <div className="row-start-1 row-span-1 col-span-1">
           <h1 className="text-xs ">Report Info</h1>
           <div className="p-4 bg-white grid grid-cols-1 grid-rows-3 gap-4 shadow-md">
             <div
@@ -139,7 +138,7 @@ const ExpandedReport = ({ setVisible, reports }: ExpandedReportProps) => {
         </div>
 
         {/* Displays current reports driver info */}
-        <div className="row-start-1 col-start-2 row-span-4 col-span-2">
+        <div className="row-start-1 col-start-2 row-span-1 col-span-2">
           <h1 className="text-xs">Driver Info</h1>
           <div className="p-4 bg-white grid grid-cols-2 grid-rows-3 gap-4 shadow-md">
             <div
@@ -296,7 +295,7 @@ const ExpandedReport = ({ setVisible, reports }: ExpandedReportProps) => {
         </div>
 
         {/* Displays current reports police info */}
-        <div className="row-start-1 col-start-4 row-span-4">
+        <div className="row-start-1 col-start-4 row-span-1">
           <h1 className="text-xs">Police Info</h1>
           <div className="p-4 bg-white grid grid-cols-1 grid-rows-4 gap-4 shadow-md">
             <div
@@ -366,7 +365,7 @@ const ExpandedReport = ({ setVisible, reports }: ExpandedReportProps) => {
         </div>
 
         {/* Displays current reports accident info  */}
-        <div className="row-start-5 col-start-1 col-span-2 row-span-5 h-[25rem]">
+        <div className="row-start-2 col-start-1 col-span-2 row-span-1 h-[25rem]">
           <h1 className="text-xs">Accident Info</h1>
           <div className="p-4 bg-white grid grid-cols-2 grid-rows-5 gap-4 shadow-md h-full">
             <div
@@ -468,13 +467,13 @@ const ExpandedReport = ({ setVisible, reports }: ExpandedReportProps) => {
         </div>
 
         {/* Displays current reports witness list  */}
-        <div className="row-start-5 col-start-3 col-span-2 row-span-5 h-[25rem]">
+        <div className="row-start-2 col-start-3 col-span-2 row-span-1 max-h-[25rem]">
           <h1 className="text-xs">Witnesses</h1>
           <div className=" bg-white grid grid-cols-1 gap-1 shadow-md overflow-y-auto no-scrollbar h-full">
             {currentReport.data.witnesses.length > 0 ? (
               <div className="p-4">
                 <table className="w-full">
-                  <thead className="text-center sticky top-0 bg-blue-50 h-10">
+                  <thead className="text-center sticky top-0 bg-MainGreen-300 text-white font-semibold h-8">
                     <tr className="">
                       <th className="font-normal text-sm w-1/3">Name</th>
                       <th className="font-normal text-sm">Phone number</th>
@@ -488,9 +487,12 @@ const ExpandedReport = ({ setVisible, reports }: ExpandedReportProps) => {
                           key={index}
                           className="h-10 odd:bg-white even:bg-blue-50 "
                         >
-                          <td className={`text-lg `}>{currentWitness.name}</td>
-                          <td className={`text-lg`}>{currentWitness.phone}</td>
-                          <td className={`text-lg}`}>{currentWitness.email}</td>
+                          <td onClick={() => navigator.clipboard.writeText(currentWitness.name)}
+                          className={`text-lg hover:cursor-pointer hover:bg-MainGreen-100 hover:shadow-md`}>{currentWitness.name}</td>
+                          <td onClick={() => navigator.clipboard.writeText(currentWitness.phone)}
+                          className={`text-lg hover:cursor-pointer hover:bg-MainGreen-100 hover:shadow-md`}>{currentWitness.phone}</td>
+                          <td onClick={() => navigator.clipboard.writeText(currentWitness.email)}
+                          className={`text-lg hover:cursor-pointer hover:bg-MainGreen-100 hover:shadow-md`}>{currentWitness.email}</td>
                         </tr>
                       )
                     )}
@@ -504,33 +506,34 @@ const ExpandedReport = ({ setVisible, reports }: ExpandedReportProps) => {
         </div>
 
         {/* Displays current report pictures of green car */}
-        <div className="row-start-8 col-start-1 row-span-4 col-span-1">
+        <div className="row-start-3 col-start-1 row-span-1">
           <h1 className="text-xs mt-4">Pictures of green car</h1>
           <div className="p-4 bg-white shadow-md w-full">
-            {currentImages["GreenMobility"] ? (
+            {(currentImages["GreenMobility"] && currentImages["GreenMobility"].length > 0) ? (
               <ImageCarousel
                 allowPopUp={true}
                 images={currentImages["GreenMobility"]}
               />
             ) : (
               <div>
-                <Loading />
+                No Images
               </div>
             )}
           </div>
         </div>
-        {/* Displays current report pictures of other party car */}
-        <div className="row-start-8 col-start-2">
-          <h1 className="text-xs mt-4">Pictures of other party car</h1>
+
+        {/* Displays current report pictures of other partys */}
+        <div className="row-start-3 col-start-2 row-span-1">
+          <h1 className="text-xs mt-4">Pictures of other partys</h1>
           <div className="p-4 bg-white shadow-md w-full">
-            {currentImages["OtherParty"] ? (
+            {(currentImages["OtherParty"] && currentImages["OtherParty"].length > 0) ? (
               <ImageCarousel
                 allowPopUp={true}
                 images={currentImages["OtherParty"]}
               />
             ) : (
               <div>
-                <Loading />
+                No Images
               </div>
             )}
           </div>

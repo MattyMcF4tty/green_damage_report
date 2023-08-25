@@ -9,6 +9,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ExpandedReport from "./expandedReport";
 import { deleteReports } from "@/firebase/clientApp";
+import ReactPDF from '@react-pdf/renderer';
+import MyDocument from "@/utils/pdfCreator";
 
 interface ReportControls {
   selectedReports: { id: string; data: reportDataType }[];
@@ -31,6 +33,11 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
     location.reload();
   };
 
+  const handleCreatePdf = () => {
+    console.log("hejsa")
+    ReactPDF.render(<MyDocument />, `${`Downloads`}/example.pdf`);
+  }
+
   return (
     <div className="flex flex-row w-full justify-between ml-8">
       <button
@@ -49,7 +56,9 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
         {" Print"}
       </button>
       <button
-        type="button"
+        type="button" onClick={() => {if (selectedReports.length > 0) {
+          handleCreatePdf();
+        }}}
         className="bg-white border-gray-300 border-[1px] rounded-xl w-32 hover:bg-MainGreen-300 hover:text-white duration-150"
       >
         <FontAwesomeIcon icon={faCloudArrowDown} />
