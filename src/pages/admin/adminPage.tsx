@@ -20,9 +20,12 @@ const adminPage: NextPage = () => {
     "id" | "driver" | "numberplate" | "date"
   >("id");
   const [currentSearch, setCurrentSearch] = useState<string>("");
-  const [selectedReports, setSelectedReports] = useState<{id: string, data: reportDataType}[]>([]);
+  const [selectedReports, setSelectedReports] = useState<
+    { id: string; data: reportDataType }[]
+  >([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [showExpandedReports, setShowExpandedReports] = useState<boolean>(false);
+  const [showExpandedReports, setShowExpandedReports] =
+    useState<boolean>(false);
 
   const reportsPerPage = 20;
   const startIndex = (currentPage - 1) * reportsPerPage;
@@ -79,7 +82,9 @@ const adminPage: NextPage = () => {
       </div>
 
       <div className="flex flex-row justify-between my-6 items-baseline ">
-        <ReportControls selectedReports={selectedReports}/>
+        <div className="w-2/5">
+          <ReportControls selectedReports={selectedReports} />
+        </div>
         <div className="w-1/3 relative flex flex-row items-center ">
           <select
             className="h-8 border border-neutral-500 rounded-l-lg shadow-md outline-none"
