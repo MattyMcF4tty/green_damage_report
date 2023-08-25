@@ -137,15 +137,15 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
                 <label htmlFor="whatvehicle">What object?</label>
               </div>
               <div className="flex flex-row justify-between">
-                <OtherPartyList 
-                bikeValue={bikeInfo}
-                setBikeValue={setBikeInfo}
-                vehicleValue={carInfo}
-                setVehicleValue={setCarInfo}
-                pedestrianValue={pedestrianInfo}
-                setPedestrianValue={setPedestrianInfo}
-                otherObjectInfoValue={otherInfo}
-                setOtherInfoValue={setOtherInfo}
+                <OtherPartyList
+                  bikeValue={bikeInfo}
+                  setBikeValue={setBikeInfo}
+                  vehicleValue={carInfo}
+                  setVehicleValue={setCarInfo}
+                  pedestrianValue={pedestrianInfo}
+                  setPedestrianValue={setPedestrianInfo}
+                  otherInfoValue={otherInfo}
+                  setOtherInfoValue={setOtherInfo}
                 />
               </div>
             </div>
@@ -220,7 +220,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
           </div>
         </div>
       </form>
-     </LoadScript>
+    </LoadScript>
   );
 };
 

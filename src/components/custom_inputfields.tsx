@@ -473,7 +473,7 @@ export const Checkbox = ({
   const [isError, setIsError] = useState<boolean>(false);
 
   return (
-    <div className="flex flex-row-reverse items-center mr-4">
+    <div className="flex flex-col items-center">
       <label htmlFor={"Checkbox" + id}>{labelText}</label>
       <input
         className="accent-MainGreen-300 items-center mr-1 scale-125"
