@@ -9,11 +9,28 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ExpandedReport from "./expandedReport";
 import { deleteReports } from "@/firebase/clientApp";
-import ReactPDF from '@react-pdf/renderer';
+import ReactPDF from "@react-pdf/renderer";
+import generatePDF from "@/components/admin/pdfGenerator";
 
 interface ReportControls {
   selectedReports: { id: string; data: reportDataType }[];
 }
+
+const handleDownloadPDF = async (data: reportDataType) => {
+  if (data !== null) {
+    const pdfBlob = await generatePDF(data);
+    const url = URL.createObjectURL(pdfBlob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "report.pdf";
+    link.click();
+
+    URL.revokeObjectURL(url);
+  } else {
+    console.error("No data available for PDF generation");
+  }
+};
 
 const ReportControls = ({ selectedReports }: ReportControls) => {
   const [showExpandedReports, setShowExpandedReports] =
@@ -29,7 +46,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
     await deleteReports(selectedReportIDs);
 
     /* TODO: Reloads before documents are deleted */
-    location.reload();
+    /*  location.reload(); */
   };
 
   return (
@@ -50,12 +67,17 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
         {" Print"}
       </button>
       <button
-        type="button"
-        className="bg-white border-gray-300 border-[1px] rounded-xl w-32 hover:bg-MainGreen-300 hover:text-white duration-150"
+        onClick={() => {
+          if (selectedReports.length > 0) {
+            handleDownloadPDF(selectedReports[0].data);
+          }
+        }}
+        className="bg-MainGreen-300 text-white px-4 py-2 rounded-md shadow-md"
       >
-        <FontAwesomeIcon icon={faCloudArrowDown} />
-        {" Download"}
+        <FontAwesomeIcon icon={faCloudArrowDown} className="mr-2" />
+        Download PDF
       </button>
+
       <button
         type="button"
         className="bg-white border-gray-300 border-[1px] rounded-xl w-32 hover:bg-MainGreen-300 hover:text-white duration-150"

@@ -32,6 +32,7 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
 
     /* TODO: Send videre til en ny side */
   };
+
   if (data !== null) {
     return (
       <div className="flex flex-col">
