@@ -67,9 +67,6 @@ const What: NextPage<pageProps> = ({ data, id }) => {
   );
   const [accidentTime, setAccidentTime] = useState<string>(data?.time || "");
   const [accidentDate, setAccidentDate] = useState<string>(data?.date || "");
-  const [accidentLocation, setAccidentLocation] = useState<string>(
-    data?.accidentLocation || ""
-  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,7 +89,6 @@ const What: NextPage<pageProps> = ({ data, id }) => {
       greenCarNumberPlate: greenCarNumberplate,
       time: accidentTime,
       date: accidentDate,
-      accidentLocation: accidentLocation,
 
       driverRenter: showDriverInfoForm,
     };
@@ -101,7 +97,6 @@ const What: NextPage<pageProps> = ({ data, id }) => {
     router.push(`how?id=${id}`);
   };
 
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
 
   return (
     <form
@@ -215,8 +210,6 @@ const What: NextPage<pageProps> = ({ data, id }) => {
           dateValue={accidentDate}
         />
       </div>
-
-      {/* Accident location collection */}
 
       <div className="flex flex-row justify-between">
         <div className="flex flex-row w-16 justify-start h-14 mt-4 ml-10">

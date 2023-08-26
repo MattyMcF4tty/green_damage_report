@@ -3,6 +3,10 @@ import { initializeApp } from "firebase/app"
 import { collection, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
 import { ListResult, StorageReference, deleteObject, getDownloadURL, getStorage, listAll, ref, uploadBytes } from "firebase/storage"
 import { reportDataType } from "@/utils/utils";
+import { bikeInformation } from "@/components/opposite_information/bike_information_form";
+import { carInformation } from "@/components/opposite_information/car_information_form";
+import { PedestrianInformation } from "@/components/opposite_information/person_information_form";
+import { OtherInformation } from "@/components/opposite_information/other_information_form";
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -118,7 +122,7 @@ export const createDoc = async (id: string, email: string) => {
             email: ""
         },
     
-        accidentLocation: "",
+        accidentLocation: {lat: 0, lng: 0},
         time: "",
         date: "",
         accidentDescription: "",
@@ -159,7 +163,7 @@ export const createDoc = async (id: string, email: string) => {
         await setDoc(dataRef, data);
         console.log("Data writing successful")
     } catch (error) {
-        console.log("An error occurred while writing data");
+        console.log(`An error occurred while writing data:\n${error}`);
     }
 }
 

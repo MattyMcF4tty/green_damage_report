@@ -1,16 +1,10 @@
 /* import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";*/
 import { updateImages } from "@/firebase/clientApp";
-import { Address } from "cluster";
 import React, { useEffect, useState, useRef } from "react";
-import Autocomplete from "react-google-autocomplete";
 import {
   GoogleMap,
   LoadScript,
-  Marker,
-  useLoadScript,
 } from "@react-google-maps/api";
-import { map } from "mathjs";
-import { type } from "os";
 import usePlacesService from "react-google-autocomplete/lib/usePlacesAutocompleteService";
 
 /* import usePlacesAutocomplete, {
@@ -411,8 +405,6 @@ export const ImageField = ({
   const [isRequired, setIsRequired] = useState<boolean>(required);
   const [isError, setIsError] = useState<boolean>(false);
 
-  console.log(images);
-
   useEffect(() => {
     if (images === null) setIsRequired(images === null);
   }, [images]);
@@ -441,8 +433,8 @@ export const ImageField = ({
       />
       <div className="flex flex-wrap gap-[2px] mt-1">
         {images &&
-          images.map((image) => (
-            <img src={image} alt={image} className="w-20" />
+          images.map((image, index) => (
+            <img key={index} src={image} alt={image} className="w-20" />
           ))}
       </div>
       {isError && (

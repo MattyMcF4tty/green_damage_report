@@ -8,20 +8,34 @@ export class bikeInformation {
   email: string;
   ebike: boolean | null;
   personDamage: string;
+  location: {lat: number, lng: number};
 
   constructor(
     name: string,
     phone: string,
     email: string,
     ebike: boolean | null,
-    personDamage: string
+    personDamage: string,
+    location: {lat: number, lng: number},
   ) {
     this.name = name;
     this.phone = phone;
     this.email = email;
     this.ebike = ebike;
     this.personDamage = personDamage;
+    this.location = location;
   } 
+
+  toPlainObject() {
+    return {
+      name: this.name,
+      phone: this.phone,
+      email: this.email,
+      ebike: this.ebike,
+      personDamage: this.personDamage,
+      location: this.location,
+    };
+  }
 };
 
 interface bikeInfoFormProps {
@@ -37,7 +51,7 @@ const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
   const [ebike, setEbike] = useState<boolean | null>(value.ebike);
 
   useEffect(() => {
-    const newBikeInfo = new bikeInformation(name, phoneNumber, email, ebike, personDamage)
+    const newBikeInfo = new bikeInformation(name, phoneNumber, email, ebike, personDamage, {lat: 0, lng: 0})
 ;
 
     onChange(newBikeInfo);

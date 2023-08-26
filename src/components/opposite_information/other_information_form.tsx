@@ -6,14 +6,25 @@ import { TextField } from "../custom_inputfields";
 export class OtherInformation {
   description: string;
   information: string;
+  location: {lat: number, lng: number};
 
   constructor 
   (
     description: string, 
-    information: string
+    information: string,
+    location: {lat: number, lng: number},
   ) {
     this.description = description;
     this.information = information;
+    this.location = location;
+  }
+
+  toPlainObject() {
+    return {
+      description: this.description,
+      information: this.information,
+      location: this.location,
+    };
   }
 };
 
@@ -27,11 +38,8 @@ const OtherInfoForm = ({ value, onChange }: OtherProps) => {
   const [infoOther, setInfoOther] = useState<string>(value.information);
 
   useEffect(() => {
-    const newOtherInfo: OtherInformation = {
-      description: descripeOther,
-      information: infoOther,
-    };
-
+    const newOtherInfo: OtherInformation = new OtherInformation(descripeOther, infoOther, {lat: 0, lng: 0})
+  
     onChange(newOtherInfo);
   }, [descripeOther, infoOther]);
 

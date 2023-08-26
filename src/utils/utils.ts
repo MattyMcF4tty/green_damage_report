@@ -2,6 +2,7 @@ import { bikeInformation } from "@/components/opposite_information/bike_informat
 import { carInformation } from "@/components/opposite_information/car_information_form";
 import { OtherInformation } from "@/components/opposite_information/other_information_form";
 import { PedestrianInformation } from "@/components/opposite_information/person_information_form";
+import { WitnessInformation } from "@/components/otherPartys/witnessList";
 import { getDocIds } from "@/firebase/clientApp";
 
 export type pageProps = {
@@ -24,7 +25,7 @@ export type reportDataType = {
         email: string
     },
 
-    accidentLocation: string
+    accidentLocation: {lat: 0, lng: 0}
     time: string
     date: string
     accidentDescription: string
@@ -39,7 +40,7 @@ export type reportDataType = {
     pedestrianInfo: PedestrianInformation[]
     otherObjectInfo: OtherInformation[]
 
-    witnesses: {name:string, phone:string, email:string}[]
+    witnesses: WitnessInformation[]
 
     /* SITE LOGIC */
     /* What */
@@ -80,3 +81,25 @@ export const generateId = async () => {
 
     return id;
 }
+
+
+export const GetUserPosition = () => {
+    return new Promise<{ lat: number; lng: number } | undefined>((resolve) => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    const userLocation = { lat: latitude, lng: longitude };
+                    resolve(userLocation);
+                },
+                (error) => {
+                    console.error("Error getting geolocation:", error);
+                    resolve(undefined);
+                }
+            );
+        } else {
+            console.error("Geolocation is not available.");
+            resolve(undefined);
+        }
+    });
+};

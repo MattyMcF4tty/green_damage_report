@@ -9,12 +9,24 @@ interface WitnessListProps {
   ) => void;
 }
 
+class WitnessInformation {
+  name: string; 
+  phone: string; 
+  email: string;
+
+  constructor(name: string, phone: string, email: string) {
+    this.name = name;
+    this.phone = phone;
+    this.email = email;
+  }
+}
+
 const WitnessList = ({ value, onChange }: WitnessListProps) => {
   const [showNewWitness, setShowNewWitness] = useState<boolean>(false);
   const [showUpdateWitness, setShowUpdateWitness] = useState<boolean>(false);
   const [updateWitnessIndex, setupdateWitnessIndex] = useState<number>(-1);
   const [witnesses, setWitnesses] =
-    useState<{ name: string; phone: string; email: string }[]>(value);
+    useState<WitnessInformation[]>(value);
 
   useEffect(() => {
     onChange(witnesses);

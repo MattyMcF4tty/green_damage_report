@@ -1,15 +1,11 @@
-import React, { use, useEffect, useState } from "react";
-import Bike from "../../components/opposite_information/bike_information_form";
-import Person, {
+import React, { useState } from "react";
+import {
   PedestrianInformation,
 } from "../../components/opposite_information/person_information_form";
-import LocationAdress, {
+import {
   YesNo,
-  Checkbox,
-  TextField,
 } from "../../components/custom_inputfields";
-import Other from "../../components/opposite_information/other_information_form";
-import CarInfoForm, {
+import {
   carInformation,
 } from "../../components/opposite_information/car_information_form";
 import { bikeInformation } from "../../components/opposite_information/bike_information_form";
@@ -21,9 +17,8 @@ import NextButton from "@/components/buttons/next";
 import { getData, updateData } from "@/firebase/clientApp";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { pageProps } from "@/utils/utils";
-import Google from "@/components/google";
-import { LoadScript } from "@react-google-maps/api";
 import { OtherPartyList } from "@/components/otherPartys/otherPartyList";
+import GoogleMapsField from "@/components/google_maps_field";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -83,21 +78,19 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
   const [pedestrianInfo, setPedestrianInfo] = useState<PedestrianInformation[]>(
     data?.pedestrianInfo || []
   );
-  /*   const [objectInfo, setObjectInfo] = useState<ObjectInformation>(data?.otherObjectInfo || {description: "", information: ""}); */
+  const [accidentLocation, setAccidentLocation] = useState(data?.accidentLocation || {lat:0, lng:0})
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     /* Data that gets sent to server */
     const data = {
-      vehicleInfo: carInfo,
-      bikerInfo: bikeInfo,
-      otherObjectInfo: otherInfo,
-      pedestrianInfo: pedestrianInfo,
+      vehicleInfo: carInfo.map(info => info.toPlainObject()) ,
+      bikerInfo: bikeInfo.map(info => info.toPlainObject()) ,
+      otherObjectInfo: otherInfo.map(info => info.toPlainObject()) ,
+      pedestrianInfo: pedestrianInfo.map(info => info.toPlainObject()),
       address: address,
-
-      /*       objectInfo, */
-
+      
       /* PAGE LOGIC */
       collisionPersonVehicle: isVehicleChecked,
       singleVehicleAccident: isSingleVehicleChecked,
@@ -108,12 +101,12 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
     };
 
     await updateData(id, data);
-    router.push(`confirmation?id=${id}`);
-  };
-  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
-
+/*     router.push(`confirmation?id=${id}`);
+ */  };
+/*   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
+ */
+  /*     <LoadScript googleMapsApiKey={apiKey || ""} libraries={["places"]}> */
   return (
-    <LoadScript googleMapsApiKey={apiKey || ""} libraries={["places"]}>
       <form
         className="flex flex-col items-start w-full h-full"
         onSubmit={(e) => handleSubmit(e)}
@@ -159,7 +152,21 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
             </div>
 
             <div className="w-full">
-              <Google show={true} showAutocomplete={true} />
+              <GoogleMapsField 
+              showMap={true} 
+              startZoom={17} 
+              startPos={{lat:55.682993, lng:12.585482}}
+              accidentLocation={accidentLocation}
+              setAccidentLocation={setAccidentLocation}
+              bikes={bikeInfo}
+              setBikes={setBikeInfo}
+              vehicles={carInfo}
+              setVehicles={setCarInfo}
+              pedestrians={pedestrianInfo}
+              setPedestrians={setPedestrianInfo}
+              objects={otherInfo}
+              setObjects={setOtherInfo}
+              />
             </div>
           </div>
         )}
@@ -177,8 +184,9 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
             </div>
             <div className="w-full">
               {isSingleVehicleChecked && (
-                <Google show={false} showAutocomplete={true} />
-              )}
+                <div/>
+/*                 <Google show={false} showAutocomplete={true} />
+ */              )}
             </div>
           </div>
         )}
@@ -220,7 +228,6 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
           </div>
         </div>
       </form>
-    </LoadScript>
   );
 };
 

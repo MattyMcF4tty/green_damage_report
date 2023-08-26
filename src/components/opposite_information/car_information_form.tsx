@@ -11,6 +11,8 @@ export class carInformation {
   insurance: string;
   numberplate: string;
   model: string;
+  location: {lat: number, lng: number};
+
 
   constructor(
     name: string,
@@ -19,7 +21,8 @@ export class carInformation {
     driversLicenseNumber: string,
     insurance: string,
     numberplate: string,
-    model: string
+    model: string,
+    location: {lat: number, lng: number},
   ) {
     this.name = name;
     this.phone = phone;
@@ -28,7 +31,21 @@ export class carInformation {
     this.insurance = insurance;
     this.numberplate = numberplate;
     this.model = model;
+    this.location = location;
   } 
+
+  toPlainObject() {
+    return {
+      name: this.name,
+      phone: this.phone,
+      email: this.email,
+      driversLicenseNumber: this.driversLicenseNumber,
+      insurance: this.insurance,
+      numberplate: this.numberplate,
+      model: this.model,
+      location: this.location
+    };
+  }
 };
 
 interface carInfoFormProps {
@@ -48,15 +65,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
   const [insurance, setInsurance] = useState<string>(value.insurance);
 
   useEffect(() => {
-    const newCarInfo: carInformation = {
-      name: name,
-      phone: phoneNumber,
-      email: email,
-      insurance: insurance,
-      driversLicenseNumber: drivingLicenseNumber,
-      numberplate: numberplate,
-      model: model,
-    };
+    const newCarInfo: carInformation = new carInformation(name, phoneNumber, email, insurance, drivingLicenseNumber, numberplate, model, {lat: 0, lng: 0})
 
     onChange(newCarInfo);
   }, [
