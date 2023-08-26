@@ -260,7 +260,7 @@ function Google({
       {show && (
         <div>
           <button
-            className="add-line-button border-[1px] border-MainGreen-200 rounded-md mb-2 bg-MainGreen-100 w-1/2"
+            className="add-line-button border-[1px] border-MainGreen-200 rounded-md mb-2 bg-MainGreen-100 w-1/2 lg:w-1/5"
             onClick={addDraggableLine}
             type="button"
           >
@@ -272,7 +272,7 @@ function Google({
               onLoad={handleMapLoad}
               center={Center}
               zoom={Zoom}
-              mapContainerClassName="w-full h-[400px] border-[1px] border-MainGreen-200 rounded-lg"
+              mapContainerClassName="w-full h-[600px] border-[1px] border-MainGreen-200 rounded-lg"
             />
           </div>
         </div>

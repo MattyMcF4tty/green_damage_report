@@ -8,18 +8,18 @@ export class PedestrianInformation {
   email: string;
   personDamage: string;
 
-  constructor (
+  constructor(
     name: string,
     phone: string,
     email: string,
-    personDamage: string,
+    personDamage: string
   ) {
     this.name = name;
     this.phone = phone;
     this.email = email;
     this.personDamage = personDamage;
   }
-};
+}
 
 interface PedestrianProps {
   value: PedestrianInformation;

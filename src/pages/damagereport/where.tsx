@@ -118,7 +118,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
         className="flex flex-col items-start w-full h-full"
         onSubmit={(e) => handleSubmit(e)}
       >
-        <div className="w-full">
+        <div className="w-full ">
           <p className="text-MainGreen-300 mb-8 flex justify-start font-bold text-[20px]">
             Vital Information
           </p>
@@ -149,8 +149,8 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
                 />
               </div>
             </div>
-            <div className="my-4">
-              <p>
+            <div className="my-4 w-1/2">
+              <p className="break-words">
                 Please indicate on the map where the GreenMobility car was
                 located, as well as the location of the other partys, by using
                 the markers. Please use the draggable line to mark the car's
@@ -210,12 +210,12 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
         </div>
       )} */}
 
-        <div className="flex flex-row justify-between w-full mt-4">
-          <div className="flex flex-row w-16 justify-start h-14 ml-10 ">
+        <div className="flex flex-row justify-between w-full mt-4 ">
+          <div className="flex flex-row w-16 justify-start h-14 ml-10 lg:w-16">
             <BackButton pageName={`how?id=${id}`} />
           </div>
 
-          <div className="flex flex-row w-16 justify-end h-14 mr-10">
+          <div className="flex flex-row w-16 justify-end h-14 mr-10 lg:w-16">
             <NextButton />
           </div>
         </div>

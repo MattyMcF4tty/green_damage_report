@@ -28,8 +28,16 @@ export function Navbar() {
     }
   });
 
+  const updatedPageIndex = pageIndex.map((item) => ({
+    ...item,
+    color:
+      item.page === currentPage ||
+      pageIndex.findIndex((page) => page.page === currentPage) >=
+        pageIndex.findIndex((page) => page.page === item.page),
+  }));
+
   const ChangeLineColor = (page: string) => {
-    const pageIndexEntry = pageIndex.find((item) => item.page === page);
+    const pageIndexEntry = updatedPageIndex.find((item) => item.page === page);
 
     if (pageIndexEntry && pageIndexEntry.color) {
       return "border-t-MainGreen-300";
@@ -40,68 +48,24 @@ export function Navbar() {
 
   return (
     <nav className="flex items-center justify-center w-full h-16">
-      {pageIndex[0].color ? (
-        <img
-          src="../GreenLogos/GreenLogo-color-1.png"
-          alt="green"
-          className="h-4/6"
-        />
-      ) : (
-        <img
-          src="../GreenLogos/GreenLogo-gray-1.png"
-          alt="green"
-          className="h-4/6"
-        />
-      )}
-
-      <hr className={`${ChangeLineColor(page2)} border-t-[1.5px] w-10 mx-2`} />
-      {pageIndex[1].color ? (
-        <img
-          src="../GreenLogos/GreenLogo-color-2.png"
-          alt="green"
-          className="h-4/6"
-        />
-      ) : (
-        <img
-          src="../GreenLogos/GreenLogo-gray-2.png"
-          alt="green"
-          className="h-4/6"
-        />
-      )}
-
-      <hr className={`${ChangeLineColor(page3)} border-t-[1.5px] w-10 mx-2`} />
-      {pageIndex[2].color ? (
-        <img
-          src="../GreenLogos/GreenLogo-color-3.png"
-          alt="green"
-          className="h-4/6"
-        />
-      ) : (
-        <img
-          src="../GreenLogos/GreenLogo-gray-3.png"
-          alt="green"
-          className="h-4/6"
-        />
-      )}
-
-      <hr
-        className={`${ChangeLineColor(
-          confirmationPage
-        )} border-t-[1.5px] w-10 mx-2`}
-      />
-      {pageIndex[3].color ? (
-        <img
-          src="../GreenLogos/GreenLogo-color-4.png"
-          alt="green"
-          className="h-4/6"
-        />
-      ) : (
-        <img
-          src="../GreenLogos/GreenLogo-gray-4.png"
-          alt="green"
-          className="h-4/6"
-        />
-      )}
+      {updatedPageIndex.map((item, index) => (
+        <React.Fragment key={item.page}>
+          <img
+            src={`../GreenLogos/GreenLogo-${item.color ? "color" : "gray"}-${
+              index + 1
+            }.png`}
+            alt="green"
+            className="h-4/6"
+          />
+          {index < updatedPageIndex.length - 1 && (
+            <hr
+              className={`${ChangeLineColor(
+                item.page
+              )} border-t-[1.5px] w-10 mx-2`}
+            />
+          )}
+        </React.Fragment>
+      ))}
     </nav>
   );
 }

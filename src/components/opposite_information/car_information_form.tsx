@@ -28,8 +28,8 @@ export class carInformation {
     this.insurance = insurance;
     this.numberplate = numberplate;
     this.model = model;
-  } 
-};
+  }
+}
 
 interface carInfoFormProps {
   value: carInformation;
