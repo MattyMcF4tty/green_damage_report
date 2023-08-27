@@ -2,11 +2,40 @@ import React, { useState, useEffect } from "react";
 import PhoneNumber from "./phone_form";
 import { Inputfield, TextField } from "../custom_inputfields";
 
-export type PedestrianInformation = {
+export class PedestrianInformation {
   name: string;
   phone: string;
   email: string;
   personDamage: string;
+  location: {lat: number | null, lng: number | null};
+
+  constructor (
+    name: string,
+    phone: string,
+    email: string,
+    personDamage: string,
+    location: {lat: number | null, lng: number | null},
+  ) {
+    this.name = name;
+    this.phone = phone;
+    this.email = email;
+    this.personDamage = personDamage;
+    this.location = location;
+  }
+
+  updateFields(fields: Partial<PedestrianInformation>) {
+    Object.assign(this, fields);
+  }
+
+  toPlainObject() {
+    return {
+      name: this.name,
+      phone: this.phone,
+      email: this.email,
+      personDamage: this.personDamage,
+      location: this.location,
+    };
+  }
 };
 
 interface PedestrianProps {
@@ -21,12 +50,7 @@ const PedestrianInfoForm = ({ value, onChange }: PedestrianProps) => {
   const [personDamage, setPersonDamage] = useState<string>(value.personDamage);
 
   useEffect(() => {
-    const newPedestrianInfo: PedestrianInformation = {
-      name: name,
-      phone: phoneNumber,
-      email: email,
-      personDamage: personDamage,
-    };
+    const newPedestrianInfo: PedestrianInformation = new PedestrianInformation(name, phoneNumber, email, personDamage, {lat: null, lng: null})
 
     onChange(newPedestrianInfo);
   }, [name, phoneNumber, email, personDamage]);

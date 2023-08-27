@@ -1,7 +1,12 @@
 /* import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";*/
 import { updateImages } from "@/firebase/clientApp";
-import { Address } from "cluster";
 import React, { useEffect, useState, useRef } from "react";
+import {
+  GoogleMap,
+  LoadScript,
+} from "@react-google-maps/api";
+import usePlacesService from "react-google-autocomplete/lib/usePlacesAutocompleteService";
+
 /* import usePlacesAutocomplete, {
   getGeocode,
   getLatLng,
@@ -21,7 +26,7 @@ interface InputfieldProps {
     | "license"
     | "ssn"
     | "speed";
-  value: string;
+  value: string | null;
   onChange: (isValue: string) => void;
   pattern?: string;
 }
@@ -34,7 +39,7 @@ export const Inputfield = ({
   type,
   onChange,
 }: InputfieldProps) => {
-  const [currentValue, setCurrentValue] = useState<string>(value);
+  const [currentValue, setCurrentValue] = useState<string>(value || "");
   const [isError, setIsError] = useState<boolean>(false);
   const [bgColor, setBgColor] = useState("bg-white");
   const [isFocused, setIsFocused] = useState<boolean>(false);
@@ -151,8 +156,8 @@ interface TimeDateProps {
   id: string;
   labelText: string;
   required: boolean;
-  timeValue: string;
-  dateValue: string;
+  timeValue: string | null;
+  dateValue: string | null;
   timeChange: (Value: string) => void;
   dateChange: (Value: string) => void;
 }
@@ -168,17 +173,20 @@ export const TimeDateField = ({
 }: TimeDateProps) => {
   const [dateError, setDateError] = useState<boolean>(false);
   const [timeError, setTimeError] = useState<boolean>(false);
+  const [currentTime, setCurrentTime] = useState<string>(timeValue || "");
+  const [currentDate, setCurrentDate] = useState<string>(dateValue || "");
+
 
   const [timeBgColor, setTimeBgColor] = useState("bg-white");
   const [dateBgColor, setDateBgColor] = useState("bg-white");
 
   useEffect(() => {
-    timeChange(timeValue);
-  }, [timeValue]);
+    timeChange(currentTime);
+  }, [currentTime]);
 
   useEffect(() => {
-    dateChange(dateValue);
-  }, [dateValue]);
+    dateChange(currentDate);
+  }, [currentDate]);
 
   useEffect(() => {
     if (timeValue === "" || timeValue === null) {
@@ -204,18 +212,21 @@ export const TimeDateField = ({
           className={`${dateBgColor} h-10 rounded-none w-32 border-[1px] focus:border-[3px] border-MainGreen-200 outline-none`}
           id={"Date" + id}
           type="date"
-          value={dateValue}
+          value={currentDate}
           required={required}
-          onChange={(event) => dateChange(event.target.value)}
+          onChange={(event) => {
+            setCurrentDate(event.target.value);
+            setDateError(false);
+          }}
         />
         <input
           className={`${timeBgColor} h-10 ml-5 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none`}
           id={"Time" + id}
           type="time"
-          value={timeValue}
+          value={currentTime}
           required={required}
           onChange={(event) => {
-            timeChange(event.target.value);
+            setCurrentTime(event.target.value);
             setTimeError(false);
           }}
           onInvalid={() => setTimeError(true)}
@@ -309,7 +320,7 @@ interface TextFieldProps {
   maxLength: number;
   labelText: string;
   required: boolean;
-  value: string;
+  value: string | null;
   onChange: (value: string) => void;
 }
 
@@ -321,16 +332,11 @@ export const TextField = ({
   onChange,
   value,
 }: TextFieldProps) => {
-  const [text, setText] = useState<string>(value);
+  const [text, setText] = useState<string>(value || "");
   const [currentLength, setCurrentLength] = useState<number>(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isError, setIsError] = useState<boolean>(false);
   const [bgColor, setBgColor] = useState("bg-white");
-  const [isValue, setIsValue] = useState<string>(value);
-
-  useEffect(() => {
-    onChange(isValue);
-  }, [isValue]);
 
   useEffect(() => {
     setCurrentLength(text.length);
@@ -400,8 +406,6 @@ export const ImageField = ({
   const [isRequired, setIsRequired] = useState<boolean>(required);
   const [isError, setIsError] = useState<boolean>(false);
 
-  console.log(images);
-
   useEffect(() => {
     if (images === null) setIsRequired(images === null);
   }, [images]);
@@ -409,8 +413,6 @@ export const ImageField = ({
   const handleChange = async (newImages: FileList | null) => {
     await updateImages(reportID, newImages, imageType);
   };
-
-  console.log(`${id}: ${isRequired}`);
 
   return (
     <div className="flex flex-col mb-4">
@@ -430,8 +432,8 @@ export const ImageField = ({
       />
       <div className="flex flex-wrap gap-[2px] mt-1">
         {images &&
-          images.map((image) => (
-            <img src={image} alt={image} className="w-20" />
+          images.map((image, index) => (
+            <img key={index} src={image} alt={image} className="w-20" />
           ))}
       </div>
       {isError && (
@@ -462,7 +464,7 @@ export const Checkbox = ({
   const [isError, setIsError] = useState<boolean>(false);
 
   return (
-    <div className="flex flex-row-reverse items-center mr-4">
+    <div className="flex flex-col items-center">
       <label htmlFor={"Checkbox" + id}>{labelText}</label>
       <input
         className="accent-MainGreen-300 items-center mr-1 scale-125"
@@ -481,94 +483,81 @@ export const Checkbox = ({
   );
 };
 
-/* ----- Location field ---------------------------------------------------- */
-/* interface LocationFieldProps {}
-
-export const LocationField = ({}: LocationFieldProps) => {
-  const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
-    libraries: ["places"],
-  });
-
-  if (loadError)
-    return (
-      <div>
-        <p>error loading maps</p>
-      </div>
-    );
-  else if (isLoaded)
-    return (
-      <GoogleMap
-        zoom={5}
-        center={{ lat: 0, lng: 0 }}
-        mapContainerStyle={{ height: "100%", width: "100%" }}
-      >
-        <Marker position={{ lat: 0, lng: 0 }} draggable={true} />
-      </GoogleMap>
-    );
-  else
-    return (
-      <div>
-        <p>loding maps</p>
-      </div>
-    );
-}; */
-
-/* interface AddressFieldProps {
-  id: string;
+interface AddressFieldProps {
+  value: string | null; // Change this type as needed
+  onChange: (value: any) => void; // Change this type as needed
   labelText: string;
-  required: boolean;
-  onChange: (address: string) => void;
 }
 
-export const AddressField= ({ id, labelText, required, onChange }: AddressFieldProps) => {
-  const { isLoaded, loadError } = loadGoogleMaps();
+export const AddressField = ({
+  value,
+  onChange,
+  labelText,
+}: AddressFieldProps) => {
+  const [currentAddress, setCurrentAddress] = useState(value || "")
+
+  useEffect(() => {
+    onChange(currentAddress)
+  }, [currentAddress])
+
   const {
-    ready,
-    value,
-    suggestions: { status, data },
-    setValue,
-    clearSuggestions,
-  } = usePlacesAutocomplete();
+    placePredictions,
+    getPlacePredictions,
+  } = usePlacesService({
+    apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
+  });
 
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setValue(e.target.value);
-  };
+  const [bgColor, setBgColor] = useState<string>("bg-white");
 
-  const handleSelect = async (description: string) => {
-    setValue(description, false);
-    clearSuggestions();
-
-    try {
-      const results = await getGeocode({ address: description });
-    } 
-    catch (error) {
-      console.log("Error: ", error);
+  useEffect(() => {
+    if (currentAddress === "" || currentAddress === null) {
+      setBgColor("bg-white");
+    } else {
+      setBgColor("bg-MainGreen-100");
     }
+  }, [currentAddress]);
 
-    onChange(description);
+  const handlePlaceSelect = (place: any) => {
+    setCurrentAddress(place.description);
+    getPlacePredictions({ input: "" });
+
+    const request = {
+      placeId: place.place_id,
+      fields: ["formatted_address", "geometry.location"],
+    };
+    const service = new window.google.maps.places.PlacesService(
+      document.createElement("div")
+    );
+    service.getDetails(request, (result: any, status: any) => {
+      if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+        console.log("Selected Address:", result.formatted_address);
+      } else {
+        console.error("Error fetching place details:", status);
+      }
+    });
   };
 
-
-  if ( isLoaded ) {
-    return (
-      <div>
-        <p>Loading Google Maps...</p>
-      </div>
-    )
-  }
-  else if ( loadError ) {
-    <div>
-      <p>Google maps failed to load</p>
+  return (
+    <div className="mb-4">
+      <label className="mb-2 block">{labelText}</label>
+      <input
+        value={currentAddress}
+        onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+          setCurrentAddress(evt.target.value);
+          getPlacePredictions({ input: evt.target.value });
+        }}
+        className={`w-full h-10 text-lg p-1 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none ${bgColor}`}
+      />
+      {placePredictions.map((item) => (
+        <div
+          key={item.place_id}
+          onClick={() => handlePlaceSelect(item)}
+          className="cursor-pointer"
+        >
+          {item.description}
+        </div>
+      ))}
     </div>
-  }
-  else if ( !isLoaded ) {
-    <div>
-      <p>Loading google maps...</p>
-    </div>
-  }
+  );
+}
 
-};
-
-TODO: Fix the google maps integration, so the fields load probably, all google maps inputfields 
-should be inside this GoogleMapsField. Maybe make new file called google_maps_fields */
