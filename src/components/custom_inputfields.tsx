@@ -26,7 +26,7 @@ interface InputfieldProps {
     | "license"
     | "ssn"
     | "speed";
-  value: string;
+  value: string | null;
   onChange: (isValue: string) => void;
   pattern?: string;
 }
@@ -39,7 +39,7 @@ export const Inputfield = ({
   type,
   onChange,
 }: InputfieldProps) => {
-  const [currentValue, setCurrentValue] = useState<string>(value);
+  const [currentValue, setCurrentValue] = useState<string>(value || "");
   const [isError, setIsError] = useState<boolean>(false);
   const [bgColor, setBgColor] = useState("bg-white");
   const [isFocused, setIsFocused] = useState<boolean>(false);
@@ -156,8 +156,8 @@ interface TimeDateProps {
   id: string;
   labelText: string;
   required: boolean;
-  timeValue: string;
-  dateValue: string;
+  timeValue: string | null;
+  dateValue: string | null;
   timeChange: (Value: string) => void;
   dateChange: (Value: string) => void;
 }
@@ -173,17 +173,20 @@ export const TimeDateField = ({
 }: TimeDateProps) => {
   const [dateError, setDateError] = useState<boolean>(false);
   const [timeError, setTimeError] = useState<boolean>(false);
+  const [currentTime, setCurrentTime] = useState<string>(timeValue || "");
+  const [currentDate, setCurrentDate] = useState<string>(dateValue || "");
+
 
   const [timeBgColor, setTimeBgColor] = useState("bg-white");
   const [dateBgColor, setDateBgColor] = useState("bg-white");
 
   useEffect(() => {
-    timeChange(timeValue);
-  }, [timeValue]);
+    timeChange(currentTime);
+  }, [currentTime]);
 
   useEffect(() => {
-    dateChange(dateValue);
-  }, [dateValue]);
+    dateChange(currentDate);
+  }, [currentDate]);
 
   useEffect(() => {
     if (timeValue === "" || timeValue === null) {
@@ -209,18 +212,21 @@ export const TimeDateField = ({
           className={`${dateBgColor} h-10 rounded-none w-32 border-[1px] focus:border-[3px] border-MainGreen-200 outline-none`}
           id={"Date" + id}
           type="date"
-          value={dateValue}
+          value={currentDate}
           required={required}
-          onChange={(event) => dateChange(event.target.value)}
+          onChange={(event) => {
+            setCurrentDate(event.target.value);
+            setDateError(false);
+          }}
         />
         <input
           className={`${timeBgColor} h-10 ml-5 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none`}
           id={"Time" + id}
           type="time"
-          value={timeValue}
+          value={currentTime}
           required={required}
           onChange={(event) => {
-            timeChange(event.target.value);
+            setCurrentTime(event.target.value);
             setTimeError(false);
           }}
           onInvalid={() => setTimeError(true)}
@@ -314,7 +320,7 @@ interface TextFieldProps {
   maxLength: number;
   labelText: string;
   required: boolean;
-  value: string;
+  value: string | null;
   onChange: (value: string) => void;
 }
 
@@ -326,16 +332,11 @@ export const TextField = ({
   onChange,
   value,
 }: TextFieldProps) => {
-  const [text, setText] = useState<string>(value);
+  const [text, setText] = useState<string>(value || "");
   const [currentLength, setCurrentLength] = useState<number>(0);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [isError, setIsError] = useState<boolean>(false);
   const [bgColor, setBgColor] = useState("bg-white");
-  const [isValue, setIsValue] = useState<string>(value);
-
-  useEffect(() => {
-    onChange(isValue);
-  }, [isValue]);
 
   useEffect(() => {
     setCurrentLength(text.length);
@@ -413,8 +414,6 @@ export const ImageField = ({
     await updateImages(reportID, newImages, imageType);
   };
 
-  console.log(`${id}: ${isRequired}`);
-
   return (
     <div className="flex flex-col mb-4">
       <label htmlFor={id}>{labelText}</label>
@@ -484,126 +483,81 @@ export const Checkbox = ({
   );
 };
 
-interface LocationAdressProps {
-  value: any; // Change this type as needed
-  type: "address" | "location";
+interface AddressFieldProps {
+  value: string | null; // Change this type as needed
   onChange: (value: any) => void; // Change this type as needed
   labelText: string;
 }
 
-declare global {
-  interface Window {
-    google: any;
-  }
-}
-
-const LocationAdress: React.FC<LocationAdressProps> = ({
+export const AddressField = ({
   value,
-  type,
   onChange,
   labelText,
-}) => {
-  if (type === "location") {
-    const containerStyle = {
-      width: "100%",
-      height: "400px",
+}: AddressFieldProps) => {
+  const [currentAddress, setCurrentAddress] = useState(value || "")
+
+  useEffect(() => {
+    onChange(currentAddress)
+  }, [currentAddress])
+
+  const {
+    placePredictions,
+    getPlacePredictions,
+  } = usePlacesService({
+    apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
+  });
+
+  const [bgColor, setBgColor] = useState<string>("bg-white");
+
+  useEffect(() => {
+    if (currentAddress === "" || currentAddress === null) {
+      setBgColor("bg-white");
+    } else {
+      setBgColor("bg-MainGreen-100");
+    }
+  }, [currentAddress]);
+
+  const handlePlaceSelect = (place: any) => {
+    setCurrentAddress(place.description);
+    getPlacePredictions({ input: "" });
+
+    const request = {
+      placeId: place.place_id,
+      fields: ["formatted_address", "geometry.location"],
     };
-
-    const Center = {
-      lat: 55.676098,
-      lng: 12.568337,
-    };
-
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
-
-    const [markerLocation, setMarkerLocation] = useState(Center);
-
-    const handleMarkerDragEnd = (event: any) => {
-      if (event.latLng) {
-        const newPosition = {
-          lat: event.latLng.lat(),
-          lng: event.latLng.lng(),
-        };
-        setMarkerLocation(newPosition);
-      }
-    };
-    return (
-      <div>
-        <LoadScript googleMapsApiKey={apiKey || ""}>
-          <GoogleMap
-            mapContainerStyle={containerStyle}
-            center={Center}
-            zoom={10}
-          ></GoogleMap>
-        </LoadScript>
-        s
-      </div>
+    const service = new window.google.maps.places.PlacesService(
+      document.createElement("div")
     );
-  } else if (type === "address") {
-    const {
-      placesService,
-      placePredictions,
-      getPlacePredictions,
-      isPlacePredictionsLoading,
-    } = usePlacesService({
-      apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
-    });
-
-    const [bgColor, setBgColor] = useState<string>("bg-white");
-
-    useEffect(() => {
-      if (value === "" || value === null) {
-        setBgColor("bg-white");
+    service.getDetails(request, (result: any, status: any) => {
+      if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+        console.log("Selected Address:", result.formatted_address);
       } else {
-        setBgColor("bg-MainGreen-100");
+        console.error("Error fetching place details:", status);
       }
-    }, [value]);
+    });
+  };
 
-    const handlePlaceSelect = (place: any) => {
-      onChange(place.description);
-      getPlacePredictions({ input: "" });
+  return (
+    <div className="mb-4">
+      <label className="mb-2 block">{labelText}</label>
+      <input
+        value={currentAddress}
+        onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
+          setCurrentAddress(evt.target.value);
+          getPlacePredictions({ input: evt.target.value });
+        }}
+        className={`w-full h-10 text-lg p-1 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none ${bgColor}`}
+      />
+      {placePredictions.map((item) => (
+        <div
+          key={item.place_id}
+          onClick={() => handlePlaceSelect(item)}
+          className="cursor-pointer"
+        >
+          {item.description}
+        </div>
+      ))}
+    </div>
+  );
+}
 
-      const request = {
-        placeId: place.place_id,
-        fields: ["formatted_address", "geometry.location"],
-      };
-      const service = new window.google.maps.places.PlacesService(
-        document.createElement("div")
-      );
-      service.getDetails(request, (result: any, status: any) => {
-        if (status === window.google.maps.places.PlacesServiceStatus.OK) {
-          console.log("Selected Address:", result.formatted_address);
-        } else {
-          console.error("Error fetching place details:", status);
-        }
-      });
-    };
-
-    return (
-      <div className="mb-4">
-        <label className="mb-2 block">{labelText}</label>
-        <input
-          value={value}
-          onChange={(evt: React.ChangeEvent<HTMLInputElement>) => {
-            onChange(evt.target.value);
-            getPlacePredictions({ input: evt.target.value });
-          }}
-          className={`w-full h-10 text-lg p-1 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none ${bgColor}`}
-        />
-        {placePredictions.map((item) => (
-          <div
-            key={item.place_id}
-            onClick={() => handlePlaceSelect(item)}
-            className="cursor-pointer"
-          >
-            {item.description}
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  return null; // Default return if the type is neither 'location' nor 'address'
-};
-
-export default LocationAdress;

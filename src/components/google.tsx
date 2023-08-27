@@ -13,36 +13,35 @@ import { start } from "repl";
 const Center = { lat: 55.676098, lng: 12.568337 };
 const Zoom = 17;
 
-function Google({
-  show,
-  showAutocomplete,
-}: {
+interface GoogleMapsFieldProps {
   show: boolean;
   showAutocomplete: boolean;
-}) {
+}
+
+const Google =({show, showAutocomplete}: GoogleMapsFieldProps) => {
   const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "";
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: googleApiKey,
   });
 
-  const [autocomplete, setAutocomplete] =
-    useState<google.maps.places.Autocomplete | null>(null);
+  const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
   const [lines, setLines] = useState<google.maps.Polyline[]>([]);
 
   const [autocompleteValue, setAutocompleteValue] = useState<string>("");
-  const [autocompleteBgColor, setAutocompleteBgColor] =
-    useState<string>("bg-white"); // Default background color
+  const [autocompleteBgColor, setAutocompleteBgColor] = useState<string>("bg-white");
 
+  /* Controls autocomplete field background */
   useEffect(() => {
-    if (autocompleteValue === "" || autocompleteValue === null) {
+    if (autocompleteValue === "") {
       setAutocompleteBgColor("bg-white");
     } else {
       setAutocompleteBgColor("bg-MainGreen-100");
     }
   }, [autocompleteValue]);
 
+  /*  */
   useEffect(() => {
     if (map && autocomplete) {
       autocomplete.bindTo("bounds", map);

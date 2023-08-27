@@ -10,99 +10,90 @@ import {
 } from "../../components/opposite_information/car_information_form";
 import { bikeInformation } from "../../components/opposite_information/bike_information_form";
 import { OtherInformation } from "../../components/opposite_information/other_information_form";
-
-import { useRouter } from "next/router";
 import BackButton from "@/components/buttons/back";
 import NextButton from "@/components/buttons/next";
 import { getData, updateData } from "@/firebase/clientApp";
 import { GetServerSidePropsContext, NextPage } from "next";
-import { pageProps } from "@/utils/utils";
+import { pageProps, reportDataType } from "@/utils/utils";
 import { OtherPartyList } from "@/components/otherPartys/otherPartyList";
 import GoogleMapsField from "@/components/google_maps_field";
+import { useRouter } from "next/router";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   const id = context.query.id as string;
 
-  const data = await getData(id);
+  const data:reportDataType = await getData(id);
 
   return {
     props: {
-      data: data || null,
+      data: data.toPlainObject(),
       id: id,
     },
   };
 };
 
 const WherePage: NextPage<pageProps> = ({ data, id }) => {
-  const router = useRouter();
+  const router = useRouter()
+  const serverData = new reportDataType();
+  serverData.updateFields(data);
 
   /* logic */
-  const [isVehicleChecked, setIsVehicleChecked] = useState<boolean | null>(
-    data!.collisionPersonVehicle
-  );
-  const [isSingleVehicleChecked, setIsSingleVehicleChecked] = useState<
-    boolean | null
-  >(data!.singleVehicleAccident);
-  const [isCollisionWithObjectChecked, setIsCollisionWithObjectChecked] =
-    useState<boolean | null>(data!.collisionOther);
-  /*   const [isPersonDamageChecked, setIsPersonDamageChecked] = useState<boolean | null>(null);
-   */
-  const [isCarChecked, setIsCarChecked] = useState<boolean>(
-    data?.collisionCar || false
-  );
-  const [isBikeChecked, setIsBikeChecked] = useState<boolean>(
-    data?.collisionBike || false
-  );
-
-  const [address, setAddress] = useState<string>(
-    data?.driverInfo.address || ""
-  );
-  const [isPersonChecked, setIsPersonChecked] = useState<boolean>(
-    data?.collisionPedestrian || false
-  );
-  const [isOtherChecked, setIsOtherChecked] = useState<boolean>(false);
-  const [damageDescription, setDamageDescription] = useState<string>("");
+  const [otherPartyInvolved, setOtherPartyInvolved] = useState<boolean | null>(serverData.otherPartyInvolved);
+  const [isSingleVehicleChecked, setIsSingleVehicleChecked] = useState<boolean | null>(serverData.singleVehicleAccident);
 
   /* Data */
-  const [carInfo, setCarInfo] = useState<carInformation[]>(
-    data?.vehicleInfo || []
-  );
-  const [bikeInfo, setBikeInfo] = useState<bikeInformation[]>(
-    data?.bikerInfo || []
-  );
-  const [otherInfo, setOtherInfo] = useState<OtherInformation[]>(
-    data?.otherObjectInfo || []
-  );
-  const [pedestrianInfo, setPedestrianInfo] = useState<PedestrianInformation[]>(
-    data?.pedestrianInfo || []
-  );
-  const [accidentLocation, setAccidentLocation] = useState(data?.accidentLocation || {lat:0, lng:0})
+  const [carInfo, setCarInfo] = useState(serverData.vehicleInfo.map(info => new carInformation(info.name, info.phone, info.email, info.driversLicenseNumber, info.insurance, info.numberplate, info.model, info.location)));
+  const [bikeInfo, setBikeInfo] = useState(serverData.bikerInfo.map(info => new bikeInformation(info.name, info.phone, info.email, info.ebike, info.personDamage, info.location)));
+  const [otherInfo, setOtherInfo] = useState(serverData.otherObjectInfo.map(info => new OtherInformation(info.description, info.information, info.location)));
+  const [pedestrianInfo, setPedestrianInfo] = useState(serverData.pedestrianInfo.map(info => new PedestrianInformation(info.name, info.phone, info.email, info.personDamage, info.location)));
+  const [accidentLocation, setAccidentLocation] = useState({lat:serverData.accidentLocation.lat, lng:serverData.accidentLocation.lat})
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     /* Data that gets sent to server */
-    const data = {
-      vehicleInfo: carInfo.map(info => info.toPlainObject()) ,
-      bikerInfo: bikeInfo.map(info => info.toPlainObject()) ,
-      otherObjectInfo: otherInfo.map(info => info.toPlainObject()) ,
-      pedestrianInfo: pedestrianInfo.map(info => info.toPlainObject()),
-      address: address,
+    serverData.updateFields({
+      vehicleInfo: carInfo.map(info => ({
+        name: info.name,
+        phone: info.phone,
+        email: info.email,
+        driversLicenseNumber: info.driversLicenseNumber,
+        insurance: info.insurance,
+        numberplate: info.numberplate,
+        model: info.model,
+        location: info.location
+      })),
+      bikerInfo: bikeInfo.map(info => ({
+        name: info.name,
+        phone: info.phone,
+        email: info.email,
+        ebike: info.ebike,
+        personDamage: info.personDamage,
+        location: info.location
+      })),
+      otherObjectInfo: otherInfo.map(info => ({
+        description: info.description,
+        information: info.information,
+        location: info.location
+      })),
+      pedestrianInfo: pedestrianInfo.map(info => ({
+        name: info.name,
+        phone: info.phone,
+        email: info.email,
+        personDamage: info.personDamage,
+        location: info.location
+      })),
       
       /* PAGE LOGIC */
-      collisionPersonVehicle: isVehicleChecked,
-      singleVehicleAccident: isSingleVehicleChecked,
-      collisionOther: isCollisionWithObjectChecked,
-      collisionCar: isCarChecked,
-      collisionBike: isBikeChecked,
-      collisionPedestrian: isPersonChecked,
-    };
+      otherPartyInvolved: otherPartyInvolved,
+      singleVehicleAccident: isSingleVehicleChecked,    
+    });
 
-    await updateData(id, data);
-/*     router.push(`confirmation?id=${id}`);
- */  };
+    await updateData(id, serverData);
+    router.push(`confirmation?id=${id}`);
+  };
 /*   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
  */
   /*     <LoadScript googleMapsApiKey={apiKey || ""} libraries={["places"]}> */
@@ -117,13 +108,13 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
           </p>
           <YesNo
             required={true}
-            id="whatvehicle"
+            id="collisionWithOtherParty"
             labelText="Collision with another object?"
-            value={isVehicleChecked}
-            onChange={setIsVehicleChecked}
+            value={otherPartyInvolved}
+            onChange={setOtherPartyInvolved}
           />
         </div>
-        {isVehicleChecked && (
+        {otherPartyInvolved && (
           <div className="flex flex-col justify-left text-left w-full mb-4">
             <div id="whatvehicle" className="flex flex-col w-full">
               <div>
@@ -171,7 +162,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
           </div>
         )}
 
-        {!isVehicleChecked && (
+        {!otherPartyInvolved && (
           <div className="w-full">
             <div>
               <YesNo

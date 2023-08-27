@@ -1,36 +1,28 @@
 import React, { useEffect, useState } from "react";
-import LocationField, {
+import {
   TimeDateField,
   Inputfield,
   YesNo,
+  AddressField
 } from "@/components/custom_inputfields";
 import { GetServerSidePropsContext, NextPage } from "next";
 import NextButton from "@/components/buttons/next";
 import BackButton from "@/components/buttons/back";
 import { useRouter } from "next/router";
 import { getData, updateData } from "@/firebase/clientApp";
-import { pageProps } from "@/utils/utils";
+import { pageProps, reportDataType } from "@/utils/utils";
 import PhoneNumber from "@/components/opposite_information/phone_form";
-/* import AddressField from "@/components/google_autofill";
-/* import AddressLocation from "@/components/google_autofill";
- */ import LocationAdress from "@/components/custom_inputfields";
-import {
-  GoogleMap,
-  LoadScript,
-  Marker,
-  useLoadScript,
-} from "@react-google-maps/api";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   const id = context.query.id as string;
 
-  const data = await getData(id);
+  const data:reportDataType = await getData(id);
 
   return {
     props: {
-      data: data || null,
+      data: data.toPlainObject(),
       id: id,
     },
   };
@@ -38,45 +30,30 @@ export const getServerSideProps = async (
 
 const What: NextPage<pageProps> = ({ data, id }) => {
   const router = useRouter();
+  const serverData = new reportDataType();
+  serverData.updateFields(data)
+  console.log("serverData", serverData.greenCarNumberPlate)
 
-  const [firstName, setFirstName] = useState<string>(
-    data?.driverInfo.firstName || ""
-  );
-  const [lastName, setLastName] = useState<string>(
-    data?.driverInfo.lastName || ""
-  );
-  const [address, setAddress] = useState<string>(
-    data?.driverInfo.address || ""
-  );
-  const [socialSecurityNumber, setSocialSecurityNumber] = useState<string>(
-    data?.driverInfo.socialSecurityNumber || ""
-  );
-  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState<string>(
-    data?.driverInfo.drivingLicenseNumber || ""
-  );
-  const [phoneNumber, setPhoneNumber] = useState<string>(
-    data?.driverInfo.phoneNumber || ""
-  );
-  const [email, setEmail] = useState<string>(data?.driverInfo.email || "");
+  const [firstName, setFirstName] = useState(serverData.driverInfo.firstName);
+  const [lastName, setLastName] = useState(serverData.driverInfo.lastName);
+  const [address, setAddress] = useState(serverData.driverInfo.address);
+  const [socialSecurityNumber, setSocialSecurityNumber] = useState(serverData.driverInfo.socialSecurityNumber);
+  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState(serverData.driverInfo.drivingLicenseNumber);
+  const [phoneNumber, setPhoneNumber] = useState(serverData.driverInfo.phoneNumber);
+  const [email, setEmail] = useState(serverData.driverInfo.email);
 
-  const [greenCarNumberplate, setgreenCarNumberplate] = useState<string>(
-    data?.greenCarNumberPlate || ""
-  );
-  const [showDriverInfoForm, setShowDriverInfoForm] = useState<boolean | null>(
-    data!.driverRenter
-  );
-  const [accidentTime, setAccidentTime] = useState<string>(data?.time || "");
-  const [accidentDate, setAccidentDate] = useState<string>(data?.date || "");
+  const [greenCarNumberplate, setgreenCarNumberplate] = useState(serverData.greenCarNumberPlate);
+  const [showDriverInfoForm, setShowDriverInfoForm] = useState(serverData.driverRenter);
+  const [accidentTime, setAccidentTime] = useState(serverData.time);
+  const [accidentDate, setAccidentDate] = useState(serverData.date);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (showDriverInfoForm != true) {
-      /* TODO: Make function that gets information about current driver from green server */
-    }
-
-    const data = {
-      driverInfo: {
+    /* TODO: Make function that gets information about current driver from green server */
+    if (showDriverInfoForm !== true) {
+      const newDriverInfo = {
         firstName: firstName,
         lastName: lastName,
         address: address,
@@ -84,15 +61,29 @@ const What: NextPage<pageProps> = ({ data, id }) => {
         socialSecurityNumber: socialSecurityNumber,
         drivingLicenseNumber: drivingLicenseNumber,
         email: email,
-      },
+      }
+      serverData.updateFields({driverInfo: newDriverInfo})
+    } else {
+      const newDriverInfo = {
+        firstName: "John",
+        lastName: "Doe",
+        address: "Landgreven, 3, 31301, København",
+        phoneNumber: "+00 00 00 00 00",
+        socialSecurityNumber: "000000-0000",
+        drivingLicenseNumber: "00000000",
+        email: "JohnDoe@placeholder.com",
+      }
+      serverData.updateFields({driverInfo: newDriverInfo})
+    }
 
+    serverData.updateFields({
       greenCarNumberPlate: greenCarNumberplate,
+      driverRenter: showDriverInfoForm,
       time: accidentTime,
       date: accidentDate,
+    })
 
-      driverRenter: showDriverInfoForm,
-    };
-    await updateData(id, data);
+    await updateData(id, serverData);
 
     router.push(`how?id=${id}`);
   };
@@ -154,11 +145,10 @@ const What: NextPage<pageProps> = ({ data, id }) => {
               onChange={setLastName}
             />
             {/* TODO: make google autofill */}
-            <LocationAdress
+            <AddressField
               labelText="Home address of the driver"
               value={address}
               onChange={setAddress}
-              type={"address"} // Pass the appropriate type
             />
 
             {/* TODO: Check if its a real phone number */}

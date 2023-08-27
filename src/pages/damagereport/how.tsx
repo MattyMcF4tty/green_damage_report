@@ -9,7 +9,7 @@ import NextButton from "@/components/buttons/next";
 import BackButton from "@/components/buttons/back";
 import { useRouter } from "next/router";
 import { GetServerSidePropsContext, NextPage } from "next";
-import { pageProps } from "@/utils/utils";
+import { pageProps, reportDataType } from "@/utils/utils";
 import { getData, getImages, updateData } from "@/firebase/clientApp";
 import WitnessList from "@/components/otherPartys/witnessList";
 
@@ -23,7 +23,7 @@ export const getServerSideProps = async (
 
   return {
     props: {
-      data: data || null,
+      data: data.toPlainObject(),
       images: images || null,
       id: id,
     },
@@ -32,31 +32,17 @@ export const getServerSideProps = async (
 
 const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
   const router = useRouter();
+  const serverData = new reportDataType();
+  serverData.updateFields(data);
 
-  const [accidentDescription, setAccidentDescription] = useState<string>(
-    data?.accidentDescription || ""
-  );
-  const [greenDriverSpeed, setGreenDriverSpeed] = useState<string>(
-    data?.speed || ""
-  );
-  const [damageDescription, setDamageDescription] = useState<string>(
-    data?.damageDescription || ""
-  );
-  const [policePresent, setPolicePresent] = useState<boolean | null>(
-    data!.policePresent
-  );
-  const [policeReport, setPoliceReport] = useState<boolean | null>(
-    data!.policeReportExist
-  );
-  const [journalNumber, setJournalNumber] = useState<string>(
-    data?.policeReportNumber || ""
-  );
-  const [witnessesPresent, setWitnessesPresent] = useState<boolean | null>(
-    data!.witnessesPresent
-  );
-  const [witnesses, setWitnesses] = useState<
-    { name: string; phone: string; email: string }[]
-  >(data?.witnesses || []);
+  const [accidentDescription, setAccidentDescription] = useState(serverData.accidentDescription);
+  const [greenDriverSpeed, setGreenDriverSpeed] = useState(serverData.speed);
+  const [damageDescription, setDamageDescription] = useState(serverData.damageDescription);
+  const [policePresent, setPolicePresent] = useState(serverData.policePresent);
+  const [policeReport, setPoliceReport] = useState(serverData.policeReportExist);
+  const [journalNumber, setJournalNumber] = useState(serverData.policeReportNumber);
+  const [witnessesPresent, setWitnessesPresent] = useState(serverData.witnessesPresent);
+  const [witnesses, setWitnesses] = useState(serverData.witnesses);
 
   const [greenImages, setGreenImages] = useState<string[] | null>(
     images?.["GreenMobility"] || null
@@ -68,23 +54,20 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log(greenImages);
-    /* Making witnesses to the correct datatype and securing only correct data is sent to server */
-    const witnessesData = witnesses.map((witness) => ({
-      name: witness.name,
-      phone: witness.phone,
-      email: witness.email,
-    }));
-
     /* Make sure to clear typed data if police or witnesses were not present */
     if (witnessesPresent) {
       setWitnesses([]);
     }
-    if (!policePresent || !policeReport) {
-      setJournalNumber("");
+
+    /* Clear police data if checkboxes is not checked */
+    if (!policePresent) {
+      setPoliceReport(null)
+    }
+    if (!policeReport) {
+      setJournalNumber(null);
     }
 
-    const data = {
+    serverData.updateFields({
       accidentDescription: accidentDescription,
       speed: greenDriverSpeed,
       damageDescription: damageDescription,
@@ -93,10 +76,10 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
       policePresent: policePresent,
       policeReportExist: policeReport,
       witnessesPresent: witnessesPresent,
-      witnesses: witnessesData,
-    };
+      witnesses: witnesses,
+    });
 
-    await updateData(id, data);
+    await updateData(id, serverData);
 
     router.push(`where?id=${id}`);
   };

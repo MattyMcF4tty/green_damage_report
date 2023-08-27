@@ -18,7 +18,7 @@ const markerSize = {x: 30, z: 50}
 
 
 interface GoogleMapsFieldProps {
-  startPos?: {lat: number, lng: number};
+startPos?: {lat: number | null, lng: number | null};
   startZoom?: number;
   showMap: boolean;
 

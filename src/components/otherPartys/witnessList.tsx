@@ -9,7 +9,7 @@ interface WitnessListProps {
   ) => void;
 }
 
-class WitnessInformation {
+export class WitnessInformation {
   name: string; 
   phone: string; 
   email: string;

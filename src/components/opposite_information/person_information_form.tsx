@@ -7,14 +7,14 @@ export class PedestrianInformation {
   phone: string;
   email: string;
   personDamage: string;
-  location: {lat: number, lng: number};
+  location: {lat: number | null, lng: number | null};
 
   constructor (
     name: string,
     phone: string,
     email: string,
     personDamage: string,
-    location: {lat: number, lng: number},
+    location: {lat: number | null, lng: number | null},
   ) {
     this.name = name;
     this.phone = phone;
@@ -23,13 +23,17 @@ export class PedestrianInformation {
     this.location = location;
   }
 
+  updateFields(fields: Partial<PedestrianInformation>) {
+    Object.assign(this, fields);
+  }
+
   toPlainObject() {
     return {
       name: this.name,
       phone: this.phone,
       email: this.email,
       personDamage: this.personDamage,
-      location: this.location
+      location: this.location,
     };
   }
 };
@@ -46,7 +50,7 @@ const PedestrianInfoForm = ({ value, onChange }: PedestrianProps) => {
   const [personDamage, setPersonDamage] = useState<string>(value.personDamage);
 
   useEffect(() => {
-    const newPedestrianInfo: PedestrianInformation = new PedestrianInformation(name, phoneNumber, email, personDamage, {lat: 0, lng: 0})
+    const newPedestrianInfo: PedestrianInformation = new PedestrianInformation(name, phoneNumber, email, personDamage, {lat: null, lng: null})
 
     onChange(newPedestrianInfo);
   }, [name, phoneNumber, email, personDamage]);

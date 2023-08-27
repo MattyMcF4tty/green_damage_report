@@ -8,16 +8,16 @@ export class bikeInformation {
   email: string;
   ebike: boolean | null;
   personDamage: string;
-  location: {lat: number, lng: number};
+  location: {lat: number | null, lng: number | null};
 
-  constructor(
-    name: string,
-    phone: string,
-    email: string,
-    ebike: boolean | null,
-    personDamage: string,
-    location: {lat: number, lng: number},
-  ) {
+  constructor(  
+      name: string,
+      phone: string,
+      email: string,
+      ebike: boolean | null,
+      personDamage: string,
+      location: {lat: number | null, lng: number | null},
+    ) {
     this.name = name;
     this.phone = phone;
     this.email = email;
@@ -25,6 +25,10 @@ export class bikeInformation {
     this.personDamage = personDamage;
     this.location = location;
   } 
+
+  updateFields(fields: Partial<bikeInformation>) {
+    Object.assign(this, fields);
+  }
 
   toPlainObject() {
     return {
@@ -51,8 +55,7 @@ const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
   const [ebike, setEbike] = useState<boolean | null>(value.ebike);
 
   useEffect(() => {
-    const newBikeInfo = new bikeInformation(name, phoneNumber, email, ebike, personDamage, {lat: 0, lng: 0})
-;
+    const newBikeInfo = new bikeInformation(name, phoneNumber, email, ebike, personDamage, {lat: null, lng: null});
 
     onChange(newBikeInfo);
   }, [name, phoneNumber, email, personDamage, ebike]);

@@ -16,10 +16,15 @@ const IndexPage = () => {
 
     const id = await generateId();
 
-    await createDoc(id, email);
-    console.log("Report created:\n" + "id: " + id + "\n" + "Email: " + email);
+    try {
+      await createDoc(id, email);
+      console.log("Report created:\n" + "id: " + id + "\n" + "Email: " + email);
+  
+      router.push(`damagereport/what?id=${id}`);
+    } catch ( error ) {
+      console.log(`Something went wrong:\n${error}`)
+    }
 
-    router.push(`damagereport/what?id=${id}`);
   };
 
   return (

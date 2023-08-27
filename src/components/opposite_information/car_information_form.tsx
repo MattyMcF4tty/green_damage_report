@@ -11,8 +11,7 @@ export class carInformation {
   insurance: string;
   numberplate: string;
   model: string;
-  location: {lat: number, lng: number};
-
+  location: {lat: number | null, lng: number | null};
 
   constructor(
     name: string,
@@ -22,7 +21,7 @@ export class carInformation {
     insurance: string,
     numberplate: string,
     model: string,
-    location: {lat: number, lng: number},
+    location: {lat: number | null, lng: number | null}
   ) {
     this.name = name;
     this.phone = phone;
@@ -34,6 +33,10 @@ export class carInformation {
     this.location = location;
   } 
 
+  updateFields(fields: Partial<carInformation>) {
+    Object.assign(this, fields);
+  }
+
   toPlainObject() {
     return {
       name: this.name,
@@ -43,7 +46,7 @@ export class carInformation {
       insurance: this.insurance,
       numberplate: this.numberplate,
       model: this.model,
-      location: this.location
+      location: this.location,
     };
   }
 };
@@ -65,7 +68,16 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
   const [insurance, setInsurance] = useState<string>(value.insurance);
 
   useEffect(() => {
-    const newCarInfo: carInformation = new carInformation(name, phoneNumber, email, insurance, drivingLicenseNumber, numberplate, model, {lat: 0, lng: 0})
+    const newCarInfo: carInformation = new carInformation(
+      name,
+      phoneNumber,
+      email,
+      drivingLicenseNumber,
+      insurance,
+      numberplate,
+      model,
+      {lat: null, lng: null}
+    )
 
     onChange(newCarInfo);
   }, [

@@ -27,69 +27,67 @@ const storage = getStorage(app);
 export const getData = async (id: string) => {
     console.log("fetchind docID: " + id)
     const docRef = doc(db, `unfinished/${id}`);
+    const data = new reportDataType()
 
     try {
         const docSnapshot = await getDoc(docRef)
 
         if (docSnapshot.exists()) {
-            const data = docSnapshot.data();
-            console.log("Data received from server:", data)
+            const fetchedData = docSnapshot.data();
+            console.log("Data received from server:", fetchedData)
 
-            return {
-                userEmail: data.userEmail,
-                finished: data.finished,
+            data.updateFields({
+                userEmail: fetchedData.userEmail,
+                finished: fetchedData.finished,
                 
                 driverInfo: {
-                    firstName: data.driverInfo.firstName,
-                    lastName: data.driverInfo.lastName,
-                    address: data.driverInfo.address,
-                    socialSecurityNumber: data.driverInfo.socialSecurityNumber,
-                    drivingLicenseNumber: data.driverInfo.drivingLicenseNumber,
-                    phoneNumber: data.driverInfo.phoneNumber,
-                    email: data.driverInfo.email
+                    firstName: fetchedData.driverInfo.firstName,
+                    lastName: fetchedData.driverInfo.lastName,
+                    address: fetchedData.driverInfo.address,
+                    socialSecurityNumber: fetchedData.driverInfo.socialSecurityNumber,
+                    drivingLicenseNumber: fetchedData.driverInfo.drivingLicenseNumber,
+                    phoneNumber: fetchedData.driverInfo.phoneNumber,
+                    email: fetchedData.driverInfo.email
                 },
             
-                accidentLocation: data.accidentLocation,
-                time: data.time,
-                date: data.date,
-                accidentDescription: data.accidentDescription,
+                accidentLocation: fetchedData.accidentLocation,
+                time: fetchedData.time,
+                date: fetchedData.date,
+                accidentDescription: fetchedData.accidentDescription,
             
-                greenCarNumberPlate: data.greenCarNumberPlate,
-                speed: data.speed,
-                damageDescription: data.damageDescription,
-                policeReportNumber: data.policeReportNumber,
+                greenCarNumberPlate: fetchedData.greenCarNumberPlate,
+                speed: fetchedData.speed,
+                damageDescription: fetchedData.damageDescription,
+                policeReportNumber: fetchedData.policeReportNumber,
             
-                bikerInfo: data.bikerInfo,
-                vehicleInfo: data.vehicleInfo,
-                pedestrianInfo: data.pedestrianInfo,
-                otherObjectInfo : data.otherObjectInfo,
+                bikerInfo: fetchedData.bikerInfo,
+                vehicleInfo: fetchedData.vehicleInfo,
+                pedestrianInfo: fetchedData.pedestrianInfo,
+                otherObjectInfo: fetchedData.otherObjectInfo,
             
-                witnesses: data.witnesses,
+                witnesses: fetchedData.witnesses,
 
                 /* SITE LOGIC */
                 /* What */
-                driverRenter: data.driverRenter,
+                driverRenter: fetchedData.driverRenter,
 
                 /* How */
-                policePresent: data.policePresent,
-                policeReportExist: data.policeReportExist,
-                witnessesPresent: data.witnessesPresent,
+                policePresent: fetchedData.policePresent,
+                policeReportExist: fetchedData.policeReportExist,
+                witnessesPresent: fetchedData.witnessesPresent,
 
                 /* Where */
-                collisionPersonVehicle: data.collisionPersonVehicle,
-                singleVehicleAccident: data.singleVehicleAccident,
-                collisionOther: data.collisionOther,
-                collisionCar: data.collisionCar,
-                collisionBike: data.collisionBike,
-                collisionPedestrian: data.collisionPedestrian,
-            }
+                otherPartyInvolved: fetchedData.otherPartyInvolved,
+                singleVehicleAccident: fetchedData.singleVehicleAccident,
+        })
         } 
         else {
             throw new Error("Document does not exist");
         }
     } catch (error) {
-        console.log("error fetching document" + error)
+        console.log(`Something went wrong fetching data:\n${error}\n`)
     }
+    return data;
 }
 
 export const getDocIds = async () => {
@@ -108,71 +106,25 @@ export const getDocIds = async () => {
 
 export const createDoc = async (id: string, email: string) => {
     console.log("Creating doc")
-    const data = {
-        userEmail: email,
-        finished: false,
-
-        driverInfo: {
-            firstName: "",
-            lastName: "",
-            address: "",
-            socialSecurityNumber: "",
-            drivingLicenseNumber: "",
-            phoneNumber: "",
-            email: ""
-        },
-    
-        accidentLocation: {lat: 0, lng: 0},
-        time: "",
-        date: "",
-        accidentDescription: "",
-    
-        greenCarNumberPlate: "",
-        speed: "",
-        damageDescription: "",
-        policeReportNumber: "",
-    
-        bikerInfo: [],
-        vehicleInfo: [],
-        pedestrianInfo: [],
-        otherObjectInfo : [],
-    
-        witnesses: [],
-
-        /* SITE LOGIC */
-        /* What */
-        driverRenter: null,
-
-        /* How */
-        policePresent: null,
-        policeReportExist: null,
-        witnessesPresent: null,
-
-        /* Where */
-        collisionPersonVehicle: null,
-        singleVehicleAccident: null,
-        collisionOther: null,
-        collisionCar: false,
-        collisionBike: false,
-        collisionPedestrian: false,
-    }
+    const data = new reportDataType()
+    data.updateFields({userEmail: email})
 
     const dataRef = doc(db, `unfinished/${id}`);
 
     try {
-        await setDoc(dataRef, data);
+        await setDoc(dataRef, data.toPlainObject());
         console.log("Data writing successful")
     } catch (error) {
         console.log(`An error occurred while writing data:\n${error}`);
     }
 }
 
-export const updateData = async (id:string, data:object) => {
+export const updateData = async (id:string, data:reportDataType) => {
 
     const dataRef = doc(db, `unfinished/${id}`)
 
     try {
-        await updateDoc(dataRef, data);
+        await updateDoc(dataRef, data.toPlainObject());
         console.log("Data updated")
     } catch (error) {
         console.log(`Something went wrong updating data:\n${error}`)
@@ -268,7 +220,7 @@ const getReportIds = async () => {
 export const getReports = async () => {
     const idList = await getReportIds();
     
-    const reportList: { id: string; data: reportDataType }[] = [];
+    const reportList: { id: string; data: reportDataType | null }[] = [];
   
     await Promise.all(
       idList.map(async (id) => {
