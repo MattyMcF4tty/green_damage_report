@@ -45,7 +45,7 @@ const generatePDF = async (data: reportDataType) => {
   doc.setFont("bold");
   doc.text("Driver information", 15, 123);
   doc.setLineWidth(0.5);
-  doc.line(15, 125, 75, 125);
+  doc.line(15, 125, 80, 125);
 
   doc.setFont("normal");
   // Driver information data
@@ -127,7 +127,7 @@ const generatePDF = async (data: reportDataType) => {
   doc.setFont("bold");
   doc.text("Accident information", 15, accidentInfoY);
   doc.setLineWidth(0.5);
-  doc.line(15, accidentInfoY + 2, 90, accidentInfoY + 2);
+  doc.line(15, accidentInfoY + 2, 80, accidentInfoY + 2);
 
   // Accident information data
   const accidentInfoLeftX = 15;
@@ -142,7 +142,7 @@ const generatePDF = async (data: reportDataType) => {
   // Location
   doc.text("Location:", accidentInfoLeftX, accidentInfoY + 26);
   doc.text(
-    data.accidentLocation || "-",
+    `${data.accidentLocation.lat || "-"}, ${data.accidentLocation.lng || "-"}`,
     accidentInfoRightX,
     accidentInfoY + 26
   );
@@ -244,149 +244,462 @@ const generatePDF = async (data: reportDataType) => {
     );
   }
 
-  //Other involved
+  //Others involved
 
-  // Other involved information header
-  doc.setFont("bold");
-  doc.text("Other involved in crash", 15, 137); // Adjust Y-coordinate as needed
-  doc.setLineWidth(0.5);
-  doc.line(15, 139, 80, 139); // Adjust Y-coordinate and width as needed
+  // Others involved section
+  const sectionSpacing = 10; // Adjust this value for the desired spacing
 
-  // Calculate the height of the "Others involved in crash" section
-  let othersInvolvedSectionHeight = 115; // Default height
-  const hasDamageDescription =
-    data.damageDescription && data.damageDescription.length > 0;
-  if (hasDamageDescription) {
-    // Adjust section height if damage description is present
-    othersInvolvedSectionHeight = 160;
+  // Calculate the height of the biker information section
+  const bikerInfoHeight =
+    data.bikerInfo.length > 0 ? data.bikerInfo.length * 3 + 20 : 0;
+
+  // Calculate the Y-coordinate for the start of the "Biker information" section
+  let currentY = damageInfoBoxTopY + damageInfoBoxHeight;
+
+  // Move down for the "Biker information" section
+  currentY += sectionSpacing;
+
+  // Check if there's enough space on the current page for biker information
+  const spaceForBikerInfo =
+    currentY + bikerInfoHeight < doc.internal.pageSize.height;
+
+  // Adjust starting position for the first biker information section
+  if (!spaceForBikerInfo) {
+    currentY = 10; // Reset Y-coordinate to the top of the page
   }
 
-  // Calculate the Y-coordinate of the "Others involved" section
-  const othersInvolvedBoxTopY = damageInfoBoxTopY + damageInfoBoxHeight + 10;
+  // Render biker information
+  if (data.bikerInfo && data.bikerInfo.length > 0) {
+    // Biker information header
+    doc.setFont("bold");
+    doc.text("Biker Information", 15, currentY + 10);
+    doc.setLineWidth(0.5);
+    doc.line(15, currentY + 12, 200, currentY + 12);
 
-  // Others involved information box
-  doc.setFillColor("#E6EEE5"); // Light gray color for the background
-  doc.roundedRect(
-    10,
-    othersInvolvedBoxTopY,
-    190,
-    othersInvolvedSectionHeight,
-    5, // Corner radius
-    5, // Corner radius
-    "F" // "F" fills the rectangle
-  );
+    // Render biker details
+    data.bikerInfo.forEach((currentBiker, index) => {
+      // Calculate the height required for the current biker's information
+      const bikerInfoHeight = 30; // Adjust this value as needed
 
-  // Others involved information header
-  doc.setFont("bold");
-  doc.text("Others involved in crash", 15, othersInvolvedBoxTopY + 8); // Adjust Y-coordinate as needed
-  doc.setLineWidth(0.5);
-  doc.line(15, othersInvolvedBoxTopY + 10, 80, othersInvolvedBoxTopY + 10); // Adjust Y-coordinate and width as needed
+      // Calculate the remaining space on the current page
+      const remainingSpace = doc.internal.pageSize.height - currentY;
 
-  // Bike information
-  doc.setFont("normal");
-  doc.setTextColor(0);
-  doc.text("Biker information:", 15, othersInvolvedBoxTopY + 25);
-  if (data.bikerInfo.name !== "") {
-    doc.text(`Name: ${data.bikerInfo.name}`, 20, othersInvolvedBoxTopY + 33);
-    doc.text(
-      `Electric bike: ${data.bikerInfo.ebike ? "Yes" : "No"}`,
-      20,
-      othersInvolvedBoxTopY + 41
-    );
-    doc.text(`Phone: ${data.bikerInfo.phone}`, 20, othersInvolvedBoxTopY + 49);
-    doc.text(`Email: ${data.bikerInfo.email}`, 20, othersInvolvedBoxTopY + 57);
-    // Split injuries text into multiple lines
-    doc.text("Injurie description:", 100, othersInvolvedBoxTopY + 33);
-    const maxInjuriesLineLength = 80; // Adjust as needed
-    const injuriesLines = doc.splitTextToSize(
-      data.bikerInfo.personDamage || "No injuries",
-      maxInjuriesLineLength
-    );
-    const injuriesTextY = othersInvolvedBoxTopY + 40;
-    for (let i = 0; i < injuriesLines.length; i++) {
-      doc.text(injuriesLines[i], 100, injuriesTextY + i * 8); // Adjust the Y-coordinate as needed
+      // Injuries description
+      const maxInjuryDescriptionWidth = 90; // Adjust as needed
+      const injuryDescriptionMaxLines = 3; // Maximum lines for the injury description
+
+      // Split the injury description text into lines that fit within the available width
+      const injuryDescriptionLines = doc.splitTextToSize(
+        currentBiker.personDamage || "No injury description provided",
+        maxInjuryDescriptionWidth
+      );
+
+      // Calculate the height of the injury description text
+      const numInjuryDescriptionLines = Math.min(
+        injuryDescriptionMaxLines,
+        injuryDescriptionLines.length
+      );
+      const injuryDescriptionHeight =
+        numInjuryDescriptionLines * damageLineHeight;
+
+      // Calculate the total biker section height with additional spacing
+      const currentBikerSectionHeight =
+        bikerInfoHeight + sectionSpacing + injuryDescriptionHeight + 10;
+
+      // Check if there's enough space for the next biker's information
+      if (remainingSpace < currentBikerSectionHeight) {
+        doc.addPage(); // Create a new page
+        currentY = 10; // Reset Y-coordinate to the top of the new page
+      }
+      // Draw a green box around the biker information
+      doc.setFillColor("#E6EEE5");
+      doc.roundedRect(
+        10,
+        currentY,
+        190,
+        bikerInfoHeight + sectionSpacing + injuryDescriptionHeight + 10,
+        5,
+        5,
+        "F"
+      );
+
+      // Biker information header
+      doc.setFont("bold");
+      doc.text("Biker Information", 15, currentY + 10);
+      doc.setLineWidth(0.5);
+      doc.line(15, currentY + 12, 80, currentY + 12);
+
+      // Render biker details (name, bike type, etc.)
+      doc.setFont("normal");
+      doc.text(`Name: ${currentBiker.name}`, 20, currentY + 28);
+      doc.text(`Phonenumber: ${currentBiker.phone}`, 20, currentY + 36);
+      doc.text(`Email: ${currentBiker.email}`, 20, currentY + 44);
+      doc.text(
+        `Electric bike: ${
+          currentBiker.ebike !== null
+            ? currentBiker.ebike === true
+              ? "Yes"
+              : "No"
+            : "-"
+        }`,
+        100,
+        currentY + 28
+      );
+      // Render injury description
+      doc.text("Injury description:", 100, currentY + 36);
+      for (let i = 0; i < numInjuryDescriptionLines; i++) {
+        doc.text(
+          injuryDescriptionLines[i],
+          100,
+          currentY + 44 + i * damageLineHeight
+        );
+      }
+
+      // Update currentY for the next biker
+      currentY +=
+        bikerInfoHeight + sectionSpacing + injuryDescriptionHeight + 2;
+    });
+
+    // Move down for the next section (vehicle information)
+    currentY += sectionSpacing;
+  } else {
+    // If no biker information
+    const bikerInfoHeight = 30 + sectionSpacing + 10; // Adjust the height accordingly
+    const remainingSpace = doc.internal.pageSize.height - currentY;
+
+    // Check if there's enough space for the "No biker was hit" message
+    if (remainingSpace < bikerInfoHeight) {
+      doc.addPage(); // Create a new page
+      currentY = 10; // Reset Y-coordinate to the top of the new page
     }
-  } else {
-    doc.text("No biker was hit", 20, othersInvolvedBoxTopY + 33);
-  }
-  // Other vehicle information
-  doc.setFont("normal");
-  doc.setTextColor(0);
-  doc.text("Other vehicle information:", 15, othersInvolvedBoxTopY + 90);
-  if (data.vehicleInfo.name !== "") {
-    doc.text(`Name: ${data.vehicleInfo.name}`, 20, othersInvolvedBoxTopY + 98);
 
-    // Driver license number
-    doc.text(
-      `Driver license number: ${data.vehicleInfo.driversLicenseNumber}`,
-      20,
-      othersInvolvedBoxTopY + 106
-    );
-
-    // Phone number
-    doc.text(
-      `Phone number: ${data.vehicleInfo.phone}`,
-      20,
-      othersInvolvedBoxTopY + 114
-    );
-
-    // Email
-    doc.text(
-      `Email: ${data.vehicleInfo.email}`,
-      20,
-      othersInvolvedBoxTopY + 122
-    );
-
-    // Numberplate
-    doc.text(
-      `Numberplate: ${data.vehicleInfo.numberplate}`,
-      20,
-      othersInvolvedBoxTopY + 130
-    );
-
-    // Insurance
-    doc.text(
-      `Insurance: ${data.vehicleInfo.insurance}`,
-      20,
-      othersInvolvedBoxTopY + 138
-    );
-
-    // Vehicle model
-    doc.text(
-      `Vehicle model: ${data.vehicleInfo.model}`,
-      20,
-      othersInvolvedBoxTopY + 146
-    );
-  } else {
-    doc.text("No other vehicles involved", 20, othersInvolvedBoxTopY + 98);
+    doc.setFillColor("#E6EEE5");
+    doc.roundedRect(10, currentY, 190, bikerInfoHeight, 5, 5, "F");
+    doc.setFont("bold");
+    doc.text("Biker Information", 15, currentY + 10);
+    doc.setLineWidth(0.5);
+    doc.line(15, currentY + 12, 80, currentY + 12);
+    doc.setFont("normal");
+    doc.text("No biker was hit.", 20, currentY + 28);
+    currentY += bikerInfoHeight + 2;
   }
 
-  doc.addPage();
+  currentY += sectionSpacing + 10;
 
-  // Pedestrian information
-  doc.text("Pedestrian information:", 15, othersInvolvedBoxTopY + 160);
-  if (data.pedestrianInfo.name !== "") {
-    doc.text(
-      `Name: ${data.pedestrianInfo.name}`,
-      20,
-      othersInvolvedBoxTopY + 168
-    );
-    // ... (pedestrian information)
+  // Render vehicle information
+  if (data.vehicleInfo && data.vehicleInfo.length > 0) {
+    const vehicleInfoHeight = data.vehicleInfo.length * 3 + 20;
+
+    // Calculate the remaining space on the current page
+    const remainingSpace = doc.internal.pageSize.height - currentY;
+
+    // Calculate the total vehicle section height with additional spacing
+    const currentVehicleSectionHeight = vehicleInfoHeight + sectionSpacing;
+
+    // Check if there's enough space for the vehicle information section
+    if (remainingSpace < currentVehicleSectionHeight) {
+      doc.addPage(); // Create a new page
+      currentY = 10; // Reset Y-coordinate to the top of the new page
+    }
+
+    // Vehicle information header
+    doc.setFont("bold");
+    doc.text("Vehicle Information", 15, currentY + 10);
+    doc.setLineWidth(0.5);
+    doc.line(15, currentY + 12, 80, currentY + 12);
+
+    // Render vehicle details
+    data.vehicleInfo.forEach((currentVehicle, index) => {
+      // Calculate the height required for the current vehicle's information
+      const vehicleInfoHeight = 45; // Adjust this value as needed
+
+      // Calculate the remaining space on the current page
+      const remainingSpace = doc.internal.pageSize.height - currentY;
+
+      // Check if there's enough space for the next vehicle's information
+      if (remainingSpace < vehicleInfoHeight + sectionSpacing) {
+        doc.addPage(); // Create a new page
+        currentY = 10; // Reset Y-coordinate to the top of the new page
+      }
+
+      // Draw a green box around the vehicle information
+      doc.setFillColor("#E6EEE5");
+      doc.roundedRect(
+        10,
+        currentY,
+        190,
+        vehicleInfoHeight + sectionSpacing + 10,
+        5,
+        5,
+        "F"
+      );
+
+      // Vehicle information header
+      doc.setFont("bold");
+      doc.text("Vehicle Information", 15, currentY + 10);
+      doc.setLineWidth(0.5);
+      doc.line(15, currentY + 12, 80, currentY + 12);
+
+      // Render vehicle details (name, license number, etc.)
+      doc.setFont("normal");
+      doc.text(`Name: ${currentVehicle.name}`, 20, currentY + 28);
+      doc.text(`Phonenumber: ${currentVehicle.phone}`, 20, currentY + 36);
+      doc.text(`Email: ${currentVehicle.email}`, 20, currentY + 44);
+      doc.text(`Numberplate: ${currentVehicle.numberplate}`, 20, currentY + 52);
+      doc.text(
+        `License Number: ${currentVehicle.driversLicenseNumber}`,
+        100,
+        currentY + 28
+      );
+      doc.text(`Vehicle model: ${currentVehicle.model}`, 100, currentY + 36);
+      doc.text(`Insurance: ${currentVehicle.insurance}`, 100, currentY + 44);
+
+      // Update currentY for the next vehicle
+      currentY += vehicleInfoHeight + sectionSpacing + 2;
+    });
+    currentY += sectionSpacing; // Add space after the pedestrian information section
   } else {
-    doc.text("No pedestrian was harmed", 20, othersInvolvedBoxTopY + 168);
+    // If no vehicle information
+    const vehicleInfoHeight = 30 + sectionSpacing + 10; // Adjust the height accordingly
+    const remainingSpace = doc.internal.pageSize.height - currentY;
+
+    // Check if there's enough space for the "No other vehicles involved" message
+    if (remainingSpace < vehicleInfoHeight) {
+      doc.addPage(); // Create a new page
+      currentY = 10; // Reset Y-coordinate to the top of the new page
+    }
+
+    doc.setFillColor("#E6EEE5");
+    doc.roundedRect(10, currentY, 190, vehicleInfoHeight, 5, 5, "F");
+    doc.setFont("bold");
+    doc.text("Vehicle Information", 15, currentY + 10);
+    doc.setLineWidth(0.5);
+    doc.line(15, currentY + 12, 80, currentY + 12);
+    doc.setFont("normal");
+    doc.text("No other vehicles involved.", 20, currentY + 28);
+    currentY += vehicleInfoHeight + 2;
   }
 
-  // Other object information
-  doc.text("Other object information:", 15, othersInvolvedBoxTopY + 220);
-  if (data.otherObjectInfo.description !== "") {
-    doc.text(
-      `Description: ${data.otherObjectInfo.description}`,
-      20,
-      othersInvolvedBoxTopY + 228
-    );
-    // ... (other object information)
+  // Move down for the next section (pedestrian information)
+  currentY += sectionSpacing;
+
+  // Render pedestrian information
+  if (data.pedestrianInfo && data.pedestrianInfo.length > 0) {
+    const pedestrianInfoHeight = data.pedestrianInfo.length * 3 + 20;
+
+    // Calculate the remaining space on the current page
+    const remainingSpace = doc.internal.pageSize.height - currentY;
+
+    // Calculate the total pedestrian section height with additional spacing
+    const currentPedestrianSectionHeight =
+      pedestrianInfoHeight + sectionSpacing;
+
+    // Check if there's enough space for the pedestrian information section
+    if (remainingSpace < currentPedestrianSectionHeight) {
+      doc.addPage(); // Create a new page
+      currentY = 10; // Reset Y-coordinate to the top of the new page
+    }
+
+    // Render pedestrian details
+    data.pedestrianInfo.forEach((currentPedestrian, index) => {
+      // Calculate the height required for the current pedestrian's information
+      const pedestrianInfoHeight = 45; // Adjust this value as needed
+
+      // Calculate the remaining space on the current page
+      const remainingSpace = doc.internal.pageSize.height - currentY;
+
+      // Injuries description
+      const maxInjuryDescriptionWidth = 90; // Adjust as needed
+      const injuryDescriptionMaxLines = 3; // Maximum lines for the injury description
+
+      // Split the injury description text into lines that fit within the available width
+      const injuryDescriptionLines = doc.splitTextToSize(
+        currentPedestrian.personDamage || "No injury description provided",
+        maxInjuryDescriptionWidth
+      );
+
+      // Calculate the height of the injury description text
+      const numInjuryDescriptionLines = Math.min(
+        injuryDescriptionMaxLines,
+        injuryDescriptionLines.length
+      );
+      const injuryDescriptionHeight =
+        numInjuryDescriptionLines * damageLineHeight;
+
+      // Calculate the total pedestrian section height with additional spacing
+      const currentPedestrianSectionHeight =
+        pedestrianInfoHeight + sectionSpacing + injuryDescriptionHeight + 10;
+
+      // Check if there's enough space for the next pedestrian's information
+      if (remainingSpace < currentPedestrianSectionHeight) {
+        doc.addPage(); // Create a new page
+        currentY = 10; // Reset Y-coordinate to the top of the new page
+      }
+
+      // Draw a green box around the pedestrian information
+      doc.setFillColor("#E6EEE5");
+      doc.roundedRect(
+        10,
+        currentY,
+        190,
+        pedestrianInfoHeight + injuryDescriptionHeight + 10,
+        5,
+        5,
+        "F"
+      );
+
+      // Pedestrian information header
+      doc.setFont("bold");
+      doc.text("Pedestrian Information", 15, currentY + 10);
+      doc.setLineWidth(0.5);
+      doc.line(15, currentY + 12, 80, currentY + 12);
+
+      // Render pedestrian details (name, age, etc.)
+      doc.setFont("normal");
+      doc.text(`Name: ${currentPedestrian.name}`, 20, currentY + 28);
+      doc.text(`Email: ${currentPedestrian.email}`, 20, currentY + 36);
+      doc.text(`Phonenumber: ${currentPedestrian.phone}`, 100, currentY + 28);
+      // Render injury description
+      doc.text("Injury description:", 100, currentY + 36);
+      for (let i = 0; i < numInjuryDescriptionLines; i++) {
+        doc.text(
+          injuryDescriptionLines[i],
+          100,
+          currentY + 44 + i * damageLineHeight
+        );
+      }
+      // Update currentY for the next pedestrian
+      currentY += pedestrianInfoHeight + injuryDescriptionHeight;
+    });
   } else {
-    doc.text("No collision with other object", 20, othersInvolvedBoxTopY + 228);
+    // If no pedestrian information
+    const pedestrianInfoHeight = 30 + sectionSpacing + 10; // Adjust the height accordingly
+    const remainingSpace = doc.internal.pageSize.height - currentY;
+
+    // Check if there's enough space for the "No pedestrians were harmed" message
+    if (remainingSpace < pedestrianInfoHeight) {
+      doc.addPage(); // Create a new page
+      currentY = 10; // Reset Y-coordinate to the top of the new page
+    }
+
+    doc.setFillColor("#E6EEE5");
+    doc.roundedRect(10, currentY, 190, pedestrianInfoHeight, 5, 5, "F");
+    doc.setFont("bold");
+    doc.text("Pedestrian Information", 15, currentY + 10);
+    doc.setLineWidth(0.5);
+    doc.line(15, currentY + 12, 80, currentY + 12);
+    doc.setFont("normal");
+    doc.text("No pedestrians were harmed.", 20, currentY + 28);
+    currentY += pedestrianInfoHeight + 2;
+  }
+
+  //other object info
+
+  // Render other information
+  if (data.otherObjectInfo && data.otherObjectInfo.length > 0) {
+    const otherInfoHeight = data.otherObjectInfo.length * 30 + 20;
+
+    // Calculate the remaining space on the current page
+    const remainingSpace = doc.internal.pageSize.height - currentY;
+
+    // Calculate the total other section height with additional spacing
+    const currentOtherSectionHeight = otherInfoHeight + sectionSpacing;
+
+    // Check if there's enough space for the other information section
+    if (remainingSpace < currentOtherSectionHeight) {
+      doc.addPage(); // Create a new page
+      currentY = 10; // Reset Y-coordinate to the top of the new page
+    }
+
+    data.otherObjectInfo.forEach((currentOther, index) => {
+      // Calculate the height required for the current other's information
+      const otherInfoHeight = 30; // Adjust this value as needed
+
+      // Calculate the remaining space on the current page
+      const remainingSpace = doc.internal.pageSize.height - currentY;
+
+      // Check if there's enough space for the next other's information
+      if (remainingSpace < otherInfoHeight + sectionSpacing) {
+        doc.addPage(); // Create a new page
+        currentY = 10; // Reset Y-coordinate to the top of the new page
+      }
+
+      // Split the description text into lines that fit within the available width
+      const maxDescriptionWidth = 80; // Adjust as needed
+      const descriptionLines = doc.splitTextToSize(
+        currentOther.description || "-",
+        maxDescriptionWidth
+      );
+
+      // Calculate the height of the description text
+      const descriptionMaxLines = 15; // Maximum lines for the description
+      const numDescriptionLines = Math.min(
+        descriptionMaxLines,
+        descriptionLines.length
+      );
+      const descriptionHeight = numDescriptionLines * damageLineHeight;
+
+      // Split the information text into lines that fit within the available width
+      const maxInformationWidth = 80; // Adjust as needed
+      const informationLines = doc.splitTextToSize(
+        currentOther.information || "-",
+        maxInformationWidth
+      );
+
+      // Calculate the height of the information text
+      const informationMaxLines = 15; // Maximum lines for the information
+      const numInformationLines = Math.min(
+        informationMaxLines,
+        informationLines.length
+      );
+      const informationHeight = numInformationLines * damageLineHeight;
+
+      // Calculate the total other section height with additional spacing
+      const currentOtherSectionHeight =
+        otherInfoHeight +
+        sectionSpacing +
+        descriptionHeight +
+        informationHeight +
+        10;
+
+      // Check if there's enough space for the next other's information
+      if (remainingSpace < currentOtherSectionHeight) {
+        doc.addPage(); // Create a new page
+        currentY = 10; // Reset Y-coordinate to the top of the new page
+      }
+
+      // Draw a green box around the other information
+      doc.setFillColor("#E6EEE5");
+      doc.roundedRect(10, currentY, 190, currentOtherSectionHeight, 5, 5, "F");
+
+      // Other information header
+      doc.setFont("bold");
+      doc.text("Other Information", 15, currentY + 10);
+      doc.setLineWidth(0.5);
+      doc.line(15, currentY + 12, 80, currentY + 12);
+
+      // Render description
+      doc.setFont("normal");
+      doc.text("Description:", 15, currentY + 28);
+      for (let i = 0; i < numDescriptionLines; i++) {
+        doc.text(descriptionLines[i], 15, currentY + 36 + i * damageLineHeight);
+      }
+
+      // Render information
+      doc.text("Information:", 100, currentY + 28);
+      for (let i = 0; i < numInformationLines; i++) {
+        doc.text(
+          informationLines[i],
+          100,
+          currentY + 36 + i * damageLineHeight
+        );
+      }
+
+      // Update currentY for the next other
+      currentY += currentOtherSectionHeight + 2;
+    });
+
+    currentY += sectionSpacing; // Add space after the other information section
   }
 
   // Save the PDF

@@ -45,111 +45,110 @@ const storage = getStorage(app);
 const collectionName = "Reports";
 
 export const getData = async (id: string) => {
-    console.log("fetchind docID: " + id)
-    const docRef = doc(db, `unfinished/${id}`);
-    const data = new reportDataType()
+  console.log("fetchind docID: " + id);
+  const docRef = doc(db, `${collectionName}/${id}`);
+  const data = new reportDataType();
 
-    try {
-        const docSnapshot = await getDoc(docRef)
+  try {
+    const docSnapshot = await getDoc(docRef);
 
-        if (docSnapshot.exists()) {
-            const fetchedData = docSnapshot.data();
-            console.log("Data received from server:", fetchedData)
+    if (docSnapshot.exists()) {
+      const fetchedData = docSnapshot.data();
+      console.log("Data received from server:", fetchedData);
 
-            data.updateFields({
-                userEmail: fetchedData.userEmail,
-                finished: fetchedData.finished,
-                
-                driverInfo: {
-                    firstName: fetchedData.driverInfo.firstName,
-                    lastName: fetchedData.driverInfo.lastName,
-                    address: fetchedData.driverInfo.address,
-                    socialSecurityNumber: fetchedData.driverInfo.socialSecurityNumber,
-                    drivingLicenseNumber: fetchedData.driverInfo.drivingLicenseNumber,
-                    phoneNumber: fetchedData.driverInfo.phoneNumber,
-                    email: fetchedData.driverInfo.email
-                },
-            
-                accidentLocation: fetchedData.accidentLocation,
-                time: fetchedData.time,
-                date: fetchedData.date,
-                accidentDescription: fetchedData.accidentDescription,
-            
-                greenCarNumberPlate: fetchedData.greenCarNumberPlate,
-                speed: fetchedData.speed,
-                damageDescription: fetchedData.damageDescription,
-                policeReportNumber: fetchedData.policeReportNumber,
-            
-                bikerInfo: fetchedData.bikerInfo,
-                vehicleInfo: fetchedData.vehicleInfo,
-                pedestrianInfo: fetchedData.pedestrianInfo,
-                otherObjectInfo: fetchedData.otherObjectInfo,
-            
-                witnesses: fetchedData.witnesses,
+      data.updateFields({
+        userEmail: fetchedData.userEmail,
+        finished: fetchedData.finished,
 
-                /* SITE LOGIC */
-                /* What */
-                driverRenter: fetchedData.driverRenter,
+        driverInfo: {
+          firstName: fetchedData.driverInfo.firstName,
+          lastName: fetchedData.driverInfo.lastName,
+          address: fetchedData.driverInfo.address,
+          socialSecurityNumber: fetchedData.driverInfo.socialSecurityNumber,
+          drivingLicenseNumber: fetchedData.driverInfo.drivingLicenseNumber,
+          phoneNumber: fetchedData.driverInfo.phoneNumber,
+          email: fetchedData.driverInfo.email,
+        },
 
-                /* How */
-                policePresent: fetchedData.policePresent,
-                policeReportExist: fetchedData.policeReportExist,
-                witnessesPresent: fetchedData.witnessesPresent,
+        accidentLocation: fetchedData.accidentLocation,
+        time: fetchedData.time,
+        date: fetchedData.date,
+        accidentDescription: fetchedData.accidentDescription,
 
-                /* Where */
-                otherPartyInvolved: fetchedData.otherPartyInvolved,
-                singleVehicleAccident: fetchedData.singleVehicleAccident,
-        })
-        } 
-        else {
-            throw new Error("Document does not exist");
-        }
-    } catch (error) {
-        console.log(`Something went wrong fetching data:\n${error}\n`)
+        greenCarNumberPlate: fetchedData.greenCarNumberPlate,
+        speed: fetchedData.speed,
+        damageDescription: fetchedData.damageDescription,
+        policeReportNumber: fetchedData.policeReportNumber,
+
+        bikerInfo: fetchedData.bikerInfo,
+        vehicleInfo: fetchedData.vehicleInfo,
+        pedestrianInfo: fetchedData.pedestrianInfo,
+        otherObjectInfo: fetchedData.otherObjectInfo,
+
+        witnesses: fetchedData.witnesses,
+
+        /* SITE LOGIC */
+        /* What */
+        driverRenter: fetchedData.driverRenter,
+
+        /* How */
+        policePresent: fetchedData.policePresent,
+        policeReportExist: fetchedData.policeReportExist,
+        witnessesPresent: fetchedData.witnessesPresent,
+
+        /* Where */
+        otherPartyInvolved: fetchedData.otherPartyInvolved,
+        singleVehicleAccident: fetchedData.singleVehicleAccident,
+      });
+    } else {
+      throw new Error("Document does not exist");
     }
-    return data;
-}
+  } catch (error) {
+    console.log(`Something went wrong fetching data:\n${error}\n`);
+  }
+  return data;
+};
 
 export const getDocIds = async () => {
-    const colRef = collection(db, "unfinished")
+  const colRef = collection(db, `${collectionName}`);
 
-    try {
-        const docListSnapshot = await getDocs(colRef)
+  try {
+    const docListSnapshot = await getDocs(colRef);
 
-        const docIds = docListSnapshot.docs.map((doc) => doc.id);
+    const docIds = docListSnapshot.docs.map((doc) => doc.id);
 
-        return (docIds)
-    } catch (error) {
-        console.log("Something went wrong fetching document ids: \n" + error)
-    }
-}
+    return docIds;
+  } catch (error) {
+    console.log("Something went wrong fetching document ids: \n" + error);
+  }
+};
 
 export const createDoc = async (id: string, email: string) => {
-    console.log("Creating doc")
-    const data = new reportDataType()
-    data.updateFields({userEmail: email})
+  console.log("Creating doc");
+  const data = new reportDataType();
+  data.updateFields({ userEmail: email });
 
   const dataRef = doc(db, `${collectionName}/${id}`);
 
-    try {
-        await setDoc(dataRef, data.toPlainObject());
-        console.log("Data writing successful")
-    } catch (error) {
-        console.log(`An error occurred while writing data:\n${error}`);
-    }
-}
+  try {
+    await setDoc(dataRef, data.toPlainObject());
+    console.log("Data writing successful");
+  } catch (error) {
+    console.log(`An error occurred while writing data:\n${error}`);
+  }
+};
 
 export const updateData = async (id: string, data: reportDataType) => {
   const dataRef = doc(db, `${collectionName}/${id}`);
   const currentDate = new Date();
 
-    try {
-        await updateDoc(dataRef, data.toPlainObject());
-        console.log("Data updated")
-    } catch (error) {
-        console.log(`Something went wrong updating data:\n${error}`)
-    }
-}
+  try {
+    await updateDoc(dataRef, data.toPlainObject());
+    console.log("Data updated");
+  } catch (error) {
+    console.log(`Something went wrong updating data:\n${error}`);
+  }
+};
 
 export const updateImages = async (
   id: string,
@@ -259,15 +258,15 @@ export const getReportIds = async () => {
 };
 
 export const getReports = async () => {
-    const idList = await getReportIds();
-    
-    const reportList: { id: string; data: reportDataType | null }[] = [];
+  const idList = await getReportIds();
+
+  const reportList: { id: string; data: reportDataType }[] = [];
   if (idList.length > 0) {
     try {
-    await Promise.all(
-      idList.map(async (id) => {
-        const docData = await getData(id);
-        if (docData !== undefined) {
+      await Promise.all(
+        idList.map(async (id) => {
+          const docData = await getData(id);
+          if (docData !== undefined) {
             reportList.push({ id: id, data: docData });
           }
         })
