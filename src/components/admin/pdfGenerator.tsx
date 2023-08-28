@@ -384,7 +384,7 @@ const generatePDF = async (data: reportDataType) => {
     currentY += bikerInfoHeight + 2;
   }
 
-  currentY += sectionSpacing + 10;
+  currentY += sectionSpacing;
 
   // Render vehicle information
   if (data.vehicleInfo && data.vehicleInfo.length > 0) {
@@ -590,10 +590,11 @@ const generatePDF = async (data: reportDataType) => {
     doc.line(15, currentY + 12, 80, currentY + 12);
     doc.setFont("normal");
     doc.text("No pedestrians were harmed.", 20, currentY + 28);
-    currentY += pedestrianInfoHeight + 2;
+    currentY += pedestrianInfoHeight;
   }
 
   //other object info
+  currentY += sectionSpacing + 10;
 
   // Render other information
   if (data.otherObjectInfo && data.otherObjectInfo.length > 0) {
@@ -656,11 +657,7 @@ const generatePDF = async (data: reportDataType) => {
 
       // Calculate the total other section height with additional spacing
       const currentOtherSectionHeight =
-        otherInfoHeight +
-        sectionSpacing +
-        descriptionHeight +
-        informationHeight +
-        10;
+        otherInfoHeight + sectionSpacing + descriptionHeight;
 
       // Check if there's enough space for the next other's information
       if (remainingSpace < currentOtherSectionHeight) {
@@ -670,7 +667,15 @@ const generatePDF = async (data: reportDataType) => {
 
       // Draw a green box around the other information
       doc.setFillColor("#E6EEE5");
-      doc.roundedRect(10, currentY, 190, currentOtherSectionHeight, 5, 5, "F");
+      doc.roundedRect(
+        10,
+        currentY,
+        190,
+        currentOtherSectionHeight + 5,
+        5,
+        5,
+        "F"
+      );
 
       // Other information header
       doc.setFont("bold");
@@ -700,7 +705,111 @@ const generatePDF = async (data: reportDataType) => {
     });
 
     currentY += sectionSpacing; // Add space after the other information section
+  } else {
+    // If no collision with other objects
+    const otherInfoHeight = 30 + sectionSpacing + 10; // Adjust the height accordingly
+    const remainingSpace = doc.internal.pageSize.height - currentY;
+
+    // Check if there's enough space for the "No collision with other object" message
+    if (remainingSpace < otherInfoHeight) {
+      doc.addPage(); // Create a new page
+      currentY = 10; // Reset Y-coordinate to the top of the new page
+    }
+
+    doc.setFillColor("#E6EEE5");
+    doc.roundedRect(10, currentY, 190, otherInfoHeight, 5, 5, "F");
+    doc.setFont("bold");
+    doc.text("Other Information", 15, currentY + 10);
+    doc.setLineWidth(0.5);
+    doc.line(15, currentY + 12, 80, currentY + 12);
+    doc.setFont("normal");
+    doc.text("No collision with other object.", 20, currentY + 28);
+    currentY += otherInfoHeight + 2;
   }
+
+  // Witnesses information
+  if (data.witnesses.length > 0) {
+    const maxWitnessesPerRow = 2;
+    const numRows = Math.ceil(data.witnesses.length / maxWitnessesPerRow);
+    const witnessInfoHeight = numRows * 45;
+
+    // Calculate the remaining space on the current page
+    const remainingSpace = doc.internal.pageSize.height - currentY;
+
+    // Calculate the total witness section height with additional spacing
+    const currentWitnessSectionHeight = witnessInfoHeight + sectionSpacing;
+
+    // Check if there's enough space for the witness information section
+    if (remainingSpace < currentWitnessSectionHeight) {
+      doc.addPage(); // Create a new page
+      currentY = 10; // Reset Y-coordinate to the top of the new page
+    }
+
+    // Draw a green box around the witness information
+    doc.setFillColor("#E6EEE5");
+    doc.roundedRect(
+      10,
+      currentY,
+      190,
+      currentWitnessSectionHeight, // No adjustment needed here
+      5,
+      5,
+      "F"
+    );
+
+    // Witnesses information header
+    doc.setFont("bold");
+    doc.text("Witnesses Information", 15, currentY + 10);
+    doc.setLineWidth(0.5);
+    doc.line(15, currentY + 12, 80, currentY + 12);
+
+    let currentColumn = 0;
+    let currentRow = 0;
+
+    data.witnesses.forEach((witness, index) => {
+      const startX = 20 + currentColumn * 95;
+      const startY = currentY + 28 + currentRow * 45; // Adjusted to 45
+
+      // Render witness details (name, phone, email)
+      doc.setFont("normal");
+      doc.text(`Name: ${witness.name}`, startX, startY);
+      doc.text(`Phone: ${witness.phone}`, startX, startY + 8);
+      doc.text(`Email: ${witness.email}`, startX, startY + 16);
+
+      currentColumn++;
+      if (currentColumn >= maxWitnessesPerRow) {
+        currentColumn = 0;
+        currentRow++;
+      }
+    });
+
+    // Update currentY for the next section
+    currentY += currentWitnessSectionHeight + sectionSpacing;
+  } else {
+    // If no witnesses information
+    const noWitnessesHeight = 30 + sectionSpacing + 10;
+    const remainingSpace = doc.internal.pageSize.height - currentY;
+
+    // Check if there's enough space for the "No witnesses information" message
+    if (remainingSpace < noWitnessesHeight) {
+      doc.addPage(); // Create a new page
+      currentY = 10; // Reset Y-coordinate to the top of the new page
+    }
+
+    // Draw a green box around the "No witnesses information" message
+    doc.setFillColor("#E6EEE5");
+    doc.roundedRect(10, currentY, 190, noWitnessesHeight, 5, 5, "F");
+
+    doc.setFont("bold");
+    doc.text("Witnesses Information", 15, currentY + 10);
+    doc.setLineWidth(0.5);
+    doc.line(15, currentY + 12, 120, currentY + 12);
+    doc.setFont("normal");
+    doc.text("No witnesses information.", 20, currentY + 28);
+    currentY += noWitnessesHeight + 2;
+  }
+
+  // Images of damages to GreenMobility and other party car section
 
   // Save the PDF
   return doc.output("blob");
