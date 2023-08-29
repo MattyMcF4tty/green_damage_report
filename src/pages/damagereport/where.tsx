@@ -12,7 +12,7 @@ import { bikeInformation } from "../../components/opposite_information/bike_info
 import { OtherInformation } from "../../components/opposite_information/other_information_form";
 import BackButton from "@/components/buttons/back";
 import NextButton from "@/components/buttons/next";
-import { getData, updateData } from "@/firebase/clientApp";
+import { updateData } from "@/firebase/clientApp";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { getServerSidePropsWithRedirect, pageProps, reportDataType } from "@/utils/utils";
 import { OtherPartyList } from "@/components/otherPartys/otherPartyList";

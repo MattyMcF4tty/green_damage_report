@@ -1,5 +1,5 @@
 import { Inputfield } from "@/components/custom_inputfields";
-import { createDoc, updateData } from "@/firebase/clientApp";
+import { checkEmailExists, createDoc, updateData } from "@/firebase/clientApp";
 import { generateId } from "@/utils/utils";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
@@ -16,10 +16,13 @@ const IndexPage = () => {
     const id = await generateId();
 
     try {
-      await createDoc(id, email);
-      console.log("Report created:\n" + "id: " + id + "\n" + "Email: " + email);
-  
-      router.push(`damagereport/what?id=${id}`);
+      if (await checkEmailExists(email)) {
+        await createDoc(id, email);
+    
+        router.push(`damagereport/what?id=${id}`);
+      } else {
+        router.push("damagereport/reportfinished");
+      }
     } catch ( error ) {
       console.log(`Something went wrong:\n${error}`)
     }

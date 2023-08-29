@@ -44,12 +44,15 @@ export const getData = async (id: string) => {
 }
 
 export const createDoc = async (id: string, email: string) => {
-    const data = new reportDataType()
-    data.updateFields({userEmail: email})
-
-    const dataRef = doc(db, `${collectionName}/${id}`);
+    const emailExist = await checkEmailExists(email);
 
     try {
+        const data = new reportDataType()
+        data.updateFields({userEmail: email.toLowerCase()})
+        console.log("Report created:\n" + "id: " + id + "\n" + "Email: " + email.toLowerCase());
+
+        const dataRef = doc(db, `${collectionName}/${id}`);
+
         await setDoc(dataRef, data.toPlainObject());
     } catch (error) {
         console.error(`An error occurred while writing data:\n${error}`);
@@ -203,4 +206,25 @@ export const deleteReports = async (reportsToDelete: string[]) => {
             console.error(`Error deleting ${reportRef.path}: ${error}`);
         }
     })
+}
+
+export const checkEmailExists = async (email: string) => {
+    const collectionRef = collection(db, collectionName)
+    const q = query(collectionRef, where("userEmail", "==", email.toLowerCase()));
+    
+    try {
+      const querySnapshot = await getDocs(q);
+      querySnapshot.forEach(doc => (console.log(doc.id)))
+
+      if (querySnapshot.empty) {
+        // Email exists in at least one document
+        return true;
+      } else {
+        // Email doesn't exist in any documents
+        return false;
+      }
+    } catch (error) {
+      console.error(`An error occurred while checking email:\n${error}`);
+      return false; // Return false on error or if the query fails
+    }
 }
