@@ -1,10 +1,6 @@
-import { bikeInformation } from "@/components/opposite_information/bike_information_form";
-import { carInformation } from "@/components/opposite_information/car_information_form";
-import { OtherInformation } from "@/components/opposite_information/other_information_form";
-import { PedestrianInformation } from "@/components/opposite_information/person_information_form";
 import { WitnessInformation } from "@/components/otherPartys/witnessList";
 import { getDocIds } from "@/firebase/clientApp";
-import { stringify } from "postcss";
+import CryptoJS from "crypto-js";
 
 export type pageProps = {
     data: {    userEmail: string | null;
@@ -125,6 +121,44 @@ export const GetUserPosition = () => {
         }
     });
 };
+
+export const encryptData = (data: reportDataType) => {
+    const encryptedData = { ...data };
+    const secretKey = process.env.NEXT_PUBLIC_SECRET || "";
+
+    Object.keys(encryptedData.driverInfo).forEach((item) => {
+        if (typeof encryptedData.driverInfo[item as keyof typeof encryptedData.driverInfo] === "string") {
+            encryptedData.driverInfo[item as keyof typeof encryptedData.driverInfo] = CryptoJS.AES.encrypt(
+                encryptedData.driverInfo[item as keyof typeof encryptedData.driverInfo] as string,
+                secretKey
+            ).toString();
+        }
+    });
+    console.log("after: ", encryptedData.driverInfo)
+
+    return encryptedData;
+};
+
+export const decryptData = (data: reportDataType) => {
+    const decryptedData = new reportDataType;
+    decryptedData.updateFields({...data})
+    const secretKey = process.env.NEXT_PUBLIC_SECRET || "";
+
+    Object.keys(decryptedData.driverInfo).forEach((item) => {
+        if (typeof decryptedData.driverInfo[item as keyof typeof decryptedData.driverInfo] === "string") {
+            const decryptedValue = CryptoJS.AES.decrypt(
+                decryptedData.driverInfo[item as keyof typeof decryptedData.driverInfo] as string,
+                secretKey
+            ).toString(CryptoJS.enc.Utf8); // Convert the decrypted value to UTF-8 string
+            decryptedData.driverInfo[item as keyof typeof decryptedData.driverInfo] = decryptedValue;
+        }
+    });
+
+    console.log("Decrypted Data:", decryptedData.driverInfo);
+
+
+    return decryptedData;
+}
 
 
 /* ---------------- classes ------------------------------ */

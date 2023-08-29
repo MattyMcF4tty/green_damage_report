@@ -18,6 +18,7 @@ import { pageProps, reportDataType } from "@/utils/utils";
 import { OtherPartyList } from "@/components/otherPartys/otherPartyList";
 import GoogleMapsField from "@/components/google_maps_field";
 import { useRouter } from "next/router";
+import Google from "@/components/google";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -48,7 +49,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
   const [bikeInfo, setBikeInfo] = useState(serverData.bikerInfo.map(info => new bikeInformation(info.name, info.phone, info.email, info.ebike, info.personDamage, info.location)));
   const [otherInfo, setOtherInfo] = useState(serverData.otherObjectInfo.map(info => new OtherInformation(info.description, info.information, info.location)));
   const [pedestrianInfo, setPedestrianInfo] = useState(serverData.pedestrianInfo.map(info => new PedestrianInformation(info.name, info.phone, info.email, info.personDamage, info.location)));
-  const [accidentLocation, setAccidentLocation] = useState({lat:serverData.accidentLocation.lat, lng:serverData.accidentLocation.lat})
+  const [accidentLocation, setAccidentLocation] = useState({lat:serverData.accidentLocation.lat, lng:serverData.accidentLocation.lng})
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -85,6 +86,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
         personDamage: info.personDamage,
         location: info.location
       })),
+      accidentLocation: accidentLocation,
       
       /* PAGE LOGIC */
       otherPartyInvolved: otherPartyInvolved,
@@ -143,10 +145,10 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
             </div>
 
             <div className="w-full">
-              <GoogleMapsField 
+{/*               <GoogleMapsField 
               showMap={true} 
               startZoom={17} 
-              startPos={{lat:55.682993, lng:12.585482}}
+              startPos={{lat:55.68292552469843, lng:12.585443426890635}}
               accidentLocation={accidentLocation}
               setAccidentLocation={setAccidentLocation}
               bikes={bikeInfo}
@@ -157,6 +159,11 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
               setPedestrians={setPedestrianInfo}
               objects={otherInfo}
               setObjects={setOtherInfo}
+              /> */}
+
+              <Google
+              show={true}
+              showAutocomplete={true}
               />
             </div>
           </div>

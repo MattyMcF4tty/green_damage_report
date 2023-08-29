@@ -2,11 +2,8 @@ import { promises } from "dns";
 import { initializeApp } from "firebase/app"
 import { collection, doc, getDoc, getDocs, getFirestore, setDoc, updateDoc } from "firebase/firestore";
 import { ListResult, StorageReference, deleteObject, getDownloadURL, getStorage, listAll, ref, uploadBytes } from "firebase/storage"
-import { reportDataType } from "@/utils/utils";
-import { bikeInformation } from "@/components/opposite_information/bike_information_form";
-import { carInformation } from "@/components/opposite_information/car_information_form";
-import { PedestrianInformation } from "@/components/opposite_information/person_information_form";
-import { OtherInformation } from "@/components/opposite_information/other_information_form";
+import { decryptData, encryptData, reportDataType } from "@/utils/utils";
+
 
 const firebaseConfig = {
     apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -87,7 +84,7 @@ export const getData = async (id: string) => {
     } catch (error) {
         console.log(`Something went wrong fetching data:\n${error}\n`)
     }
-    return data;
+    return decryptData(data);
 }
 
 export const getDocIds = async () => {
@@ -124,7 +121,8 @@ export const updateData = async (id:string, data:reportDataType) => {
     const dataRef = doc(db, `unfinished/${id}`)
 
     try {
-        await updateDoc(dataRef, data.toPlainObject());
+        const encryptedData = encryptData(data);
+        await updateDoc(dataRef, encryptedData);
         console.log("Data updated")
     } catch (error) {
         console.log(`Something went wrong updating data:\n${error}`)
