@@ -122,7 +122,7 @@ export const updateData = async (id:string, data:reportDataType) => {
 
     try {
         const encryptedData = encryptData(data);
-        await updateDoc(dataRef, encryptedData);
+        await updateDoc(dataRef, encryptedData.toPlainObject());
         console.log("Data updated")
     } catch (error) {
         console.log(`Something went wrong updating data:\n${error}`)

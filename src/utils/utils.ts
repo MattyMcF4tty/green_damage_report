@@ -123,7 +123,8 @@ export const GetUserPosition = () => {
 };
 
 export const encryptData = (data: reportDataType) => {
-    const encryptedData = { ...data };
+    const encryptedData = new reportDataType();
+    encryptedData.updateFields({ ...data })
     const secretKey = process.env.NEXT_PUBLIC_SECRET || "";
 
     Object.keys(encryptedData.driverInfo).forEach((item) => {
