@@ -9,42 +9,14 @@ import { GetServerSidePropsContext, NextPage } from "next";
 import NextButton from "@/components/buttons/next";
 import BackButton from "@/components/buttons/back";
 import { useRouter } from "next/router";
-import { getData, updateData } from "@/firebase/clientApp";
-import { pageProps, reportDataType } from "@/utils/utils";
+import { updateData } from "@/firebase/clientApp";
+import { getServerSidePropsWithRedirect, pageProps, reportDataType } from "@/utils/utils";
 import PhoneNumber from "@/components/opposite_information/phone_form";
-import { redirect } from "next/dist/server/api-utils";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  const id = context.query.id as string;
-
-  try {
-    const data: reportDataType = await getData(id);
-    
-    if (data.finished) {
-      return {
-        redirect: {
-          destination: "reportfinished",
-          permanent: false,
-        },
-      };
-    }
-
-    return {
-      props: {
-        data: data.toPlainObject(),
-        id: id,
-      },
-    };
-  } catch (error) {
-    return {
-      redirect: {
-        destination: "reportfinished",
-        permanent: false,
-      },
-    };
-  }
+  return await getServerSidePropsWithRedirect(context)
 };
 
 const What: NextPage<pageProps> = ({ data, id }) => {

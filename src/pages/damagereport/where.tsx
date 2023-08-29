@@ -14,7 +14,7 @@ import BackButton from "@/components/buttons/back";
 import NextButton from "@/components/buttons/next";
 import { getData, updateData } from "@/firebase/clientApp";
 import { GetServerSidePropsContext, NextPage } from "next";
-import { pageProps, reportDataType } from "@/utils/utils";
+import { getServerSidePropsWithRedirect, pageProps, reportDataType } from "@/utils/utils";
 import { OtherPartyList } from "@/components/otherPartys/otherPartyList";
 import GoogleMapsField from "@/components/google_maps_field";
 import { useRouter } from "next/router";
@@ -23,34 +23,7 @@ import Google from "@/components/google";
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  const id = context.query.id as string;
-
-  try {
-    const data: reportDataType = await getData(id);
-    
-    if (data.finished) {
-      return {
-        redirect: {
-          destination: "reportfinished",
-          permanent: false,
-        },
-      };
-    }
-
-    return {
-      props: {
-        data: data.toPlainObject(),
-        id: id,
-      },
-    };
-  } catch (error) {
-    return {
-      redirect: {
-        destination: "reportfinished",
-        permanent: false,
-      },
-    };
-  }
+  return await getServerSidePropsWithRedirect(context)
 };
 
 const WherePage: NextPage<pageProps> = ({ data, id }) => {

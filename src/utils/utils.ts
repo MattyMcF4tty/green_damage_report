@@ -1,6 +1,7 @@
 import { WitnessInformation } from "@/components/otherPartys/witnessList";
-import { getReportIds } from "@/firebase/clientApp";
+import { getData, getImages, getReportIds } from "@/firebase/clientApp";
 import CryptoJS from "crypto-js";
+import { GetServerSidePropsContext } from "next";
 
 
 export type pageProps = {
@@ -176,6 +177,42 @@ export const decryptData = (data: reportDataType) => {
     return decryptedData;
 }
 
+
+export const getServerSidePropsWithRedirect = async (
+    context: GetServerSidePropsContext
+  ) => {
+    const id = context.query.id as string;
+  
+    try {
+      const data: reportDataType = await getData(id);
+      const images = await getImages(id);
+      
+      if (data.finished) {
+        return {
+          redirect: {
+            destination: "reportfinished",
+            permanent: false,
+          },
+        };
+      }
+  
+      return {
+        props: {
+          data: data.toPlainObject(),
+          images: images || null,
+          id: id,
+        },
+      };
+    } catch (error) {
+      return {
+        redirect: {
+          destination: "reportfinished",
+          permanent: false,
+        },
+      };
+    }
+  };
+  
 
 export const reportSearch = (reportList: {id: string; data: reportDataType;}[], status: 'all' | 'finished' | 'unfinished', filter: 'id' | 'driver' | 'numberplate' | 'date', search: string) => {
     let updatedFilteredList = [...reportList];

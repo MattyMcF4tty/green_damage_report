@@ -9,43 +9,14 @@ import NextButton from "@/components/buttons/next";
 import BackButton from "@/components/buttons/back";
 import { useRouter } from "next/router";
 import { GetServerSidePropsContext, NextPage } from "next";
-import { pageProps, reportDataType } from "@/utils/utils";
-import { getData, getImages, updateData } from "@/firebase/clientApp";
+import { getServerSidePropsWithRedirect, pageProps, reportDataType } from "@/utils/utils";
+import { updateData } from "@/firebase/clientApp";
 import WitnessList from "@/components/otherPartys/witnessList";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  const id = context.query.id as string;
-
-  try {
-    const data: reportDataType = await getData(id);
-    const images = await getImages(id);
-    
-    if (data.finished) {
-      return {
-        redirect: {
-          destination: "reportfinished",
-          permanent: false,
-        },
-      };
-    }
-
-    return {
-      props: {
-        data: data.toPlainObject(),
-        images: images || null,
-        id: id,
-      },
-    };
-  } catch (error) {
-    return {
-      redirect: {
-        destination: "reportfinished",
-        permanent: false,
-      },
-    };
-  }
+  return await getServerSidePropsWithRedirect(context)
 };
 
 const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
