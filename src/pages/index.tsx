@@ -3,7 +3,6 @@ import { createDoc, updateData } from "@/firebase/clientApp";
 import { generateId } from "@/utils/utils";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { text } from "stream/consumers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRightLong } from "@fortawesome/free-solid-svg-icons";
 

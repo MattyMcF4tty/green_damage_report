@@ -25,14 +25,32 @@ export const getServerSideProps = async (
 ) => {
   const id = context.query.id as string;
 
-  const data:reportDataType = await getData(id);
+  try {
+    const data: reportDataType = await getData(id);
+    
+    if (data.finished) {
+      return {
+        redirect: {
+          destination: "reportfinished",
+          permanent: false,
+        },
+      };
+    }
 
-  return {
-    props: {
-      data: data.toPlainObject(),
-      id: id,
-    },
-  };
+    return {
+      props: {
+        data: data.toPlainObject(),
+        id: id,
+      },
+    };
+  } catch (error) {
+    return {
+      redirect: {
+        destination: "reportfinished",
+        permanent: false,
+      },
+    };
+  }
 };
 
 const WherePage: NextPage<pageProps> = ({ data, id }) => {

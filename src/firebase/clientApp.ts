@@ -30,52 +30,7 @@ export const getData = async (id: string) => {
         const docSnapshot = await getDoc(docRef)
         if (docSnapshot.exists()) {
             const fetchedData = docSnapshot.data();
-
-            data.updateFields({
-                userEmail: fetchedData.userEmail,
-                finished: fetchedData.finished,
-                lastChange: fetchedData.lastChange,
-                
-                driverInfo: {
-                    firstName: fetchedData.driverInfo.firstName,
-                    lastName: fetchedData.driverInfo.lastName,
-                    address: fetchedData.driverInfo.address,
-                    socialSecurityNumber: fetchedData.driverInfo.socialSecurityNumber,
-                    drivingLicenseNumber: fetchedData.driverInfo.drivingLicenseNumber,
-                    phoneNumber: fetchedData.driverInfo.phoneNumber,
-                    email: fetchedData.driverInfo.email
-                },
-            
-                accidentLocation: fetchedData.accidentLocation,
-                time: fetchedData.time,
-                date: fetchedData.date,
-                accidentDescription: fetchedData.accidentDescription,
-            
-                greenCarNumberPlate: fetchedData.greenCarNumberPlate,
-                speed: fetchedData.speed,
-                damageDescription: fetchedData.damageDescription,
-                policeReportNumber: fetchedData.policeReportNumber,
-            
-                bikerInfo: fetchedData.bikerInfo,
-                vehicleInfo: fetchedData.vehicleInfo,
-                pedestrianInfo: fetchedData.pedestrianInfo,
-                otherObjectInfo: fetchedData.otherObjectInfo,
-            
-                witnesses: fetchedData.witnesses,
-
-                /* SITE LOGIC */
-                /* What */
-                driverRenter: fetchedData.driverRenter,
-
-                /* How */
-                policePresent: fetchedData.policePresent,
-                policeReportExist: fetchedData.policeReportExist,
-                witnessesPresent: fetchedData.witnessesPresent,
-
-                /* Where */
-                otherPartyInvolved: fetchedData.otherPartyInvolved,
-                singleVehicleAccident: fetchedData.singleVehicleAccident,
-        })
+            data.updateFields(fetchedData)
         } 
         else {
             throw new Error("Document does not exist");

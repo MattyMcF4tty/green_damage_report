@@ -12,20 +12,39 @@ import { useRouter } from "next/router";
 import { getData, updateData } from "@/firebase/clientApp";
 import { pageProps, reportDataType } from "@/utils/utils";
 import PhoneNumber from "@/components/opposite_information/phone_form";
+import { redirect } from "next/dist/server/api-utils";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   const id = context.query.id as string;
 
-  const data:reportDataType = await getData(id);
+  try {
+    const data: reportDataType = await getData(id);
+    
+    if (data.finished) {
+      return {
+        redirect: {
+          destination: "reportfinished",
+          permanent: false,
+        },
+      };
+    }
 
-  return {
-    props: {
-      data: data.toPlainObject(),
-      id: id,
-    },
-  };
+    return {
+      props: {
+        data: data.toPlainObject(),
+        id: id,
+      },
+    };
+  } catch (error) {
+    return {
+      redirect: {
+        destination: "reportfinished",
+        permanent: false,
+      },
+    };
+  }
 };
 
 const What: NextPage<pageProps> = ({ data, id }) => {

@@ -18,16 +18,34 @@ export const getServerSideProps = async (
 ) => {
   const id = context.query.id as string;
 
-  const data = await getData(id);
-  const images = await getImages(id);
+  try {
+    const data: reportDataType = await getData(id);
+    const images = await getImages(id);
+    
+    if (data.finished) {
+      return {
+        redirect: {
+          destination: "reportfinished",
+          permanent: false,
+        },
+      };
+    }
 
-  return {
-    props: {
-      data: data.toPlainObject(),
-      images: images || null,
-      id: id,
-    },
-  };
+    return {
+      props: {
+        data: data.toPlainObject(),
+        images: images || null,
+        id: id,
+      },
+    };
+  } catch (error) {
+    return {
+      redirect: {
+        destination: "reportfinished",
+        permanent: false,
+      },
+    };
+  }
 };
 
 const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
