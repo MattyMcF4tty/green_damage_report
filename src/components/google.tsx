@@ -5,6 +5,7 @@ import {
   GoogleMap,
   Autocomplete,
   Marker,
+  LoadScript,
 } from "@react-google-maps/api";
 import ImageUrlRed from "../rødbil.png";
 import ImageUrlGreen from "../grønbil.png";
@@ -240,43 +241,45 @@ const Google =({show, showAutocomplete}: GoogleMapsFieldProps) => {
   }
 
   return (
-    <div>
-      {showAutocomplete && (
-        <div className="mb-2">
-          {/* Container with spacing */}
-          <Autocomplete onLoad={setAutocomplete}>
-            <input
-              type="text"
-              placeholder="Enter the location of the incident"
-              className={`w-full h-10 text-lg p-1 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none ${autocompleteBgColor}`} // Apply the dynamic background color
-              value={autocompleteValue}
-              onChange={(e) => setAutocompleteValue(e.target.value)}
-            />
-          </Autocomplete>
-        </div>
-      )}
-
-      {show && (
-        <div>
-          <button
-            className="add-line-button border-[1px] border-MainGreen-200 rounded-md mb-2 bg-MainGreen-100 w-1/2"
-            onClick={addDraggableLine}
-            type="button"
-          >
-            Add Draggable Line
-          </button>
-
-          <div className="mb-4">
-            <GoogleMap
-              onLoad={handleMapLoad}
-              center={Center}
-              zoom={Zoom}
-              mapContainerClassName="w-full h-[400px] border-[1px] border-MainGreen-200 rounded-lg"
-            />
+    <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY || ""} libraries={["places"]}>
+      <div>
+        {showAutocomplete && (
+          <div className="mb-2">
+            {/* Container with spacing */}
+            <Autocomplete onLoad={setAutocomplete}>
+              <input
+                type="text"
+                placeholder="Enter the location of the incident"
+                className={`w-full h-10 text-lg p-1 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none ${autocompleteBgColor}`} // Apply the dynamic background color
+                value={autocompleteValue}
+                onChange={(e) => setAutocompleteValue(e.target.value)}
+              />
+            </Autocomplete>
           </div>
-        </div>
-      )}
-    </div>
+        )}
+
+        {show && (
+          <div>
+            <button
+              className="add-line-button border-[1px] border-MainGreen-200 rounded-md mb-2 bg-MainGreen-100 w-1/2"
+              onClick={addDraggableLine}
+              type="button"
+            >
+              Add Draggable Line
+            </button>
+
+            <div className="mb-4">
+              <GoogleMap
+                onLoad={handleMapLoad}
+                center={Center}
+                zoom={Zoom}
+                mapContainerClassName="w-full h-[400px] border-[1px] border-MainGreen-200 rounded-lg"
+              />
+            </div>
+          </div>
+        )}
+      </div>
+    </LoadScript>
   );
 }
 

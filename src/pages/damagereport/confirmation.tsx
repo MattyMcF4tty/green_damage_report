@@ -33,7 +33,8 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
     console.log("Damage Report done");
     serverData.updateFields({finished: true});
 
-    /* TODO: Send videre til en ny side */
+    updateData(id, serverData)
+    Router.push("thankyou")
   };
 
     return (

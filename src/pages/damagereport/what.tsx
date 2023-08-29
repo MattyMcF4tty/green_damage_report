@@ -32,7 +32,6 @@ const What: NextPage<pageProps> = ({ data, id }) => {
   const router = useRouter();
   const serverData = new reportDataType();
   serverData.updateFields(data)
-  console.log("serverData", serverData.greenCarNumberPlate)
 
   const [firstName, setFirstName] = useState(serverData.driverInfo.firstName);
   const [lastName, setLastName] = useState(serverData.driverInfo.lastName);

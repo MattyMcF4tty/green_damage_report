@@ -71,11 +71,11 @@ const ExpandedReport = ({setVisible, reports}: ExpandedReportProps) => {
               </span>
             </div>
 
-            <div onClick={() => navigator.clipboard.writeText(`${currentReport.data.lastChange.time} - ${currentReport.data.lastChange.date}`)}
+            <div onClick={() => navigator.clipboard.writeText(`${currentReport.data.lastChange}`)}
             className="row-start-4 col-span-1 hover:bg-gray-50 hover:shadow-md flex flex-col justify-center hover:cursor-pointer">
               <h1 className="text-sm">Updated</h1>
               <span className="text-2xl">
-                {`${currentReport.data.lastChange.time} - ${currentReport.data.lastChange.date}`}
+                {`${currentReport.data.lastChange}`}
               </span>
             </div>
           </div>
@@ -191,11 +191,11 @@ const ExpandedReport = ({setVisible, reports}: ExpandedReportProps) => {
               </span>
             </div>
 
-            <div onClick={() => navigator.clipboard.writeText(currentReport.data.accidentLocation ? (currentReport.data.accidentLocation) : ("Unknown"))}
+            <div onClick={() => navigator.clipboard.writeText(`lat: ${currentReport.data.accidentLocation.lat ? `${currentReport.data.accidentLocation.lat}` : "-"} lng: ${currentReport.data.accidentLocation.lat ? `${currentReport.data.accidentLocation.lat}` : "-"}`)}
             className="row-start-1 col-start-2 col-span-1 hover:bg-gray-50 hover:shadow-md flex flex-col justify-center hover:cursor-pointer">
               <h1 className="text-sm">Accident location</h1>
               <span className="text-2xl">
-                {currentReport.data.accidentLocation ? (currentReport.data.accidentLocation) : ("-")}
+                {`lat: ${currentReport.data.accidentLocation.lat ? `${currentReport.data.accidentLocation.lat}` : "-"} lng: ${currentReport.data.accidentLocation.lat ? `${currentReport.data.accidentLocation.lat}` : "-"}`}              
               </span>
             </div>
 

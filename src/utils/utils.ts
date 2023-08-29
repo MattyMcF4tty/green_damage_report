@@ -7,7 +7,7 @@ export type pageProps = {
     data: {    
         userEmail: string | null;
         finished: boolean;
-        lastChange: {time: string, date: string},
+        lastChange: string,
 
         driverInfo: {
             firstName: string | null;
@@ -130,6 +130,7 @@ export const encryptData = (data: reportDataType) => {
     encryptedData.updateFields({ ...data })
     const secretKey = process.env.NEXT_PUBLIC_SECRET || "";
 
+    /* Encrypting driver info */
     Object.keys(encryptedData.driverInfo).forEach((item) => {
         if (typeof encryptedData.driverInfo[item as keyof typeof encryptedData.driverInfo] === "string") {
             encryptedData.driverInfo[item as keyof typeof encryptedData.driverInfo] = CryptoJS.AES.encrypt(
@@ -138,7 +139,13 @@ export const encryptData = (data: reportDataType) => {
             ).toString();
         }
     });
-    console.log("after: ", encryptedData.driverInfo)
+
+    /* Encrypting police journal number */
+    if (encryptedData.policeReportNumber) {
+        encryptedData.updateFields({policeReportNumber: 
+            CryptoJS.AES.encrypt(encryptedData.policeReportNumber, secretKey).toString()
+        })
+    }
 
     return encryptedData;
 };
@@ -148,6 +155,7 @@ export const decryptData = (data: reportDataType) => {
     decryptedData.updateFields({...data})
     const secretKey = process.env.NEXT_PUBLIC_SECRET || "";
 
+    /* Decryption driver info */
     Object.keys(decryptedData.driverInfo).forEach((item) => {
         if (typeof decryptedData.driverInfo[item as keyof typeof decryptedData.driverInfo] === "string") {
             const decryptedValue = CryptoJS.AES.decrypt(
@@ -158,17 +166,66 @@ export const decryptData = (data: reportDataType) => {
         }
     });
 
-    console.log("Decrypted Data:", decryptedData.driverInfo);
-
+    /* Decrypting police journal number */
+    if (decryptedData.policeReportNumber) {
+        decryptedData.updateFields({policeReportNumber: 
+            CryptoJS.AES.decrypt(decryptedData.policeReportNumber, secretKey).toString(CryptoJS.enc.Utf8)
+        })
+    }
 
     return decryptedData;
 }
 
 
+export const reportSearch = (reportList: {id: string; data: reportDataType;}[], status: 'all' | 'finished' | 'unfinished', filter: 'id' | 'driver' | 'numberplate' | 'date', search: string) => {
+    let updatedFilteredList = [...reportList];
+
+    switch (status) {
+        case 'finished':
+        updatedFilteredList = reportList.filter(report => report.data.finished === true);
+        break;
+        case 'unfinished':
+        updatedFilteredList = reportList.filter(report => report.data.finished === false);
+        break;
+    }
+
+    if (search !== "") {
+        switch (filter) {
+        case 'id':
+            updatedFilteredList = updatedFilteredList.filter(report => report.id.includes(search));
+            break;
+        case 'driver':
+            updatedFilteredList = updatedFilteredList.filter(report => {
+                if (report.data.driverInfo.firstName && report.data.driverInfo.lastName) {
+                    `${report.data.driverInfo.firstName.toLowerCase()} ${report.data.driverInfo.lastName.toLowerCase()}`.includes(search.toLowerCase())
+                };
+            });
+        break;
+        case 'numberplate':
+            updatedFilteredList = updatedFilteredList.filter(report => {
+                if (report.data.greenCarNumberPlate) { 
+                    report.data.greenCarNumberPlate.toLowerCase().includes(search.toLowerCase())
+                };
+            });
+        break;
+        case 'date':
+            updatedFilteredList = updatedFilteredList.filter(report => {
+                if (report.data.date) {
+                    report.data.date.toLowerCase().includes(search.toLowerCase())
+                };
+            });
+            break;
+        };
+    };
+
+    return updatedFilteredList;
+};
+
 /* ---------------- classes ------------------------------ */
 export class reportDataType {
     userEmail: string | null;
     finished: boolean;
+    lastChange: string;
 
     driverInfo: {
         firstName: string | null;
@@ -239,6 +296,7 @@ export class reportDataType {
     constructor() {
         this.userEmail = "";
         this.finished = false;
+        this.lastChange = `${new Date().getHours()}:${new Date().getMinutes()} - ${new Date().getDay()}/${new Date().getMonth()}/${new Date().getFullYear()}`
         this.driverInfo = {
             firstName: null,
             lastName: null,
@@ -277,6 +335,7 @@ export class reportDataType {
         return {
             userEmail: this.userEmail,
             finished: this.finished,
+            lastChange: this.lastChange,
             driverInfo: {
                 firstName: this.driverInfo.firstName,
                 lastName: this.driverInfo.lastName,
@@ -309,44 +368,5 @@ export class reportDataType {
             otherPartyInvolved: this.otherPartyInvolved,
             singleVehicleAccident: this.singleVehicleAccident,
         };
-    }
-}
-
-export const reportSearch = (reportList: {id: string; data: reportDataType;}[], status: 'all' | 'finished' | 'unfinished', filter: 'id' | 'driver' | 'numberplate' | 'date', search: string) => {
-    let updatedFilteredList = [...reportList];
-
-    switch (status) {
-        case 'finished':
-        updatedFilteredList = reportList.filter(report => report.data.finished === true);
-        break;
-        case 'unfinished':
-        updatedFilteredList = reportList.filter(report => report.data.finished === false);
-        break;
-    }
-
-    if (search !== "") {
-        switch (filter) {
-        case 'id':
-            updatedFilteredList = updatedFilteredList.filter(report => report.id.includes(search));
-            break;
-        case 'driver':
-            updatedFilteredList = updatedFilteredList.filter(report =>
-            report.data.driverInfo.firstName !== undefined &&
-            `${report.data.driverInfo.firstName.toLowerCase()} ${report.data.driverInfo.lastName.toLowerCase()}`.includes(search.toLowerCase())
-            );
-            break;
-        case 'numberplate':
-            updatedFilteredList = updatedFilteredList.filter(report =>
-            report.data.greenCarNumberPlate.toLowerCase().includes(search.toLowerCase())
-            );
-            break;
-        case 'date':
-            updatedFilteredList = updatedFilteredList.filter(report =>
-            report.data.date.toLowerCase().includes(search.toLowerCase())
-            );
-            break;
-        };
     };
-
-    return updatedFilteredList;
-}
+};

@@ -19,7 +19,7 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-const collectionName = "Reports"
+const collectionName = "DamageReports"
 
 export const getData = async (id: string) => {
     console.log("fetchind docID: " + id)
@@ -30,7 +30,6 @@ export const getData = async (id: string) => {
         const docSnapshot = await getDoc(docRef)
         if (docSnapshot.exists()) {
             const fetchedData = docSnapshot.data();
-            console.log("Data received from server:", fetchedData)
 
             data.updateFields({
                 userEmail: fetchedData.userEmail,
@@ -82,12 +81,14 @@ export const getData = async (id: string) => {
             throw new Error("Document does not exist");
         }
     } catch (error) {
-        console.log(`Something went wrong fetching data:\n${error}\n`)
+        console.error(`Something went wrong fetching data:\n${error}\n`)
     }
+    
+    const decryptedData = decryptData(data)
+    return decryptedData;
 }
 
 export const createDoc = async (id: string, email: string) => {
-    console.log("Creating doc")
     const data = new reportDataType()
     data.updateFields({userEmail: email})
 
@@ -95,9 +96,8 @@ export const createDoc = async (id: string, email: string) => {
 
     try {
         await setDoc(dataRef, data.toPlainObject());
-        console.log("Data writing successful")
     } catch (error) {
-        console.log(`An error occurred while writing data:\n${error}`);
+        console.error(`An error occurred while writing data:\n${error}`);
     }
 }
 
@@ -110,9 +110,8 @@ export const updateData = async (id:string, data:reportDataType) => {
         const encryptedData = encryptData(data);
         await updateDoc(dataRef, encryptedData.toPlainObject());
         await updateDoc(dataRef, {lastChange: `${currentDate.getHours()}:${currentDate.getMinutes()} - ${currentDate.getDay()}/${currentDate.getMonth()}/${currentDate.getFullYear()}`})
-        console.log("Data updated")
     } catch (error) {
-        console.log(`Something went wrong updating data:\n${error}`)
+        console.error(`Something went wrong updating data:\n${error}`)
     }
 }
 
@@ -132,7 +131,6 @@ export const updateImages = async (id: string, images: FileList | null, imageTyp
     } else {
       deleteAllImages(storageRef);
     }
-    console.log("Images updated");
   } catch (error) {
     console.error(`Something went wrong updating images at ${id}/${imageType}:\n${error}\n`);
   }
@@ -148,7 +146,6 @@ const deleteAllImages = async(StorageRef: StorageReference) => {
         })
 
         await Promise.all(deletedImages)
-        console.log(`All images in ${StorageRef.name} has been deleted`)
     }
     catch ( error ) {
         console.error(`Something went wrong deleting all images in ${StorageRef.name}:\n${error}\n`)
@@ -160,8 +157,6 @@ export const getImages = async (id: string) => {
     const otherPartyStorageRef = ref(storage, `${id}/OtherParty`);
     const imageURLs: Record<string, string[]> = {'GreenMobility': [], 'OtherParty': []};
 
-
-    console.log(greenStorageRef.fullPath)
     try {
         const greenImageList: ListResult = await listAll(greenStorageRef);
         const otherPartyImageList: ListResult = await listAll(otherPartyStorageRef);
@@ -218,7 +213,6 @@ export const getReports = async () => {
     const idList = await getReportIds();
     const reportList: { id: string; data: reportDataType }[] = [];
 
-    console.log(idList)
     if (idList.length > 0) {  
         try {
             await Promise.all(
@@ -249,7 +243,6 @@ export const deleteReports = async (reportsToDelete: string[]) => {
             for (const report of reportsToDelete) {
                 const reportRef = doc(db, `${collectionName}/${report}`);
                 await deleteDoc(reportRef);
-                console.log(`${reportRef.path} deleted successfully.`);
             }
         } catch (error) {
             console.error(`Error deleting ${reportRef.path}: ${error}`);

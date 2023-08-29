@@ -139,13 +139,13 @@ const ReportList = ({
                       </td>
                       <td className="w-2/12">{report.id}</td>
                       <td className="w-2/12">
-                        {report.data.driverInfo.firstName !== ""
+                        {report.data.driverInfo.firstName && report.data.driverInfo.lastName
                           ? `${report.data.driverInfo.firstName} ${report.data.driverInfo.lastName}`
                           : "-"}
                       </td>
                       <td  className="w-2/12">
-                        {report.data.greenCarNumberPlate !== ""
-                          ? `${report.data?.greenCarNumberPlate.toUpperCase()}`
+                        {report.data.greenCarNumberPlate
+                          ? `${report.data.greenCarNumberPlate.toUpperCase()}`
                           : "-"}
                       </td>
                       <td className="w-1/12">
@@ -153,7 +153,7 @@ const ReportList = ({
                         ("Unfinished")}
                       </td>
                       <td className="w-2/12">
-                        {report.data.lastChange.date}
+                        {report.data.lastChange}
                       </td>
                     </tr>
                   ))
