@@ -1,65 +1,85 @@
-import { bikeInformation } from "@/components/opposite_information/bike_information_form";
-import { carInformation } from "@/components/opposite_information/car_information_form";
-import { OtherInformation } from "@/components/opposite_information/other_information_form";
-import { PedestrianInformation } from "@/components/opposite_information/person_information_form";
+import { WitnessInformation } from "@/components/otherPartys/witnessList";
 import { getReportIds } from "@/firebase/clientApp";
+import CryptoJS from "crypto-js";
 
 
 export type pageProps = {
-    data: reportDataType | null ;
+    data: {    
+        userEmail: string | null;
+        finished: boolean;
+        lastChange: {time: string, date: string},
+
+        driverInfo: {
+            firstName: string | null;
+            lastName: string | null;
+            address: string | null;
+            socialSecurityNumber: string | null;
+            drivingLicenseNumber: string | null;
+            phoneNumber: string | null;
+            email: string | null;
+        };
+    
+        accidentLocation: {lat: number | null, lng: number | null};
+        time: string | null;
+        date: string | null;
+        accidentDescription: string | null;
+    
+        greenCarNumberPlate: string | null;
+        speed: string | null;
+        damageDescription: string | null;
+        policeReportNumber: string | null;
+    
+        bikerInfo: {  
+            name: string;
+            phone: string;
+            email: string;
+            ebike: boolean | null;
+            personDamage: string;
+            location: {lat: number | null, lng: number | null};
+        }[];
+        vehicleInfo: {  
+            name: string;
+            phone: string;
+            email: string;
+            driversLicenseNumber: string;
+            insurance: string;
+            numberplate: string;
+            model: string;
+            location: {lat: number | null, lng: number | null};
+        }[];
+        pedestrianInfo: {  
+            name: string;
+            phone: string;
+            email: string;
+            personDamage: string;
+            location: {lat: number | null, lng: number | null};
+        }[];
+        otherObjectInfo: {  
+            description: string;
+            information: string;
+            location: {lat: number | null, lng: number | null};
+        }[];
+    
+        witnesses: WitnessInformation[];
+    
+        /* SITE LOGIC */
+        /* What */
+        driverRenter: boolean | null;
+    
+        /* How */
+        policePresent: boolean | null;
+        policeReportExist: boolean | null;
+        witnessesPresent: boolean | null;
+    
+        /* Where */
+        otherPartyInvolved: boolean | null;
+        singleVehicleAccident: boolean | null;
+    };
     images: Record<string, string[]> | null;
     id: string;
 }
 
-export type reportDataType = {
-    userEmail: string,
-    finished: boolean,
-    lastChange: {time: string, date: string},
 
-    driverInfo: {
-        firstName: string,
-        lastName: string,
-        address: string,
-        socialSecurityNumber: string,
-        drivingLicenseNumber: string,
-        phoneNumber: string,
-        email: string
-    },
-
-    accidentLocation: string
-    time: string
-    date: string
-    accidentDescription: string
-
-    greenCarNumberPlate: string
-    speed: string
-    damageDescription: string
-    policeReportNumber: string
-
-    bikerInfo: bikeInformation
-    vehicleInfo: carInformation
-    pedestrianInfo: PedestrianInformation
-    otherObjectInfo: OtherInformation
-
-    witnesses: {name:string, phone:string, email:string}[]
-
-    /* SITE LOGIC */
-    /* What */
-    driverRenter: boolean | null
-
-    /* How */
-    policePresent: boolean | null
-    policeReportExist: boolean | null
-    witnessesPresent: boolean | null
-
-    /* Where */
-    collisionPersonVehicle: boolean | null
-    singleVehicleAccident: boolean | null
-    collisionOther: boolean | null
-    collisionCar: boolean
-    collisionBike: boolean
-    collisionPedestrian: boolean
-}
 
 export const generateId = async () => {
     const dataList = await getReportIds();
@@ -81,6 +101,215 @@ export const generateId = async () => {
     }
 
     return id;
+}
+
+
+export const GetUserPosition = () => {
+    return new Promise<{ lat: number; lng: number } | undefined>((resolve) => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    const userLocation = { lat: latitude, lng: longitude };
+                    resolve(userLocation);
+                },
+                (error) => {
+                    console.error("Error getting geolocation:", error);
+                    resolve(undefined);
+                }
+            );
+        } else {
+            console.error("Geolocation is not available.");
+            resolve(undefined);
+        }
+    });
+};
+
+export const encryptData = (data: reportDataType) => {
+    const encryptedData = new reportDataType();
+    encryptedData.updateFields({ ...data })
+    const secretKey = process.env.NEXT_PUBLIC_SECRET || "";
+
+    Object.keys(encryptedData.driverInfo).forEach((item) => {
+        if (typeof encryptedData.driverInfo[item as keyof typeof encryptedData.driverInfo] === "string") {
+            encryptedData.driverInfo[item as keyof typeof encryptedData.driverInfo] = CryptoJS.AES.encrypt(
+                encryptedData.driverInfo[item as keyof typeof encryptedData.driverInfo] as string,
+                secretKey
+            ).toString();
+        }
+    });
+    console.log("after: ", encryptedData.driverInfo)
+
+    return encryptedData;
+};
+
+export const decryptData = (data: reportDataType) => {
+    const decryptedData = new reportDataType;
+    decryptedData.updateFields({...data})
+    const secretKey = process.env.NEXT_PUBLIC_SECRET || "";
+
+    Object.keys(decryptedData.driverInfo).forEach((item) => {
+        if (typeof decryptedData.driverInfo[item as keyof typeof decryptedData.driverInfo] === "string") {
+            const decryptedValue = CryptoJS.AES.decrypt(
+                decryptedData.driverInfo[item as keyof typeof decryptedData.driverInfo] as string,
+                secretKey
+            ).toString(CryptoJS.enc.Utf8); // Convert the decrypted value to UTF-8 string
+            decryptedData.driverInfo[item as keyof typeof decryptedData.driverInfo] = decryptedValue;
+        }
+    });
+
+    console.log("Decrypted Data:", decryptedData.driverInfo);
+
+
+    return decryptedData;
+}
+
+
+/* ---------------- classes ------------------------------ */
+export class reportDataType {
+    userEmail: string | null;
+    finished: boolean;
+
+    driverInfo: {
+        firstName: string | null;
+        lastName: string | null;
+        address: string | null;
+        socialSecurityNumber: string | null;
+        drivingLicenseNumber: string | null;
+        phoneNumber: string | null;
+        email: string | null;
+    };
+
+    accidentLocation: {lat: number | null, lng: number | null};
+    time: string | null;
+    date: string | null;
+    accidentDescription: string | null;
+
+    greenCarNumberPlate: string | null;
+    speed: string | null;
+    damageDescription: string | null;
+    policeReportNumber: string | null;
+
+    bikerInfo: {  
+        name: string;
+        phone: string;
+        email: string;
+        ebike: boolean | null;
+        personDamage: string;
+        location: {lat: number | null, lng: number | null};
+    }[];
+    vehicleInfo: {  
+        name: string;
+        phone: string;
+        email: string;
+        driversLicenseNumber: string;
+        insurance: string;
+        numberplate: string;
+        model: string;
+        location: {lat: number | null, lng: number | null};
+    }[];
+    pedestrianInfo: {  
+        name: string;
+        phone: string;
+        email: string;
+        personDamage: string;
+        location: {lat: number | null, lng: number | null};
+    }[];
+    otherObjectInfo: {  
+        description: string;
+        information: string;
+        location: {lat: number | null, lng: number | null};
+    }[];
+
+    witnesses: WitnessInformation[];
+
+    /* SITE LOGIC */
+    /* What */
+    driverRenter: boolean | null;
+
+    /* How */
+    policePresent: boolean | null;
+    policeReportExist: boolean | null;
+    witnessesPresent: boolean | null;
+
+    /* Where */
+    otherPartyInvolved: boolean | null;
+    singleVehicleAccident: boolean | null;
+
+    constructor() {
+        this.userEmail = "";
+        this.finished = false;
+        this.driverInfo = {
+            firstName: null,
+            lastName: null,
+            address: null,
+            socialSecurityNumber: null,
+            drivingLicenseNumber: null,
+            phoneNumber: null,
+            email: null,
+        };
+        this.accidentLocation = {lat: null, lng: null};
+        this.time = null;
+        this.date = null;
+        this.accidentDescription = null;
+        this.greenCarNumberPlate = null;
+        this.speed = null;
+        this.damageDescription = null;
+        this.policeReportNumber = null;
+        this.bikerInfo = [];
+        this.vehicleInfo = [];
+        this.pedestrianInfo = [];
+        this.otherObjectInfo = [];
+        this.witnesses = [];
+        this.driverRenter = null;
+        this.policePresent = null;
+        this.policeReportExist = null;
+        this.witnessesPresent = null;
+        this.otherPartyInvolved = null;
+        this.singleVehicleAccident = null;
+    }
+
+    updateFields(fields: Partial<reportDataType>) {
+        Object.assign(this, fields);
+    }
+
+    toPlainObject() {
+        return {
+            userEmail: this.userEmail,
+            finished: this.finished,
+            driverInfo: {
+                firstName: this.driverInfo.firstName,
+                lastName: this.driverInfo.lastName,
+                address: this.driverInfo.address,
+                socialSecurityNumber: this.driverInfo.socialSecurityNumber,
+                drivingLicenseNumber: this.driverInfo.drivingLicenseNumber,
+                phoneNumber: this.driverInfo.phoneNumber,
+                email: this.driverInfo.email
+            },
+            accidentLocation: {
+                lat: this.accidentLocation.lat,
+                lng: this.accidentLocation.lng
+            },
+            time: this.time,
+            date: this.date,
+            accidentDescription: this.accidentDescription,
+            greenCarNumberPlate: this.greenCarNumberPlate,
+            speed: this.speed,
+            damageDescription: this.damageDescription,
+            policeReportNumber: this.policeReportNumber,
+            bikerInfo: this.bikerInfo,
+            vehicleInfo: this.vehicleInfo,
+            pedestrianInfo: this.pedestrianInfo,
+            otherObjectInfo: this.otherObjectInfo,
+            witnesses: this.witnesses,
+            driverRenter: this.driverRenter,
+            policePresent: this.policePresent,
+            policeReportExist: this.policeReportExist,
+            witnessesPresent: this.witnessesPresent,
+            otherPartyInvolved: this.otherPartyInvolved,
+            singleVehicleAccident: this.singleVehicleAccident,
+        };
+    }
 }
 
 export const reportSearch = (reportList: {id: string; data: reportDataType;}[], status: 'all' | 'finished' | 'unfinished', filter: 'id' | 'driver' | 'numberplate' | 'date', search: string) => {

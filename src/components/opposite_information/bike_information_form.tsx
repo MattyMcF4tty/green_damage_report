@@ -2,12 +2,44 @@ import React, { useState, useEffect } from "react";
 import { YesNo, Inputfield, TextField } from "../custom_inputfields";
 import PhoneNumber from "./phone_form";
 
-export type bikeInformation = {
+export class bikeInformation {
   name: string;
   phone: string;
   email: string;
   ebike: boolean | null;
   personDamage: string;
+  location: {lat: number | null, lng: number | null};
+
+  constructor(  
+      name: string,
+      phone: string,
+      email: string,
+      ebike: boolean | null,
+      personDamage: string,
+      location: {lat: number | null, lng: number | null},
+    ) {
+    this.name = name;
+    this.phone = phone;
+    this.email = email;
+    this.ebike = ebike;
+    this.personDamage = personDamage;
+    this.location = location;
+  } 
+
+  updateFields(fields: Partial<bikeInformation>) {
+    Object.assign(this, fields);
+  }
+
+  toPlainObject() {
+    return {
+      name: this.name,
+      phone: this.phone,
+      email: this.email,
+      ebike: this.ebike,
+      personDamage: this.personDamage,
+      location: this.location,
+    };
+  }
 };
 
 interface bikeInfoFormProps {
@@ -22,20 +54,8 @@ const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
   const [personDamage, setPersonDamage] = useState<string>(value.personDamage);
   const [ebike, setEbike] = useState<boolean | null>(value.ebike);
 
-  /*   const [phoneNumberData, setPhoneNumberData] = useState<string>("");
-  const handlePhoneNumberChange = (phoneNumber: string) => {
-    setPhoneNumberData(phoneNumber);
-  };
- */
-
   useEffect(() => {
-    const newBikeInfo: bikeInformation = {
-      name: name,
-      phone: phoneNumber,
-      email: email,
-      personDamage: personDamage,
-      ebike: ebike,
-    };
+    const newBikeInfo = new bikeInformation(name, phoneNumber, email, ebike, personDamage, {lat: null, lng: null});
 
     onChange(newBikeInfo);
   }, [name, phoneNumber, email, personDamage, ebike]);

@@ -10,7 +10,7 @@ import { CountryCode } from "libphonenumber-js";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 interface PhoneNumberProps {
-  value?: string;
+  value: string | null;
   labelText: string;
   onChange: (phoneNumber: string) => void;
 }

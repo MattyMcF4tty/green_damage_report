@@ -3,9 +3,32 @@ import React, { useState, useRef, useEffect } from "react";
 import { info } from "console";
 import { TextField } from "../custom_inputfields";
 
-export type OtherInformation = {
+export class OtherInformation {
   description: string;
   information: string;
+  location: {lat: number | null, lng: number | null};
+
+  constructor (
+    description: string,
+    information: string,
+    location: {lat: number | null, lng: number | null},
+  ) {
+    this.description = description;
+    this.information = information;
+    this.location = location;
+  }
+
+  updateFields(fields: Partial<OtherInformation>) {
+    Object.assign(this, fields);
+  }
+
+  toPlainObject() {
+    return {
+      description: this.description,
+      information: this.information,
+      location: this.location,
+    };
+  }
 };
 
 interface OtherProps {
@@ -18,11 +41,8 @@ const OtherInfoForm = ({ value, onChange }: OtherProps) => {
   const [infoOther, setInfoOther] = useState<string>(value.information);
 
   useEffect(() => {
-    const newOtherInfo: OtherInformation = {
-      description: descripeOther,
-      information: infoOther,
-    };
-
+    const newOtherInfo: OtherInformation = new OtherInformation(descripeOther, infoOther, {lat: null, lng: null})
+  
     onChange(newOtherInfo);
   }, [descripeOther, infoOther]);
 

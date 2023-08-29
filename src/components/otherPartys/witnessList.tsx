@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { Inputfield } from "./custom_inputfields";
-import PhoneNumber from "./opposite_information/phone_form";
+import { Inputfield } from "../custom_inputfields";
+import PhoneNumber from "../opposite_information/phone_form";
 
 interface WitnessListProps {
   value: { name: string; phone: string; email: string }[];
@@ -9,12 +9,24 @@ interface WitnessListProps {
   ) => void;
 }
 
+export class WitnessInformation {
+  name: string; 
+  phone: string; 
+  email: string;
+
+  constructor(name: string, phone: string, email: string) {
+    this.name = name;
+    this.phone = phone;
+    this.email = email;
+  }
+}
+
 const WitnessList = ({ value, onChange }: WitnessListProps) => {
   const [showNewWitness, setShowNewWitness] = useState<boolean>(false);
   const [showUpdateWitness, setShowUpdateWitness] = useState<boolean>(false);
   const [updateWitnessIndex, setupdateWitnessIndex] = useState<number>(-1);
   const [witnesses, setWitnesses] =
-    useState<{ name: string; phone: string; email: string }[]>(value);
+    useState<WitnessInformation[]>(value);
 
   useEffect(() => {
     onChange(witnesses);
@@ -49,7 +61,7 @@ const WitnessList = ({ value, onChange }: WitnessListProps) => {
         <button
           type="button"
           onClick={() => setShowNewWitness(true)}
-          className="bg-MainGreen-300 text-white p-2 mb-2"
+          className="bg-MainGreen-300 text-white p-2 mb-2 rounded-md"
         >
           Add witness
         </button>
@@ -95,7 +107,6 @@ interface newWitnessPopUpProps {
   showPopUp: (show: boolean) => void;
 }
 
-/* ------------------------------------new Witness--------------------------------------------- */
 const NewWitnessPopUp = ({
   showPopUp,
   setWitnesses,
@@ -126,7 +137,7 @@ const NewWitnessPopUp = ({
   };
 
   return (
-    <div className="fixed flex justify-center items-center z-20 inset-0 bg-black bg-opacity-75 overflow-y-auto scro">
+    <div className="fixed flex justify-center items-center z-20 inset-0 bg-black bg-opacity-75 overflow-y-auto">
       <div className="absolute flex flex-col justify-center bg-white p-4 rounded-lg">
         <div className="flex flex-row border-b-[1px] border-gray-300 mb-4 justify-center">
           <button
@@ -149,7 +160,7 @@ const NewWitnessPopUp = ({
             onChange={setWitnessName}
           />
           {/* TODO: FIX PHONE */}
-          <PhoneNumber value={witnessPhone} onChange={setWitnessPhone} />
+          <PhoneNumber labelText="Phone number" value={witnessPhone} onChange={setWitnessPhone} />
           <Inputfield
             id="witnessEmail"
             labelText="Email"
@@ -224,7 +235,7 @@ const UpdateWitnessPopUp = ({
           <button
             onClick={() => showPopUp(false)}
             type="button"
-            className="absolute ml-4 pr-4 left-0"
+            className="absolute ml-4 pr-4 left-0 rounded-md"
           >
             X
           </button>
@@ -240,7 +251,7 @@ const UpdateWitnessPopUp = ({
             value={witnessName}
             onChange={setWitnessName}
           />
-          <PhoneNumber value={witnessPhone} onChange={setWitnessPhone} />
+          <PhoneNumber labelText="Phone number" value={witnessPhone} onChange={setWitnessPhone} />
           <Inputfield
             id="witnessEmail"
             labelText="Email"
