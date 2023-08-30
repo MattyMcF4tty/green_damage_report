@@ -31,13 +31,15 @@ const generatePDF = async (
   doc.setTextColor(0);
   doc.setFont("normal");
   doc.text("Police nummer: 622 903.400", 10, 40);
-  doc.text("Forsikringstager:", 10, 47);
-  doc.text("Navn: Greenmobility A/S", 10, 54);
-  doc.text("Adresse: Landgreven 3, 4 sal", 10, 61);
-  doc.text("Postnr. og by: 1300, København K", 10, 68);
-  doc.text("Cvr. Nr.: 35521585", 10, 75);
-  doc.text("Telefonnr.: +45 70778888", 10, 82);
-  doc.text("E-mail: damage@greenmobility.com", 10, 89);
+  doc.setFont("bold");
+  doc.text("Forsikringstager", 10, 52);
+  doc.setFont("normal");
+  doc.text("Navn: Greenmobility A/S", 10, 59);
+  doc.text("Adresse: Landgreven 3, 4 sal", 10, 66);
+  doc.text("Postnr. og by: 1300, København K", 10, 73);
+  doc.text("Cvr. Nr.: 35521585", 10, 80);
+  doc.text("Telefonnr.: +45 70778888", 10, 87);
+  doc.text("E-mail: damage@greenmobility.com", 10, 94);
 
   // Draw a rectangle for the box with rounded corners around driver information
   doc.setFillColor("#E6EEE5");
