@@ -5,23 +5,33 @@ import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRightLong } from "@fortawesome/free-solid-svg-icons";
+import EmailPopUp from "@/components/popups/emailPopUp";
 
 const IndexPage = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
+  const [showPopUp, setShowPopUp] = useState(false);
+  const [ongoingReports, setOngoingReports] = useState<string[]>([])
+  const [id, setId] = useState<string>()
 
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const id = await generateId();
 
     try {
-      if (await checkEmailExists(email)) {
-        await createDoc(id, email);
-    
-        router.push(`damagereport/what?id=${id}`);
+      const ongoingReports = await checkEmailExists(email);
+      if (ongoingReports.length <= 0) {
+        const newID= await generateId();
+        setId(newID)
+        if (id) {
+          await createDoc(id, email);
+          router.push(`damagereport/what?id=${id}`);
+        } else {
+          throw new Error("Error creating id")
+        }
       } else {
-        router.push("damagereport/reportfinished");
+        setOngoingReports(ongoingReports)
+        setShowPopUp(true)
       }
     } catch ( error ) {
       console.log(`Something went wrong:\n${error}`)
@@ -114,6 +124,13 @@ const IndexPage = () => {
           <FontAwesomeIcon icon={faArrowRightLong} className="w-full text-xl" />
         </button>
       </div>
+
+      {showPopUp && (
+        <EmailPopUp 
+        setId={setId}
+        reportIDs={ongoingReports}
+        />
+      )}
     </form>
   );
 };

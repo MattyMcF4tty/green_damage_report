@@ -216,15 +216,15 @@ export const checkEmailExists = async (email: string) => {
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach(doc => (console.log(doc.id)))
 
-      if (querySnapshot.empty) {
-        // Email exists in at least one document
-        return true;
+      if (querySnapshot) {
+        const reportIDs = querySnapshot.docs.map((doc) => doc.id)
+        return reportIDs;
       } else {
-        // Email doesn't exist in any documents
-        return false;
+
+        return [];
       }
     } catch (error) {
       console.error(`An error occurred while checking email:\n${error}`);
-      return false; // Return false on error or if the query fails
+      return [];
     }
 }
