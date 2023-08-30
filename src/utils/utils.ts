@@ -94,7 +94,7 @@ export const generateId = async () => {
         .map((randomValue) => chars[randomValue % chars.length])
         .join('');
 
-        const existingData = dataList?.find((docId) => docId === id);
+        const existingData = dataList?.find((docId: string) => docId === id);
 
         if (!existingData) {
           validId = true;
@@ -178,9 +178,7 @@ export const decryptData = (data: reportDataType) => {
 }
 
 
-export const getServerSidePropsWithRedirect = async (
-    context: GetServerSidePropsContext
-  ) => {
+export const getServerSidePropsWithRedirect = async (context: GetServerSidePropsContext) => {
     const id = context.query.id as string;
   
     try {
@@ -211,7 +209,11 @@ export const getServerSidePropsWithRedirect = async (
         },
       };
     }
-  };
+};
+
+const checkFinished = () => {
+    
+}
   
 
 export const reportSearch = (reportList: {id: string; data: reportDataType;}[], status: 'all' | 'finished' | 'unfinished', filter: 'id' | 'driver' | 'numberplate' | 'date', search: string) => {

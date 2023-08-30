@@ -9,7 +9,9 @@ interface reportListProps {
   search: string;
   itemsPerPage: number;
   currentPage: number; // Add currentPage to the interface
-  currentSelectedReports: (selected: {id: string, data: reportDataType}[]) => void;
+  currentSelectedReports: (
+    selected: { id: string; data: reportDataType }[]
+  ) => void;
 }
 
 const ReportList = ({
@@ -19,17 +21,21 @@ const ReportList = ({
   itemsPerPage,
   currentSelectedReports,
 }: reportListProps) => {
-  const [reportList, setReportList] =
-    useState<{ id: string; data: reportDataType }[]>([]);
-  const [filteredReportList, setFilteredReportList] =
-    useState<{ id: string; data: reportDataType }[]>([]);
+  const [reportList, setReportList] = useState<
+    { id: string; data: reportDataType }[]
+  >([]);
+  const [filteredReportList, setFilteredReportList] = useState<
+    { id: string; data: reportDataType }[]
+  >([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [selectedReports, setSelectedReports] = useState<{id: string, data: reportDataType}[]>([]);
+  const [selectedReports, setSelectedReports] = useState<
+    { id: string; data: reportDataType }[]
+  >([]);
   const [loaded, setLoaded] = useState<boolean>(false);
 
   useEffect(() => {
-    currentSelectedReports(selectedReports)
-  }, [selectedReports])
+    currentSelectedReports(selectedReports);
+  }, [selectedReports]);
 
   /* Load server data */
   useEffect(() => {
@@ -39,6 +45,7 @@ const ReportList = ({
         setReportList(data);
         setFilteredReportList(data);
         setLoaded(true);
+        console.log(reportList);
       } catch (error) {
         console.error(
           `Something went wrong fetching data for reportList:\n${error}\n`
@@ -77,17 +84,19 @@ const ReportList = ({
           <thead className="sticky top-0 bg-MainGreen-300 text-white">
             <tr className="text-center">
               <th className="w-1/12 font-normal">
-                <input type="checkbox" className="scale-150"
+                <input
+                  type="checkbox"
+                  className="scale-150"
                   onChange={(e) => {
-                      const isChecked = e.target.checked;
+                    const isChecked = e.target.checked;
 
-                      if (isChecked) {
-                        setSelectedReports(filteredReportList);
-                      } else {
-                        setSelectedReports([]);
-                      }
-                    }}
-                  />
+                    if (isChecked) {
+                      setSelectedReports(filteredReportList);
+                    } else {
+                      setSelectedReports([]);
+                    }
+                  }}
+                />
               </th>
               <th className="w-2/12 font-normal">ID</th>
               <th className="w-2/12 font-normal">Name</th>
@@ -119,8 +128,14 @@ const ReportList = ({
                       className="even:bg-blue-50 odd:bg-white text-center"
                     >
                       <td className="w-1/12 py-2">
-                        <input type="checkbox" name={`${index}check`} id={`${index}check`} className="scale-150" 
-                          checked={selectedReports.some(selected => selected.id === report.id)}
+                        <input
+                          type="checkbox"
+                          name={`${index}check`}
+                          id={`${index}check`}
+                          className="scale-150"
+                          checked={selectedReports.some(
+                            (selected) => selected.id === report.id
+                          )}
                           onChange={(e) => {
                             const isChecked = e.target.checked;
 
@@ -131,7 +146,9 @@ const ReportList = ({
                               ]);
                             } else {
                               setSelectedReports((prevReports) =>
-                                prevReports.filter((prevReport) => prevReport.id !== report.id)
+                                prevReports.filter(
+                                  (prevReport) => prevReport.id !== report.id
+                                )
                               );
                             }
                           }}
@@ -149,8 +166,7 @@ const ReportList = ({
                           : "-"}
                       </td>
                       <td className="w-1/12">
-                        {report.data.finished ? ("Finished") : 
-                        ("Unfinished")}
+                        {report.data.finished ? "Finished" : "Unfinished"}
                       </td>
                       <td className="w-2/12">
                         {report.data.lastChange}
