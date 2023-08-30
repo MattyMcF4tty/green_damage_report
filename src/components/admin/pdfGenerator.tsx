@@ -331,12 +331,12 @@ const generatePDF = async (
       // Biker information header
       doc.setFont("bold");
       doc.text(
-        "Biker Information of other party involved in incident",
+        "Biker Information on other party involved in incident",
         15,
         currentY + 10
       );
       doc.setLineWidth(0.5);
-      doc.line(15, currentY + 12, 80, currentY + 12);
+      doc.line(15, currentY + 12, 106, currentY + 12);
 
       // Render biker details (name, bike type, etc.)
       doc.setFont("normal");
@@ -445,9 +445,13 @@ const generatePDF = async (
 
       // Vehicle information header
       doc.setFont("bold");
-      doc.text("Vehicle Information", 15, currentY + 10);
+      doc.text(
+        "Vehicle Information on other party involved in incident",
+        15,
+        currentY + 10
+      );
       doc.setLineWidth(0.5);
-      doc.line(15, currentY + 12, 80, currentY + 12);
+      doc.line(15, currentY + 12, 110, currentY + 12);
 
       // Render vehicle details (name, license number, etc.)
       doc.setFont("normal");
@@ -559,9 +563,13 @@ const generatePDF = async (
 
       // Pedestrian information header
       doc.setFont("bold");
-      doc.text("Pedestrian Information", 15, currentY + 10);
+      doc.text(
+        "Pedestrian Information on other party involved in incident",
+        15,
+        currentY + 10
+      );
       doc.setLineWidth(0.5);
-      doc.line(15, currentY + 12, 80, currentY + 12);
+      doc.line(15, currentY + 12, 114, currentY + 12);
 
       // Render pedestrian details (name, age, etc.)
       doc.setFont("normal");
@@ -688,9 +696,13 @@ const generatePDF = async (
 
       // Other information header
       doc.setFont("bold");
-      doc.text("Other Information", 15, currentY + 10);
+      doc.text(
+        "Other Information on other party involved in incident",
+        15,
+        currentY + 10
+      );
       doc.setLineWidth(0.5);
-      doc.line(15, currentY + 12, 80, currentY + 12);
+      doc.line(15, currentY + 12, 107, currentY + 12);
 
       // Render description
       doc.setFont("normal");
