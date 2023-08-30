@@ -12,27 +12,26 @@ const IndexPage = () => {
   const [email, setEmail] = useState("");
   const [showPopUp, setShowPopUp] = useState(false);
   const [ongoingReports, setOngoingReports] = useState<string[]>([])
-  const [id, setId] = useState<string>()
+  const [id, setId] = useState(generateId());
 
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const ID = await generateId()
 
     try {
-/*       const ongoingReports = await checkEmailExists(email);
- */      /* if (ongoingReports.length <= 0) { */
-        const newID = await generateId();
-/*         setId(newID)
-        if (id) { */
-          await createDoc(newID, email);
-          router.push(`damagereport/what?id=${newID}`);
-/*         } else {
+      const ongoingReports = await checkEmailExists(email);
+      if (ongoingReports.length == 0) { 
+        if (ID !== undefined) {
+          await createDoc(ID, email);
+          router.push(`damagereport/what?id=${ID}`);
+        } else {
           throw new Error("Error creating id")
-        } */
-/*       } else {
+        } 
+      } else {
         setOngoingReports(ongoingReports)
         setShowPopUp(true)
-      } */
+      }
     } catch ( error ) {
       console.log(`Something went wrong:\n${error}`)
     }
@@ -127,7 +126,7 @@ const IndexPage = () => {
 
       {showPopUp && (
         <EmailPopUp 
-        setId={setId}
+        setId={(id) => (id)}
         reportIDs={ongoingReports}
         />
       )}
