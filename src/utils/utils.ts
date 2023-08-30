@@ -293,16 +293,6 @@ export const reportSearch = (
   return updatedFilteredList;
 };
 
-const nodemailer = require("nodemailer");
-
-const transporter = nodemailer.createTransport({
-  service: "Gmail", // e.g., 'Gmail'
-  auth: {
-    user: "carloslundrodriguez@gmail.com",
-    pass: process.env.NEXT_PUBLIC_EMAIL_PASS,
-  },
-});
-
 /* ---------------- classes ------------------------------ */
 export class reportDataType {
   userEmail: string | null;

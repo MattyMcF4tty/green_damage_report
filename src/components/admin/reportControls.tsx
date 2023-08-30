@@ -37,6 +37,32 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
   const [showExpandedReports, setShowExpandedReports] =
     useState<boolean>(false);
 
+  const [status, setStatus] = useState("");
+
+  const sendEmail = async () => {
+    const emailData = {
+      to: "matthias.r.kristensen@gmail.com", // Recipient's email address
+      subject: "Du lugter",
+      text: "af tis",
+    };
+
+    try {
+      const response = await fetch("/api/sendMail", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(emailData),
+      });
+
+      const data = await response.json();
+      setStatus(data.message);
+    } catch (error) {
+      console.error("Error sending email:", error);
+      setStatus("An error occurred while sending the email");
+    }
+  };
+
   const handleDelete = async () => {
     /* Delete reports on server */
     const selectedReportIDs: string[] = [];
@@ -60,13 +86,8 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
         <FontAwesomeIcon icon={faTrashCan} />
         {" Delete"}
       </button>
-      <button
-        type="button"
-        className="bg-white border-gray-300 border-[1px] rounded-xl w-32 hover:bg-MainGreen-300 hover:text-white duration-150"
-      >
-        <FontAwesomeIcon icon={faPrint} />
-        {" Print"}
-      </button>
+      <button onClick={sendEmail}>Send Email</button>
+      <p>Status: {status}</p>
       <button
         onClick={() => {
           if (selectedReports.length > 0) {
