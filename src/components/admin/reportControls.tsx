@@ -1,16 +1,15 @@
-import { reportDataType } from "@/utils/utils";
+import { reportDataType, sendEmail } from "@/utils/utils";
 import {
   faCloudArrowDown,
   faEye,
-  faPrint,
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ExpandedReport from "./expandedReport";
 import { deleteReports, getImages } from "@/firebase/clientApp";
-import ReactPDF from "@react-pdf/renderer";
 import generatePDF from "@/components/admin/pdfGenerator";
+
 
 interface ReportControls {
   selectedReports: { id: string; data: reportDataType }[];
@@ -39,28 +38,8 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
 
   const [status, setStatus] = useState("");
 
-  const sendEmail = async () => {
-    const emailData = {
-      to: "matthias.r.kristensen@gmail.com", // Recipient's email address
-      subject: "Du lugter",
-      text: "af tis",
-    };
-
-    try {
-      const response = await fetch("/api/sendMail", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(emailData),
-      });
-
-      const data = await response.json();
-      setStatus(data.message);
-    } catch (error) {
-      console.error("Error sending email:", error);
-      setStatus("An error occurred while sending the email");
-    }
+  const handleSendEmail = async() => {
+    await sendEmail("carloslundrodriguez@gmail.com", "sut din far", "dø");
   };
 
   const handleDelete = async () => {
@@ -86,8 +65,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
         <FontAwesomeIcon icon={faTrashCan} />
         {" Delete"}
       </button>
-      <button onClick={sendEmail}>Send Email</button>
-      <p>Status: {status}</p>
+      <button onClick={() => handleSendEmail()}>Send Email</button>
       <button
         onClick={() => {
           if (selectedReports.length > 0) {

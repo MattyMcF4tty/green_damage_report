@@ -2,6 +2,9 @@ import { WitnessInformation } from "@/components/otherPartys/witnessList";
 import { getData, getImages, getReportIds } from "@/firebase/clientApp";
 import CryptoJS from "crypto-js";
 import { GetServerSidePropsContext } from "next";
+import SMTPTransport from "nodemailer/lib/smtp-transport";
+import nodemailer from 'nodemailer'
+import axios from "axios";
 
 export type pageProps = {
   data: {
@@ -291,6 +294,21 @@ export const reportSearch = (
   }
 
   return updatedFilteredList;
+};
+
+export const sendEmail = async (toEmail: string, subject: string, text: string) => {
+  const emailData = {
+    toEmail: toEmail,
+    subject: subject,
+    text: text,
+  };
+
+  try {
+    const response = await axios.post('../api/send-email', emailData);
+    console.log('Server response:', response.data);
+  } catch (error) {
+    console.error('Error sending email:', error);
+  }
 };
 
 /* ---------------- classes ------------------------------ */
