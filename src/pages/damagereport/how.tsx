@@ -80,18 +80,20 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
         <p className="text-MainGreen-300 mb-8 flex justify-start font-bold text-[20px]">
           Incident Occurrence Details
         </p>
-        <TextField
-          id="accidentDescription"
-          labelText="Description of the incident"
-          maxLength={200}
-          required={true}
-          value={accidentDescription}
-          onChange={setAccidentDescription}
-        />
+        <div className="">
+          <TextField
+            id="accidentDescription"
+            labelText="Description of the incident"
+            maxLength={200}
+            required={true}
+            value={accidentDescription}
+            onChange={setAccidentDescription}
+          />
+        </div>
       </div>
 
       {/* Accident speed collection */}
-      <div>
+      <div className="">
         <Inputfield
           id="speedcollection"
           labelText="km/h"
@@ -126,7 +128,7 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
       </div>
 
       {/* Damage description collection */}
-      <div>
+      <div className="">
         <TextField
           id="damageDescription"
           labelText="
@@ -139,7 +141,7 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
       </div>
 
       {/* Police Report collection */}
-      <div>
+      <div className="">
         <YesNo
           labelText="Were there police present?"
           id="PolicePresent"

@@ -3,10 +3,10 @@ import { faArrowRightLong } from "@fortawesome/free-solid-svg-icons";
 
 const NextButton = () => {
   return (
-    <div>
+    <div className="w-full h-full">
       <button
         type="submit"
-        className="text-white bg-MainGreen-300 h-full rounded-full"
+        className="text-white w-full bg-MainGreen-300 h-full rounded-full"
       >
         <FontAwesomeIcon icon={faArrowRightLong} className="w-full text-xl" />
       </button>

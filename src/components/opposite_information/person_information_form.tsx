@@ -9,7 +9,7 @@ export class PedestrianInformation {
   personDamage: string;
   location: {lat: number | null, lng: number | null};
 
-  constructor (
+  constructor(
     name: string,
     phone: string,
     email: string,
@@ -36,7 +36,7 @@ export class PedestrianInformation {
       location: this.location,
     };
   }
-};
+}
 
 interface PedestrianProps {
   value: PedestrianInformation;

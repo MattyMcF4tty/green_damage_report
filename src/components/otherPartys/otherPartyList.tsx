@@ -365,7 +365,7 @@ const NewObjectPopUp = ({
             requried={false}
           />
         </div>
-        <div className="w-full">
+        <div className="w-full overflow-x-hidden overflow-y-auto no-scrollbar">
           {!isBike && !isVehicle && !isPedestrian && !isOther && (
             <p className="w-full text-center mt-2">
               Select one of the following
@@ -450,8 +450,8 @@ const UpdateBike = ({
   }
 
   return (
-    <div className="fixed flex justify-center items-center z-20 inset-0 bg-black bg-opacity-75 overflow-auto">
-      <div className="bg-white py-2 w-96 p-2 rounded-md max-h-[40rem] overflow-y-auto">
+    <div className="fixed flex justify-center items-center z-20 inset-0 bg-black bg-opacity-75 overflow-auto ">
+      <div className="bg-white py-2 w-96 p-2 rounded-md max-h-[40rem] overflow-y-auto lg:w-1/3 lg:p-2 lg:h-full">
         <p className="mb-4 w-full text-center border-b-2 border-MainGreen-300 rounded-b-sm">
           Update Bike
         </p>
@@ -464,14 +464,14 @@ const UpdateBike = ({
         <div>
           <div className="flex flex-row w-full justify-evenly h-10">
             <button
-              onClick={() => handleBikeDelete()}
-              className="bg-red-500 w-1/4 h-full rounded-md hover:bg-red-600 text-white"
+              onClick={() => {handleBikeDelete(); setVisibility(false)}}
+              className="bg-gray-300 w-1/4 h-full rounded-md hover:bg-red-500 hover:text-white lg:mt-6"
             >
               Delete
             </button>
             <button
               onClick={() => handleBikeUpdate()}
-              className="bg-MainGreen-300 w-1/4 text-white h-full rounded-md"
+              className="bg-MainGreen-300 w-1/4 text-white h-full rounded-md lg:mt-6"
             >
               Save
             </button>
@@ -516,7 +516,7 @@ const UpdateVehicle = ({
 
   return (
     <div className="fixed flex justify-center items-center z-20 inset-0 bg-black bg-opacity-75 overflow-auto">
-      <div className="bg-white py-2 w-96 p-2 rounded-md max-h-[40rem] overflow-y-auto">
+      <div className="bg-white py-2 w-96 p-2 rounded-md max-h-[40rem] overflow-x-hidden overflow-y-auto no-scrollbar lg:w-1/3 lg:p-2">
         <p className="mb-4 w-full text-center border-b-2 border-MainGreen-300 rounded-b-sm">
           Update Vehicle
         </p>
@@ -580,18 +580,18 @@ const UpdatePedestrian = ({
 
   return (
     <div className="fixed flex justify-center items-center z-20 inset-0 bg-black bg-opacity-75 overflow-auto">
-      <div className="bg-white py-2 w-96 p-2 rounded-md max-h-[40rem] overflow-y-auto">
+      <div className="bg-white py-2 w-96 p-2 rounded-md max-h-[40rem] overflow-y-auto lg:w-1/3 lg:p-2 lg:">
         <p className="mb-4 w-full text-center border-b-2 border-MainGreen-300 rounded-b-sm">
           Update Pedestrian
         </p>
-        <div className="">
+        <div className="lg:flex lg:justify-evenly lg:">
           <PedestrianInfoForm
             value={pedestrianValue[index]}
             onChange={setCurrentPedestrianInfo}
           />
         </div>
         <div>
-          <div className="flex flex-row w-full justify-evenly h-10">
+          <div className="flex flex-row w-full justify-evenly h-10 ">
             <button
               onClick={() => handlePedestrianDelete()}
               className="bg-red-500 w-1/4 rounded-md hover:bg-red-600 text-white"
@@ -644,7 +644,7 @@ const UpdateOther = ({
 
   return (
     <div className="fixed flex justify-center items-center z-20 inset-0 bg-black bg-opacity-75 overflow-auto">
-      <div className="bg-white py-2 w-96 p-2 rounded-md max-h-[40rem] overflow-y-auto">
+      <div className="bg-white py-2 w-96 p-2 rounded-md max-h-[40rem] overflow-y-auto lg:w-1/3 lg:h-[25rem]">
         <p className="mb-4 w-full text-center border-b-2 border-MainGreen-300 rounded-b-sm">
           Update Other
         </p>
@@ -655,7 +655,7 @@ const UpdateOther = ({
           />
         </div>
         <div>
-          <div className="flex flex-row w-full justify-evenly h-10">
+          <div className="flex flex-row w-full justify-evenly h-10 lg:flex lg:">
             <button
               onClick={() => handleOtherDelete()}
               className="bg-red-500 w-1/4 rounded-md hover:bg-red-600 text-white"
