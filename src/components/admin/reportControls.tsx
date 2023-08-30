@@ -1,16 +1,15 @@
-import { reportDataType } from "@/utils/utils";
+import { reportDataType, sendEmail } from "@/utils/utils";
 import {
   faCloudArrowDown,
   faEye,
-  faPrint,
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ExpandedReport from "./expandedReport";
 import { deleteReports, getImages } from "@/firebase/clientApp";
-import ReactPDF from "@react-pdf/renderer";
 import generatePDF from "@/components/admin/pdfGenerator";
+
 
 interface ReportControls {
   selectedReports: { id: string; data: reportDataType }[];
@@ -37,6 +36,12 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
   const [showExpandedReports, setShowExpandedReports] =
     useState<boolean>(false);
 
+  const [status, setStatus] = useState("");
+
+  const handleSendEmail = async() => {
+    await sendEmail("carloslundrodriguez@gmail.com", "sut din far", "dø");
+  };
+
   const handleDelete = async () => {
     /* Delete reports on server */
     const selectedReportIDs: string[] = [];
@@ -60,13 +65,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
         <FontAwesomeIcon icon={faTrashCan} />
         {" Delete"}
       </button>
-      <button
-        type="button"
-        className="bg-white border-gray-300 border-[1px] rounded-xl w-32 hover:bg-MainGreen-300 hover:text-white duration-150"
-      >
-        <FontAwesomeIcon icon={faPrint} />
-        {" Print"}
-      </button>
+      <button onClick={() => handleSendEmail()}>Send Email</button>
       <button
         onClick={() => {
           if (selectedReports.length > 0) {
