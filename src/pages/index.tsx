@@ -1,6 +1,6 @@
 import { Inputfield } from "@/components/custom_inputfields";
 import { checkEmailExists, createDoc, updateData } from "@/firebase/clientApp";
-import { generateId } from "@/utils/utils";
+import { generateId, sendEmail } from "@/utils/utils";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -24,6 +24,10 @@ const IndexPage = () => {
       if (ongoingReports.length == 0) { 
         if (ID !== undefined) {
           await createDoc(ID, email);
+          await sendEmail (
+            `${email}`, 
+            "GreenMobility Damage Report", 
+            `You started a Damagereport on: \n${router.asPath}/damagereport/what?id=${ID}`)
           router.push(`damagereport/what?id=${ID}`);
         } else {
           throw new Error("Error creating id")

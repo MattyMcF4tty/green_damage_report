@@ -232,7 +232,6 @@ export const getServerSidePropsWithRedirect = async (
   }
 };
 
-const checkFinished = () => {};
 
 export const reportSearch = (
   reportList: { id: string; data: reportDataType }[],
