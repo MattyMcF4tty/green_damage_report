@@ -277,11 +277,7 @@ const generatePDF = async (
   if (data.bikerInfo && data.bikerInfo.length > 0) {
     // Biker information header
     doc.setFont("bold");
-    doc.text(
-      "Biker Information of other party involved in incident",
-      15,
-      currentY + 10
-    );
+    doc.text("Biker Information", 15, currentY + 10);
     doc.setLineWidth(0.5);
     doc.line(15, currentY + 12, 200, currentY + 12);
 
@@ -334,7 +330,11 @@ const generatePDF = async (
 
       // Biker information header
       doc.setFont("bold");
-      doc.text("Biker Information", 15, currentY + 10);
+      doc.text(
+        "Biker Information of other party involved in incident",
+        15,
+        currentY + 10
+      );
       doc.setLineWidth(0.5);
       doc.line(15, currentY + 12, 80, currentY + 12);
 
