@@ -1,12 +1,8 @@
-import { promises } from "dns";
 import { initializeApp } from "firebase/app"
 import { collection, deleteDoc, doc, getDoc, getDocs, getFirestore, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { ListResult, StorageReference, deleteObject, getDownloadURL, getStorage, listAll, ref, uploadBytes } from "firebase/storage"
 import { decryptData, encryptData, reportDataType } from "@/utils/utils";
-import { bikeInformation } from "@/components/opposite_information/bike_information_form";
-import { carInformation } from "@/components/opposite_information/car_information_form";
-import { PedestrianInformation } from "@/components/opposite_information/person_information_form";
-import { OtherInformation } from "@/components/opposite_information/other_information_form";
+
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -47,14 +43,12 @@ export const getData = async (id: string) => {
 }
 
 export const createDoc = async (id: string, email: string) => {
-
     try {
         const data = new reportDataType()
         data.updateFields({userEmail: email.toLowerCase()})
         console.log("Report created:\n" + "id: " + id + "\n" + "Email: " + email.toLowerCase());
 
         const dataRef = doc(db, `${collectionName}/${id}`);
-
         await setDoc(dataRef, data.toPlainObject());
     } catch (error) {
         console.error(`An error occurred while writing data:\n${error}`);
