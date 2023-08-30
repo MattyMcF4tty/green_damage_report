@@ -15,7 +15,10 @@ const addImageToPDF = async (pdfDoc: jsPDF) => {
   return pdfDoc;
 };
 
-const generatePDF = async (data: reportDataType) => {
+const generatePDF = async (
+  data: reportDataType,
+  images: Record<string, string[]>
+) => {
   const doc = new jsPDF();
 
   // Start adding data to the PDF
@@ -810,6 +813,19 @@ const generatePDF = async (data: reportDataType) => {
   }
 
   // Images of damages to GreenMobility and other party car section
+
+  // Check if the 'images' object and 'GreenMobility' property exist
+  if (images["GreenMobility"]) {
+    images["GreenMobility"].forEach((image) => {
+      // Assuming 'image' is the image URL or base64 data
+      doc.addImage(image, "JPEG", 15, currentY, 80, 60); // Adjust width and height as needed
+      currentY += 70; // Increase Y for the next image
+      doc.text(image, 15, currentY);
+    });
+  } else {
+    // Handle case where 'GreenMobility' images are not available
+    doc.text("No GreenMobility images available.", 15, currentY);
+  }
 
   // Save the PDF
   return doc.output("blob");

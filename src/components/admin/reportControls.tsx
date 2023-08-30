@@ -8,7 +8,7 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ExpandedReport from "./expandedReport";
-import { deleteReports } from "@/firebase/clientApp";
+import { deleteReports, getImages } from "@/firebase/clientApp";
 import ReactPDF from "@react-pdf/renderer";
 import generatePDF from "@/components/admin/pdfGenerator";
 
@@ -16,9 +16,10 @@ interface ReportControls {
   selectedReports: { id: string; data: reportDataType }[];
 }
 
-const handleDownloadPDF = async (data: reportDataType) => {
+const handleDownloadPDF = async (id: string, data: reportDataType) => {
+  const images = await getImages(id);
   if (data !== null) {
-    const pdfBlob = await generatePDF(data);
+    const pdfBlob = await generatePDF(data, images);
     const url = URL.createObjectURL(pdfBlob);
 
     const link = document.createElement("a");
@@ -69,7 +70,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
       <button
         onClick={() => {
           if (selectedReports.length > 0) {
-            handleDownloadPDF(selectedReports[0].data);
+            handleDownloadPDF(selectedReports[0].id, selectedReports[0].data);
           }
         }}
         className="bg-MainGreen-300 text-white px-4 py-2 rounded-md shadow-md"
