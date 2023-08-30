@@ -2,7 +2,7 @@ import { promises } from "dns";
 import { initializeApp } from "firebase/app"
 import { collection, deleteDoc, doc, getDoc, getDocs, getFirestore, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { ListResult, StorageReference, deleteObject, getDownloadURL, getStorage, listAll, ref, uploadBytes } from "firebase/storage"
-import { reportDataType } from "@/utils/utils";
+import { decryptData, encryptData, reportDataType } from "@/utils/utils";
 import { bikeInformation } from "@/components/opposite_information/bike_information_form";
 import { carInformation } from "@/components/opposite_information/car_information_form";
 import { PedestrianInformation } from "@/components/opposite_information/person_information_form";
@@ -47,7 +47,6 @@ export const getData = async (id: string) => {
 }
 
 export const createDoc = async (id: string, email: string) => {
-    const emailExist = await checkEmailExists(email);
 
     try {
         const data = new reportDataType()

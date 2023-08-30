@@ -19,20 +19,20 @@ const IndexPage = () => {
 
 
     try {
-      const ongoingReports = await checkEmailExists(email);
-      if (ongoingReports.length <= 0) {
-        const newID= await generateId();
-        setId(newID)
-        if (id) {
-          await createDoc(id, email);
-          router.push(`damagereport/what?id=${id}`);
-        } else {
+/*       const ongoingReports = await checkEmailExists(email);
+ */      /* if (ongoingReports.length <= 0) { */
+        const newID = await generateId();
+/*         setId(newID)
+        if (id) { */
+          await createDoc(newID, email);
+          router.push(`damagereport/what?id=${newID}`);
+/*         } else {
           throw new Error("Error creating id")
-        }
-      } else {
+        } */
+/*       } else {
         setOngoingReports(ongoingReports)
         setShowPopUp(true)
-      }
+      } */
     } catch ( error ) {
       console.log(`Something went wrong:\n${error}`)
     }
