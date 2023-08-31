@@ -30,7 +30,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           <img
             src="../GreenLogos/GreenMobilityTextLogo.png"
             alt="greenlogo"
-            className=""
+            className="lg:ml-[27rem]"
           />
           <Component {...pageProps} />
         </div>
