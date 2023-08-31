@@ -748,6 +748,9 @@ const generatePDF = async (
     currentY += otherInfoHeight + 2;
   }
 
+  currentY += sectionSpacing; // Add space after the other information section
+
+
   // Witnesses information
   if (data.witnesses.length > 0) {
     const maxWitnessesPerRow = 2;
