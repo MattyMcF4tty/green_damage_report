@@ -48,9 +48,9 @@ const IndexPage = () => {
       className="flex flex-col items-center"
     >
       <div className="container mx-auto p-8">
-        <div className="mb-4">
-          <div className="flex flex-col">
-            <h3 className="mb-2 text-left  text-MainGreen-300 flex flex-row items-center">
+        <div className="mb-4 ">
+          <div className="flex flex-col ">
+            <h3 className="mb-2 text-left  text-MainGreen-300 flex flex-row items-center ">
               <img
                 src="../GreenLogos/GreenLogo-gray-1.png"
                 alt="greengraylogo"
@@ -116,6 +116,7 @@ const IndexPage = () => {
           onChange={setEmail}
           value={email}
           type="email"
+          placeHolder="greenmobility@example.com"
         />
       </div>
 

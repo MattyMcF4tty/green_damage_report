@@ -100,6 +100,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
           required={true}
           value={greenCarNumberplate}
           onChange={setgreenCarNumberplate}
+          placeHolder="DR12345"
         />
       </div>
 
@@ -124,6 +125,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
               type="text"
               value={firstName}
               onChange={setFirstName}
+              placeHolder="John"
             />
 
             <Inputfield
@@ -133,7 +135,8 @@ const What: NextPage<pageProps> = ({ data, id }) => {
               type="text"
               value={lastName}
               onChange={setLastName}
-            />
+           placeHolder="Doe"
+           />
             {/* TODO: make google autofill */}
             <AddressField
               labelText="Home address of the driver"
@@ -149,6 +152,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
               type="ssn"
               value={socialSecurityNumber}
               onChange={setSocialSecurityNumber}
+            placeHolder="123456-1234"
             />
 
             <Inputfield
@@ -158,6 +162,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
               type="license"
               value={drivingLicenseNumber}
               onChange={setDrivingLicenseNumber}
+              placeHolder="12345678"
             />
 
             <PhoneNumber
@@ -173,6 +178,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
               type="email"
               value={email}
               onChange={setEmail}
+              placeHolder="Greenmobility@example.com"
             />
           </div>
         )}

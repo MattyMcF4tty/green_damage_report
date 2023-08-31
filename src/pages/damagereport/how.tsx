@@ -9,14 +9,18 @@ import NextButton from "@/components/buttons/next";
 import BackButton from "@/components/buttons/back";
 import { useRouter } from "next/router";
 import { GetServerSidePropsContext, NextPage } from "next";
-import { getServerSidePropsWithRedirect, pageProps, reportDataType } from "@/utils/utils";
+import {
+  getServerSidePropsWithRedirect,
+  pageProps,
+  reportDataType,
+} from "@/utils/utils";
 import { updateData } from "@/firebase/clientApp";
 import WitnessList from "@/components/otherPartys/witnessList";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  return await getServerSidePropsWithRedirect(context)
+  return await getServerSidePropsWithRedirect(context);
 };
 
 const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
@@ -24,13 +28,23 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
   const serverData = new reportDataType();
   serverData.updateFields(data);
 
-  const [accidentDescription, setAccidentDescription] = useState(serverData.accidentDescription);
+  const [accidentDescription, setAccidentDescription] = useState(
+    serverData.accidentDescription
+  );
   const [greenDriverSpeed, setGreenDriverSpeed] = useState(serverData.speed);
-  const [damageDescription, setDamageDescription] = useState(serverData.damageDescription);
+  const [damageDescription, setDamageDescription] = useState(
+    serverData.damageDescription
+  );
   const [policePresent, setPolicePresent] = useState(serverData.policePresent);
-  const [policeReport, setPoliceReport] = useState(serverData.policeReportExist);
-  const [journalNumber, setJournalNumber] = useState(serverData.policeReportNumber);
-  const [witnessesPresent, setWitnessesPresent] = useState(serverData.witnessesPresent);
+  const [policeReport, setPoliceReport] = useState(
+    serverData.policeReportExist
+  );
+  const [journalNumber, setJournalNumber] = useState(
+    serverData.policeReportNumber
+  );
+  const [witnessesPresent, setWitnessesPresent] = useState(
+    serverData.witnessesPresent
+  );
   const [witnesses, setWitnesses] = useState(serverData.witnesses);
 
   const [greenImages, setGreenImages] = useState<string[] | null>(
@@ -50,7 +64,7 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
 
     /* Clear police data if checkboxes is not checked */
     if (!policePresent) {
-      setPoliceReport(null)
+      setPoliceReport(null);
     }
     if (!policeReport) {
       setJournalNumber(null);
@@ -96,11 +110,12 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
       <div className="">
         <Inputfield
           id="speedcollection"
-          labelText="km/h"
+          labelText="Please enter your speed for when the incident occurred"
           required={true}
           type="number"
           value={greenDriverSpeed}
           onChange={setGreenDriverSpeed}
+          placeHolder="km/h"
         />
       </div>
 
@@ -166,9 +181,11 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
                 Please enter the police report number"
                 id="JournalNumber"
                 required={false}
-                type="number"
+                type="journalNumber"
                 value={journalNumber}
                 onChange={setJournalNumber}
+                pattern="journalNumber"
+                placeHolder="1234-12345-12345-12"
               />
             )}
           </div>

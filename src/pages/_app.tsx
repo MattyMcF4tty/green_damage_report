@@ -26,10 +26,11 @@ function MyApp({ Component, pageProps }: AppProps) {
         </div>
       ) : (
         <div className="p-4">
+          {/* TODO: FIX IMAGE ONLY NEEDS TO GET DISPLAYED ON INDEX */}
           <img
             src="../GreenLogos/GreenMobilityTextLogo.png"
             alt="greenlogo"
-            className=""
+            className="lg:ml-[27rem]"
           />
           <Component {...pageProps} />
         </div>

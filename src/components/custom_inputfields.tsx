@@ -25,10 +25,13 @@ interface InputfieldProps {
     | "numberplate"
     | "license"
     | "ssn"
+    | "journalNumber"
     | "speed";
+
   value: string | null;
   onChange: (isValue: string) => void;
   pattern?: string;
+  placeHolder: string;
 }
 
 export const Inputfield = ({
@@ -38,6 +41,7 @@ export const Inputfield = ({
   value,
   type,
   onChange,
+  placeHolder
 }: InputfieldProps) => {
   const [currentValue, setCurrentValue] = useState<string>(value || "");
   const [isError, setIsError] = useState<boolean>(false);
@@ -54,7 +58,7 @@ export const Inputfield = ({
       break;
     case "email":
       pattern =
-        "^[a-zA-Z0-9.]{0,100}@[a-zA-Z0-9]{2,20}.(es|com|org|dk)$"; /* Email pattern */
+      "^[a-åA-Å0-9.]{1,100}@[a-åA-Å0-9]{2,20}\\.[a-åA-Å]{1,3}$"; /* Email pattern */
       patternError = "Please enter a valid Email";
       break;
     case "tel":
@@ -78,10 +82,14 @@ export const Inputfield = ({
     case "ssn":
       pattern = "^[0-9]{6}-[0-9]{4}$";
       patternError = "Please enter a valid social security number";
-      break;
+    break;
     case "speed":
       pattern = "[0-9]{3}";
       break;
+    case "journalNumber":  
+      pattern="[0-9]{4}-[0-9]{5}-[0-9]{5}-[0-9]{2}"
+      patternError="Please enter a valid journal number"
+    break;
     default:
       pattern = ""; /* No pattern for "text" type, it allows any input */
       patternError = "Please enter only valid characters";
@@ -145,6 +153,7 @@ export const Inputfield = ({
         onBlur={() => handleLeave()}
         onInvalid={() => handleCheck()}
         onFocus={() => setIsFocused(true)}
+        placeholder={placeHolder}
       />
       {isError && <p className="text-sm text-red-500">{patternError}</p>}
     </div>
