@@ -7,8 +7,9 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ExpandedReport from "./expandedReport";
-import { deleteReports, getImages } from "@/firebase/clientApp";
-import generatePDF from "@/components/admin/pdfGenerator";
+import { deleteReports, getImages, handlePdf, storage } from "@/firebase/clientApp";
+import generatePDF from "@/utils/pdfGenerator";
+import { ref, uploadBytes } from "firebase/storage";
 
 
 interface ReportControls {
@@ -16,20 +17,24 @@ interface ReportControls {
 }
 
 const handleDownloadPDF = async (id: string, data: reportDataType) => {
-  const images = await getImages(id);
+  await handlePdf(id)
+/*   const images = await getImages(id);
   if (data !== null) {
     const pdfBlob = await generatePDF(data, images);
-    const url = URL.createObjectURL(pdfBlob);
+
+    const refer = ref(storage, "abc/")
+    await uploadBytes(refer, pdfBlob) */
+/*     const url = URL.createObjectURL(pdfBlob);
 
     const link = document.createElement("a");
     link.href = url;
     link.download = "report.pdf";
     link.click();
 
-    URL.revokeObjectURL(url);
-  } else {
+    URL.revokeObjectURL(url); */
+/*   } else {
     console.error("No data available for PDF generation");
-  }
+  } */
 };
 
 const ReportControls = ({ selectedReports }: ReportControls) => {

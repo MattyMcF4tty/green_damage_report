@@ -1,6 +1,7 @@
 import jsPDF from "jspdf";
 import { reportDataType } from "@/utils/utils";
 import { getImages } from "@/firebase/clientApp";
+import axios from "axios";
 
 const addImageToPDF = async (pdfDoc: jsPDF) => {
   // Add image at the top
@@ -865,19 +866,23 @@ const generatePDF = async (
 
   // Check if the 'images' object and 'GreenMobility' property exist
   if (images["GreenMobility"]) {
-    images["GreenMobility"].forEach((image) => {
-      // Assuming 'image' is the image URL or base64 data
-      doc.addImage(image, "JPEG", 15, currentY, 80, 60); // Adjust width and height as needed
-      currentY += 70; // Increase Y for the next image
-      doc.text(image, 15, currentY);
-    });
+    for (const GreenMobility in images) {
+      if (Array.isArray(images[GreenMobility])) {
+        for (const imageUrl of images[GreenMobility]) {
+          const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+          const imageBase64 = Buffer.from(response.data, 'binary').toString('base64');
+          doc.addImage(imageBase64, 'JPEG', 10, currentY, 50, 50); // Add image to PDF
+          currentY += 60; // Update y position for next image
+        }
+      }
+    }
   } else {
     // Handle case where 'GreenMobility' images are not available
     doc.text("No GreenMobility images available.", 15, currentY);
   }
 
   // Save the PDF
-  return doc.output("blob");
+  return new Uint8Array(doc.output('arraybuffer'));
 };
 
 export default generatePDF;

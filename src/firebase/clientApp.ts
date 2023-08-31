@@ -2,6 +2,7 @@ import { initializeApp } from "firebase/app"
 import { collection, deleteDoc, doc, getDoc, getDocs, getFirestore, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { ListResult, StorageReference, deleteObject, getDownloadURL, getStorage, listAll, ref, uploadBytes } from "firebase/storage"
 import { decryptData, encryptData, reportDataType } from "@/utils/utils";
+import axios from "axios";
 
 
 const firebaseConfig = {
@@ -13,10 +14,10 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
 };
 
-const app = initializeApp(firebaseConfig);
+export const app = initializeApp(firebaseConfig);
 
-const db = getFirestore(app);
-const storage = getStorage(app);
+export const db = getFirestore(app);
+export const storage = getStorage(app);
 
 const collectionName = "DamageReports"
 
@@ -231,3 +232,15 @@ export const checkEmailExists = async (email: string) => {
       return [];
     }
 }
+
+export async function handlePdf(id: string) {
+  try {
+    const response = await axios.post('/api/generatepdf', { id });
+    if (response.status === 200) {
+      console.log('PDF generated and uploaded successfully.');
+    }
+  } catch (error) {
+    console.error('An error occurred:', error);
+  }
+}
+

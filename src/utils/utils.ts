@@ -310,6 +310,12 @@ export const sendEmail = async (toEmail: string, subject: string, text: string) 
   }
 };
 
+export const handlePdf = async () => {
+  const response = await axios.get('/api/generatepdf', {
+    responseType: 'blob',
+  });
+}
+
 /* ---------------- classes ------------------------------ */
 export class reportDataType {
   userEmail: string | null;
