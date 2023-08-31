@@ -68,7 +68,7 @@ const generatePDF = async (
 
   const email = data.driverInfo.email
     ? data.driverInfo.email
-    : "No email provided";
+    : "No email has been provided";
 
   const socialSecurityNumber = data.driverInfo.socialSecurityNumber
     ? data.driverInfo.socialSecurityNumber
@@ -80,20 +80,32 @@ const generatePDF = async (
     ? data.driverInfo.drivingLicenseNumber
     : "-";
 
+    const driverRenter = data.driverRenter
+    
+    
+
   doc.text(`Name: ${name}`, 15, driverInfoY);
   doc.text(`Phone number: ${phoneNumber}`, 15, driverInfoY + 8);
   doc.text(`Email: ${email}`, 15, driverInfoY + 16);
   doc.text(
-    `Social Security Number: ${socialSecurityNumber}`,
+    `Address: ${address}`,
     15,
     driverInfoY + 24
   );
-  doc.text(`Address: ${address}`, 105, driverInfoY);
+  doc.text(`Social security number: ${socialSecurityNumber}`, 105, driverInfoY);
   doc.text(
     `Driving License Number: ${drivingLicenseNumber}`,
     105,
     driverInfoY + 8
   );
+  if(driverRenter === null){
+    doc.text("Is driver and renter the same? -", 105, driverInfoY+16 )
+  } else if(driverRenter === true){
+    doc.text("Driver and renter is the same", 105, driverInfoY+16)
+  } else{
+    doc.text("Driver and renter is not the same", 105, driverInfoY+16)
+  }
+  
   // Add space between driver information and accident information
   const spaceBetweenSections = 10;
   const accidentInfoY = driverInfoY + 40 + spaceBetweenSections;
@@ -340,9 +352,9 @@ const generatePDF = async (
 
       // Render biker details (name, bike type, etc.)
       doc.setFont("normal");
-      doc.text(`Name: ${currentBiker.name}`, 20, currentY + 28);
-      doc.text(`Phonenumber: ${currentBiker.phone}`, 20, currentY + 36);
-      doc.text(`Email: ${currentBiker.email}`, 20, currentY + 44);
+      doc.text(`Name: ${currentBiker.name || "-"}`, 20, currentY + 28);
+      doc.text(`Phonenumber: ${currentBiker.phone || "-"}`, 20, currentY + 36);
+      doc.text(`Email: ${currentBiker.email || "No email has been provided"}`, 20, currentY + 44);
       doc.text(
         `Electric bike: ${
           currentBiker.ebike !== null
@@ -385,9 +397,13 @@ const generatePDF = async (
     doc.setFillColor("#E6EEE5");
     doc.roundedRect(10, currentY, 190, bikerInfoHeight, 5, 5, "F");
     doc.setFont("bold");
-    doc.text("Biker Information", 15, currentY + 10);
+    doc.text(
+      "Biker Information on other party involved in incident",
+      15,
+      currentY + 10
+    );
     doc.setLineWidth(0.5);
-    doc.line(15, currentY + 12, 80, currentY + 12);
+    doc.line(15, currentY + 12, 106, currentY + 12);
     doc.setFont("normal");
     doc.text("No biker was hit.", 20, currentY + 28);
     currentY += bikerInfoHeight + 2;
@@ -455,17 +471,17 @@ const generatePDF = async (
 
       // Render vehicle details (name, license number, etc.)
       doc.setFont("normal");
-      doc.text(`Name: ${currentVehicle.name}`, 20, currentY + 28);
-      doc.text(`Phonenumber: ${currentVehicle.phone}`, 20, currentY + 36);
-      doc.text(`Email: ${currentVehicle.email}`, 20, currentY + 44);
-      doc.text(`Numberplate: ${currentVehicle.numberplate}`, 20, currentY + 52);
+      doc.text(`Name: ${currentVehicle.name  || "-"}`, 20, currentY + 28);
+      doc.text(`Phonenumber: ${currentVehicle.phone || "-"}`, 20, currentY + 36);
+      doc.text(`Email: ${currentVehicle.email || "No email has been provided"}`, 20, currentY + 44);
+      doc.text(`Numberplate: ${currentVehicle.numberplate  || "-"}`, 20, currentY + 52);
       doc.text(
-        `License Number: ${currentVehicle.driversLicenseNumber}`,
+        `License Number: ${currentVehicle.driversLicenseNumber || "-"}`,
         100,
         currentY + 28
       );
-      doc.text(`Vehicle model: ${currentVehicle.model}`, 100, currentY + 36);
-      doc.text(`Insurance: ${currentVehicle.insurance}`, 100, currentY + 44);
+      doc.text(`Vehicle model: ${currentVehicle.model || "-"}`, 100, currentY + 36);
+      doc.text(`Insurance: ${currentVehicle.insurance || "-"}`, 100, currentY + 44);
 
       // Update currentY for the next vehicle
       currentY += vehicleInfoHeight + sectionSpacing + 2;
@@ -485,9 +501,13 @@ const generatePDF = async (
     doc.setFillColor("#E6EEE5");
     doc.roundedRect(10, currentY, 190, vehicleInfoHeight, 5, 5, "F");
     doc.setFont("bold");
-    doc.text("Vehicle Information", 15, currentY + 10);
+    doc.text(
+      "Vehicle Information on other party involved in incident",
+      15,
+      currentY + 10
+    );
     doc.setLineWidth(0.5);
-    doc.line(15, currentY + 12, 80, currentY + 12);
+    doc.line(15, currentY + 12, 110, currentY + 12);
     doc.setFont("normal");
     doc.text("No other vehicles involved.", 20, currentY + 28);
     currentY += vehicleInfoHeight + 2;
@@ -573,9 +593,9 @@ const generatePDF = async (
 
       // Render pedestrian details (name, age, etc.)
       doc.setFont("normal");
-      doc.text(`Name: ${currentPedestrian.name}`, 20, currentY + 28);
-      doc.text(`Email: ${currentPedestrian.email}`, 20, currentY + 36);
-      doc.text(`Phonenumber: ${currentPedestrian.phone}`, 100, currentY + 28);
+      doc.text(`Name: ${currentPedestrian.name || "-"}`, 20, currentY + 28);
+      doc.text(`Email: ${currentPedestrian.email || "No email has been provided"}`, 20, currentY + 36);
+      doc.text(`Phonenumber: ${currentPedestrian.phone || "-"}`, 100, currentY + 28);
       // Render injury description
       doc.text("Injury description:", 100, currentY + 36);
       for (let i = 0; i < numInjuryDescriptionLines; i++) {
@@ -602,9 +622,13 @@ const generatePDF = async (
     doc.setFillColor("#E6EEE5");
     doc.roundedRect(10, currentY, 190, pedestrianInfoHeight, 5, 5, "F");
     doc.setFont("bold");
-    doc.text("Pedestrian Information", 15, currentY + 10);
+    doc.text(
+      "Pedestrian Information on other party involved in incident",
+      15,
+      currentY + 10
+    );
     doc.setLineWidth(0.5);
-    doc.line(15, currentY + 12, 80, currentY + 12);
+    doc.line(15, currentY + 12, 114, currentY + 12);
     doc.setFont("normal");
     doc.text("No pedestrians were harmed.", 20, currentY + 28);
     currentY += pedestrianInfoHeight;
@@ -740,9 +764,13 @@ const generatePDF = async (
     doc.setFillColor("#E6EEE5");
     doc.roundedRect(10, currentY, 190, otherInfoHeight, 5, 5, "F");
     doc.setFont("bold");
-    doc.text("Other Information", 15, currentY + 10);
+    doc.text(
+      "Other Information on other party involved in incident",
+      15,
+      currentY + 10
+    );
     doc.setLineWidth(0.5);
-    doc.line(15, currentY + 12, 80, currentY + 12);
+    doc.line(15, currentY + 12, 107, currentY + 12);
     doc.setFont("normal");
     doc.text("No collision with other object.", 20, currentY + 28);
     currentY += otherInfoHeight + 2;
@@ -796,9 +824,9 @@ const generatePDF = async (
 
       // Render witness details (name, phone, email)
       doc.setFont("normal");
-      doc.text(`Name: ${witness.name}`, startX, startY);
-      doc.text(`Phone: ${witness.phone}`, startX, startY + 8);
-      doc.text(`Email: ${witness.email}`, startX, startY + 16);
+      doc.text(`Name: ${witness.name || "-"}`, startX, startY);
+      doc.text(`Phone: ${witness.phone || "-"}`, startX, startY + 8);
+      doc.text(`Email: ${witness.email || "No email has been provided"}`, startX, startY + 16);
 
       currentColumn++;
       if (currentColumn >= maxWitnessesPerRow) {
@@ -827,7 +855,7 @@ const generatePDF = async (
     doc.setFont("bold");
     doc.text("Witnesses Information", 15, currentY + 10);
     doc.setLineWidth(0.5);
-    doc.line(15, currentY + 12, 120, currentY + 12);
+    doc.line(15, currentY + 12, 80, currentY + 12);
     doc.setFont("normal");
     doc.text("No witnesses information.", 20, currentY + 28);
     currentY += noWitnessesHeight + 2;
