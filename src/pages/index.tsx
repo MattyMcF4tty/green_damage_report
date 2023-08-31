@@ -116,6 +116,7 @@ const IndexPage = () => {
           onChange={setEmail}
           value={email}
           type="email"
+          placeHolder="greenmobility@example.com"
         />
       </div>
 

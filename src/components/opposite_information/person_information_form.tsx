@@ -7,14 +7,14 @@ export class PedestrianInformation {
   phone: string;
   email: string;
   personDamage: string;
-  location: {lat: number | null, lng: number | null};
+  location: { lat: number | null; lng: number | null };
 
   constructor(
     name: string,
     phone: string,
     email: string,
     personDamage: string,
-    location: {lat: number | null, lng: number | null},
+    location: { lat: number | null; lng: number | null }
   ) {
     this.name = name;
     this.phone = phone;
@@ -50,7 +50,13 @@ const PedestrianInfoForm = ({ value, onChange }: PedestrianProps) => {
   const [personDamage, setPersonDamage] = useState<string>(value.personDamage);
 
   useEffect(() => {
-    const newPedestrianInfo: PedestrianInformation = new PedestrianInformation(name, phoneNumber, email, personDamage, {lat: null, lng: null})
+    const newPedestrianInfo: PedestrianInformation = new PedestrianInformation(
+      name,
+      phoneNumber,
+      email,
+      personDamage,
+      { lat: null, lng: null }
+    );
 
     onChange(newPedestrianInfo);
   }, [name, phoneNumber, email, personDamage]);
@@ -64,6 +70,7 @@ const PedestrianInfoForm = ({ value, onChange }: PedestrianProps) => {
         type="text"
         value={name}
         onChange={setName}
+        placeHolder="John Doe"
       />
       <PhoneNumber
         value={phoneNumber}
@@ -77,6 +84,7 @@ const PedestrianInfoForm = ({ value, onChange }: PedestrianProps) => {
         type="text"
         value={email}
         onChange={setEmail}
+        placeHolder="Greenmobility@example.com"
       />
 
       <TextField

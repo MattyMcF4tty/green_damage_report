@@ -8,23 +8,23 @@ export class bikeInformation {
   email: string;
   ebike: boolean | null;
   personDamage: string;
-  location: {lat: number | null, lng: number | null};
+  location: { lat: number | null; lng: number | null };
 
-  constructor(  
-      name: string,
-      phone: string,
-      email: string,
-      ebike: boolean | null,
-      personDamage: string,
-      location: {lat: number | null, lng: number | null},
-    ) {
+  constructor(
+    name: string,
+    phone: string,
+    email: string,
+    ebike: boolean | null,
+    personDamage: string,
+    location: { lat: number | null; lng: number | null }
+  ) {
     this.name = name;
     this.phone = phone;
     this.email = email;
     this.ebike = ebike;
     this.personDamage = personDamage;
     this.location = location;
-  } 
+  }
 
   updateFields(fields: Partial<bikeInformation>) {
     Object.assign(this, fields);
@@ -40,7 +40,7 @@ export class bikeInformation {
       location: this.location,
     };
   }
-};
+}
 
 interface bikeInfoFormProps {
   value: bikeInformation;
@@ -55,7 +55,14 @@ const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
   const [ebike, setEbike] = useState<boolean | null>(value.ebike);
 
   useEffect(() => {
-    const newBikeInfo = new bikeInformation(name, phoneNumber, email, ebike, personDamage, {lat: null, lng: null});
+    const newBikeInfo = new bikeInformation(
+      name,
+      phoneNumber,
+      email,
+      ebike,
+      personDamage,
+      { lat: null, lng: null }
+    );
 
     onChange(newBikeInfo);
   }, [name, phoneNumber, email, personDamage, ebike]);
@@ -78,6 +85,7 @@ const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
           type="text"
           value={name}
           onChange={setName}
+          placeHolder="John Doe"
         />
 
         <PhoneNumber
@@ -92,6 +100,7 @@ const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
           type="text"
           value={email}
           onChange={setEmail}
+          placeHolder="Greenmobility@example.com"
         />
 
         <TextField

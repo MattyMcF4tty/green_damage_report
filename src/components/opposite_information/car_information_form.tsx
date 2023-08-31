@@ -11,7 +11,7 @@ export class carInformation {
   insurance: string;
   numberplate: string;
   model: string;
-  location: {lat: number | null, lng: number | null};
+  location: { lat: number | null; lng: number | null };
 
   constructor(
     name: string,
@@ -21,7 +21,7 @@ export class carInformation {
     insurance: string,
     numberplate: string,
     model: string,
-    location: {lat: number | null, lng: number | null}
+    location: { lat: number | null; lng: number | null }
   ) {
     this.name = name;
     this.phone = phone;
@@ -31,7 +31,7 @@ export class carInformation {
     this.numberplate = numberplate;
     this.model = model;
     this.location = location;
-  } 
+  }
 
   updateFields(fields: Partial<carInformation>) {
     Object.assign(this, fields);
@@ -49,7 +49,7 @@ export class carInformation {
       location: this.location,
     };
   }
-};
+}
 
 interface carInfoFormProps {
   value: carInformation;
@@ -76,8 +76,8 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
       insurance,
       numberplate,
       model,
-      {lat: null, lng: null}
-    )
+      { lat: null, lng: null }
+    );
 
     onChange(newCarInfo);
   }, [
@@ -101,6 +101,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
         type="text"
         value={numberplate}
         onChange={setNumberplate}
+        placeHolder="DR12345"
       />
       <Inputfield
         labelText="
@@ -110,6 +111,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
         type="text"
         value={model}
         onChange={setModel}
+        placeHolder="Renault Zoe"
       />
       <Inputfield
         labelText="
@@ -119,6 +121,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
         type="text"
         value={name}
         onChange={setName}
+        placeHolder="John Doe"
       />
       <PhoneNumber
         value={phoneNumber}
@@ -132,6 +135,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
         type="text"
         value={email}
         onChange={setEmail}
+        placeHolder="Greenmobility@example.com"
       />
       <Inputfield
         labelText="Driver license number of the other person involved"
@@ -140,6 +144,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
         type="text"
         value={drivingLicenseNumber}
         onChange={setDrivingLicenseNumber}
+        placeHolder="12345678"
       />
       <Inputfield
         labelText="Insurance details of the other person"
@@ -148,6 +153,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
         type="text"
         value={insurance}
         onChange={setInsurance}
+        placeHolder="Your insurance..."
       />
     </div>
   );
