@@ -1,10 +1,7 @@
 /* import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";*/
 import { updateImages } from "@/firebase/clientApp";
 import React, { useEffect, useState, useRef } from "react";
-import {
-  GoogleMap,
-  LoadScript,
-} from "@react-google-maps/api";
+import { GoogleMap, LoadScript } from "@react-google-maps/api";
 import usePlacesService from "react-google-autocomplete/lib/usePlacesAutocompleteService";
 
 /* import usePlacesAutocomplete, {
@@ -41,7 +38,7 @@ export const Inputfield = ({
   value,
   type,
   onChange,
-  placeHolder
+  placeHolder,
 }: InputfieldProps) => {
   const [currentValue, setCurrentValue] = useState<string>(value || "");
   const [isError, setIsError] = useState<boolean>(false);
@@ -58,7 +55,7 @@ export const Inputfield = ({
       break;
     case "email":
       pattern =
-      "^[a-åA-Å0-9.]{1,100}@[a-åA-Å0-9]{2,20}\\.[a-åA-Å]{1,3}$"; /* Email pattern */
+        "^[a-åA-Å0-9.]{1,100}@[a-åA-Å0-9]{2,20}\\.[a-åA-Å]{1,3}$"; /* Email pattern */
       patternError = "Please enter a valid Email";
       break;
     case "tel":
@@ -82,14 +79,14 @@ export const Inputfield = ({
     case "ssn":
       pattern = "^[0-9]{6}-[0-9]{4}$";
       patternError = "Please enter a valid social security number";
-    break;
+      break;
     case "speed":
       pattern = "[0-9]{3}";
       break;
-    case "journalNumber":  
-      pattern="[0-9]{4}-[0-9]{5}-[0-9]{5}-[0-9]{2}"
-      patternError="Please enter a valid journal number"
-    break;
+    case "journalNumber":
+      pattern = "[0-9]{4}-[0-9]{5}-[0-9]{5}-[0-9]{2}";
+      patternError = "Please enter a valid journal number";
+      break;
     default:
       pattern = ""; /* No pattern for "text" type, it allows any input */
       patternError = "Please enter only valid characters";
@@ -184,7 +181,6 @@ export const TimeDateField = ({
   const [timeError, setTimeError] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<string>(timeValue || "");
   const [currentDate, setCurrentDate] = useState<string>(dateValue || "");
-
 
   const [timeBgColor, setTimeBgColor] = useState("bg-white");
   const [dateBgColor, setDateBgColor] = useState("bg-white");
@@ -503,16 +499,13 @@ export const AddressField = ({
   onChange,
   labelText,
 }: AddressFieldProps) => {
-  const [currentAddress, setCurrentAddress] = useState(value || "")
+  const [currentAddress, setCurrentAddress] = useState(value || "");
 
   useEffect(() => {
-    onChange(currentAddress)
-  }, [currentAddress])
+    onChange(currentAddress);
+  }, [currentAddress]);
 
-  const {
-    placePredictions,
-    getPlacePredictions,
-  } = usePlacesService({
+  const { placePredictions, getPlacePredictions } = usePlacesService({
     apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
   });
 
@@ -568,5 +561,4 @@ export const AddressField = ({
       ))}
     </div>
   );
-}
-
+};
