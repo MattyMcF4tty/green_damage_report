@@ -108,14 +108,13 @@ const GoogleMapsField = ({
 
   useEffect(() => {
     if (map) {
-      indicators.map((markers) => addDraggableLine(markers));
+      indicators.map((marker) => createLineWithoutUpdatingIndicators(marker));
     }
   }, [map]);
 
-  const updateIndicatorsState = (indicators: googleIndicator[]) => {
-    setIndicators(indicators);
+  const updateIndicatorsState = (newIndicators: googleIndicator[]) => {
+    setIndicators(newIndicators);
   };
-
   const calculateMiddlePosition = (
     start: google.maps.LatLng,
     end: google.maps.LatLng
@@ -125,7 +124,12 @@ const GoogleMapsField = ({
       (start.lng() + end.lng()) / 2
     );
   };
-  const addDraggableLine = (markers: googleIndicator) => {
+
+  const createLineWithoutUpdatingIndicators = (markers: googleIndicator) => {
+    addDraggableLine(markers, false);
+  };
+
+  const addDraggableLine = (markers: googleIndicator, isNewLine: boolean) => {
     if (map) {
       const center = map.getCenter();
       if (!center) {
@@ -134,16 +138,25 @@ const GoogleMapsField = ({
 
       const position = new google.maps.LatLng(center.lat(), center.lng());
 
-      const startPosition = new google.maps.LatLng(
-        position.lat() + 0.00005, // Slightly adjust latitude for the second start marker
-        position.lng()
-      );
-
-      const startMarker = new google.maps.Marker({
-        position: {
-          lat: markers.marker1.lat || startPos.lat,
-          lng: markers.marker1.lng || startPos.lng,
+      // Define initial positions based on passed `markers` or `position`
+      const initialPositions = {
+        start: {
+          lat: markers.marker1.lat || position.lat(),
+          lng: markers.marker1.lng || position.lng(),
         },
+        middle: {
+          lat: markers.marker2.lat || position.lat(),
+          lng: markers.marker2.lng || position.lng(),
+        },
+        end: {
+          lat: markers.marker3.lat || position.lat(),
+          lng: markers.marker3.lng || position.lng(),
+        },
+      };
+
+      // Create the markers
+      const startMarker = new google.maps.Marker({
+        position: initialPositions.start,
         map: map,
         icon: {
           path: google.maps.SymbolPath.CIRCLE,
@@ -156,19 +169,13 @@ const GoogleMapsField = ({
       });
 
       const endMarker = new google.maps.Marker({
-        position: {
-          lat: markers.marker3.lat || startPos.lat,
-          lng: markers.marker3.lng || startPos.lng,
-        },
+        position: initialPositions.end,
         map: map,
         draggable: true,
       });
 
       const middleMarker = new google.maps.Marker({
-        position: {
-          lat: markers.marker2.lat || startPos.lat,
-          lng: markers.marker2.lng || startPos.lng,
-        },
+        position: initialPositions.middle,
         map: map,
         icon: {
           path: google.maps.SymbolPath.CIRCLE,
@@ -178,9 +185,9 @@ const GoogleMapsField = ({
           strokeWeight: 0,
         },
         draggable: true,
-        zIndex: 2,
       });
 
+      // Create the line
       const line = new google.maps.Polyline({
         path: [
           startMarker.getPosition()!,
@@ -190,7 +197,8 @@ const GoogleMapsField = ({
         map: map,
       });
 
-      startMarker.addListener("drag", () => {
+      // Attach event listeners for dragging
+      const updateLineAndMiddle = () => {
         const startMarkerPosition = startMarker.getPosition();
         const endMarkerPosition = endMarker.getPosition();
         if (startMarkerPosition && endMarkerPosition) {
@@ -205,24 +213,10 @@ const GoogleMapsField = ({
           );
           middleMarker.setPosition(newMiddleMarkerPosition);
         }
-      });
+      };
 
-      endMarker.addListener("drag", () => {
-        const startMarkerPosition = startMarker.getPosition();
-        const endMarkerPosition = endMarker.getPosition();
-        if (startMarkerPosition && endMarkerPosition) {
-          line.setPath([
-            startMarkerPosition,
-            middleMarker.getPosition()!,
-            endMarkerPosition,
-          ]);
-          const newMiddleMarkerPosition = calculateMiddlePosition(
-            startMarkerPosition,
-            endMarkerPosition
-          );
-          middleMarker.setPosition(newMiddleMarkerPosition);
-        }
-      });
+      startMarker.addListener("drag", updateLineAndMiddle);
+      endMarker.addListener("drag", updateLineAndMiddle);
 
       middleMarker.addListener("drag", () => {
         const startMarkerPosition = startMarker.getPosition();
@@ -237,66 +231,81 @@ const GoogleMapsField = ({
           ]);
         }
       });
+      // Function to update markers after dragend
+      const updateMarkerPositions = () => {
+        const startMarkerPosition = startMarker.getPosition();
+        const middleMarkerPosition = middleMarker.getPosition();
+        const endMarkerPosition = endMarker.getPosition();
 
-      // Attach dragend event listeners to update positions
-      startMarker.addListener("dragend", () => {
-        const newStartMarkerPosition = startMarker.getPosition();
-        if (newStartMarkerPosition) {
-          console.log(
-            "Start Marker New Position:",
-            newStartMarkerPosition.toJSON()
+        if (startMarkerPosition && middleMarkerPosition && endMarkerPosition) {
+          const newIndicator = new googleIndicator(
+            {
+              lat: startMarkerPosition.lat(),
+              lng: startMarkerPosition.lng(),
+            },
+            {
+              lat: middleMarkerPosition.lat(),
+              lng: middleMarkerPosition.lng(),
+            },
+            {
+              lat: endMarkerPosition.lat(),
+              lng: endMarkerPosition.lng(),
+            }
           );
+
+          // Update the state here
+          setIndicators([...indicators, newIndicator]);
         }
-      });
+      };
 
-      middleMarker.addListener("dragend", () => {
-        const newMiddleMarkerPosition = middleMarker.getPosition();
-        if (newMiddleMarkerPosition) {
-          console.log(
-            "Middle Marker New Position:",
-            newMiddleMarkerPosition.toJSON()
-          );
-        }
-      });
-
-      endMarker.addListener("dragend", () => {
-        const newEndMarkerPosition = endMarker.getPosition();
-        if (newEndMarkerPosition) {
-          console.log(
-            "End Marker New Position:",
-            newEndMarkerPosition.toJSON()
-          );
-        }
-      });
-
-      setLineMarkers([startMarker, middleMarker, endMarker]);
-      setLines([line]);
-      // Store the marker positions into indicators state
-      const startMarkerPosition = startMarker.getPosition();
-      const middleMarkerPosition = middleMarker.getPosition();
-      const endMarkerPosition = endMarker.getPosition();
-
-      if (startMarkerPosition && middleMarkerPosition && endMarkerPosition) {
-        const newIndicator = new googleIndicator(
-          {
-            lat: startMarkerPosition.lat(),
-            lng: startMarkerPosition.lng(),
-          },
-          {
-            lat: middleMarkerPosition.lat(),
-            lng: middleMarkerPosition.lng(),
-          },
-          {
-            lat: endMarkerPosition.lat(),
-            lng: endMarkerPosition.lng(),
-          }
+      // Conditionally call updateMarkerPositions
+      if (!isNewLine) {
+        updateMarkerPositions();
+      } else {
+        // Update existing line and markers
+        startMarker.setPosition(
+          new google.maps.LatLng(
+            initialPositions.start.lat,
+            initialPositions.start.lng
+          )
         );
+        middleMarker.setPosition(
+          new google.maps.LatLng(
+            initialPositions.middle.lat,
+            initialPositions.middle.lng
+          )
+        );
+        endMarker.setPosition(
+          new google.maps.LatLng(
+            initialPositions.end.lat,
+            initialPositions.end.lng
+          )
+        );
+        line.setPath([
+          startMarker.getPosition()!,
+          middleMarker.getPosition()!,
+          endMarker.getPosition()!,
+        ]);
+        updateMarkerPositions();
 
-        setIndicators([...indicators, newIndicator]);
+        // Attach dragend event listeners
+        startMarker.addListener("dragend", updateMarkerPositions);
+        middleMarker.addListener("dragend", updateMarkerPositions);
+        endMarker.addListener("dragend", updateMarkerPositions);
       }
+
+      // Update line markers
+      setLineMarkers((prevMarkers) => [
+        ...prevMarkers,
+        startMarker,
+        middleMarker,
+        endMarker,
+      ]);
+
+      // Update lines
+      setLines((prevLines) => [...prevLines, line]);
     }
   };
-
   /* Load Google maps javascript api */
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "",
@@ -535,7 +544,16 @@ const GoogleMapsField = ({
     <div className="w-full h-full">
       <button
         className="add-line-button border-[1px] border-MainGreen-200 rounded-md mb-2 bg-MainGreen-100 w-1/2"
-        onClick={() => addDraggableLine(setIndicators)}
+        onClick={() =>
+          addDraggableLine(
+            new googleIndicator(
+              { lat: null, lng: null }, // Or default coordinates
+              { lat: null, lng: null }, // Or default coordinates
+              { lat: null, lng: null } // Or default coordinates
+            ),
+            true // isNewLine is true
+          )
+        }
         type="button"
       >
         Add Draggable Line
