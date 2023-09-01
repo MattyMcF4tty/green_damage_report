@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app"
 import { collection, deleteDoc, doc, getDoc, getDocs, getFirestore, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { ListResult, StorageReference, deleteObject, getDownloadURL, getStorage, listAll, ref, uploadBytes } from "firebase/storage"
-import { decryptData, encryptData, reportDataType } from "@/utils/utils";
+import { decryptData, downloadToPc, encryptData, reportDataType } from "@/utils/utils";
 import axios from "axios";
 
 
@@ -233,14 +233,38 @@ export const checkEmailExists = async (email: string) => {
     }
 }
 
-export async function handlePdf(id: string) {
+export const handleGeneratePdf = async (id: string)  => {
   try {
     const response = await axios.post('/api/generatepdf', { id });
     if (response.status === 200) {
-      console.log('PDF generated and uploaded successfully.');
+      console.log(`PDF of ${id} generated and uploaded successfully.`);
     }
   } catch (error) {
     console.error('An error occurred:', error);
+  }
+}
+
+export const handleDownloadPdf = async (id: string) => {
+  try {
+    const response = await axios.post('/api/downloadpdf', { id }, { responseType: 'arraybuffer' });
+
+    if (response.status === 200) {
+      console.log(`PDF of ${id} downloaded from server successfully.`);
+      
+      const pdfBlob: Blob = new Blob([response.data], { type: 'application/pdf' });
+      
+      await downloadToPc(pdfBlob, `DamageReport_${id}`);
+    } else {
+      throw new Error("Something went wrong downloading pdf to pc");
+    }
+  } catch (error:any) {
+    if (error.response && error.response.status === 404) {
+      console.log('PDF does not exist, creating a new one.');
+      await handleGeneratePdf(id);
+      await handleDownloadPdf(id);
+    } else {
+      console.error('An error occurred:', error);
+    }
   }
 }
 

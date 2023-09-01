@@ -1,24 +1,25 @@
 import jsPDF from "jspdf";
 import { reportDataType } from "@/utils/utils";
-import { getImages } from "@/firebase/clientApp";
 import axios from "axios";
+import fs from 'fs';
+import path from 'path';
 
-const addImageToPDF = async (pdfDoc: jsPDF) => {
-  // Add image at the top
-  const imageWidth = 80; // Adjust the width of the image as needed
-  const imageHeight = 20; // Adjust the height of the image as needed
-  const imageX = 65; // X-coordinate of the image (centered)
-  const imageY = 10; // Y-coordinate of the image
-  const imageUrl = "../GreenLogos/GreenMobilityTextLogo.png"; // Replace with the actual image URL
 
-  pdfDoc.addImage(imageUrl, "JPEG", imageX, imageY, imageWidth, imageHeight);
+const addImageToPDF = (pdfDoc: jsPDF, logoBase64: string) => {
+  const imageWidth = 80;
+  const imageHeight = 20;
+  const imageX = 65;
+  const imageY = 10;
 
-  return pdfDoc;
+  // Use logoBase64 as the image source
+  pdfDoc.addImage(logoBase64, "PNG", imageX, imageY, imageWidth, imageHeight);
 };
 
-const generatePDF = async (
+
+const createReportPDF = async (
   data: reportDataType,
-  images: Record<string, string[]>
+  images: Record<string, string[]>,
+  logo: string
 ) => {
   const doc = new jsPDF();
 
@@ -26,7 +27,7 @@ const generatePDF = async (
   doc.setFontSize(12);
 
   // Call function to add image to the PDF
-  await addImageToPDF(doc);
+  addImageToPDF(doc, logo);
 
   // Additional text above driver information
   doc.setTextColor(0);
@@ -881,8 +882,26 @@ const generatePDF = async (
     doc.text("No GreenMobility images available.", 15, currentY);
   }
 
+  doc.addPage()
+  // Check if the 'images' object and 'GreenMobility' property exist
+  if (images["OtherParty"]) {
+    for (const OtherParty in images) {
+      if (Array.isArray(images[OtherParty])) {
+        for (const imageUrl of images[OtherParty]) {
+          const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
+          const imageBase64 = Buffer.from(response.data, 'binary').toString('base64');
+          doc.addImage(imageBase64, 'JPEG', 10, currentY, 50, 50); // Add image to PDF
+          currentY += 60; // Update y position for next image
+        }
+      }
+    }
+  } else {
+    // Handle case where 'GreenMobility' images are not available
+    doc.text("No GreenMobility images available.", 15, currentY);
+  }
+
   // Save the PDF
-  return new Uint8Array(doc.output('arraybuffer'));
+  return new Uint8Array(doc.output('arraybuffer'))
 };
 
-export default generatePDF;
+export default createReportPDF;

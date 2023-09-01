@@ -7,8 +7,8 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ExpandedReport from "./expandedReport";
-import { deleteReports, getImages, handlePdf, storage } from "@/firebase/clientApp";
-import generatePDF from "@/utils/pdfGenerator";
+import { deleteReports, getImages, handleDownloadPdf, handleGeneratePdf, storage } from "@/firebase/clientApp";
+import generatePDF from "@/utils/reportPdfTemplate";
 import { ref, uploadBytes } from "firebase/storage";
 
 
@@ -16,35 +16,23 @@ interface ReportControls {
   selectedReports: { id: string; data: reportDataType }[];
 }
 
-const handleDownloadPDF = async (id: string, data: reportDataType) => {
-  await handlePdf(id)
-/*   const images = await getImages(id);
-  if (data !== null) {
-    const pdfBlob = await generatePDF(data, images);
-
-    const refer = ref(storage, "abc/")
-    await uploadBytes(refer, pdfBlob) */
-/*     const url = URL.createObjectURL(pdfBlob);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "report.pdf";
-    link.click();
-
-    URL.revokeObjectURL(url); */
-/*   } else {
-    console.error("No data available for PDF generation");
-  } */
-};
 
 const ReportControls = ({ selectedReports }: ReportControls) => {
   const [showExpandedReports, setShowExpandedReports] =
     useState<boolean>(false);
 
-  const [status, setStatus] = useState("");
+  const [allowPdf, setAllowPdf] = useState(true);
 
   const handleSendEmail = async() => {
     await sendEmail("carloslundrodriguez@gmail.com", "sut din far", "dø");
+  };
+
+  const handleDownloadPDF = async (selectedReports: {id: string, data: reportDataType}[]) => {
+    setAllowPdf(false);
+    selectedReports.map(async (report) => {
+      await handleDownloadPdf(report.id);
+    })
+    setAllowPdf(true);
   };
 
   const handleDelete = async () => {
@@ -72,9 +60,10 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
       </button>
       <button onClick={() => handleSendEmail()}>Send Email</button>
       <button
+        disabled={!allowPdf}
         onClick={() => {
           if (selectedReports.length > 0) {
-            handleDownloadPDF(selectedReports[0].id, selectedReports[0].data);
+            handleDownloadPDF(selectedReports);
           }
         }}
         className="bg-MainGreen-300 text-white px-4 py-2 rounded-md shadow-md"
