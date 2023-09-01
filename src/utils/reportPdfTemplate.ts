@@ -1,9 +1,8 @@
 import jsPDF from "jspdf";
 import { reportDataType } from "@/utils/utils";
 import axios from "axios";
-import fs from 'fs';
-import path from 'path';
-
+import fs from "fs";
+import path from "path";
 
 const addImageToPDF = (pdfDoc: jsPDF, logoBase64: string) => {
   const imageWidth = 80;
@@ -14,7 +13,6 @@ const addImageToPDF = (pdfDoc: jsPDF, logoBase64: string) => {
   // Use logoBase64 as the image source
   pdfDoc.addImage(logoBase64, "PNG", imageX, imageY, imageWidth, imageHeight);
 };
-
 
 const createReportPDF = async (
   data: reportDataType,
@@ -82,32 +80,26 @@ const createReportPDF = async (
     ? data.driverInfo.drivingLicenseNumber
     : "-";
 
-    const driverRenter = data.driverRenter
-    
-    
+  const driverRenter = data.driverRenter;
 
   doc.text(`Name: ${name}`, 15, driverInfoY);
   doc.text(`Phone number: ${phoneNumber}`, 15, driverInfoY + 8);
   doc.text(`Email: ${email}`, 15, driverInfoY + 16);
-  doc.text(
-    `Address: ${address}`,
-    15,
-    driverInfoY + 24
-  );
+  doc.text(`Address: ${address}`, 15, driverInfoY + 24);
   doc.text(`Social security number: ${socialSecurityNumber}`, 105, driverInfoY);
   doc.text(
     `Driving License Number: ${drivingLicenseNumber}`,
     105,
     driverInfoY + 8
   );
-  if(driverRenter === null){
-    doc.text("Is driver and renter the same? -", 105, driverInfoY+16 )
-  } else if(driverRenter === true){
-    doc.text("Driver and renter is the same", 105, driverInfoY+16)
-  } else{
-    doc.text("Driver and renter is not the same", 105, driverInfoY+16)
+  if (driverRenter === null) {
+    doc.text("Is driver and renter the same? -", 105, driverInfoY + 16);
+  } else if (driverRenter === true) {
+    doc.text("Driver and renter is the same", 105, driverInfoY + 16);
+  } else {
+    doc.text("Driver and renter is not the same", 105, driverInfoY + 16);
   }
-  
+
   // Add space between driver information and accident information
   const spaceBetweenSections = 10;
   const accidentInfoY = driverInfoY + 40 + spaceBetweenSections;
@@ -356,7 +348,11 @@ const createReportPDF = async (
       doc.setFont("normal");
       doc.text(`Name: ${currentBiker.name || "-"}`, 20, currentY + 28);
       doc.text(`Phonenumber: ${currentBiker.phone || "-"}`, 20, currentY + 36);
-      doc.text(`Email: ${currentBiker.email || "No email has been provided"}`, 20, currentY + 44);
+      doc.text(
+        `Email: ${currentBiker.email || "No email has been provided"}`,
+        20,
+        currentY + 44
+      );
       doc.text(
         `Electric bike: ${
           currentBiker.ebike !== null
@@ -473,17 +469,37 @@ const createReportPDF = async (
 
       // Render vehicle details (name, license number, etc.)
       doc.setFont("normal");
-      doc.text(`Name: ${currentVehicle.name  || "-"}`, 20, currentY + 28);
-      doc.text(`Phonenumber: ${currentVehicle.phone || "-"}`, 20, currentY + 36);
-      doc.text(`Email: ${currentVehicle.email || "No email has been provided"}`, 20, currentY + 44);
-      doc.text(`Numberplate: ${currentVehicle.numberplate  || "-"}`, 20, currentY + 52);
+      doc.text(`Name: ${currentVehicle.name || "-"}`, 20, currentY + 28);
+      doc.text(
+        `Phonenumber: ${currentVehicle.phone || "-"}`,
+        20,
+        currentY + 36
+      );
+      doc.text(
+        `Email: ${currentVehicle.email || "No email has been provided"}`,
+        20,
+        currentY + 44
+      );
+      doc.text(
+        `Numberplate: ${currentVehicle.numberplate || "-"}`,
+        20,
+        currentY + 52
+      );
       doc.text(
         `License Number: ${currentVehicle.driversLicenseNumber || "-"}`,
         100,
         currentY + 28
       );
-      doc.text(`Vehicle model: ${currentVehicle.model || "-"}`, 100, currentY + 36);
-      doc.text(`Insurance: ${currentVehicle.insurance || "-"}`, 100, currentY + 44);
+      doc.text(
+        `Vehicle model: ${currentVehicle.model || "-"}`,
+        100,
+        currentY + 36
+      );
+      doc.text(
+        `Insurance: ${currentVehicle.insurance || "-"}`,
+        100,
+        currentY + 44
+      );
 
       // Update currentY for the next vehicle
       currentY += vehicleInfoHeight + sectionSpacing + 2;
@@ -596,8 +612,16 @@ const createReportPDF = async (
       // Render pedestrian details (name, age, etc.)
       doc.setFont("normal");
       doc.text(`Name: ${currentPedestrian.name || "-"}`, 20, currentY + 28);
-      doc.text(`Email: ${currentPedestrian.email || "No email has been provided"}`, 20, currentY + 36);
-      doc.text(`Phonenumber: ${currentPedestrian.phone || "-"}`, 100, currentY + 28);
+      doc.text(
+        `Email: ${currentPedestrian.email || "No email has been provided"}`,
+        20,
+        currentY + 36
+      );
+      doc.text(
+        `Phonenumber: ${currentPedestrian.phone || "-"}`,
+        100,
+        currentY + 28
+      );
       // Render injury description
       doc.text("Injury description:", 100, currentY + 36);
       for (let i = 0; i < numInjuryDescriptionLines; i++) {
@@ -779,19 +803,17 @@ const createReportPDF = async (
   }
 
   currentY += sectionSpacing; // Add space after the other information section
-
+  const maxWitnessesPerRow = 2;
+  const numRows = Math.ceil(data.witnesses.length / maxWitnessesPerRow);
+  const witnessInfoHeight = numRows * 45;
+  const currentWitnessSectionHeight = witnessInfoHeight + sectionSpacing;
 
   // Witnesses information
   if (data.witnesses.length > 0) {
-    const maxWitnessesPerRow = 2;
-    const numRows = Math.ceil(data.witnesses.length / maxWitnessesPerRow);
-    const witnessInfoHeight = numRows * 45;
-
     // Calculate the remaining space on the current page
     const remainingSpace = doc.internal.pageSize.height - currentY;
 
     // Calculate the total witness section height with additional spacing
-    const currentWitnessSectionHeight = witnessInfoHeight + sectionSpacing;
 
     // Check if there's enough space for the witness information section
     if (remainingSpace < currentWitnessSectionHeight) {
@@ -828,7 +850,11 @@ const createReportPDF = async (
       doc.setFont("normal");
       doc.text(`Name: ${witness.name || "-"}`, startX, startY);
       doc.text(`Phone: ${witness.phone || "-"}`, startX, startY + 8);
-      doc.text(`Email: ${witness.email || "No email has been provided"}`, startX, startY + 16);
+      doc.text(
+        `Email: ${witness.email || "No email has been provided"}`,
+        startX,
+        startY + 16
+      );
 
       currentColumn++;
       if (currentColumn >= maxWitnessesPerRow) {
@@ -862,46 +888,120 @@ const createReportPDF = async (
     doc.text("No witnesses information.", 20, currentY + 28);
     currentY += noWitnessesHeight + 2;
   }
+  currentY += sectionSpacing;
 
-  // Images of damages to GreenMobility and other party car section
+  const calculateRequiredHeight = (
+    numImages: number,
+    imageHeight: number,
+    headerHeight: number
+  ) => {
+    return numImages * imageHeight + headerHeight;
+  };
 
-  // Check if the 'images' object and 'GreenMobility' property exist
+  // Images of damages to GreenMobility section
+  const imageHeight = 60;
+  const headerHeight = 20;
+  const totalGreenMobilityHeight =
+    images["GreenMobility"].length * imageHeight + headerHeight;
+  const remainingSpaceGreen = doc.internal.pageSize.height - currentY;
+
+  const requiredHeightGreenMobility = calculateRequiredHeight(
+    images["GreenMobility"].length,
+    imageHeight,
+    headerHeight
+  );
+
+  // Function to add header for image sections
+  const addImageSectionHeader = (text: string) => {
+    doc.setFont("bold");
+    doc.text(text, 15, currentY + 10);
+    doc.setLineWidth(0.5);
+    doc.line(15, currentY + 12, 80, currentY + 12); // Add underline
+    doc.setFont("normal");
+    currentY += headerHeight; // Add space for header
+  };
+
   if (images["GreenMobility"]) {
-    for (const GreenMobility in images) {
-      if (Array.isArray(images[GreenMobility])) {
-        for (const imageUrl of images[GreenMobility]) {
-          const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-          const imageBase64 = Buffer.from(response.data, 'binary').toString('base64');
-          doc.addImage(imageBase64, 'JPEG', 10, currentY, 50, 50); // Add image to PDF
-          currentY += 60; // Update y position for next image
+    if (Array.isArray(images["GreenMobility"])) {
+      doc.setFillColor("#E6EEE5");
+      doc.roundedRect(
+        10,
+        currentY,
+        190,
+        requiredHeightGreenMobility,
+        5,
+        5,
+        "F"
+      );
+
+      addImageSectionHeader("GreenMobility Damage Images");
+
+      for (const imageUrl of images["GreenMobility"]) {
+        if (remainingSpaceGreen < requiredHeightGreenMobility) {
+          doc.addPage();
+          currentY = 10;
         }
+
+        const response = await axios.get(imageUrl, {
+          responseType: "arraybuffer",
+        });
+        const imageBase64 = Buffer.from(response.data, "binary").toString(
+          "base64"
+        );
+        doc.addImage(imageBase64, "JPEG", 15, currentY, 80, 80);
+        currentY += imageHeight; // Update y position for next image
       }
+    } else {
+      addImageSectionHeader("GreenMobility Damage Images");
+      doc.text("No GreenMobility images available.", 15, currentY);
+      currentY += headerHeight;
     }
-  } else {
-    // Handle case where 'GreenMobility' images are not available
-    doc.text("No GreenMobility images available.", 15, currentY);
   }
 
-  doc.addPage()
-  // Check if the 'images' object and 'GreenMobility' property exist
+  // Add a new page before adding 'OtherParty' images
+  doc.addPage();
+  currentY = 10; // Reset Y-coordinate to the top of the new page
+
+  const totalOtherPartyHeight =
+    images["OtherParty"].length * imageHeight + headerHeight;
+  const remainingSpaceOther = doc.internal.pageSize.height - currentY;
+  const requiredHeightOtherParty = calculateRequiredHeight(
+    images["OtherParty"].length,
+    imageHeight,
+    headerHeight
+  );
+
+  // For OtherParty images
   if (images["OtherParty"]) {
-    for (const OtherParty in images) {
-      if (Array.isArray(images[OtherParty])) {
-        for (const imageUrl of images[OtherParty]) {
-          const response = await axios.get(imageUrl, { responseType: 'arraybuffer' });
-          const imageBase64 = Buffer.from(response.data, 'binary').toString('base64');
-          doc.addImage(imageBase64, 'JPEG', 10, currentY, 50, 50); // Add image to PDF
-          currentY += 60; // Update y position for next image
+    if (Array.isArray(images["OtherParty"])) {
+      doc.setFillColor("#E6EEE5");
+      doc.roundedRect(10, currentY, 190, requiredHeightOtherParty, 5, 5, "F");
+
+      addImageSectionHeader("OtherParty Damage Images");
+
+      for (const imageUrl of images["OtherParty"]) {
+        if (remainingSpaceOther < requiredHeightOtherParty) {
+          doc.addPage();
+          currentY = 10;
         }
+
+        const response = await axios.get(imageUrl, {
+          responseType: "arraybuffer",
+        });
+        const imageBase64 = Buffer.from(response.data, "binary").toString(
+          "base64"
+        );
+        doc.addImage(imageBase64, "JPEG", 15, currentY, 80, 80); // Add image to PDF
+        currentY += imageHeight; // Update y position for next image
       }
+    } else {
+      addImageSectionHeader("OtherParty Damage Images");
+      doc.text("No OtherParty images available.", 15, currentY);
+      currentY += headerHeight;
     }
-  } else {
-    // Handle case where 'GreenMobility' images are not available
-    doc.text("No GreenMobility images available.", 15, currentY);
   }
 
   // Save the PDF
-  return new Uint8Array(doc.output('arraybuffer'))
+  return new Uint8Array(doc.output("arraybuffer"));
 };
-
 export default createReportPDF;
