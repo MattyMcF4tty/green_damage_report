@@ -2,8 +2,6 @@ import { WitnessInformation } from "@/components/otherPartys/witnessList";
 import { getData, getImages, getReportIds } from "@/firebase/clientApp";
 import CryptoJS from "crypto-js";
 import { GetServerSidePropsContext } from "next";
-import SMTPTransport from "nodemailer/lib/smtp-transport";
-import nodemailer from 'nodemailer'
 import axios from "axios";
 
 export type pageProps = {

@@ -31,7 +31,7 @@ interface InputfieldProps {
   value: string | null;
   onChange: (isValue: string) => void;
   pattern?: string;
-  placeHolder: string;
+  placeHolder?: string;
 }
 
 export const Inputfield = ({
@@ -153,7 +153,7 @@ export const Inputfield = ({
         onBlur={() => handleLeave()}
         onInvalid={() => handleCheck()}
         onFocus={() => setIsFocused(true)}
-        placeholder={placeHolder}
+        placeholder={placeHolder ? placeHolder : ""}
       />
       {isError && <p className="text-sm text-red-500">{patternError}</p>}
     </div>
