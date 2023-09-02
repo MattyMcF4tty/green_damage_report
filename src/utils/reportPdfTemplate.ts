@@ -3,6 +3,7 @@ import { reportDataType } from "@/utils/utils";
 import axios from "axios";
 import fs from "fs";
 import path from "path";
+import sharp from "sharp";
 
 const addImageToPDF = (pdfDoc: jsPDF, logoBase64: string) => {
   const imageWidth = 80;
@@ -890,6 +891,9 @@ const createReportPDF = async (
   }
   currentY += sectionSpacing;
 
+  //images section
+  doc.addPage();
+
   const calculateRequiredHeight = (
     numImages: number,
     imageHeight: number,
@@ -897,19 +901,6 @@ const createReportPDF = async (
   ) => {
     return numImages * imageHeight + headerHeight;
   };
-
-  // Images of damages to GreenMobility section
-  const imageHeight = 60;
-  const headerHeight = 20;
-  const totalGreenMobilityHeight =
-    images["GreenMobility"].length * imageHeight + headerHeight;
-  const remainingSpaceGreen = doc.internal.pageSize.height - currentY;
-
-  const requiredHeightGreenMobility = calculateRequiredHeight(
-    images["GreenMobility"].length,
-    imageHeight,
-    headerHeight
-  );
 
   // Function to add header for image sections
   const addImageSectionHeader = (text: string) => {
@@ -921,35 +912,70 @@ const createReportPDF = async (
     currentY += headerHeight; // Add space for header
   };
 
+  // Images of damages to GreenMobility section
+  const maxImageHeight = 200; // max height you're willing to allow an image to be
+  const headerHeight = 20;
+  currentY = 10;
+
   if (images["GreenMobility"]) {
     if (Array.isArray(images["GreenMobility"])) {
-      doc.setFillColor("#E6EEE5");
-      doc.roundedRect(
-        10,
-        currentY,
-        190,
-        requiredHeightGreenMobility,
-        5,
-        5,
-        "F"
-      );
-
+      // Create a section header
       addImageSectionHeader("GreenMobility Damage Images");
 
       for (const imageUrl of images["GreenMobility"]) {
-        if (remainingSpaceGreen < requiredHeightGreenMobility) {
-          doc.addPage();
-          currentY = 10;
-        }
-
         const response = await axios.get(imageUrl, {
           responseType: "arraybuffer",
         });
-        const imageBase64 = Buffer.from(response.data, "binary").toString(
-          "base64"
+
+        const correctedImageBuffer = await sharp(response.data)
+          .rotate(/* angle to rotate, if needed */)
+          .toBuffer();
+
+        const imageMetadata = await sharp(correctedImageBuffer).metadata();
+
+        const originalWidth = imageMetadata.width!;
+        const originalHeight = imageMetadata.height!;
+
+        const maxImageWidth = 185; // Set a maximum width for images
+
+        let heightScaleFactor, widthScaleFactor;
+
+        if (originalHeight > maxImageHeight) {
+          heightScaleFactor = maxImageHeight / originalHeight;
+        } else {
+          heightScaleFactor = 1; // keep the image at its original height
+        }
+
+        if (originalWidth > maxImageWidth) {
+          widthScaleFactor = maxImageWidth / originalWidth;
+        } else {
+          widthScaleFactor = 1; // keep the image at its original width
+        }
+
+        const scaleFactor = Math.min(heightScaleFactor, widthScaleFactor); // Take the smaller of the two scale factors to maintain aspect ratio
+
+        const scaledWidth = originalWidth * scaleFactor;
+        const scaledHeight = originalHeight * scaleFactor;
+
+        const remainingSpaceGreen = doc.internal.pageSize.height - currentY;
+
+        if (remainingSpaceGreen < scaledHeight + 5) {
+          doc.addPage();
+          currentY = 10;
+          addImageSectionHeader("GreenMobility Damage Images Continued");
+        }
+
+        const imageBase64 = correctedImageBuffer.toString("base64");
+
+        doc.addImage(
+          imageBase64,
+          "JPEG",
+          15,
+          currentY,
+          scaledWidth,
+          scaledHeight
         );
-        doc.addImage(imageBase64, "JPEG", 15, currentY, 80, 80);
-        currentY += imageHeight; // Update y position for next image
+        currentY += scaledHeight; // Update the y-coordinate based on the height
       }
     } else {
       addImageSectionHeader("GreenMobility Damage Images");
@@ -963,44 +989,65 @@ const createReportPDF = async (
   currentY = 10; // Reset Y-coordinate to the top of the new page
 
   const totalOtherPartyHeight =
-    images["OtherParty"].length * imageHeight + headerHeight;
+    images["OtherParty"].length * maxImageHeight + headerHeight;
   const remainingSpaceOther = doc.internal.pageSize.height - currentY;
   const requiredHeightOtherParty = calculateRequiredHeight(
     images["OtherParty"].length,
-    imageHeight,
+    maxImageHeight,
     headerHeight
   );
 
   // For OtherParty images
   if (images["OtherParty"]) {
     if (Array.isArray(images["OtherParty"])) {
-      doc.setFillColor("#E6EEE5");
-      doc.roundedRect(10, currentY, 190, requiredHeightOtherParty, 5, 5, "F");
-
       addImageSectionHeader("OtherParty Damage Images");
 
       for (const imageUrl of images["OtherParty"]) {
-        if (remainingSpaceOther < requiredHeightOtherParty) {
-          doc.addPage();
-          currentY = 10;
-        }
-
         const response = await axios.get(imageUrl, {
           responseType: "arraybuffer",
         });
-        const imageBase64 = Buffer.from(response.data, "binary").toString(
-          "base64"
+
+        const correctedImageBuffer = await sharp(response.data)
+          .rotate(/* angle to rotate, if needed */)
+          .toBuffer();
+
+        const imageMetadata = await sharp(correctedImageBuffer).metadata();
+        const originalWidth = imageMetadata.width!;
+        const originalHeight = imageMetadata.height!;
+
+        let scaleFactor;
+        if (originalHeight > maxImageHeight) {
+          scaleFactor = maxImageHeight / originalHeight;
+        } else {
+          scaleFactor = 1; // keep the image at its original size
+        }
+
+        const scaledWidth = originalWidth * scaleFactor;
+        const scaledHeight = originalHeight * scaleFactor;
+
+        const remainingSpaceOther = doc.internal.pageSize.height - currentY;
+
+        if (remainingSpaceOther < scaledHeight + 5) {
+          doc.addPage();
+          currentY = 10;
+          addImageSectionHeader("OtherParty Damage Images Continued");
+        }
+
+        const imageBase64 = correctedImageBuffer.toString("base64");
+
+        doc.addImage(
+          imageBase64,
+          "JPEG",
+          15,
+          currentY,
+          scaledWidth,
+          scaledHeight
         );
-        doc.addImage(imageBase64, "JPEG", 15, currentY, 80, 80); // Add image to PDF
-        currentY += imageHeight; // Update y position for next image
+
+        currentY += scaledHeight; // Update the y-coordinate based on the height
       }
-    } else {
-      addImageSectionHeader("OtherParty Damage Images");
-      doc.text("No OtherParty images available.", 15, currentY);
-      currentY += headerHeight;
     }
   }
-
   // Save the PDF
   return new Uint8Array(doc.output("arraybuffer"));
 };
