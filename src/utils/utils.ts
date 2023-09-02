@@ -308,6 +308,24 @@ export const sendEmail = async (toEmail: string, subject: string, text: string) 
   }
 };
 
+
+export const downloadToPc = async (file:Blob, fileName: string) => {
+  const url: string = window.URL.createObjectURL(file);
+
+  // Create a 'download' anchor tag
+  const downloadLink: HTMLAnchorElement = document.createElement('a');
+  downloadLink.href = url;
+  downloadLink.download = fileName;
+
+  // This will download the PDF upon click
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+
+  // Cleanup
+  document.body.removeChild(downloadLink);
+  window.URL.revokeObjectURL(url);
+}
+
 /* ---------------- classes ------------------------------ */
 export class reportDataType {
   userEmail: string | null;

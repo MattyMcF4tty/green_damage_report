@@ -1,23 +1,24 @@
 import jsPDF from "jspdf";
 import { reportDataType } from "@/utils/utils";
-import { getImages } from "@/firebase/clientApp";
+import axios from "axios";
+import fs from "fs";
+import path from "path";
+import sharp from "sharp";
 
-const addImageToPDF = async (pdfDoc: jsPDF) => {
-  // Add image at the top
-  const imageWidth = 80; // Adjust the width of the image as needed
-  const imageHeight = 20; // Adjust the height of the image as needed
-  const imageX = 65; // X-coordinate of the image (centered)
-  const imageY = 10; // Y-coordinate of the image
-  const imageUrl = "../GreenLogos/GreenMobilityTextLogo.png"; // Replace with the actual image URL
+const addImageToPDF = (pdfDoc: jsPDF, logoBase64: string) => {
+  const imageWidth = 80;
+  const imageHeight = 20;
+  const imageX = 65;
+  const imageY = 10;
 
-  pdfDoc.addImage(imageUrl, "JPEG", imageX, imageY, imageWidth, imageHeight);
-
-  return pdfDoc;
+  // Use logoBase64 as the image source
+  pdfDoc.addImage(logoBase64, "PNG", imageX, imageY, imageWidth, imageHeight);
 };
 
-const generatePDF = async (
+const createReportPDF = async (
   data: reportDataType,
-  images: Record<string, string[]>
+  images: Record<string, string[]>,
+  logo: string
 ) => {
   const doc = new jsPDF();
 
@@ -25,7 +26,7 @@ const generatePDF = async (
   doc.setFontSize(12);
 
   // Call function to add image to the PDF
-  await addImageToPDF(doc);
+  addImageToPDF(doc, logo);
 
   // Additional text above driver information
   doc.setTextColor(0);
@@ -68,7 +69,7 @@ const generatePDF = async (
 
   const email = data.driverInfo.email
     ? data.driverInfo.email
-    : "No email provided";
+    : "No email has been provided";
 
   const socialSecurityNumber = data.driverInfo.socialSecurityNumber
     ? data.driverInfo.socialSecurityNumber
@@ -80,20 +81,26 @@ const generatePDF = async (
     ? data.driverInfo.drivingLicenseNumber
     : "-";
 
+  const driverRenter = data.driverRenter;
+
   doc.text(`Name: ${name}`, 15, driverInfoY);
   doc.text(`Phone number: ${phoneNumber}`, 15, driverInfoY + 8);
   doc.text(`Email: ${email}`, 15, driverInfoY + 16);
-  doc.text(
-    `Social Security Number: ${socialSecurityNumber}`,
-    15,
-    driverInfoY + 24
-  );
-  doc.text(`Address: ${address}`, 105, driverInfoY);
+  doc.text(`Address: ${address}`, 15, driverInfoY + 24);
+  doc.text(`Social security number: ${socialSecurityNumber}`, 105, driverInfoY);
   doc.text(
     `Driving License Number: ${drivingLicenseNumber}`,
     105,
     driverInfoY + 8
   );
+  if (driverRenter === null) {
+    doc.text("Is driver and renter the same? -", 105, driverInfoY + 16);
+  } else if (driverRenter === true) {
+    doc.text("Driver and renter is the same", 105, driverInfoY + 16);
+  } else {
+    doc.text("Driver and renter is not the same", 105, driverInfoY + 16);
+  }
+
   // Add space between driver information and accident information
   const spaceBetweenSections = 10;
   const accidentInfoY = driverInfoY + 40 + spaceBetweenSections;
@@ -340,9 +347,13 @@ const generatePDF = async (
 
       // Render biker details (name, bike type, etc.)
       doc.setFont("normal");
-      doc.text(`Name: ${currentBiker.name}`, 20, currentY + 28);
-      doc.text(`Phonenumber: ${currentBiker.phone}`, 20, currentY + 36);
-      doc.text(`Email: ${currentBiker.email}`, 20, currentY + 44);
+      doc.text(`Name: ${currentBiker.name || "-"}`, 20, currentY + 28);
+      doc.text(`Phonenumber: ${currentBiker.phone || "-"}`, 20, currentY + 36);
+      doc.text(
+        `Email: ${currentBiker.email || "No email has been provided"}`,
+        20,
+        currentY + 44
+      );
       doc.text(
         `Electric bike: ${
           currentBiker.ebike !== null
@@ -385,9 +396,13 @@ const generatePDF = async (
     doc.setFillColor("#E6EEE5");
     doc.roundedRect(10, currentY, 190, bikerInfoHeight, 5, 5, "F");
     doc.setFont("bold");
-    doc.text("Biker Information", 15, currentY + 10);
+    doc.text(
+      "Biker Information on other party involved in incident",
+      15,
+      currentY + 10
+    );
     doc.setLineWidth(0.5);
-    doc.line(15, currentY + 12, 80, currentY + 12);
+    doc.line(15, currentY + 12, 106, currentY + 12);
     doc.setFont("normal");
     doc.text("No biker was hit.", 20, currentY + 28);
     currentY += bikerInfoHeight + 2;
@@ -455,17 +470,37 @@ const generatePDF = async (
 
       // Render vehicle details (name, license number, etc.)
       doc.setFont("normal");
-      doc.text(`Name: ${currentVehicle.name}`, 20, currentY + 28);
-      doc.text(`Phonenumber: ${currentVehicle.phone}`, 20, currentY + 36);
-      doc.text(`Email: ${currentVehicle.email}`, 20, currentY + 44);
-      doc.text(`Numberplate: ${currentVehicle.numberplate}`, 20, currentY + 52);
+      doc.text(`Name: ${currentVehicle.name || "-"}`, 20, currentY + 28);
       doc.text(
-        `License Number: ${currentVehicle.driversLicenseNumber}`,
+        `Phonenumber: ${currentVehicle.phone || "-"}`,
+        20,
+        currentY + 36
+      );
+      doc.text(
+        `Email: ${currentVehicle.email || "No email has been provided"}`,
+        20,
+        currentY + 44
+      );
+      doc.text(
+        `Numberplate: ${currentVehicle.numberplate || "-"}`,
+        20,
+        currentY + 52
+      );
+      doc.text(
+        `License Number: ${currentVehicle.driversLicenseNumber || "-"}`,
         100,
         currentY + 28
       );
-      doc.text(`Vehicle model: ${currentVehicle.model}`, 100, currentY + 36);
-      doc.text(`Insurance: ${currentVehicle.insurance}`, 100, currentY + 44);
+      doc.text(
+        `Vehicle model: ${currentVehicle.model || "-"}`,
+        100,
+        currentY + 36
+      );
+      doc.text(
+        `Insurance: ${currentVehicle.insurance || "-"}`,
+        100,
+        currentY + 44
+      );
 
       // Update currentY for the next vehicle
       currentY += vehicleInfoHeight + sectionSpacing + 2;
@@ -485,9 +520,13 @@ const generatePDF = async (
     doc.setFillColor("#E6EEE5");
     doc.roundedRect(10, currentY, 190, vehicleInfoHeight, 5, 5, "F");
     doc.setFont("bold");
-    doc.text("Vehicle Information", 15, currentY + 10);
+    doc.text(
+      "Vehicle Information on other party involved in incident",
+      15,
+      currentY + 10
+    );
     doc.setLineWidth(0.5);
-    doc.line(15, currentY + 12, 80, currentY + 12);
+    doc.line(15, currentY + 12, 110, currentY + 12);
     doc.setFont("normal");
     doc.text("No other vehicles involved.", 20, currentY + 28);
     currentY += vehicleInfoHeight + 2;
@@ -573,9 +612,17 @@ const generatePDF = async (
 
       // Render pedestrian details (name, age, etc.)
       doc.setFont("normal");
-      doc.text(`Name: ${currentPedestrian.name}`, 20, currentY + 28);
-      doc.text(`Email: ${currentPedestrian.email}`, 20, currentY + 36);
-      doc.text(`Phonenumber: ${currentPedestrian.phone}`, 100, currentY + 28);
+      doc.text(`Name: ${currentPedestrian.name || "-"}`, 20, currentY + 28);
+      doc.text(
+        `Email: ${currentPedestrian.email || "No email has been provided"}`,
+        20,
+        currentY + 36
+      );
+      doc.text(
+        `Phonenumber: ${currentPedestrian.phone || "-"}`,
+        100,
+        currentY + 28
+      );
       // Render injury description
       doc.text("Injury description:", 100, currentY + 36);
       for (let i = 0; i < numInjuryDescriptionLines; i++) {
@@ -602,9 +649,13 @@ const generatePDF = async (
     doc.setFillColor("#E6EEE5");
     doc.roundedRect(10, currentY, 190, pedestrianInfoHeight, 5, 5, "F");
     doc.setFont("bold");
-    doc.text("Pedestrian Information", 15, currentY + 10);
+    doc.text(
+      "Pedestrian Information on other party involved in incident",
+      15,
+      currentY + 10
+    );
     doc.setLineWidth(0.5);
-    doc.line(15, currentY + 12, 80, currentY + 12);
+    doc.line(15, currentY + 12, 114, currentY + 12);
     doc.setFont("normal");
     doc.text("No pedestrians were harmed.", 20, currentY + 28);
     currentY += pedestrianInfoHeight;
@@ -740,25 +791,30 @@ const generatePDF = async (
     doc.setFillColor("#E6EEE5");
     doc.roundedRect(10, currentY, 190, otherInfoHeight, 5, 5, "F");
     doc.setFont("bold");
-    doc.text("Other Information", 15, currentY + 10);
+    doc.text(
+      "Other Information on other party involved in incident",
+      15,
+      currentY + 10
+    );
     doc.setLineWidth(0.5);
-    doc.line(15, currentY + 12, 80, currentY + 12);
+    doc.line(15, currentY + 12, 107, currentY + 12);
     doc.setFont("normal");
     doc.text("No collision with other object.", 20, currentY + 28);
     currentY += otherInfoHeight + 2;
   }
 
+  currentY += sectionSpacing; // Add space after the other information section
+  const maxWitnessesPerRow = 2;
+  const numRows = Math.ceil(data.witnesses.length / maxWitnessesPerRow);
+  const witnessInfoHeight = numRows * 45;
+  const currentWitnessSectionHeight = witnessInfoHeight + sectionSpacing;
+
   // Witnesses information
   if (data.witnesses.length > 0) {
-    const maxWitnessesPerRow = 2;
-    const numRows = Math.ceil(data.witnesses.length / maxWitnessesPerRow);
-    const witnessInfoHeight = numRows * 45;
-
     // Calculate the remaining space on the current page
     const remainingSpace = doc.internal.pageSize.height - currentY;
 
     // Calculate the total witness section height with additional spacing
-    const currentWitnessSectionHeight = witnessInfoHeight + sectionSpacing;
 
     // Check if there's enough space for the witness information section
     if (remainingSpace < currentWitnessSectionHeight) {
@@ -793,9 +849,13 @@ const generatePDF = async (
 
       // Render witness details (name, phone, email)
       doc.setFont("normal");
-      doc.text(`Name: ${witness.name}`, startX, startY);
-      doc.text(`Phone: ${witness.phone}`, startX, startY + 8);
-      doc.text(`Email: ${witness.email}`, startX, startY + 16);
+      doc.text(`Name: ${witness.name || "-"}`, startX, startY);
+      doc.text(`Phone: ${witness.phone || "-"}`, startX, startY + 8);
+      doc.text(
+        `Email: ${witness.email || "No email has been provided"}`,
+        startX,
+        startY + 16
+      );
 
       currentColumn++;
       if (currentColumn >= maxWitnessesPerRow) {
@@ -824,29 +884,171 @@ const generatePDF = async (
     doc.setFont("bold");
     doc.text("Witnesses Information", 15, currentY + 10);
     doc.setLineWidth(0.5);
-    doc.line(15, currentY + 12, 120, currentY + 12);
+    doc.line(15, currentY + 12, 80, currentY + 12);
     doc.setFont("normal");
     doc.text("No witnesses information.", 20, currentY + 28);
     currentY += noWitnessesHeight + 2;
   }
+  currentY += sectionSpacing;
 
-  // Images of damages to GreenMobility and other party car section
+  //images section
+  doc.addPage();
 
-  // Check if the 'images' object and 'GreenMobility' property exist
+  const calculateRequiredHeight = (
+    numImages: number,
+    imageHeight: number,
+    headerHeight: number
+  ) => {
+    return numImages * imageHeight + headerHeight;
+  };
+
+  // Function to add header for image sections
+  const addImageSectionHeader = (text: string) => {
+    doc.setFont("bold");
+    doc.text(text, 15, currentY + 10);
+    doc.setLineWidth(0.5);
+    doc.line(15, currentY + 12, 80, currentY + 12); // Add underline
+    doc.setFont("normal");
+    currentY += headerHeight; // Add space for header
+  };
+
+  // Images of damages to GreenMobility section
+  const maxImageHeight = 200; // max height you're willing to allow an image to be
+  const headerHeight = 20;
+  currentY = 10;
+
   if (images["GreenMobility"]) {
-    images["GreenMobility"].forEach((image) => {
-      // Assuming 'image' is the image URL or base64 data
-      doc.addImage(image, "JPEG", 15, currentY, 80, 60); // Adjust width and height as needed
-      currentY += 70; // Increase Y for the next image
-      doc.text(image, 15, currentY);
-    });
-  } else {
-    // Handle case where 'GreenMobility' images are not available
-    doc.text("No GreenMobility images available.", 15, currentY);
+    if (Array.isArray(images["GreenMobility"])) {
+      // Create a section header
+      addImageSectionHeader("GreenMobility Damage Images");
+
+      for (const imageUrl of images["GreenMobility"]) {
+        const response = await axios.get(imageUrl, {
+          responseType: "arraybuffer",
+        });
+
+        const correctedImageBuffer = await sharp(response.data)
+          .rotate(/* angle to rotate, if needed */)
+          .toBuffer();
+
+        const imageMetadata = await sharp(correctedImageBuffer).metadata();
+
+        const originalWidth = imageMetadata.width!;
+        const originalHeight = imageMetadata.height!;
+
+        const maxImageWidth = 185; // Set a maximum width for images
+
+        let heightScaleFactor, widthScaleFactor;
+
+        if (originalHeight > maxImageHeight) {
+          heightScaleFactor = maxImageHeight / originalHeight;
+        } else {
+          heightScaleFactor = 1; // keep the image at its original height
+        }
+
+        if (originalWidth > maxImageWidth) {
+          widthScaleFactor = maxImageWidth / originalWidth;
+        } else {
+          widthScaleFactor = 1; // keep the image at its original width
+        }
+
+        const scaleFactor = Math.min(heightScaleFactor, widthScaleFactor); // Take the smaller of the two scale factors to maintain aspect ratio
+
+        const scaledWidth = originalWidth * scaleFactor;
+        const scaledHeight = originalHeight * scaleFactor;
+
+        const remainingSpaceGreen = doc.internal.pageSize.height - currentY;
+
+        if (remainingSpaceGreen < scaledHeight + 5) {
+          doc.addPage();
+          currentY = 10;
+          addImageSectionHeader("GreenMobility Damage Images Continued");
+        }
+
+        const imageBase64 = correctedImageBuffer.toString("base64");
+
+        doc.addImage(
+          imageBase64,
+          "JPEG",
+          15,
+          currentY,
+          scaledWidth,
+          scaledHeight
+        );
+        currentY += scaledHeight; // Update the y-coordinate based on the height
+      }
+    } else {
+      addImageSectionHeader("GreenMobility Damage Images");
+      doc.text("No GreenMobility images available.", 15, currentY);
+      currentY += headerHeight;
+    }
   }
 
-  // Save the PDF
-  return doc.output("blob");
-};
+  // Add a new page before adding 'OtherParty' images
+  doc.addPage();
+  currentY = 10; // Reset Y-coordinate to the top of the new page
 
-export default generatePDF;
+  const totalOtherPartyHeight =
+    images["OtherParty"].length * maxImageHeight + headerHeight;
+  const remainingSpaceOther = doc.internal.pageSize.height - currentY;
+  const requiredHeightOtherParty = calculateRequiredHeight(
+    images["OtherParty"].length,
+    maxImageHeight,
+    headerHeight
+  );
+
+  // For OtherParty images
+  if (images["OtherParty"]) {
+    if (Array.isArray(images["OtherParty"])) {
+      addImageSectionHeader("OtherParty Damage Images");
+
+      for (const imageUrl of images["OtherParty"]) {
+        const response = await axios.get(imageUrl, {
+          responseType: "arraybuffer",
+        });
+
+        const correctedImageBuffer = await sharp(response.data)
+          .rotate(/* angle to rotate, if needed */)
+          .toBuffer();
+
+        const imageMetadata = await sharp(correctedImageBuffer).metadata();
+        const originalWidth = imageMetadata.width!;
+        const originalHeight = imageMetadata.height!;
+
+        let scaleFactor;
+        if (originalHeight > maxImageHeight) {
+          scaleFactor = maxImageHeight / originalHeight;
+        } else {
+          scaleFactor = 1; // keep the image at its original size
+        }
+
+        const scaledWidth = originalWidth * scaleFactor;
+        const scaledHeight = originalHeight * scaleFactor;
+
+        const remainingSpaceOther = doc.internal.pageSize.height - currentY;
+
+        if (remainingSpaceOther < scaledHeight + 5) {
+          doc.addPage();
+          currentY = 10;
+          addImageSectionHeader("OtherParty Damage Images Continued");
+        }
+
+        const imageBase64 = correctedImageBuffer.toString("base64");
+
+        doc.addImage(
+          imageBase64,
+          "JPEG",
+          15,
+          currentY,
+          scaledWidth,
+          scaledHeight
+        );
+
+        currentY += scaledHeight; // Update the y-coordinate based on the height
+      }
+    }
+  }
+  // Save the PDF
+  return new Uint8Array(doc.output("arraybuffer"));
+};
+export default createReportPDF;
