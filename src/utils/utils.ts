@@ -124,7 +124,7 @@ export const GetUserPosition = () => {
   });
 };
 
-export const encryptData = (data: reportDataType) => {
+export const encryptData = async (data: reportDataType) => {
   const encryptedData = new reportDataType();
   encryptedData.updateFields({ ...data });
   const secretKey = process.env.NEXT_PUBLIC_SECRET || "";
@@ -159,7 +159,7 @@ export const encryptData = (data: reportDataType) => {
   return encryptedData;
 };
 
-export const decryptData = (data: reportDataType) => {
+export const decryptData = async (data: reportDataType) => {
   const decryptedData = new reportDataType();
   decryptedData.updateFields({ ...data });
   const secretKey = process.env.NEXT_PUBLIC_SECRET || "";

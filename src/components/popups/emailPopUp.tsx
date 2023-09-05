@@ -18,7 +18,7 @@ const EmailPopUp = ({reportIDs, setVisibility, email}: EmailPopUpProps) => {
         await sendEmail (
           `${email}`, 
           "GreenMobility Damage Report", 
-          `You started a Damagereport on: \n${Router.asPath}/damagereport/what?id=${id}`)
+          `You started a Damagereport on: \nhttps://green-damage-report.vercel.app/damagereport/what?id=${id}`)
         Router.push(`damagereport/what?id=${id}`);
     }
 

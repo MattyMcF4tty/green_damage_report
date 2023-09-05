@@ -27,7 +27,7 @@ const IndexPage = () => {
           await sendEmail (
             `${email}`, 
             "GreenMobility Damage Report", 
-            `You started a Damagereport on: \n${router.asPath}/damagereport/what?id=${ID}`)
+            `You started a Damagereport on: \nhttps://green-damage-report.vercel.app/damagereport/what?id=${ID}`)
           router.push(`damagereport/what?id=${ID}`);
         } else {
           throw new Error("Error creating id")

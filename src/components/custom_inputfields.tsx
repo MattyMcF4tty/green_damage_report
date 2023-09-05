@@ -513,7 +513,7 @@ export const AddressField = ({
     placePredictions,
     getPlacePredictions,
   } = usePlacesService({
-    apiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY,
+    apiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY,
   });
 
   const [bgColor, setBgColor] = useState<string>("bg-white");
