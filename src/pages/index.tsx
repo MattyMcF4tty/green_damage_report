@@ -131,8 +131,9 @@ const IndexPage = () => {
 
       {showPopUp && (
         <EmailPopUp 
-        setId={(id) => (id)}
-        reportIDs={ongoingReports}
+          setVisibility={setShowPopUp}
+          reportIDs={ongoingReports}
+          email={email}
         />
       )}
     </form>
