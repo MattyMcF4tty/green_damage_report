@@ -19,6 +19,7 @@ import GoogleMapsField, {
 } from "@/components/google_maps_field";
 import { useRouter } from "next/router";
 import Google from "@/components/google";
+import html2canvas from "html2canvas";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -150,6 +151,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
   /*   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
    */
   /*     <LoadScript googleMapsApiKey={apiKey || ""} libraries={["places"]}> */
+
   return (
     <form
       className="flex flex-col items-start w-full h-full"

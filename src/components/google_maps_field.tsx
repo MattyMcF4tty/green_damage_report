@@ -106,9 +106,19 @@ const GoogleMapsField = ({
   const [lineMarkers, setLineMarkers] = useState<google.maps.Marker[]>([]);
   const [lines, setLines] = useState<google.maps.Polyline[]>([]);
 
+  const clearAllLinesAndMarkers = () => {
+    lineMarkers.forEach((marker) => marker.setMap(null)); // Remove marker from map
+    lines.forEach((line) => line.setMap(null)); // Remove line from map
+    setLineMarkers([]);
+    setLines([]);
+  };
+
   useEffect(() => {
     if (map) {
-      indicators.map((marker) => createLineWithoutUpdatingIndicators(marker));
+      clearAllLinesAndMarkers(); // Clear existing lines and markers
+      indicators.forEach((marker) =>
+        createLineWithoutUpdatingIndicators(marker)
+      );
     }
   }, [map]);
 
@@ -253,10 +263,28 @@ const GoogleMapsField = ({
             }
           );
 
-          // Update the state here
-          setIndicators([...indicators, newIndicator]);
+          if (isNewLine) {
+            // Add new line to the state
+            setIndicators([...indicators, newIndicator]);
+          } else {
+            // Find and update the corresponding line in the state
+            const indexToUpdate = indicators.findIndex((indicator) => {
+              // Compare using some logic to find the corresponding line (e.g. by positions)
+              // Modify this as per your needs
+              return JSON.stringify(indicator) === JSON.stringify(markers);
+            });
+            if (indexToUpdate !== -1) {
+              const updatedIndicators = [...indicators];
+              updatedIndicators[indexToUpdate] = newIndicator;
+              setIndicators(updatedIndicators);
+            }
+          }
         }
       };
+      // Attach dragend event listeners
+      startMarker.addListener("dragend", updateMarkerPositions);
+      middleMarker.addListener("dragend", updateMarkerPositions);
+      endMarker.addListener("dragend", updateMarkerPositions);
 
       // Conditionally call updateMarkerPositions
       if (!isNewLine) {
@@ -287,11 +315,6 @@ const GoogleMapsField = ({
           endMarker.getPosition()!,
         ]);
         updateMarkerPositions();
-
-        // Attach dragend event listeners
-        startMarker.addListener("dragend", updateMarkerPositions);
-        middleMarker.addListener("dragend", updateMarkerPositions);
-        endMarker.addListener("dragend", updateMarkerPositions);
       }
 
       // Update line markers
