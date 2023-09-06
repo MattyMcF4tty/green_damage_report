@@ -17,7 +17,6 @@ import ObjectIcon from "../../public/MapIcons/ObjectIcon.png";
 import GreenCarIcon from "../../public/MapIcons/GreenCarIcon.png";
 import { PedestrianInformation } from "./opposite_information/person_information_form";
 import { OtherInformation } from "./opposite_information/other_information_form";
-import Google from "./google";
 
 /* Design settings */
 const markerSize = { x: 30, z: 50 };
@@ -331,7 +330,7 @@ const GoogleMapsField = ({
   };
   /* Load Google maps javascript api */
   const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "",
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
   });
 
   /* Load previos location or where user is now */
