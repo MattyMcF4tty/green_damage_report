@@ -11,8 +11,10 @@ interface EmailPopUpProps {
 
 const EmailPopUp = ({reportIDs, setVisibility, email}: EmailPopUpProps) => {
     const Router = useRouter()
+    const [enableButtons, setEnableButtons] = useState(true)
 
     const handleNewReport = async() => {
+        setEnableButtons(false);
         const id = await generateId()
         await createDoc(id, email);
         await sendEmail (
@@ -34,9 +36,9 @@ const EmailPopUp = ({reportIDs, setVisibility, email}: EmailPopUpProps) => {
                     ))}
                 </div>
                 <div className="flex flex-row h-[2.4rem] mt-10 justify-evenly">
-                    <button onClick={() => {setVisibility(false)}} 
+                    <button disabled={!enableButtons} onClick={() => {setVisibility(false)}} 
                     className="bg-gray-200 p-1 h-full w-24">Cancel</button>
-                    <button onClick={() => {handleNewReport()}} 
+                    <button disabled={!enableButtons} onClick={() => {handleNewReport()}} 
                     className="bg-MainGreen-300 p-1 h-full w-24 text-white">New report</button>
                 </div>
             </div>            

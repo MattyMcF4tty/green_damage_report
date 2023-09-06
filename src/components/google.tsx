@@ -20,7 +20,7 @@ interface GoogleMapsFieldProps {
 }
 
 const Google =({show, showAutocomplete}: GoogleMapsFieldProps) => {
-  const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "";
+  const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "";
   const { isLoaded, loadError } = useJsApiLoader({
     googleMapsApiKey: googleApiKey,
   });
@@ -241,7 +241,7 @@ const Google =({show, showAutocomplete}: GoogleMapsFieldProps) => {
   }
 
   return (
-    <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY || ""} libraries={["places"]}>
+    <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""} libraries={["places"]}>
       <div>
         {showAutocomplete && (
           <div className="mb-2">
