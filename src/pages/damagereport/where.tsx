@@ -18,8 +18,6 @@ import GoogleMapsField, {
   googleIndicator,
 } from "@/components/google_maps_field";
 import { useRouter } from "next/router";
-import Google from "@/components/google";
-import html2canvas from "html2canvas";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
