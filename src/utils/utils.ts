@@ -60,6 +60,11 @@ export type pageProps = {
       information: string;
       location: { lat: number | null; lng: number | null };
     }[];
+    googleIndicators: {
+      marker1: { lat: number; lng: number };
+      marker2: { lat: number; lng: number };
+      marker3: { lat: number; lng: number };
+    }[];
 
     witnesses: WitnessInformation[];
 
@@ -230,7 +235,6 @@ export const getServerSidePropsWithRedirect = async (
   }
 };
 
-
 export const reportSearch = (
   reportList: { id: string; data: reportDataType }[],
   status: "all" | "finished" | "unfinished",
@@ -293,7 +297,11 @@ export const reportSearch = (
   return updatedFilteredList;
 };
 
-export const sendEmail = async (toEmail: string, subject: string, text: string) => {
+export const sendEmail = async (
+  toEmail: string,
+  subject: string,
+  text: string
+) => {
   const emailData = {
     toEmail: toEmail,
     subject: subject,
@@ -301,10 +309,10 @@ export const sendEmail = async (toEmail: string, subject: string, text: string) 
   };
 
   try {
-    const response = await axios.post('../api/send-email', emailData);
-    console.log('Server response:', response.data);
+    const response = await axios.post("../api/send-email", emailData);
+    console.log("Server response:", response.data);
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error("Error sending email:", error);
   }
 };
 
@@ -382,6 +390,11 @@ export class reportDataType {
     information: string;
     location: { lat: number | null; lng: number | null };
   }[];
+  googleIndicators: {
+    marker1: { lat: number | null; lng: number | null };
+    marker2: { lat: number | null; lng: number | null };
+    marker3: { lat: number | null; lng: number | null };
+  }[];
 
   witnesses: WitnessInformation[];
 
@@ -423,6 +436,7 @@ export class reportDataType {
     this.vehicleInfo = [];
     this.pedestrianInfo = [];
     this.otherObjectInfo = [];
+    this.googleIndicators = [];
     this.witnesses = [];
     this.driverRenter = null;
     this.policePresent = null;
@@ -465,6 +479,7 @@ export class reportDataType {
       vehicleInfo: this.vehicleInfo,
       pedestrianInfo: this.pedestrianInfo,
       otherObjectInfo: this.otherObjectInfo,
+      googleIndicators: this.googleIndicators,
       witnesses: this.witnesses,
       driverRenter: this.driverRenter,
       policePresent: this.policePresent,
