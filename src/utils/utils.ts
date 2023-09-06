@@ -3,6 +3,10 @@ import { getData, getImages, getReportIds } from "@/firebase/clientApp";
 import CryptoJS from "crypto-js";
 import { GetServerSidePropsContext } from "next";
 import axios from "axios";
+import Cookies from 'js-cookie';
+import app from "@/firebase/firebaseConfig";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { useRouter } from "next/router";
 
 export type pageProps = {
   data: {
@@ -332,6 +336,84 @@ export const downloadToPc = async (file:Blob, fileName: string) => {
   // Cleanup
   document.body.removeChild(downloadLink);
   window.URL.revokeObjectURL(url);
+}
+
+export const handleSignUp = async (email:string, password:string) => {
+  const data = {
+    email: email,
+    password: password
+  }
+
+  const response = await fetch('http://localhost:3000/api/auth/signUp', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+
+  const responseData = await response.json()
+  if (response.ok) {
+    console.log("User created succesfully")
+    Cookies.set("AuthToken", responseData.userToken, {expires: 9999-12-31, secure: true});
+    return true;
+  } else {
+    return false;
+  }
+}
+
+export const handleVerifyUser = async (userToken: string | undefined) => {
+  
+  const response = await fetch(`http://localhost:3000/api/auth/verifyAdmin`, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({userToken: userToken})
+  })
+
+  const responseData = await response.json();
+  if (response.ok) {
+    console.log(responseData.message);
+    return true;
+  } else {
+    console.error(responseData.message);
+    return false;
+  }
+}
+
+export const handleSignIn = async (email: string, password: string) => {
+  try {
+    const data = {
+      email: email,
+      password: password
+    }
+
+    const response = await fetch(`http://localhost:3000/api/auth/signIn`, {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+
+    const responseData = await response.json();
+    if (response.ok) {
+      console.log(responseData.message)
+      Cookies.set('AuthToken', responseData.userToken, {expires: 9999-12-31})
+      return true;
+    }
+    else {
+      throw new Error(responseData.message)
+    }
+  } catch (error:any) {
+    console.error('Something went wrong signing in:\n', error.message)
+    return false;
+  }
+}
+
+export const handleSignOut = () => {
+  Cookies.remove("AuthToken");
 }
 
 /* ---------------- classes ------------------------------ */

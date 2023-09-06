@@ -47,6 +47,11 @@ const IndexPage = () => {
       onSubmit={(e) => handleStart(e)}
       className="flex flex-col items-center"
     >
+      <img
+        src="../GreenLogos/GreenMobilityTextLogo.png"
+        alt="greenlogo"
+        className="lg:ml-[27rem]"
+      />
       <div className="container mx-auto p-8">
         <div className="mb-4 ">
           <div className="flex flex-col ">
