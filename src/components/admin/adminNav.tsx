@@ -5,28 +5,44 @@ import { useRouter } from "next/router";
 import React from "react";
 
 const AdminNavbar = () => {
-  const Router = useRouter()
-
+  const Router = useRouter();
 
   const handleLogOut = () => {
-    handleSignOut()
-    Router.push("")
-  }
+    handleSignOut();
+    Router.push("");
+  };
   return (
-    <div className="bg-MainGreen-300 flex flex-row h-14 w-full justify-between">
-      <div className="flex flex-row items-center left-0">
-        <img src="../GreenLogo.png" alt="GreenLogo" className="h-full" />
+    <div className="bg-MainGreen-300 flex flex-row h-14 w-full ">
+      <div
+        className="flex flex-row items-center hover:cursor-pointer"
+        onClick={() => Router.push("/auth/admin/adminPage")}
+      >
+        <img
+          src="../GreenLogos/GreenLogo-color.png"
+          alt="GreenLogo"
+          className="h-full"
+        />
         <p className="text-white ml-3 font-semibold">Admin</p>
       </div>
-      <div className="right-0 text-white font-bold">
-        <button type="button"onClick={() => Router.push("/auth/signUp")}
-        className="border-l-2 h-full w-[6rem] hover:bg-white duration-150 hover:text-MainGreen-300">
-          New user
-        </button>
-        <button type="button" onClick={() => handleLogOut()}
-        className="border-l-2 h-full w-[4rem] text-xl hover:bg-red-500 duration-150">
-        <FontAwesomeIcon icon={faArrowRightFromBracket} />
-        </button>
+      <div className="flex justify-end w-full">
+        <div>
+          <button
+            className="pr-2 border-l-2 h-full pl-2 text-white hover:text-lg hover:text-white w-[8rem]"
+            type="button"
+            onClick={() => Router.push("/auth/signUp")}
+          >
+            New user
+          </button>
+        </div>
+        <div className="h-full text-white font-bold ">
+          <button
+            type="button"
+            onClick={() => handleLogOut()}
+            className="border-l-2 h-full w-[4rem] text-xl hover:bg-red-500 duration-150"
+          >
+            <FontAwesomeIcon icon={faArrowRightFromBracket} />
+          </button>
+        </div>
       </div>
     </div>
   );

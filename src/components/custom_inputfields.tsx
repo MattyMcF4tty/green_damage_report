@@ -23,8 +23,7 @@ interface InputfieldProps {
     | "license"
     | "ssn"
     | "journalNumber"
-    | "speed"
-    | "password"
+    | "speed";
 
   value: string | null;
   onChange: (isValue: string) => void;
@@ -88,9 +87,7 @@ export const Inputfield = ({
       pattern = "[0-9]{4}-[0-9]{5}-[0-9]{5}-[0-9]{2}";
       patternError = "Please enter a valid journal number";
       break;
-    case "password": 
-      pattern = ""
-      patternError = "Please enter only valid characters";
+
     default:
       pattern = ""; /* No pattern for "text" type, it allows any input */
       patternError = "Please enter only valid characters";
