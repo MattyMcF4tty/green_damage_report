@@ -1,5 +1,5 @@
 import { createDoc } from "@/firebase/clientApp";
-import { generateId, sendEmail } from "@/utils/utils";
+import { generateId } from "@/utils/utils";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 
@@ -17,10 +17,6 @@ const EmailPopUp = ({reportIDs, setVisibility, email}: EmailPopUpProps) => {
         setEnableButtons(false);
         const id = await generateId()
         await createDoc(id, email);
-        await sendEmail (
-          `${email}`, 
-          "GreenMobility Damage Report", 
-          `You started a Damagereport on: \nhttps://green-damage-report.vercel.app/damagereport/what?id=${id}`)
         Router.push(`damagereport/what?id=${id}`);
     }
 
