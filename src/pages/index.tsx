@@ -1,6 +1,6 @@
 import { Inputfield } from "@/components/custom_inputfields";
 import { checkEmailExists, createDoc, updateData } from "@/firebase/clientApp";
-import { generateId, sendEmail } from "@/utils/utils";
+import { generateId } from "@/utils/utils";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
