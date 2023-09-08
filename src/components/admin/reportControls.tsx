@@ -1,4 +1,4 @@
-import { reportDataType, sendEmail } from "@/utils/utils";
+import { reportDataType, handleSendEmail } from "@/utils/utils";
 import {
   faCloudArrowDown,
   faEye,
@@ -23,8 +23,8 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
 
   const [allowPdf, setAllowPdf] = useState(true);
 
-  const handleSendEmail = async() => {
-    await sendEmail("carloslundrodriguez@gmail.com", "sut din far", "dø");
+  const handleSendEmails = async() => {
+    await handleSendEmail("carloslundrodriguez@gmail.com", "sut din far", "dø");
   };
 
   const handleDownloadPDF = async (selectedReports: {id: string, data: reportDataType}[]) => {
@@ -58,7 +58,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
         <FontAwesomeIcon icon={faTrashCan} />
         {" Delete"}
       </button>
-      <button onClick={() => handleSendEmail()}>Send Email</button>
+      <button onClick={() => handleSendEmails()}>Send Email</button>
       <button
         disabled={!allowPdf}
         onClick={() => {
