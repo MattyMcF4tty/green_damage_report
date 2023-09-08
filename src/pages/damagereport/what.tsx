@@ -3,40 +3,53 @@ import {
   TimeDateField,
   Inputfield,
   YesNo,
-  AddressField
+  AddressField,
 } from "@/components/custom_inputfields";
 import { GetServerSidePropsContext, NextPage } from "next";
 import NextButton from "@/components/buttons/next";
 import BackButton from "@/components/buttons/back";
 import { useRouter } from "next/router";
 import { updateData } from "@/firebase/clientApp";
-import { getServerSidePropsWithRedirect, pageProps, reportDataType } from "@/utils/utils";
+import {
+  getServerSidePropsWithRedirect,
+  pageProps,
+  reportDataType,
+} from "@/utils/utils";
 import PhoneNumber from "@/components/opposite_information/phone_form";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  return await getServerSidePropsWithRedirect(context)
+  return await getServerSidePropsWithRedirect(context);
 };
 
 const What: NextPage<pageProps> = ({ data, id }) => {
   const router = useRouter();
   const serverData = new reportDataType();
-  serverData.updateFields(data)
+  serverData.updateFields(data);
 
   const [firstName, setFirstName] = useState(serverData.driverInfo.firstName);
   const [lastName, setLastName] = useState(serverData.driverInfo.lastName);
   const [address, setAddress] = useState(serverData.driverInfo.address);
-  const [socialSecurityNumber, setSocialSecurityNumber] = useState(serverData.driverInfo.socialSecurityNumber);
-  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState(serverData.driverInfo.drivingLicenseNumber);
-  const [phoneNumber, setPhoneNumber] = useState(serverData.driverInfo.phoneNumber);
+  const [socialSecurityNumber, setSocialSecurityNumber] = useState(
+    serverData.driverInfo.socialSecurityNumber
+  );
+  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState(
+    serverData.driverInfo.drivingLicenseNumber
+  );
+  const [phoneNumber, setPhoneNumber] = useState(
+    serverData.driverInfo.phoneNumber
+  );
   const [email, setEmail] = useState(serverData.driverInfo.email);
 
-  const [greenCarNumberplate, setgreenCarNumberplate] = useState(serverData.greenCarNumberPlate);
-  const [showDriverInfoForm, setShowDriverInfoForm] = useState(serverData.driverRenter);
+  const [greenCarNumberplate, setgreenCarNumberplate] = useState(
+    serverData.greenCarNumberPlate
+  );
+  const [showDriverInfoForm, setShowDriverInfoForm] = useState(
+    serverData.driverRenter
+  );
   const [accidentTime, setAccidentTime] = useState(serverData.time);
   const [accidentDate, setAccidentDate] = useState(serverData.date);
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,8 +64,8 @@ const What: NextPage<pageProps> = ({ data, id }) => {
         socialSecurityNumber: socialSecurityNumber,
         drivingLicenseNumber: drivingLicenseNumber,
         email: email,
-      }
-      serverData.updateFields({driverInfo: newDriverInfo})
+      };
+      serverData.updateFields({ driverInfo: newDriverInfo });
     } else {
       const newDriverInfo = {
         firstName: "John",
@@ -62,8 +75,8 @@ const What: NextPage<pageProps> = ({ data, id }) => {
         socialSecurityNumber: "000000-0000",
         drivingLicenseNumber: "00000000",
         email: "JohnDoe@placeholder.com",
-      }
-      serverData.updateFields({driverInfo: newDriverInfo})
+      };
+      serverData.updateFields({ driverInfo: newDriverInfo });
     }
 
     serverData.updateFields({
@@ -71,13 +84,12 @@ const What: NextPage<pageProps> = ({ data, id }) => {
       driverRenter: showDriverInfoForm,
       time: accidentTime,
       date: accidentDate,
-    })
+    });
 
     await updateData(id, serverData);
 
     router.push(`how?id=${id}`);
   };
-
 
   return (
     <form
@@ -127,7 +139,6 @@ const What: NextPage<pageProps> = ({ data, id }) => {
               onChange={setFirstName}
               placeHolder="John"
             />
-
             <Inputfield
               labelText="Please enter the last name of the driver"
               id="LastNameInput"
@@ -135,16 +146,16 @@ const What: NextPage<pageProps> = ({ data, id }) => {
               type="text"
               value={lastName}
               onChange={setLastName}
-           placeHolder="Doe"
-           />
+              placeHolder="Doe"
+            />
             {/* TODO: make google autofill */}
             <AddressField
               labelText="Please enter the home address of the driver"
               value={address}
               onChange={setAddress}
             />
-
             {/* TODO: Check if its a real phone number */}
+
             <Inputfield
               labelText="Please enter the social security number of the driver"
               id="SocialSecurityNumberInput"
@@ -152,7 +163,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
               type="ssn"
               value={socialSecurityNumber}
               onChange={setSocialSecurityNumber}
-            placeHolder="123456-1234"
+              placeHolder="123456-1234"
             />
 
             <Inputfield
@@ -164,13 +175,11 @@ const What: NextPage<pageProps> = ({ data, id }) => {
               onChange={setDrivingLicenseNumber}
               placeHolder="12345678"
             />
-
             <PhoneNumber
               value={phoneNumber}
               onChange={setPhoneNumber}
               labelText="Please enter the phonenumber of the driver"
             />
-
             <Inputfield
               labelText="Please enter the email of the driver"
               id="EmailInput"

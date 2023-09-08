@@ -134,6 +134,35 @@ export const Inputfield = ({
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let newValue = e.target.value;
+
+    if (type === "ssn" && newValue.length === 6 && !newValue.includes("-")) {
+      newValue += "-";
+    } else if (
+      type === "ssn" &&
+      newValue.length === 7 &&
+      newValue.includes("-") &&
+      newValue.charAt(6) === "-"
+    ) {
+      newValue = newValue.slice(0, -1);
+    }
+
+    // Police report format logic
+    if (type === "journalNumber") {
+      // When the value is 4 characters long and doesn't have a hyphen yet
+      if (newValue.length === 4 && !newValue.includes("-")) {
+        newValue += "-";
+      } else if (newValue.length === 10 && newValue.charAt(9) !== "-") {
+        newValue += "-";
+      } else if (newValue.length === 16 && newValue.charAt(15) !== "-") {
+        newValue += "-";
+      }
+    }
+    setCurrentValue(newValue);
+    onChange(newValue); // pass the possibly modified value back to the parent
+  };
+
   return (
     <div className="flex flex-col mb-4">
       <label htmlFor={id} className="mb-2">
@@ -145,7 +174,7 @@ export const Inputfield = ({
         type={type}
         required={required}
         value={currentValue}
-        onChange={(e) => setCurrentValue(e.target.value)}
+        onChange={handleInputChange}
         pattern={pattern}
         onBlur={() => handleLeave()}
         onInvalid={() => handleCheck()}
