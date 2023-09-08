@@ -24,10 +24,6 @@ const IndexPage = () => {
       if (ongoingReports.length == 0) { 
         if (ID !== undefined) {
           await createDoc(ID, email);
-          await sendEmail (
-            `${email}`, 
-            "GreenMobility Damage Report", 
-            `You started a Damagereport on: \nhttps://green-damage-report.vercel.app/damagereport/what?id=${ID}`)
           router.push(`damagereport/what?id=${ID}`);
         } else {
           throw new Error("Error creating id")

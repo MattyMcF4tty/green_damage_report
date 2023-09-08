@@ -297,7 +297,7 @@ export const reportSearch = (
   return updatedFilteredList;
 };
 
-export const sendEmail = async (
+export const handleSendEmail = async (
   toEmail: string,
   subject: string,
   text: string
