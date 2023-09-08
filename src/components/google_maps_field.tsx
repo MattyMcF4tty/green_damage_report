@@ -61,19 +61,39 @@ interface GoogleMapsFieldProps {
   }) => void;
 
   bikes: bikeInformation[];
-  setBikes: (newBikes: bikeInformation[]) => void;
+  setBikes: (
+    newBikes:
+      | bikeInformation[]
+      | ((prevBikes: bikeInformation[]) => bikeInformation[])
+  ) => void;
 
   vehicles: carInformation[];
-  setVehicles: (newBikes: carInformation[]) => void;
+  setVehicles: (
+    newVehicles:
+      | carInformation[]
+      | ((prevVehicles: carInformation[]) => carInformation[])
+  ) => void;
 
   pedestrians: PedestrianInformation[];
-  setPedestrians: (newPedestrians: PedestrianInformation[]) => void;
+  setPedestrians: (
+    newPedestrians:
+      | PedestrianInformation[]
+      | ((prevPedestrians: PedestrianInformation[]) => PedestrianInformation[])
+  ) => void;
 
   objects: OtherInformation[];
-  setObjects: (newObjects: OtherInformation[]) => void;
+  setObjects: (
+    newObjects:
+      | OtherInformation[]
+      | ((prevObject: OtherInformation[]) => OtherInformation[])
+  ) => void;
 
   indicators: googleIndicator[];
-  setIndicators: (indicators: googleIndicator[]) => void;
+  setIndicators: (
+    indicators:
+      | googleIndicator[]
+      | ((prevIndicator: googleIndicator[]) => googleIndicator[])
+  ) => void;
 }
 
 const GoogleMapsField = ({
@@ -105,6 +125,9 @@ const GoogleMapsField = ({
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [lineMarkers, setLineMarkers] = useState<google.maps.Marker[]>([]);
   const [lines, setLines] = useState<google.maps.Polyline[]>([]);
+  const [selectedLineIndex, setSelectedLineIndex] = useState<number | null>(
+    null
+  );
 
   const clearAllLinesAndMarkers = () => {
     lineMarkers.forEach((marker) => marker.setMap(null)); // Remove marker from map
@@ -317,6 +340,13 @@ const GoogleMapsField = ({
         updateMarkerPositions();
       }
 
+      middleMarker.addListener("click", () => {
+        const index = indicators.findIndex((indicators) => {
+          return JSON.stringify(indicators) === JSON.stringify(markers);
+        });
+        setSelectedLineIndex(index);
+      });
+
       // Update line markers
       setLineMarkers((prevMarkers) => [
         ...prevMarkers,
@@ -329,9 +359,40 @@ const GoogleMapsField = ({
       setLines((prevLines) => [...prevLines, line]);
     }
   };
+
+  const deleteLine = (index: number) => {
+    // Delete the line and markers from the map
+    const startMarker = lineMarkers[index * 3];
+    const middleMarker = lineMarkers[index * 3 + 1];
+    const endMarker = lineMarkers[index * 3 + 2];
+
+    startMarker.setMap(null);
+    middleMarker.setMap(null);
+    endMarker.setMap(null);
+    lines[index].setMap(null);
+
+    // Update the lineMarkers and lines state
+    const updatedLineMarkers = [...lineMarkers];
+    updatedLineMarkers.splice(index * 3, 3);
+    setLineMarkers(updatedLineMarkers);
+
+    const updatedLines = [...lines];
+    updatedLines.splice(index, 1);
+    setLines(updatedLines);
+
+    // Update the indicators state
+    const updatedIndicators = [...indicators];
+    updatedIndicators.splice(index, 1);
+    setIndicators(updatedIndicators);
+    google.maps.event.clearListeners(updatedLineMarkers, "click");
+
+    // Close the InfoWindow
+    setSelectedLineIndex(null);
+  };
+
   /* Load Google maps javascript api */
   const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "",
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
   });
 
   /* Load previos location or where user is now */
@@ -380,8 +441,19 @@ const GoogleMapsField = ({
         lat: markerPos ? markerPos.lat() : bikes[index].location.lat,
         lng: markerPos ? markerPos.lng() : bikes[index].location.lng,
       };
-      newBikes[index].location = bikePos;
-      setBikes(newBikes);
+
+      setBikes((prevBikes: bikeInformation[]) => {
+        const updatedBikes = [...prevBikes];
+        if (updatedBikes[index]) {
+          updatedBikes[index].location = bikePos;
+        } else {
+          console.warn(
+            `Bike at index ${index} does not exist in updatedBikes.`
+          );
+        }
+        return updatedBikes;
+      });
+
       nameWindow.close();
     });
 
@@ -419,11 +491,21 @@ const GoogleMapsField = ({
         lat: markerPos ? markerPos.lat() : vehicles[index].location.lat,
         lng: markerPos ? markerPos.lng() : vehicles[index].location.lng,
       };
-      newVehicles[index].location = vehiclePos;
-      setVehicles(newVehicles);
+
+      setVehicles((prevVehicles: carInformation[]) => {
+        const updatedVehicles = [...prevVehicles];
+        if (updatedVehicles[index]) {
+          updatedVehicles[index].location = vehiclePos;
+        } else {
+          console.warn(
+            `Vehicle at index ${index} does not exist in updatedVehicle.`
+          );
+        }
+        return updatedVehicles;
+      });
+
       nameWindow.close();
     });
-
     vehicleMarker.addListener("drag", () => {
       nameWindow.setContent(`${vehicle.name}`);
       nameWindow.open(map, vehicleMarker);
@@ -460,12 +542,23 @@ const GoogleMapsField = ({
 
     pedestrianMarker.addListener("dragend", () => {
       const markerPos = pedestrianMarker.getPosition();
-      const vehiclePos = {
+      const PedestrianPos = {
         lat: markerPos ? markerPos.lat() : pedestrians[index].location.lat,
         lng: markerPos ? markerPos.lng() : pedestrians[index].location.lng,
       };
-      newPedestrians[index].location = vehiclePos;
-      setPedestrians(newPedestrians);
+
+      setPedestrians((prevPedestrians: PedestrianInformation[]) => {
+        const updatedPedestrian = [...prevPedestrians];
+        if (updatedPedestrian[index]) {
+          updatedPedestrian[index].location = PedestrianPos;
+        } else {
+          console.warn(
+            `Pedestrian at index ${index} does not exist in  updatedPedestrian.`
+          );
+        }
+        return updatedPedestrian;
+      });
+
       nameWindow.close();
     });
 
@@ -499,12 +592,23 @@ const GoogleMapsField = ({
 
     objectMarker.addListener("dragend", () => {
       const markerPos = objectMarker.getPosition();
-      const vehiclePos = {
+      const objectPos = {
         lat: markerPos ? markerPos.lat() : objects[index].location.lat,
         lng: markerPos ? markerPos.lng() : objects[index].location.lng,
       };
-      newObjects[index].location = vehiclePos;
-      setObjects(newObjects);
+
+      setObjects((prevObject: OtherInformation[]) => {
+        const updatedObject = [...prevObject];
+        if (updatedObject[index]) {
+          updatedObject[index].location = objectPos;
+        } else {
+          console.warn(
+            `Object at index ${index} does not exist in  updatedObject.`
+          );
+        }
+        return updatedObject;
+      });
+
       nameWindow.close();
     });
 
@@ -598,6 +702,21 @@ const GoogleMapsField = ({
                   streetViewControl: false,
                 }}
               >
+                {selectedLineIndex !== null &&
+                  selectedLineIndex < indicators.length &&
+                  indicators[selectedLineIndex]?.marker2 && (
+                    <InfoWindow
+                      position={{
+                        lat: indicators[selectedLineIndex].marker2.lat!,
+                        lng: indicators[selectedLineIndex].marker2.lng!,
+                      }}
+                      onCloseClick={() => setSelectedLineIndex(null)}
+                    >
+                      <button onClick={() => deleteLine(selectedLineIndex)}>
+                        Delete
+                      </button>
+                    </InfoWindow>
+                  )}
                 <MarkerF
                   position={mapPos}
                   draggable={true}
