@@ -171,7 +171,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
         <div className="flex flex-col justify-left text-left w-full mb-4">
           <div id="whatvehicle" className="flex flex-col w-full">
             <div>
-              <label htmlFor="whatvehicle">What object?</label>
+              <label htmlFor="whatvehicle">Please select the object</label>
             </div>
             <div className="flex flex-row justify-between">
               <OtherPartyList
@@ -192,6 +192,8 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
               located, as well as the location of the other partys, by using the
               markers. Please use the draggable line to mark the car's
               trajectory leading to the collision.
+
+              The green dot indicates the starting point, the yellow dot indicates the move leading to the incident and the red dot indicates the incident.
             </p>
           </div>
 
@@ -213,27 +215,6 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
               indicators={indicators}
               setIndicators={setIndicators}
             />
-          </div>
-        </div>
-      )}
-
-      {!otherPartyInvolved && (
-        <div className="w-full">
-          <div>
-            <YesNo
-              id="SingleVehicleAccident"
-              labelText="Single vehicle accident"
-              required={true}
-              value={isSingleVehicleChecked}
-              onChange={setIsSingleVehicleChecked} // Update the handler
-            />
-          </div>
-          <div className="w-full">
-            {isSingleVehicleChecked && (
-              <div />
-              /*                 <Google show={false} showAutocomplete={true} />
-               */
-            )}
           </div>
         </div>
       )}

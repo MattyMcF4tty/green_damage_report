@@ -97,7 +97,7 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
         <div className="">
           <TextField
             id="accidentDescription"
-            labelText="Description of the incident"
+            labelText="Please describe the incident"
             maxLength={200}
             required={true}
             value={accidentDescription}
@@ -124,7 +124,7 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
         <ImageField
           reportID={id}
           id="FrontImage"
-          labelText="Take pictures of damages to the GreenMobility car"
+          labelText="Please take pictures of the damage to the GreenMobility car"
           required={false}
           images={greenImages}
           imageType="GreenMobility"
@@ -134,7 +134,7 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
         <ImageField
           reportID={id}
           id="LeftImage"
-          labelText="Take pictures of damages to other partys"
+          labelText="Please take pictures of the damage to the other party"
           required={false}
           images={otherPartyImages}
           imageType="OtherParty"
@@ -158,7 +158,7 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
       {/* Police Report collection */}
       <div className="">
         <YesNo
-          labelText="Were there police present?"
+          labelText="Were the police present?"
           id="PolicePresent"
           required={true}
           value={policePresent}

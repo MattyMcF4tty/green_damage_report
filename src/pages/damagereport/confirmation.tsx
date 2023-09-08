@@ -26,7 +26,7 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
       await handleSendEmail(
         data.userEmail, 
         "GreenMobility Damage report",
-        "This is a confirmation that we have received your damage report. It will now be processed by our damage department. If you have any questions, please contact damage@greenmobility.com"
+        `This is a confirmation that we have received your damage report for vehicle ${data.greenCarNumberPlate}. It will now be processed by our damage department. If you have any questions, please contact damage@greenmobility.com`
         )
     }
     Router.push("thankyou")

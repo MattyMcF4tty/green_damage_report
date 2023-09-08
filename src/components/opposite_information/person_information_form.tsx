@@ -65,7 +65,7 @@ const PedestrianInfoForm = ({ value, onChange }: PedestrianProps) => {
     <div className="flex flex-col w-full mt-4">
       <Inputfield
         id="NamePedestrian"
-        labelText="Fullname of the other person involved"
+        labelText="Please enter the full name of the party involved"
         required={true}
         type="text"
         value={name}
@@ -75,11 +75,11 @@ const PedestrianInfoForm = ({ value, onChange }: PedestrianProps) => {
       <PhoneNumber
         value={phoneNumber}
         onChange={setPhoneNumber}
-        labelText="Phone number of the other person involved"
+        labelText="Please enter the phone number of the party involved"
       />
       <Inputfield
         id="EmailPedestrian"
-        labelText="Email adress of the other person"
+        labelText="Please enter the email adress of the party involved"
         required={false}
         type="text"
         value={email}

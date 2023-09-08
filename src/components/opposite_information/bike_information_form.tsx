@@ -73,13 +73,13 @@ const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
         <YesNo
           required={true}
           id="Ebike"
-          labelText="Is it an electric bike?"
+          labelText="Was it an electric bike?"
           value={ebike}
           onChange={setEbike}
         />
 
         <Inputfield
-          labelText="Fullname of the other person involved"
+          labelText="Please enter the full name of the party involved"
           id="nameInput"
           required={true}
           type="text"
@@ -91,10 +91,10 @@ const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
         <PhoneNumber
           value={phoneNumber}
           onChange={setPhoneNumber}
-          labelText="Phone number of the other person involved"
+          labelText="Please enter the phone number of the party involved"
         />
         <Inputfield
-          labelText="Email address of the other person"
+          labelText="Please enter the email address of the party involved"
           id="EmailInput"
           required={false}
           type="text"

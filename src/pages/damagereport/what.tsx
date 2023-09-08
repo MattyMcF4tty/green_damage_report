@@ -94,7 +94,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
         </p>
         <Inputfield
           labelText="
-          The license plate of the GreenMobility car"
+          Please enter the license plate of the GreenMobility car"
           id="greenCarNumberplateInput"
           type="numberplate"
           required={true}
@@ -119,7 +119,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
         {!showDriverInfoForm && showDriverInfoForm !== null && (
           <div className="flex flex-col">
             <Inputfield
-              labelText="First name of the driver"
+              labelText="Please enter the first name of the driver"
               id="FirstNameInput"
               required={true}
               type="text"
@@ -129,7 +129,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
             />
 
             <Inputfield
-              labelText="Last name of the driver"
+              labelText="Please enter the last name of the driver"
               id="LastNameInput"
               required={true}
               type="text"
@@ -139,14 +139,14 @@ const What: NextPage<pageProps> = ({ data, id }) => {
            />
             {/* TODO: make google autofill */}
             <AddressField
-              labelText="Home address of the driver"
+              labelText="Please enter the home address of the driver"
               value={address}
               onChange={setAddress}
             />
 
             {/* TODO: Check if its a real phone number */}
             <Inputfield
-              labelText="Social security number of the driver"
+              labelText="Please enter the social security number of the driver"
               id="SocialSecurityNumberInput"
               required={false}
               type="ssn"
@@ -156,7 +156,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
             />
 
             <Inputfield
-              labelText="Driving license number of the driver"
+              labelText="Please enter the driving license number of the driver"
               id="DrivingLicenseNumberInput"
               required={false}
               type="license"
@@ -168,11 +168,11 @@ const What: NextPage<pageProps> = ({ data, id }) => {
             <PhoneNumber
               value={phoneNumber}
               onChange={setPhoneNumber}
-              labelText="Phonenumber of the driver"
+              labelText="Please enter the phonenumber of the driver"
             />
 
             <Inputfield
-              labelText="Email of the driver"
+              labelText="Please enter the email of the driver"
               id="EmailInput"
               required={true}
               type="email"
@@ -187,7 +187,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
       {/* Accident time and date collection */}
       <div>
         <TimeDateField
-          labelText="When did the accident occur?"
+          labelText="Please enter the date and the time the accident occurred"
           id="Accident"
           required={true}
           timeChange={setAccidentTime}

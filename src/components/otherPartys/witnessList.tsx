@@ -153,17 +153,16 @@ const NewWitnessPopUp = ({
         <div>
           <Inputfield
             id="witnessName"
-            labelText="Name"
+            labelText="Please enter the name of the witness"
             required={true}
             type="text"
             value={witnessName}
             onChange={setWitnessName}
           />
-          {/* TODO: FIX PHONE */}
-          <PhoneNumber labelText="Phone number" value={witnessPhone} onChange={setWitnessPhone} />
+          <PhoneNumber labelText="Please enter the phone number of the witness" value={witnessPhone} onChange={setWitnessPhone} />
           <Inputfield
             id="witnessEmail"
-            labelText="Email"
+            labelText="Please enter the Email of the witness"
             required={true}
             type="email"
             value={witnessEmail}
