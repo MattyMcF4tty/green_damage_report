@@ -31,7 +31,8 @@ const EmailPopUp = ({reportIDs, setVisibility, email}: EmailPopUpProps) => {
                 <p className="mt-2">Reports:</p>
                 <div className="flex flex-col">
                     {reportIDs.map((id, index) => (
-                        <button onClick={() => (Router.push(`damagereport/what?id=${id}`))} 
+                        <button key={index}
+                        onClick={() => (Router.push(`damagereport/what?id=${id}`))} 
                         className="italic underline text-left">{id}</button>
                     ))}
                 </div>

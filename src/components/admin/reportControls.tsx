@@ -1,4 +1,4 @@
-import { reportDataType, sendEmail } from "@/utils/utils";
+import { handleDownloadImages, handleDownloadPdf, reportDataType, sendEmail } from "@/utils/utils";
 import {
   faCloudArrowDown,
   faEnvelope,
@@ -13,10 +13,6 @@ import { useState } from "react";
 import ExpandedReport from "./expandedReport";
 import {
   deleteReports,
-  getImages,
-  handleDownloadPdf,
-  handleGeneratePdf,
-  storage,
 } from "@/firebase/clientApp";
 import generatePDF from "@/utils/reportPdfTemplate";
 import { ref, uploadBytes } from "firebase/storage";
@@ -35,7 +31,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
     await sendEmail("carloslundrodriguez@gmail.com", "sut din far", "dø");
   };
 
-  const handleDownloadPDF = async (
+  const handleInstallPDF = async (
     selectedReports: { id: string; data: reportDataType }[]
   ) => {
     setAllowPdf(false);
@@ -79,7 +75,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
         disabled={!allowPdf}
         onClick={() => {
           if (selectedReports.length > 0) {
-            handleDownloadPDF(selectedReports);
+            handleInstallPDF(selectedReports);
           }
         }}
         className="bg-white text-black px-4 py-2 rounded-xl border-[1px]  border-gray-300 hover:bg-MainGreen-300 hover:text-white duration-150"

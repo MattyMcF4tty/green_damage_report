@@ -211,7 +211,12 @@ export const getServerSidePropsWithRedirect = async (
 
   try {
     const data: reportDataType = await getData(id);
-    const images = await getImages(id);
+    const GreenMobilityImages = await handleDownloadImages(`${id}/GreenMobility`, 'url');
+    const otherPartyImages = await handleDownloadImages(`${id}/OtherParty`, 'url');
+    const images: Record<string, string[]> = {
+      GreenMobility: GreenMobilityImages,
+      OtherParty: otherPartyImages
+    };
 
     if (data.finished) {
       return {
@@ -415,6 +420,87 @@ export const handleSignIn = async (email: string, password: string) => {
 export const handleSignOut = () => {
   Cookies.remove("AuthToken");
 }
+
+export const handleDownloadImages = async (path: string, type: 'url' | 'base64') => {
+  try {
+    const data = {
+      path: path,
+      type: type
+    };
+
+    const response = await fetch('http://localhost:3000/api/firebase/downloadImages', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+
+    // Handling non-ok responses
+    const responseData = await response.json();
+
+    if (!response.ok) {
+      throw new Error(`Status ${response.status}: ${responseData.message || 'Something went wrong contacting the server'}`);
+    }
+
+    console.log(responseData.message)
+    const images: string[] = responseData.data;
+
+    return images;
+  } catch (error: any) {
+    console.error(error.message);
+    return [];
+  }
+};
+
+export const handleGeneratePdf = async (id: string)  => {
+  try {
+    const data = {id: id}
+
+    const response = await fetch('/api/generatepdf', {
+      method: 'POST',
+      headers: {
+          'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(data)
+    })
+    const responseData = await response.json()
+    
+    // Check if response is not ok
+    if (!response.ok) {
+      const message = responseData.message || "Unknown error";  // use optional chaining
+      throw new Error(`${response.status}: ${message}`)
+    }
+  
+    console.log(`PDF of ${id} generated and uploaded successfully.`);
+  } catch (error:any) {
+    console.error(error.message)
+    return new Error(error.message)
+  }
+}
+
+export const handleDownloadPdf = async (id: string) => {
+  try {
+    const data = {id: id}
+    const response = await axios.post<ArrayBuffer>('/api/downloadpdf', data, {
+      responseType: 'arraybuffer' // Important: specify the response type as 'arraybuffer'
+    });
+
+    if (!(response.status === 200)) {
+      throw new Error(`${response.status}`)
+    }
+    
+    /* Convert pdfbuffer to blob and download to pc */
+    const pdfBlob: Blob = new Blob([response.data], { type: 'application/pdf' });
+  
+    console.log(`PDF of ${id} downloaded from server successfully.`);
+    await downloadToPc(pdfBlob, `DamageReport_${id}`);
+  } catch (error:any) {
+    console.error('An error occurred:', error);
+    return new Error(`${Response}`)
+  }
+}
+
 
 /* ---------------- classes ------------------------------ */
 export class reportDataType {
