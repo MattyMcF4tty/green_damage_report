@@ -6,11 +6,28 @@ import {
   faCloudArrowDown,
   faEye,
 } from "@fortawesome/free-solid-svg-icons";
-import { NextPage } from "next";
-import { reportDataType } from "@/utils/utils";
+import { GetServerSidePropsContext, NextPage } from "next";
+import { handleVerifyUser, reportDataType } from "@/utils/utils";
 import ExpandedReport from "@/components/admin/expandedReport";
 import ReportList from "@/components/admin/reportList";
 import ReportControls from "@/components/admin/reportControls";
+
+export const getServerSideProps = async (context: GetServerSidePropsContext) => {
+  const token = context.req.cookies["AuthToken"]
+  const userVerified = await handleVerifyUser(token);
+
+  if (!userVerified) {
+    // Redirect to the admin page
+    return {
+      redirect: {
+        destination: '/auth/signIn',
+        permanent: false,
+      },
+    };
+  }
+
+  return {props: {}}
+};
 
 const adminPage: NextPage = () => {
   const [currentStatus, setCurrentStatus] = useState<

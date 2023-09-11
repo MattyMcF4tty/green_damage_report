@@ -1,23 +1,12 @@
 import { initializeApp } from "firebase/app"
 import { collection, deleteDoc, doc, getDoc, getDocs, getFirestore, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { ListResult, StorageReference, deleteObject, getDownloadURL, getStorage, listAll, ref, uploadBytes } from "firebase/storage"
-import { decryptData, downloadToPc, encryptData, reportDataType } from "@/utils/utils";
+import { decryptData, downloadToPc, encryptData, handleGeneratePdf, reportDataType } from "@/utils/utils";
 import axios from "axios";
+import app from "./firebaseConfig";
 
-
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-};
-
-export const app = initializeApp(firebaseConfig);
-
-export const db = getFirestore(app);
-export const storage = getStorage(app);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
 const collectionName = "DamageReports"
 
@@ -73,7 +62,7 @@ export const updateData = async (id:string, data:reportDataType) => {
 export const updateImages = async (
   id: string,
   images: FileList | null,
-  imageType: "GreenMobility" | "OtherParty"
+  imageType: 'GreenMobility' | 'OtherParty'
 ) => {
   const storageRef = ref(storage, `${id}/${imageType}`);
 
@@ -86,6 +75,7 @@ export const updateImages = async (
         const imageBlob = new Blob([image], { type: image.type });
 
         await uploadBytes(imageRef, imageBlob);
+        console.log(images)
       }
     } else {
       deleteAllImages(storageRef);
@@ -232,39 +222,3 @@ export const checkEmailExists = async (email: string) => {
       return [];
     }
 }
-
-export const handleGeneratePdf = async (id: string)  => {
-  try {
-    const response = await axios.post('/api/generatepdf', { id });
-    if (response.status === 200) {
-      console.log(`PDF of ${id} generated and uploaded successfully.`);
-    }
-  } catch (error) {
-    console.error('An error occurred:', error);
-  }
-}
-
-export const handleDownloadPdf = async (id: string) => {
-  try {
-    const response = await axios.post('/api/downloadpdf', { id }, { responseType: 'arraybuffer' });
-
-    if (response.status === 200) {
-      console.log(`PDF of ${id} downloaded from server successfully.`);
-      
-      const pdfBlob: Blob = new Blob([response.data], { type: 'application/pdf' });
-      
-      await downloadToPc(pdfBlob, `DamageReport_${id}`);
-    } else {
-      throw new Error("Something went wrong downloading pdf to pc");
-    }
-  } catch (error:any) {
-    if (error.response && error.response.status === 404) {
-      console.log('PDF does not exist, creating a new one.');
-      await handleGeneratePdf(id);
-      await handleDownloadPdf(id);
-    } else {
-      console.error('An error occurred:', error);
-    }
-  }
-}
-

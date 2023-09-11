@@ -17,7 +17,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             <Component {...pageProps} />
           </div>
         </div>
-      ) : pathname.startsWith("/admin") ? (
+      ) : (pathname.includes("auth/admin") || pathname.includes("auth/signUp")) ? (
         <div>
           <AdminNavbar />
           <div className="p-4">
@@ -25,13 +25,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           </div>
         </div>
       ) : (
-        <div className="p-4">
-          {/* TODO: FIX IMAGE ONLY NEEDS TO GET DISPLAYED ON INDEX */}
-          <img
-            src="../GreenLogos/GreenMobilityTextLogo.png"
-            alt="greenlogo"
-            className="lg:ml-[27rem]"
-          />
+        <div>
           <Component {...pageProps} />
         </div>
       )}

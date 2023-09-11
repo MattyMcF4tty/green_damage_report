@@ -1,21 +1,28 @@
-import { reportDataType, handleSendEmail } from "@/utils/utils";
+import {
+  handleDownloadImages,
+  handleDownloadPdf,
+  reportDataType,
+  handleSendEmail,
+} from "@/utils/utils";
 import {
   faCloudArrowDown,
+  faEnvelope,
   faEye,
+  faMailBulk,
+  faMailForward,
+  faMailReply,
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ExpandedReport from "./expandedReport";
-import { deleteReports, getImages, handleDownloadPdf, handleGeneratePdf, storage } from "@/firebase/clientApp";
+import { deleteReports } from "@/firebase/clientApp";
 import generatePDF from "@/utils/reportPdfTemplate";
 import { ref, uploadBytes } from "firebase/storage";
-
 
 interface ReportControls {
   selectedReports: { id: string; data: reportDataType }[];
 }
-
 
 const ReportControls = ({ selectedReports }: ReportControls) => {
   const [showExpandedReports, setShowExpandedReports] =
@@ -23,15 +30,17 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
 
   const [allowPdf, setAllowPdf] = useState(true);
 
-  const handleSendEmails = async() => {
+  const handleEmail = async () => {
     await handleSendEmail("carloslundrodriguez@gmail.com", "sut din far", "dø");
   };
 
-  const handleDownloadPDF = async (selectedReports: {id: string, data: reportDataType}[]) => {
+  const handleInstallPDF = async (
+    selectedReports: { id: string; data: reportDataType }[]
+  ) => {
     setAllowPdf(false);
     selectedReports.map(async (report) => {
       await handleDownloadPdf(report.id);
-    })
+    });
     setAllowPdf(true);
   };
 
@@ -55,18 +64,24 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
         className="bg-white border-gray-300 border-[1px] rounded-xl w-32  hover:bg-MainGreen-300 hover:text-white duration-150"
         onClick={() => handleDelete()}
       >
-        <FontAwesomeIcon icon={faTrashCan} />
+        <FontAwesomeIcon icon={faTrashCan} className="mr-2" />
         {" Delete"}
       </button>
-      <button onClick={() => handleSendEmails()}>Send Email</button>
+      <button
+        className="bg-white text-black w-32 rounded-xl border-[1px]  border-gray-300 hover:bg-MainGreen-300 hover:text-white duration-150"
+        onClick={() => handleEmail()}
+      >
+        <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
+        Send Email
+      </button>
       <button
         disabled={!allowPdf}
         onClick={() => {
           if (selectedReports.length > 0) {
-            handleDownloadPDF(selectedReports);
+            handleInstallPDF(selectedReports);
           }
         }}
-        className="bg-MainGreen-300 text-white px-4 py-2 rounded-md shadow-md"
+        className="bg-white text-black px-4 py-2 rounded-xl border-[1px]  border-gray-300 hover:bg-MainGreen-300 hover:text-white duration-150"
       >
         <FontAwesomeIcon icon={faCloudArrowDown} className="mr-2" />
         Download PDF
@@ -81,7 +96,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
           }
         }}
       >
-        <FontAwesomeIcon icon={faEye} />
+        <FontAwesomeIcon icon={faEye} className="mr-2" />
         {" Expand"}
       </button>
 

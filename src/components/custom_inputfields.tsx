@@ -87,6 +87,7 @@ export const Inputfield = ({
       pattern = "[0-9]{4}-[0-9]{5}-[0-9]{5}-[0-9]{2}";
       patternError = "Please enter a valid journal number";
       break;
+
     default:
       pattern = ""; /* No pattern for "text" type, it allows any input */
       patternError = "Please enter only valid characters";
@@ -454,18 +455,22 @@ export const ImageField = ({
 }: ImageFieldProps) => {
   const [isRequired, setIsRequired] = useState<boolean>(required);
   const [isError, setIsError] = useState<boolean>(false);
+  const [imagesUploaded, setImagesUploaded] = useState(required)
 
   useEffect(() => {
     if (images === null) setIsRequired(images === null);
   }, [images]);
 
   const handleChange = async (newImages: FileList | null) => {
+    setImagesUploaded(true)
     await updateImages(reportID, newImages, imageType);
+    setImagesUploaded(false)
   };
 
   return (
     <div className="flex flex-col mb-4">
       <label htmlFor={id}>{labelText}</label>
+      <input type="text" required={imagesUploaded} className="w-0 h-0 opacity-0"/>
       <input
         className="cursor-pointer"
         id={id}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
 import BackButton from "@/components/buttons/back";
@@ -15,6 +15,10 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
   const Router = useRouter();
   const serverData = new reportDataType();
   serverData.updateFields(data);
+
+  useEffect(() => {
+    console.log(images)
+  }, [])
 
   let [confirmVis, setConfirmVis] = useState(false);
 
