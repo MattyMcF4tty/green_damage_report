@@ -159,6 +159,21 @@ export const Inputfield = ({
         newValue += "-";
       }
     }
+    // Numberplate format logic
+    if (type === "numberplate") {
+      // When the value is 2 characters long and doesn't have a space yet
+      if (newValue.length === 2 && !newValue.includes(" ")) {
+        newValue += " ";
+      } else if (newValue.length === 5 && newValue.charAt(4) !== " ") {
+        newValue += " ";
+      } // Removing spaces when characters are deleted
+      else if (newValue.length === 3 && newValue.charAt(2) === " ") {
+        newValue = newValue.slice(0, -1);
+      } else if (newValue.length === 6 && newValue.charAt(5) === " ") {
+        newValue = newValue.slice(0, -1);
+      }
+    }
+
     setCurrentValue(newValue);
     onChange(newValue); // pass the possibly modified value back to the parent
   };
