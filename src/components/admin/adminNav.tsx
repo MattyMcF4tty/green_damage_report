@@ -9,8 +9,9 @@ const AdminNavbar = () => {
 
   const handleLogOut = () => {
     handleSignOut();
-    Router.push("");
+    Router.push("/auth/signIn")
   };
+
   return (
     <div className="bg-MainGreen-300 flex flex-row h-14 w-full ">
       <div
