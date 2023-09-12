@@ -12,7 +12,6 @@ const IndexPage = () => {
   const [email, setEmail] = useState("");
   const [showPopUp, setShowPopUp] = useState(false);
   const [ongoingReports, setOngoingReports] = useState<string[]>([])
-  const [id, setId] = useState(generateId());
 
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +45,7 @@ const IndexPage = () => {
       <img
         src="../GreenLogos/GreenMobilityTextLogo.png"
         alt="greenlogo"
-        className="lg:ml-[27rem]"
+        className=""
       />
       <div className="container mx-auto p-8">
         <div className="mb-4 ">

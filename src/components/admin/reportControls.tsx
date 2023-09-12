@@ -1,5 +1,4 @@
 import {
-  handleDownloadImages,
   handleDownloadPdf,
   reportDataType,
   handleSendEmail,
@@ -8,17 +7,13 @@ import {
   faCloudArrowDown,
   faEnvelope,
   faEye,
-  faMailBulk,
-  faMailForward,
-  faMailReply,
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ExpandedReport from "./expandedReport";
 import { deleteReports } from "@/firebase/clientApp";
-import generatePDF from "@/utils/reportPdfTemplate";
-import { ref, uploadBytes } from "firebase/storage";
+
 
 interface ReportControls {
   selectedReports: { id: string; data: reportDataType }[];
@@ -53,7 +48,6 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
 
     await deleteReports(selectedReportIDs);
 
-    /* TODO: Reloads before documents are deleted */
     location.reload();
   };
 

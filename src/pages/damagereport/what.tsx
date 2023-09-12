@@ -104,7 +104,6 @@ const What: NextPage<pageProps> = ({ data, id }) => {
     >
       {/* GreenMobility car numberplate collection */}
       <div>
-        {/* TODO: Make it so you can only type a valid numberplate for the country where the accident took place and get a list from a server with all the green numberplates */}
         <p className="text-MainGreen-300 mb-8 flex justify-start font-bold text-[20px]">
           Initial Event Inquiry
         </p>
@@ -152,14 +151,11 @@ const What: NextPage<pageProps> = ({ data, id }) => {
               onChange={setLastName}
               placeHolder="Doe"
             />
-            {/* TODO: make google autofill */}
             <AddressField
               labelText="Please enter the home address of the driver"
               value={address}
               onChange={setAddress}
             />
-            {/* TODO: Check if its a real phone number */}
-
             <Inputfield
               labelText="Please enter the social security number of the driver"
               id="SocialSecurityNumberInput"
