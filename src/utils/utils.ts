@@ -248,7 +248,7 @@ export const handleSendEmail = async (
   };
 
   try {
-    const response = await axios.post("../api/send-email", emailData);
+    const response = await axios.post(process.env.URL + 'api/send-email', emailData);
     console.log("Server response:", response.data.message);
   } catch (error) {
     console.error("Error sending email:", error);
@@ -279,7 +279,7 @@ export const handleSignUp = async (email:string, password:string) => {
     password: password
   }
 
-  const response = await fetch('http://localhost:3000/api/auth/signUp', {
+  const response = await fetch(process.env.URL + '/api/auth/signUp', {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json'
@@ -299,7 +299,7 @@ export const handleSignUp = async (email:string, password:string) => {
 
 export const handleVerifyUser = async (userToken: string | undefined) => {
   
-  const response = await fetch(`http://localhost:3000/api/auth/verifyAdmin`, {
+  const response = await fetch(process.env.URL + '/api/auth/verifyAdmin', {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json'
@@ -324,7 +324,7 @@ export const handleSignIn = async (email: string, password: string) => {
       password: password
     }
 
-    const response = await fetch(`http://localhost:3000/api/auth/signIn`, {
+    const response = await fetch(process.env.URL + '/api/auth/signIn', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json'
@@ -358,7 +358,7 @@ export const handleDownloadImages = async (path: string, type: 'url' | 'base64')
       type: type
     };
 
-    const response = await fetch('http://localhost:3000/api/firebase/downloadImages', {
+    const response = await fetch(process.env.URL + '/api/downloadImages', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json'
@@ -387,7 +387,7 @@ export const handleGeneratePdf = async (id: string)  => {
   try {
     const data = {id: id}
 
-    const response = await fetch('/api/generatepdf', {
+    const response = await fetch(process.env.URL + '/api/generatepdf', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json'
@@ -412,7 +412,7 @@ export const handleGeneratePdf = async (id: string)  => {
 export const handleDownloadPdf = async (id: string) => {
   try {
     const data = {id: id}
-    const response = await axios.post<ArrayBuffer>('/api/downloadpdf', data, {
+    const response = await axios.post<ArrayBuffer>(process.env.URL + '/api/downloadpdf', data, {
       responseType: 'arraybuffer' // Important: specify the response type as 'arraybuffer'
     });
 
