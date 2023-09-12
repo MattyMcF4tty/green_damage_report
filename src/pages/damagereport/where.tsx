@@ -6,7 +6,7 @@ import { bikeInformation } from "../../components/opposite_information/bike_info
 import { OtherInformation } from "../../components/opposite_information/other_information_form";
 import BackButton from "@/components/buttons/back";
 import NextButton from "@/components/buttons/next";
-import { updateData } from "@/firebase/clientApp";
+import { handleUploadMap, updateData } from "@/firebase/clientApp";
 import { GetServerSidePropsContext, NextPage } from "next";
 import {
   getServerSidePropsWithRedirect,
@@ -18,6 +18,7 @@ import GoogleMapsField, {
   googleIndicator,
 } from "@/components/google_maps_field";
 import { useRouter } from "next/router";
+import html2canvas from "html2canvas";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -98,6 +99,40 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    function dataURItoBlob(dataURI: string): Blob {
+      const byteString = atob(dataURI.split(",")[1]);
+      const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+
+      return new Blob([ab], { type: mimeString });
+    }
+
+    const mapField = document.getElementById("MyMap"); // Assuming you give an ID to the map container in GoogleMapsField
+
+    if (mapField) {
+      const canvas = await html2canvas(mapField, {
+        useCORS: true,
+        scale: 17, // Set the zoom level
+      });
+
+      const dataUrl = canvas.toDataURL("image/png");
+      const mapBlob: Blob = dataURItoBlob(dataUrl);
+
+      // Do something with the dataURL (e.g., save it or send it to the server)
+      await handleUploadMap(mapBlob, id);
+
+      // Example: Save the Blob as a file (client-side)
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(mapBlob);
+      a.download = "map.png";
+      a.click();
+    }
 
     /* Data that gets sent to server */
     serverData.updateFields({
