@@ -99,6 +99,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAllowClick(false);
 
     function dataURItoBlob(dataURI: string): Blob {
       const byteString = atob(dataURI.split(",")[1]);
