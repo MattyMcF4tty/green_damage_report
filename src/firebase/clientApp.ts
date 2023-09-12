@@ -1,35 +1,33 @@
-import { initializeApp } from "firebase/app"
 import { collection, deleteDoc, doc, getDoc, getDocs, getFirestore, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { ListResult, StorageReference, deleteObject, getDownloadURL, getStorage, listAll, ref, uploadBytes } from "firebase/storage"
-import { decryptData, downloadToPc, encryptData, handleGeneratePdf, reportDataType } from "@/utils/utils";
-import axios from "axios";
+import { decryptData, encryptData, reportDataType } from "@/utils/utils";
 import app from "./firebaseConfig";
 
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-const collectionName = "EncryptionTest"
+export const collectionName = "DamageReports"
 
 export const getData = async (id: string) => {
-    console.log("fetchind docID: " + id)
-    const docRef = doc(db, `${collectionName}/${id}`);
-    const data = new reportDataType()
+  console.log("fetchind docID: " + id)
+  const docRef = doc(db, `${collectionName}/${id}`);
+  const data = new reportDataType()
 
-    try {
-        const docSnapshot = await getDoc(docRef)
-        if (docSnapshot.exists()) {
-            const fetchedData = docSnapshot.data();
-            data.updateFields(fetchedData)
-        } 
-        else {
-            throw new Error("Document does not exist");
-        }
-    } catch (error) {
-        console.error(`Something went wrong fetching data:\n${error}\n`)
+  try {
+    const docSnapshot = await getDoc(docRef)
+    if (docSnapshot.exists()) {
+      const fetchedData = docSnapshot.data();
+      data.updateFields(fetchedData)
+    } 
+    else {
+      throw new Error("Document does not exist");
     }
-    
-    const decryptedData = decryptData(data);
-    return decryptedData;
+  } catch (error) {
+    console.error(`Something went wrong fetching data:\n${error}\n`)
+  }
+  const decryptedData = data;
+
+  return decryptedData;
 }
 
 export const createDoc = async (id: string, email: string) => {
@@ -51,7 +49,7 @@ export const updateData = async (id:string, data:reportDataType) => {
 
 
     try {
-        const encryptedData = encryptData(data);
+        const encryptedData = data;
         await updateDoc(dataRef, encryptedData.toPlainObject());
         await updateDoc(dataRef, {lastChange: `${currentDate.getHours()}:${currentDate.getMinutes()} - ${currentDate.getDay()}/${currentDate.getMonth()}/${currentDate.getFullYear()}`})
     } catch (error) {
@@ -184,41 +182,17 @@ export const getReports = async () => {
 };
 
 export const deleteReports = async (reportsToDelete: string[]) => {
-  reportsToDelete.map(async (report) => {
-    const reportRef = doc(db, `${collectionName}/${report}`);
+  if (reportsToDelete.length === 0) {
+      throw Error("No reports to delete");
+  }
 
-    try {
-      if (reportsToDelete.length === 0) {
-        throw Error("No reports to delete");
-      }
+  const deletePromises = reportsToDelete.map(report => {
+      const reportRef = doc(db, `${collectionName}/${report}`);
+      return deleteDoc(reportRef).catch(error => {
+          console.error(`Error deleting ${reportRef.path}: ${error}`);
+      });
+  });
 
-            for (const report of reportsToDelete) {
-                const reportRef = doc(db, `${collectionName}/${report}`);
-                await deleteDoc(reportRef);
-            }
-        } catch (error) {
-            console.error(`Error deleting ${reportRef.path}: ${error}`);
-        }
-    })
-}
-
-export const checkEmailExists = async (email: string) => {
-    const collectionRef = collection(db, collectionName)
-    const q = query(collectionRef, where("userEmail", "==", email.toLowerCase()));
-    
-    try {
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach(doc => (console.log(doc.id)))
-
-      if (querySnapshot) {
-        const reportIDs = querySnapshot.docs.map((doc) => doc.id)
-        return reportIDs;
-      } else {
-
-        return [];
-      }
-    } catch (error) {
-      console.error(`An error occurred while checking email:\n${error}`);
-      return [];
-    }
+  await Promise.all(deletePromises);
+  return;
 }

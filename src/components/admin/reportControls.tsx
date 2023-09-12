@@ -54,7 +54,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
     await deleteReports(selectedReportIDs);
 
     /* TODO: Reloads before documents are deleted */
-    /*  location.reload(); */
+    location.reload();
   };
 
   return (

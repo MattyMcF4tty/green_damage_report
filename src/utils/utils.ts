@@ -1,93 +1,18 @@
 import { WitnessInformation } from "@/components/otherPartys/witnessList";
-import { getData, getImages, getReportIds } from "@/firebase/clientApp";
+import { collectionName, getData, getImages, getReportIds } from "@/firebase/clientApp";
 import CryptoJS from "crypto-js";
 import { GetServerSidePropsContext } from "next";
 import axios from "axios";
 import Cookies from 'js-cookie';
-import app from "@/firebase/firebaseConfig";
+import app, { FireDatabase } from "@/firebase/firebaseConfig";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/router";
+import { collection, getDocs, query, where } from "firebase/firestore";
 
-export type pageProps = {
-  data: {
-    userEmail: string | null;
-    finished: boolean;
-    lastChange: string;
 
-    driverInfo: {
-      firstName: string | null;
-      lastName: string | null;
-      address: string | null;
-      socialSecurityNumber: string | null;
-      drivingLicenseNumber: string | null;
-      phoneNumber: string | null;
-      email: string | null;
-    };
+/* ------- utils config ----- */
+const firebaseCollectionName = collectionName
 
-    accidentLocation: { lat: number | null; lng: number | null };
-    time: string | null;
-    date: string | null;
-    accidentDescription: string | null;
-
-    greenCarNumberPlate: string | null;
-    speed: string | null;
-    damageDescription: string | null;
-    policeReportNumber: string | null;
-
-    bikerInfo: {
-      name: string;
-      phone: string;
-      email: string;
-      ebike: boolean | null;
-      personDamage: string;
-      location: { lat: number | null; lng: number | null };
-    }[];
-    vehicleInfo: {
-      name: string;
-      phone: string;
-      email: string;
-      driversLicenseNumber: string;
-      insurance: string;
-      numberplate: string;
-      model: string;
-      location: { lat: number | null; lng: number | null };
-    }[];
-    pedestrianInfo: {
-      name: string;
-      phone: string;
-      email: string;
-      personDamage: string;
-      location: { lat: number | null; lng: number | null };
-    }[];
-    otherObjectInfo: {
-      description: string;
-      information: string;
-      location: { lat: number | null; lng: number | null };
-    }[];
-    googleIndicators: {
-      marker1: { lat: number; lng: number };
-      marker2: { lat: number; lng: number };
-      marker3: { lat: number; lng: number };
-    }[];
-
-    witnesses: WitnessInformation[];
-
-    /* SITE LOGIC */
-    /* What */
-    driverRenter: boolean | null;
-
-    /* How */
-    policePresent: boolean | null;
-    policeReportExist: boolean | null;
-    witnessesPresent: boolean | null;
-
-    /* Where */
-    otherPartyInvolved: boolean | null;
-    singleVehicleAccident: boolean | null;
-  };
-  images: Record<string, string[]> | null;
-  id: string;
-};
 
 export const generateId = async () => {
   const dataList = await getReportIds();
@@ -173,6 +98,7 @@ export const decryptData = (data: reportDataType) => {
   decryptedData.updateFields({ ...data });
   const secretKey = process.env.DATA_ENCRYPTION_KEY || "";
 
+  console.log('Before Decryption', decryptedData);
   /* Decryption driver info */
   Object.keys(decryptedData.driverInfo).forEach((item) => {
     if (
@@ -201,6 +127,7 @@ export const decryptData = (data: reportDataType) => {
     });
   }
 
+  console.log('After Decryption', decryptedData)
   return decryptedData;
 };
 
@@ -209,8 +136,8 @@ export const getServerSidePropsWithRedirect = async (
 ) => {
   const id = context.query.id as string;
 
-  try {
-    const data: reportDataType = await getData(id);
+/*   try {
+ */    const data: reportDataType = await getData(id);
     const GreenMobilityImages = await handleDownloadImages(`${id}/GreenMobility`, 'url');
     const otherPartyImages = await handleDownloadImages(`${id}/OtherParty`, 'url');
     const images: Record<string, string[]> = {
@@ -222,7 +149,7 @@ export const getServerSidePropsWithRedirect = async (
       console.log(data.finished)
       return {
         redirect: {
-          destination: "reportfinished",
+          destination: "/damagereport/reportfinished",
           permanent: false,
         },
       };
@@ -235,15 +162,16 @@ export const getServerSidePropsWithRedirect = async (
         id: id,
       },
     };
-  } catch (error) {
-    /* TODO: Make error page */
+/*   } catch (error: any) {
+    console.error("Error in getServerSideProps:", error.message);
+    context.res.statusCode = 500;
     return {
-      redirect: {
-        destination: "reportfinished",
-        permanent: false,
-      },
+      props: {
+        errorMessage: "An internal error occurred.",
+        statusCode: 500
+      }
     };
-  }
+  } */
 };
 
 export const reportSearch = (
@@ -503,8 +431,110 @@ export const handleDownloadPdf = async (id: string) => {
   }
 }
 
+export const getReportsByEmail = async (email:string) => {
+  const collectionRef = collection(FireDatabase, firebaseCollectionName)
+  const reportIDs: string[] = [];
+  const q = query(
+    collectionRef,
+    where("userEmail", "==", email.toLowerCase()),
+    where("finished", "==", false)
+  );
 
-/* ---------------- classes ------------------------------ */
+  try {
+    const querySnapshot = await getDocs(q);
+    querySnapshot.docs.map(async(doc) => {
+      reportIDs.push(doc.id)
+    })
+
+    return reportIDs;
+  } catch (error:any) {
+    throw Error(`Something went wrong checking for ongoing reports:\n`, error.message)
+  }
+}
+
+
+/* ---------------- classes and types ------------------------------ */
+export type pageProps = {
+  data: {
+    userEmail: string | null;
+    finished: boolean;
+    lastChange: string;
+
+    driverInfo: {
+      firstName: string | null;
+      lastName: string | null;
+      address: string | null;
+      socialSecurityNumber: string | null;
+      drivingLicenseNumber: string | null;
+      phoneNumber: string | null;
+      email: string | null;
+    };
+
+    accidentLocation: { lat: number | null; lng: number | null };
+    time: string | null;
+    date: string | null;
+    accidentDescription: string | null;
+
+    greenCarNumberPlate: string | null;
+    speed: string | null;
+    damageDescription: string | null;
+    policeReportNumber: string | null;
+
+    bikerInfo: {
+      name: string;
+      phone: string;
+      email: string;
+      ebike: boolean | null;
+      personDamage: string;
+      location: { lat: number | null; lng: number | null };
+    }[];
+    vehicleInfo: {
+      name: string;
+      phone: string;
+      email: string;
+      driversLicenseNumber: string;
+      insurance: string;
+      numberplate: string;
+      model: string;
+      location: { lat: number | null; lng: number | null };
+    }[];
+    pedestrianInfo: {
+      name: string;
+      phone: string;
+      email: string;
+      personDamage: string;
+      location: { lat: number | null; lng: number | null };
+    }[];
+    otherObjectInfo: {
+      description: string;
+      information: string;
+      location: { lat: number | null; lng: number | null };
+    }[];
+    googleIndicators: {
+      marker1: { lat: number; lng: number };
+      marker2: { lat: number; lng: number };
+      marker3: { lat: number; lng: number };
+    }[];
+
+    witnesses: WitnessInformation[];
+
+    /* SITE LOGIC */
+    /* What */
+    driverRenter: boolean | null;
+
+    /* How */
+    policePresent: boolean | null;
+    policeReportExist: boolean | null;
+    witnessesPresent: boolean | null;
+
+    /* Where */
+    otherPartyInvolved: boolean | null;
+    singleVehicleAccident: boolean | null;
+  };
+  images: Record<string, string[]> | null;
+  id: string;
+};
+
 export class reportDataType {
   userEmail: string | null;
   finished: boolean;

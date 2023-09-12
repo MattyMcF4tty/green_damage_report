@@ -18,7 +18,7 @@ const AdminNavbar = () => {
         onClick={() => Router.push("/auth/admin/adminPage")}
       >
         <img
-          src="../GreenLogos/GreenLogo-color.png"
+          src="../../GreenLogos/GreenLogo-color.png"
           alt="GreenLogo"
           className="h-full"
         />

@@ -1,6 +1,6 @@
 import { Inputfield } from "@/components/custom_inputfields";
-import { checkEmailExists, createDoc, updateData } from "@/firebase/clientApp";
-import { generateId } from "@/utils/utils";
+import { createDoc } from "@/firebase/clientApp";
+import { generateId, getReportsByEmail } from "@/utils/utils";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -20,7 +20,7 @@ const IndexPage = () => {
     const ID = await generateId()
 
     try {
-      const ongoingReports = await checkEmailExists(email);
+      const ongoingReports = await getReportsByEmail(email);
       if (ongoingReports.length == 0) { 
         if (ID !== undefined && email !== "") {
           await createDoc(ID, email);
@@ -33,7 +33,7 @@ const IndexPage = () => {
         setShowPopUp(true)
       }
     } catch ( error ) {
-      console.log(`Something went wrong:\n${error}`)
+      console.error(`Something went wrong:\n${error}`)
     }
 
   };

@@ -116,6 +116,8 @@ const NewWitnessPopUp = ({
   const [witnessPhone, setWitnessPhone] = useState<string>("");
   const [witnessEmail, setWitnessEmail] = useState<string>("");
 
+  const allowSave = (witnessName !== "" || witnessPhone !== "" || witnessEmail !== "");
+
   const handleClosePopUp = () => {
     setWitnessName("");
     setWitnessPhone("");
@@ -171,8 +173,9 @@ const NewWitnessPopUp = ({
         </div>
         <button
           type="button"
+          disabled={!allowSave}
           onClick={() => handleNewWitness()}
-          className="bg-MainGreen-300 text-white mt-4 p-2"
+          className="bg-MainGreen-300 text-white mt-4 p-2 disabled:bg-MainGreen-200"
         >
           Save
         </button>
@@ -204,6 +207,8 @@ const UpdateWitnessPopUp = ({
   const [witnessEmail, setWitnessEmail] = useState<string>(
     witnesses[index].email
   );
+
+  const allowSave = (witnessName !== "" || witnessPhone !== "" || witnessEmail !== "");
 
   const handleUpdateWitness = () => {
     const updatedWitness = {
@@ -270,8 +275,9 @@ const UpdateWitnessPopUp = ({
           </button>
           <button
             type="button"
+            disabled={!allowSave}
             onClick={() => handleUpdateWitness()}
-            className="bg-MainGreen-300 text-white mt-4 p-2 w-1/3"
+            className="bg-MainGreen-300 text-white mt-4 p-2 w-1/3 disabled:bg-MainGreen-200"
           >
             Update
           </button>
