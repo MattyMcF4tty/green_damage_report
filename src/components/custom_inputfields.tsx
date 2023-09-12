@@ -158,6 +158,13 @@ export const Inputfield = ({
         newValue += "-";
       } else if (newValue.length === 16 && newValue.charAt(15) !== "-") {
         newValue += "-";
+      } // Removing hyphens when characters are deleted
+      else if (newValue.length === 5 && newValue.charAt(4) === "-") {
+        newValue = newValue.slice(0, -1);
+      } else if (newValue.length === 11 && newValue.charAt(10) === "-") {
+        newValue = newValue.slice(0, -1);
+      } else if (newValue.length === 17 && newValue.charAt(16) === "-") {
+        newValue = newValue.slice(0, -1);
       }
     }
     // Numberplate format logic
