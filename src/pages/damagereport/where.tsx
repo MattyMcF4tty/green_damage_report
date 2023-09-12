@@ -187,7 +187,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
               />
             </div>
           </div>
-          <div className="my-4 w-1/2">
+          <div className="my-4">
             <p className="break-words">
               Please indicate on the map where the GreenMobility car was
               located, as well as the location of the other partys, by using the
