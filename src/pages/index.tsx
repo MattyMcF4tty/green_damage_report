@@ -22,11 +22,11 @@ const IndexPage = () => {
     try {
       const ongoingReports = await checkEmailExists(email);
       if (ongoingReports.length == 0) { 
-        if (ID !== undefined) {
+        if (ID !== undefined && email !== "") {
           await createDoc(ID, email);
           router.push(`damagereport/what?id=${ID}`);
         } else {
-          throw new Error("Error creating id")
+          throw new Error("Error creating report Missing ID or Mail")
         } 
       } else {
         setOngoingReports(ongoingReports)

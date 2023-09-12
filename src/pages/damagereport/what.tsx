@@ -50,9 +50,13 @@ const What: NextPage<pageProps> = ({ data, id }) => {
   );
   const [accidentTime, setAccidentTime] = useState(serverData.time);
   const [accidentDate, setAccidentDate] = useState(serverData.date);
+  const [allowClick, setAllowClick] = useState(true);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAllowClick(false);
+    
 
     /* TODO: Make function that gets information about current driver from green server */
     if (showDriverInfoForm !== true) {
@@ -212,7 +216,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
         </div>
 
         <div className="flex flex-row h-14 mt-4 w-16 justify-end mr-10">
-          <NextButton />
+          <NextButton allowClick={allowClick}/>
         </div>
       </div>
     </form>

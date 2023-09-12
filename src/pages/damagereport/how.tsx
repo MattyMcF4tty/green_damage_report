@@ -27,6 +27,7 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
   const router = useRouter();
   const serverData = new reportDataType();
   serverData.updateFields(data);
+  const [allowClick, setAllowClick] = useState(true);
 
   const [accidentDescription, setAccidentDescription] = useState(
     serverData.accidentDescription
@@ -213,7 +214,7 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
         </div>
 
         <div className="flex flex-row w-16 justify-end h-14 mr-10">
-          <NextButton />
+          <NextButton allowClick={allowClick}/>
         </div>
       </div>
     </form>

@@ -29,6 +29,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
   const router = useRouter();
   const serverData = new reportDataType();
   serverData.updateFields(data);
+  const [allowClick, setAllowClick] = useState(true);
 
   /* logic */
   const [otherPartyInvolved, setOtherPartyInvolved] = useState<boolean | null>(
@@ -252,7 +253,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
         </div>
 
         <div className="flex flex-row w-16 justify-end h-14 mr-10 lg:w-16">
-          <NextButton />
+          <NextButton allowClick={allowClick}/>
         </div>
       </div>
     </form>
