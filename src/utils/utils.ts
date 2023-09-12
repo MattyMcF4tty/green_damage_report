@@ -279,7 +279,7 @@ export const handleSignUp = async (email:string, password:string) => {
     password: password
   }
 
-  const response = await fetch(process.env.URL + '/api/auth/signUp', {
+  const response = await fetch(process.env.NEXT_PUBLIC_URL + '/api/auth/signUp', {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json'
@@ -299,7 +299,7 @@ export const handleSignUp = async (email:string, password:string) => {
 
 export const handleVerifyUser = async (userToken: string | undefined) => {
   
-  const response = await fetch(process.env.URL + '/api/auth/verifyAdmin', {
+  const response = await fetch(process.env.NEXT_PUBLIC_URL + '/api/auth/verifyAdmin', {
     method: 'POST',
     headers: {
         'Content-Type': 'application/json'
@@ -324,7 +324,7 @@ export const handleSignIn = async (email: string, password: string) => {
       password: password
     }
 
-    const response = await fetch(process.env.URL + '/api/auth/signIn', {
+    const response = await fetch(process.env.NEXT_PUBLIC_URL + '/api/auth/signIn', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json'
@@ -358,7 +358,7 @@ export const handleDownloadImages = async (path: string, type: 'url' | 'base64')
       type: type
     };
 
-    const response = await fetch(process.env.URL + '/api/downloadImages', {
+    const response = await fetch(process.env.NEXT_PUBLIC_URL + '/api/downloadImages', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json'
@@ -387,7 +387,7 @@ export const handleGeneratePdf = async (id: string)  => {
   try {
     const data = {id: id}
 
-    const response = await fetch(process.env.URL + '/api/generatepdf', {
+    const response = await fetch(process.env.NEXT_PUBLIC_URL + '/api/generatepdf', {
       method: 'POST',
       headers: {
           'Content-Type': 'application/json'
