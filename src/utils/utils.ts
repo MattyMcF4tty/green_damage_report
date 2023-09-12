@@ -248,7 +248,7 @@ export const handleSendEmail = async (
   };
 
   try {
-    const response = await axios.post(process.env.URL + 'api/send-email', emailData);
+    const response = await axios.post('api/send-email', emailData);
     console.log("Server response:", response.data.message);
   } catch (error) {
     console.error("Error sending email:", error);
@@ -412,7 +412,7 @@ export const handleGeneratePdf = async (id: string)  => {
 export const handleDownloadPdf = async (id: string) => {
   try {
     const data = {id: id}
-    const response = await axios.post<ArrayBuffer>(process.env.URL + '/api/downloadpdf', data, {
+    const response = await axios.post<ArrayBuffer>('/api/downloadpdf', data, {
       responseType: 'arraybuffer' // Important: specify the response type as 'arraybuffer'
     });
 
