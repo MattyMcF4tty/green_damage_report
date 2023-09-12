@@ -248,7 +248,7 @@ export const handleSendEmail = async (
   };
 
   try {
-    const response = await axios.post('api/send-email', emailData);
+    const response = await axios.post('/api/sendEmail', emailData);
     console.log("Server response:", response.data.message);
   } catch (error) {
     console.error("Error sending email:", error);
