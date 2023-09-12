@@ -31,31 +31,34 @@ export const getData = async (id: string) => {
 }
 
 export const createDoc = async (id: string, email: string) => {
-    try {
-        const data = new reportDataType()
-        data.updateFields({userEmail: email.toLowerCase()})
-        console.log("Report created:\n" + "id: " + id + "\n" + "Email: " + email.toLowerCase());
+  try {
+    const data = new reportDataType();
+    data.updateFields({ userEmail: email.toLowerCase() });
+    console.log(
+      "Report created:\n" + "id: " + id + "\n" + "Email: " + email.toLowerCase()
+    );
 
-        const dataRef = doc(db, `${collectionName}/${id}`);
-        await setDoc(dataRef, data.toPlainObject());
-    } catch (error) {
-        console.error(`An error occurred while writing data:\n${error}`);
-    }
-}
-
-export const updateData = async (id:string, data:reportDataType) => {
     const dataRef = doc(db, `${collectionName}/${id}`);
-    const currentDate = new Date();
+    await setDoc(dataRef, data.toPlainObject());
+  } catch (error) {
+    console.error(`An error occurred while writing data:\n${error}`);
+  }
+};
 
+export const updateData = async (id: string, data: reportDataType) => {
+  const dataRef = doc(db, `${collectionName}/${id}`);
+  const currentDate = new Date();
 
-    try {
-        const encryptedData = data;
-        await updateDoc(dataRef, encryptedData.toPlainObject());
-        await updateDoc(dataRef, {lastChange: `${currentDate.getHours()}:${currentDate.getMinutes()} - ${currentDate.getDay()}/${currentDate.getMonth()}/${currentDate.getFullYear()}`})
-    } catch (error) {
-        console.error(`Something went wrong updating data:\n${error}`)
-    }
-}
+  try {
+    const encryptedData = data;
+    await updateDoc(dataRef, encryptedData.toPlainObject());
+    await updateDoc(dataRef, {
+      lastChange: `${currentDate.getHours()}:${currentDate.getMinutes()} - ${currentDate.getDay()}/${currentDate.getMonth()}/${currentDate.getFullYear()}`,
+    });
+  } catch (error) {
+    console.error(`Something went wrong updating data:\n${error}`);
+  }
+};
 
 export const updateImages = async (
   id: string,
@@ -89,16 +92,19 @@ const deleteAllImages = async (StorageRef: StorageReference) => {
   try {
     const storedImages: ListResult = await listAll(StorageRef);
 
-        const deletedImages:Promise<void>[] = storedImages.items.map(async (image) => {
-            await deleteObject(image);
-        })
+    const deletedImages: Promise<void>[] = storedImages.items.map(
+      async (image) => {
+        await deleteObject(image);
+      }
+    );
 
-        await Promise.all(deletedImages)
-    }
-    catch ( error ) {
-        console.error(`Something went wrong deleting all images in ${StorageRef.name}:\n${error}\n`)
-    }
-}
+    await Promise.all(deletedImages);
+  } catch (error) {
+    console.error(
+      `Something went wrong deleting all images in ${StorageRef.name}:\n${error}\n`
+    );
+  }
+};
 
 export const getImages = async (id: string) => {
   const greenStorageRef = ref(storage, `${id}/GreenMobility`);
@@ -108,9 +114,9 @@ export const getImages = async (id: string) => {
     OtherParty: [],
   };
 
-    try {
-        const greenImageList: ListResult = await listAll(greenStorageRef);
-        const otherPartyImageList: ListResult = await listAll(otherPartyStorageRef);
+  try {
+    const greenImageList: ListResult = await listAll(greenStorageRef);
+    const otherPartyImageList: ListResult = await listAll(otherPartyStorageRef);
 
     /* Get images of GreenMobility car */
     const greenImageURLs: string[] = [];
@@ -160,23 +166,23 @@ export const getReportIds = async () => {
 };
 
 export const getReports = async () => {
-    const idList = await getReportIds();
-    const reportList: { id: string; data: reportDataType }[] = [];
+  const idList = await getReportIds();
+  const reportList: { id: string; data: reportDataType }[] = [];
 
-    if (idList.length > 0) {  
-        try {
-            await Promise.all(
-                idList.map(async (id) => {
-                  const docData = await getData(id);
-                  if (docData !== undefined) {
-                      reportList.push({ id: id, data: docData });
-                  }
-                })
-            );
-        } catch(error) {
-            console.error(`Something went wrong fecthing reports:\n${error}\n`)
-        }
+  if (idList.length > 0) {
+    try {
+      await Promise.all(
+        idList.map(async (id) => {
+          const docData = await getData(id);
+          if (docData !== undefined) {
+            reportList.push({ id: id, data: docData });
+          }
+        })
+      );
+    } catch (error) {
+      console.error(`Something went wrong fecthing reports:\n${error}\n`);
     }
+  }
 
   return reportList;
 };
@@ -196,3 +202,9 @@ export const deleteReports = async (reportsToDelete: string[]) => {
   await Promise.all(deletePromises);
   return;
 }
+
+export const handleUploadMap = async (mapImg: Blob, id: string) => {
+  const storageRef = ref(storage, `${id}/admin/map`);
+
+  await uploadBytes(storageRef, mapImg);
+};

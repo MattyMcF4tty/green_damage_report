@@ -57,6 +57,7 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAllowClick(false);
 
     /* Make sure to clear typed data if police or witnesses were not present */
     if (witnessesPresent) {
