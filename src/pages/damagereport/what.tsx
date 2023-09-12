@@ -10,7 +10,7 @@ import NextButton from "@/components/buttons/next";
 import BackButton from "@/components/buttons/back";
 import { useRouter } from "next/router";
 import { updateData } from "@/firebase/clientApp";
-import { getServerSidePropsWithRedirect, pageProps, reportDataType } from "@/utils/utils";
+import { decryptData, getServerSidePropsWithRedirect, pageProps, reportDataType } from "@/utils/utils";
 import PhoneNumber from "@/components/opposite_information/phone_form";
 
 export const getServerSideProps = async (
@@ -36,10 +36,13 @@ const What: NextPage<pageProps> = ({ data, id }) => {
   const [showDriverInfoForm, setShowDriverInfoForm] = useState(serverData.driverRenter);
   const [accidentTime, setAccidentTime] = useState(serverData.time);
   const [accidentDate, setAccidentDate] = useState(serverData.date);
+  const [allowClick, setAllowClick] = useState(true);
 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAllowClick(false);
+    
 
     /* TODO: Make function that gets information about current driver from green server */
     if (showDriverInfoForm !== true) {
@@ -203,7 +206,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
         </div>
 
         <div className="flex flex-row h-14 mt-4 w-16 justify-end mr-10">
-          <NextButton />
+          <NextButton allowClick={allowClick}/>
         </div>
       </div>
     </form>

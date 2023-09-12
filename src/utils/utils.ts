@@ -136,7 +136,7 @@ export const GetUserPosition = () => {
 export const encryptData = (data: reportDataType) => {
   const encryptedData = new reportDataType();
   encryptedData.updateFields({ ...data });
-  const secretKey = process.env.NEXT_PUBLIC_SECRET || "";
+  const secretKey = process.env.DATA_ENCRYPTION_KEY || "";
 
   /* Encrypting driver info */
   Object.keys(encryptedData.driverInfo).forEach((item) => {
@@ -164,14 +164,14 @@ export const encryptData = (data: reportDataType) => {
       ).toString(),
     });
   }
-
+  
   return encryptedData;
 };
 
 export const decryptData = (data: reportDataType) => {
   const decryptedData = new reportDataType();
   decryptedData.updateFields({ ...data });
-  const secretKey = process.env.NEXT_PUBLIC_SECRET || "";
+  const secretKey = process.env.DATA_ENCRYPTION_KEY || "";
 
   /* Decryption driver info */
   Object.keys(decryptedData.driverInfo).forEach((item) => {
@@ -218,7 +218,8 @@ export const getServerSidePropsWithRedirect = async (
       OtherParty: otherPartyImages
     };
 
-    if (data.finished) {
+    if (data.finished === true) {
+      console.log(data.finished)
       return {
         redirect: {
           destination: "reportfinished",
@@ -235,6 +236,7 @@ export const getServerSidePropsWithRedirect = async (
       },
     };
   } catch (error) {
+    /* TODO: Make error page */
     return {
       redirect: {
         destination: "reportfinished",
@@ -319,7 +321,7 @@ export const sendEmail = async (
 
   try {
     const response = await axios.post("../api/send-email", emailData);
-    console.log("Server response:", response.data);
+    console.log("Server response:", response.data.message);
   } catch (error) {
     console.error("Error sending email:", error);
   }

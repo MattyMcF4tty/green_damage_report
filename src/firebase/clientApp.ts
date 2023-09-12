@@ -8,7 +8,7 @@ import app from "./firebaseConfig";
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-const collectionName = "DamageReports"
+const collectionName = "EncryptionTest"
 
 export const getData = async (id: string) => {
     console.log("fetchind docID: " + id)
@@ -28,7 +28,7 @@ export const getData = async (id: string) => {
         console.error(`Something went wrong fetching data:\n${error}\n`)
     }
     
-    const decryptedData = decryptData(data)
+    const decryptedData = decryptData(data);
     return decryptedData;
 }
 
