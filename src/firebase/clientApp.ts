@@ -202,3 +202,9 @@ export const deleteReports = async (reportsToDelete: string[]) => {
   await Promise.all(deletePromises);
   return;
 }
+
+export const handleUploadMap = async (mapImg: Blob, id: string) => {
+  const storageRef = ref(storage, `${id}/admin/map`);
+
+  await uploadBytes(storageRef, mapImg);
+};

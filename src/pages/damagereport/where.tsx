@@ -40,12 +40,12 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
     boolean | null
   >(serverData.singleVehicleAccident);
 
+  // DATA
   const [indicators, setIndicators] = useState(
     data.googleIndicators.map(
       (info) => new googleIndicator(info.marker1, info.marker2, info.marker3)
     )
   );
-  /* Data */
   const [carInfo, setCarInfo] = useState(
     serverData.vehicleInfo.map(
       (info) =>
@@ -114,25 +114,17 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
       return new Blob([ab], { type: mimeString });
     }
 
-    const mapField = document.getElementById("MyMap"); // Assuming you give an ID to the map container in GoogleMapsField
-
+    const mapField = document.getElementById("MyMap"); 
     if (mapField) {
       const canvas = await html2canvas(mapField, {
         useCORS: true,
-        scale: 17, // Set the zoom level
+        scale: 17,
       });
 
       const dataUrl = canvas.toDataURL("image/png");
       const mapBlob: Blob = dataURItoBlob(dataUrl);
 
-      // Do something with the dataURL (e.g., save it or send it to the server)
       await handleUploadMap(mapBlob, id);
-
-      // Example: Save the Blob as a file (client-side)
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(mapBlob);
-      a.download = "map.png";
-      a.click();
     }
 
     /* Data that gets sent to server */
