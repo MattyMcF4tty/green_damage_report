@@ -40,9 +40,9 @@ const SignUpPage: NextPage = () => {
       onSubmit={(e) => handleSubmit(e)}
       className="h-[calc(100vh-5.5rem)] w-full flex justify-center items-center bg-white"
     >
-      <div className="absolute top-14">
-        <img src="../GreenLogos/GreenMobilityTextLogo.png" alt="GreenLogo" />
-      </div>
+      <img className="absolute top-20 w-1/3 hover:cursor-pointer" onClick={() => Router.push("/")}
+      src="../GreenLogos/GreenMobilityTextLogo.png" alt="GreenLogo" />
+
       <div className=" p-8 border-[1px] border-MainGreen-200 bg-gray-100 rounded-lg w-[30rem] shadow-xl flex flex-col justify-center items-center">
         <div className="w-full mb-10">
           <div className="flex flex-col ">

@@ -28,9 +28,9 @@ const signInPage: NextPage = () => {
       onSubmit={(e) => handleSubmit(e)}
       className="h-[100vh] w-full flex flex-col justify-center items-center bg-white"
     >
-      <div className="absolute top-0">
-        <img src="../GreenLogos/GreenMobilityTextLogo.png" alt="GreenLogo" />
-      </div>
+      <img className="absolute top-8 w-1/3 hover:cursor-pointer" onClick={() => Router.push("/")}
+      src="../GreenLogos/GreenMobilityTextLogo.png" alt="GreenLogo" />
+
       <div className=" p-8 border-[1px] border-MainGreen-200 bg-gray-100 rounded-lg w-[30rem] shadow-xl flex flex-col justify-center items-center">
         <div className="w-full mb-10">
           <div className="flex flex-col ">

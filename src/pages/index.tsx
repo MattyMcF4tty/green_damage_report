@@ -40,73 +40,24 @@ const IndexPage = () => {
   return (
     <form
       onSubmit={(e) => handleStart(e)}
-      className="flex flex-col items-center"
+      className="flex flex-col items-center lg:justify-center lg:h-[100vh]"
     >
       <img
         src="../GreenLogos/GreenMobilityTextLogo.png"
         alt="greenlogo"
-        className=""
+        className="mb-10 lg:absolute lg:top-52 lg:w-[58rem]"
       />
-      <div className="container mx-auto p-8">
-        <div className="mb-4 ">
-          <div className="flex flex-col ">
-            <h3 className="mb-2 text-left  text-MainGreen-300 flex flex-row items-center ">
-              <img
-                src="../GreenLogos/GreenLogo-gray-1.png"
-                alt="greengraylogo"
-                className="h-8 mr-2"
-              />
-              Initial Event Inquiry
-            </h3>
-            <p className="ml-1 mb-3">
-              We initiate by collecting the essential information about the
-              incident.
-            </p>
-          </div>
-          <div className="flex flex-col ">
-            <h3 className="mb-2 text-left  text-MainGreen-300 flex flex-row items-center">
-              <img
-                src="../GreenLogos/GreenLogo-gray-2.png"
-                alt="greengraylogo"
-                className="h-8 mr-2"
-              />
-              Incident Occurrence Details
-            </h3>
-            <p className="ml-1 mb-3">
-              The second segment delves into the specifics of how the incident
-              unfolded.
-            </p>
-          </div>
-          <div className="flex flex-col">
-            <h3 className="mb-2 text-left text-MainGreen-300 flex flex-row items-center">
-              <img
-                src="../GreenLogos/GreenLogo-gray-3.png"
-                alt="greengraylogo"
-                className="h-8 mr-2"
-              />
-              Vital Information
-            </h3>
-            <p className="ml-1 mb-3">
-              In the third section, we collect essential data on parties
-              involved.
-            </p>
-          </div>
-          <div className="flex flex-col">
-            <h3 className="mb-2 text-left text-MainGreen-300 flex flex-row items-center">
-              <img
-                src="../GreenLogos/GreenLogo-gray-4.png"
-                alt="greengraylogo"
-                className="h-8 mr-2"
-              />
-              Response Review{" "}
-            </h3>
-            <p className="ml-1 mb-3">
-              {" "}
-              Lastly, the fourth section involves carefully reviewing your
-              responses for accuracy and accepting the declaration.
-            </p>
-          </div>
-        </div>
+
+      <div className="mb-6 flex flex-col mx-4 lg:text-center lg:mb-16 lg:text-xl lg:w-[56rem]">
+        <span className="mb-2">
+        The purpose of this damage report is to document and record information about your incident.
+        </span>
+        <span>
+          Please ensure that you provide accurate information, as this report will be submitted to our insurance company to cover your side of the incident.
+          </span>
+      </div>
+
+      <div className="mx-4 lg:mx-auto lg:w-[25rem]">
         <Inputfield
           id="Email"
           labelText="
@@ -120,12 +71,13 @@ const IndexPage = () => {
         />
       </div>
 
-      <div className="flex flex-row w-full place-content-between h-10 justify-end">
+      <div className="flex flex-row justify-center lg:mt-5">
         <button
           type="submit"
-          className="w-16 h-14 mr-6 rounded-full bg-MainGreen-300 text-white"
+          className="w-32 h-14 text-lg font-semibold rounded-full bg-MainGreen-300 text-white absolute bottom-4
+          lg:bottom-auto"
         >
-          <FontAwesomeIcon icon={faArrowRightLong} className="w-full text-xl" />
+          Start
         </button>
       </div>
 
