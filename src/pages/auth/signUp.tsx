@@ -11,7 +11,6 @@ export const getServerSideProps = async (
   const userVerified = await handleVerifyUser(token);
 
   if (!userVerified) {
-    // Redirect to the admin page
     return {
       redirect: {
         destination: "/auth/signIn",
