@@ -33,28 +33,30 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
         // Check if images should be base64, and convert images to such if true
         if (type === 'base64') {
-            const base64Images = await Promise.all(
-                images.map(async (imageURL) => {
-                    try {
-                        const response = await axios.get(imageURL, {
-                            responseType: "arraybuffer",
-                        });
-
-                        // Convert image binary data to bas64
-                        const imageBuffer = Buffer.from(response.data, "binary");
-                        const base64Image = imageBuffer.toString("base64");
-
-                        return `data:image/jpeg;base64,${base64Image}`;
-                    } catch (error:any) {
-                        // Throw error if getting to base64 fails
-                        throw new Error('Error getting base64 from url:\n', error.message)
-                    }
-                })
-            )
-            // Update images variable to store base64Images instead.
-            images = base64Images;
+            if (images.length > 0) {
+                const base64Images = await Promise.all(
+                    images.map(async (imageURL) => {
+                        try {
+                            const response = await axios.get(imageURL, {
+                                responseType: "arraybuffer",
+                            });
+    
+                            // Convert image binary data to bas64
+                            const imageBuffer = Buffer.from(response.data, "binary");
+                            const base64Image = imageBuffer.toString("base64");
+    
+                            return `data:image/jpeg;base64,${base64Image}`;
+                        } catch (error:any) {
+                            // Throw error if getting to base64 fails
+                            throw new Error('Error getting base64 from url:\n', error.message)
+                        }
+                    })
+                )
+    
+                // Update images variable to store base64Images instead.
+                images = base64Images;
+            }
         }
-
 
         res.status(200).json({ message: 'Fetching images completed succesfully', data: images })
     } catch (error:any) {

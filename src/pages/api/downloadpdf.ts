@@ -11,14 +11,13 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     // Get the download URL
     const storageRef = ref(FireStorage, `${id}/admin/DamageReport.pdf`);
     
-    await handleGeneratePdf(id)
-
-   const  pdfDownloadURL = await getDownloadURL(storageRef);
+    const pdfDownloadURL = await getDownloadURL(storageRef);
 
     // Fetch the PDF as an ArrayBuffer
     const response = await axios.get(pdfDownloadURL, {
       responseType: 'arraybuffer',
     });
+
     const pdfArrayBuffer: ArrayBuffer = response.data;
 
     res.status(200).send(pdfArrayBuffer);

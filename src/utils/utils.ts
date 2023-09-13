@@ -4,10 +4,13 @@ import CryptoJS from "crypto-js";
 import { GetServerSidePropsContext } from "next";
 import axios from "axios";
 import Cookies from 'js-cookie';
-import app, { FireDatabase } from "@/firebase/firebaseConfig";
+import app, { FireDatabase, FireStorage } from "@/firebase/firebaseConfig";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/router";
 import { collection, getDocs, query, where } from "firebase/firestore";
+import { deleteObject, ref, uploadBytes } from "firebase/storage";
+import createReportPDF from "./reportPdfTemplate";
+import jsPDF from "jspdf";
 
 
 /* ------- utils config ----- */
@@ -385,33 +388,29 @@ export const handleDownloadImages = async (path: string, type: 'url' | 'base64')
 
 export const handleGeneratePdf = async (id: string)  => {
   try {
-    const data = {id: id}
-
-    const response = await fetch(process.env.NEXT_PUBLIC_URL + '/api/generatepdf', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
-    const responseData = await response.json()
-    
-    // Check if response is not ok
-    if (!response.ok) {
-      const message = responseData.message || "Unknown error";  // use optional chaining
-      throw new Error(`${response.status}: ${message}`)
+    const Images: Record<string, string[]> = {
+      GreenMobility: await handleDownloadImages(`${id}/GreenMobility`, 'base64'),
+      OtherParty: await handleDownloadImages(`${id}/OtherParty`, 'base64'),
     }
-  
+
+    const data =  await getData(id)
+    const pdfBuffer = await createReportPDF(data, Images)   
+    const storageRef = ref(FireStorage, `${id}/admin/DamageReport.pdf`)
+    await deleteObject(storageRef)
+    await uploadBytes(storageRef, pdfBuffer)
+ 
     console.log(`PDF of ${id} generated and uploaded successfully.`);
   } catch (error:any) {
     console.error(error.message)
-    return new Error(error.message)
   }
 }
 
 export const handleDownloadPdf = async (id: string) => {
   try {
     const data = {id: id}
+    await handleGeneratePdf(id);
+
+
     const response = await axios.post<ArrayBuffer>('/api/downloadpdf', data, {
       responseType: 'arraybuffer' // Important: specify the response type as 'arraybuffer'
     });
