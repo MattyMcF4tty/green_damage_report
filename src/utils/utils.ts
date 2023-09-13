@@ -451,6 +451,30 @@ export const getReportsByEmail = async (email:string) => {
   }
 }
 
+export const handleGetRenter = async (id: string) => {
+  const reportData = await getData(id)
+  const numberplate = reportData.greenCarNumberPlate;
+  const data = {
+    numberplate: numberplate?.toUpperCase()
+  }
+
+  const response = await fetch(process.env.NEXT_PUBLIC_URL + '/api/wunderfleet/getRenter', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({numberplate: data})
+  })
+
+  const responseData = await response.json();
+  if (response.ok) {
+    return (responseData.message, responseData.data)
+  } else {
+    console.error(responseData.message)
+    return {}
+  }
+}
+
 
 /* ---------------- classes and types ------------------------------ */
 export type pageProps = {
