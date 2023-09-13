@@ -1,45 +1,42 @@
-import { reportDataType, sendEmail } from "@/utils/utils";
+import {
+  handleDownloadPdf,
+  reportDataType,
+  handleSendEmail,
+} from "@/utils/utils";
 import {
   faCloudArrowDown,
+  faEnvelope,
   faEye,
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ExpandedReport from "./expandedReport";
-import { deleteReports, getImages } from "@/firebase/clientApp";
-import generatePDF from "@/components/admin/pdfGenerator";
+import { deleteReports } from "@/firebase/clientApp";
 
 
 interface ReportControls {
   selectedReports: { id: string; data: reportDataType }[];
 }
 
-const handleDownloadPDF = async (id: string, data: reportDataType) => {
-  const images = await getImages(id);
-  if (data !== null) {
-    const pdfBlob = await generatePDF(data, images);
-    const url = URL.createObjectURL(pdfBlob);
-
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "report.pdf";
-    link.click();
-
-    URL.revokeObjectURL(url);
-  } else {
-    console.error("No data available for PDF generation");
-  }
-};
-
 const ReportControls = ({ selectedReports }: ReportControls) => {
   const [showExpandedReports, setShowExpandedReports] =
     useState<boolean>(false);
 
-  const [status, setStatus] = useState("");
+  const [allowPdf, setAllowPdf] = useState(true);
 
-  const handleSendEmail = async() => {
-    await sendEmail("carloslundrodriguez@gmail.com", "sut din far", "dø");
+  const handleEmail = async () => {
+    await handleSendEmail("carloslundrodriguez@gmail.com", "sut din far", "dø");
+  };
+
+  const handleInstallPDF = async (
+    selectedReports: { id: string; data: reportDataType }[]
+  ) => {
+    setAllowPdf(false);
+    selectedReports.map(async (report) => {
+      await handleDownloadPdf(report.id);
+    });
+    setAllowPdf(true);
   };
 
   const handleDelete = async () => {
@@ -51,8 +48,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
 
     await deleteReports(selectedReportIDs);
 
-    /* TODO: Reloads before documents are deleted */
-    /*  location.reload(); */
+    location.reload();
   };
 
   return (
@@ -62,17 +58,24 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
         className="bg-white border-gray-300 border-[1px] rounded-xl w-32  hover:bg-MainGreen-300 hover:text-white duration-150"
         onClick={() => handleDelete()}
       >
-        <FontAwesomeIcon icon={faTrashCan} />
+        <FontAwesomeIcon icon={faTrashCan} className="mr-2" />
         {" Delete"}
       </button>
-      <button onClick={() => handleSendEmail()}>Send Email</button>
       <button
+        className="bg-white text-black w-32 rounded-xl border-[1px]  border-gray-300 hover:bg-MainGreen-300 hover:text-white duration-150"
+        onClick={() => handleEmail()}
+      >
+        <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
+        Send Email
+      </button>
+      <button
+        disabled={!allowPdf}
         onClick={() => {
           if (selectedReports.length > 0) {
-            handleDownloadPDF(selectedReports[0].id, selectedReports[0].data);
+            handleInstallPDF(selectedReports);
           }
         }}
-        className="bg-MainGreen-300 text-white px-4 py-2 rounded-md shadow-md"
+        className="bg-white text-black px-4 py-2 rounded-xl border-[1px]  border-gray-300 hover:bg-MainGreen-300 hover:text-white duration-150"
       >
         <FontAwesomeIcon icon={faCloudArrowDown} className="mr-2" />
         Download PDF
@@ -87,7 +90,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
           }
         }}
       >
-        <FontAwesomeIcon icon={faEye} />
+        <FontAwesomeIcon icon={faEye} className="mr-2" />
         {" Expand"}
       </button>
 

@@ -3,43 +3,60 @@ import {
   TimeDateField,
   Inputfield,
   YesNo,
-  AddressField
+  AddressField,
 } from "@/components/custom_inputfields";
 import { GetServerSidePropsContext, NextPage } from "next";
 import NextButton from "@/components/buttons/next";
 import BackButton from "@/components/buttons/back";
 import { useRouter } from "next/router";
 import { updateData } from "@/firebase/clientApp";
-import { getServerSidePropsWithRedirect, pageProps, reportDataType } from "@/utils/utils";
+import {
+  getServerSidePropsWithRedirect,
+  pageProps,
+  reportDataType,
+} from "@/utils/utils";
 import PhoneNumber from "@/components/opposite_information/phone_form";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  return await getServerSidePropsWithRedirect(context)
+  return await getServerSidePropsWithRedirect(context);
 };
 
 const What: NextPage<pageProps> = ({ data, id }) => {
   const router = useRouter();
   const serverData = new reportDataType();
-  serverData.updateFields(data)
+  serverData.updateFields(data);
 
   const [firstName, setFirstName] = useState(serverData.driverInfo.firstName);
   const [lastName, setLastName] = useState(serverData.driverInfo.lastName);
   const [address, setAddress] = useState(serverData.driverInfo.address);
-  const [socialSecurityNumber, setSocialSecurityNumber] = useState(serverData.driverInfo.socialSecurityNumber);
-  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState(serverData.driverInfo.drivingLicenseNumber);
-  const [phoneNumber, setPhoneNumber] = useState(serverData.driverInfo.phoneNumber);
+  const [socialSecurityNumber, setSocialSecurityNumber] = useState(
+    serverData.driverInfo.socialSecurityNumber
+  );
+  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState(
+    serverData.driverInfo.drivingLicenseNumber
+  );
+  const [phoneNumber, setPhoneNumber] = useState(
+    serverData.driverInfo.phoneNumber
+  );
   const [email, setEmail] = useState(serverData.driverInfo.email);
 
-  const [greenCarNumberplate, setgreenCarNumberplate] = useState(serverData.greenCarNumberPlate);
-  const [showDriverInfoForm, setShowDriverInfoForm] = useState(serverData.driverRenter);
+  const [greenCarNumberplate, setgreenCarNumberplate] = useState(
+    serverData.greenCarNumberPlate
+  );
+  const [showDriverInfoForm, setShowDriverInfoForm] = useState(
+    serverData.driverRenter
+  );
   const [accidentTime, setAccidentTime] = useState(serverData.time);
   const [accidentDate, setAccidentDate] = useState(serverData.date);
+  const [allowClick, setAllowClick] = useState(true);
 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAllowClick(false);
+    
 
     /* TODO: Make function that gets information about current driver from green server */
     if (showDriverInfoForm !== true) {
@@ -51,8 +68,8 @@ const What: NextPage<pageProps> = ({ data, id }) => {
         socialSecurityNumber: socialSecurityNumber,
         drivingLicenseNumber: drivingLicenseNumber,
         email: email,
-      }
-      serverData.updateFields({driverInfo: newDriverInfo})
+      };
+      serverData.updateFields({ driverInfo: newDriverInfo });
     } else {
       const newDriverInfo = {
         firstName: "John",
@@ -62,8 +79,8 @@ const What: NextPage<pageProps> = ({ data, id }) => {
         socialSecurityNumber: "000000-0000",
         drivingLicenseNumber: "00000000",
         email: "JohnDoe@placeholder.com",
-      }
-      serverData.updateFields({driverInfo: newDriverInfo})
+      };
+      serverData.updateFields({ driverInfo: newDriverInfo });
     }
 
     serverData.updateFields({
@@ -71,13 +88,12 @@ const What: NextPage<pageProps> = ({ data, id }) => {
       driverRenter: showDriverInfoForm,
       time: accidentTime,
       date: accidentDate,
-    })
+    });
 
     await updateData(id, serverData);
 
     router.push(`how?id=${id}`);
   };
-
 
   return (
     <form
@@ -88,13 +104,12 @@ const What: NextPage<pageProps> = ({ data, id }) => {
     >
       {/* GreenMobility car numberplate collection */}
       <div>
-        {/* TODO: Make it so you can only type a valid numberplate for the country where the accident took place and get a list from a server with all the green numberplates */}
         <p className="text-MainGreen-300 mb-8 flex justify-start font-bold text-[20px]">
           Initial Event Inquiry
         </p>
         <Inputfield
           labelText="
-          The license plate of the GreenMobility car"
+          Please enter the license plate of the GreenMobility car"
           id="greenCarNumberplateInput"
           type="numberplate"
           required={true}
@@ -119,7 +134,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
         {!showDriverInfoForm && showDriverInfoForm !== null && (
           <div className="flex flex-col">
             <Inputfield
-              labelText="First name of the driver"
+              labelText="Please enter the first name of the driver"
               id="FirstNameInput"
               required={true}
               type="text"
@@ -127,36 +142,32 @@ const What: NextPage<pageProps> = ({ data, id }) => {
               onChange={setFirstName}
               placeHolder="John"
             />
-
             <Inputfield
-              labelText="Last name of the driver"
+              labelText="Please enter the last name of the driver"
               id="LastNameInput"
               required={true}
               type="text"
               value={lastName}
               onChange={setLastName}
-           placeHolder="Doe"
-           />
-            {/* TODO: make google autofill */}
+              placeHolder="Doe"
+            />
             <AddressField
-              labelText="Home address of the driver"
+              labelText="Please enter the home address of the driver"
               value={address}
               onChange={setAddress}
             />
-
-            {/* TODO: Check if its a real phone number */}
             <Inputfield
-              labelText="Social security number of the driver"
+              labelText="Please enter the social security number of the driver"
               id="SocialSecurityNumberInput"
               required={false}
               type="ssn"
               value={socialSecurityNumber}
               onChange={setSocialSecurityNumber}
-            placeHolder="123456-1234"
+              placeHolder="123456-1234"
             />
 
             <Inputfield
-              labelText="Driving license number of the driver"
+              labelText="Please enter the driving license number of the driver"
               id="DrivingLicenseNumberInput"
               required={false}
               type="license"
@@ -164,15 +175,13 @@ const What: NextPage<pageProps> = ({ data, id }) => {
               onChange={setDrivingLicenseNumber}
               placeHolder="12345678"
             />
-
             <PhoneNumber
               value={phoneNumber}
               onChange={setPhoneNumber}
-              labelText="Phonenumber of the driver"
+              labelText="Please enter the phonenumber of the driver"
             />
-
             <Inputfield
-              labelText="Email of the driver"
+              labelText="Please enter the email of the driver"
               id="EmailInput"
               required={true}
               type="email"
@@ -187,7 +196,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
       {/* Accident time and date collection */}
       <div>
         <TimeDateField
-          labelText="When did the accident occur?"
+          labelText="Please enter the date and the time the accident occurred"
           id="Accident"
           required={true}
           timeChange={setAccidentTime}
@@ -203,7 +212,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
         </div>
 
         <div className="flex flex-row h-14 mt-4 w-16 justify-end mr-10">
-          <NextButton />
+          <NextButton allowClick={allowClick}/>
         </div>
       </div>
     </form>

@@ -1,78 +1,69 @@
-import { initializeApp } from "firebase/app"
 import { collection, deleteDoc, doc, getDoc, getDocs, getFirestore, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { ListResult, StorageReference, deleteObject, getDownloadURL, getStorage, listAll, ref, uploadBytes } from "firebase/storage"
 import { decryptData, encryptData, reportDataType } from "@/utils/utils";
-
-
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
-};
-
-const app = initializeApp(firebaseConfig);
+import app from "./firebaseConfig";
 
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-const collectionName = "DamageReports"
+export const collectionName = "DamageReports"
 
 export const getData = async (id: string) => {
-    console.log("fetchind docID: " + id)
-    const docRef = doc(db, `${collectionName}/${id}`);
-    const data = new reportDataType()
+  console.log("fetchind docID: " + id)
+  const docRef = doc(db, `${collectionName}/${id}`);
+  const data = new reportDataType()
 
-    try {
-        const docSnapshot = await getDoc(docRef)
-        if (docSnapshot.exists()) {
-            const fetchedData = docSnapshot.data();
-            data.updateFields(fetchedData)
-        } 
-        else {
-            throw new Error("Document does not exist");
-        }
-    } catch (error) {
-        console.error(`Something went wrong fetching data:\n${error}\n`)
+  try {
+    const docSnapshot = await getDoc(docRef)
+    if (docSnapshot.exists()) {
+      const fetchedData = docSnapshot.data();
+      data.updateFields(fetchedData)
+    } 
+    else {
+      throw new Error("Document does not exist");
     }
-    
-    const decryptedData = decryptData(data)
-    return decryptedData;
+  } catch (error) {
+    console.error(`Something went wrong fetching data:\n${error}\n`)
+  }
+  const decryptedData = data;
+
+  return decryptedData;
 }
 
 export const createDoc = async (id: string, email: string) => {
-    try {
-        const data = new reportDataType()
-        data.updateFields({userEmail: email.toLowerCase()})
-        console.log("Report created:\n" + "id: " + id + "\n" + "Email: " + email.toLowerCase());
+  try {
+    const data = new reportDataType();
+    data.updateFields({ userEmail: email.toLowerCase() });
+    console.log(
+      "Report created:\n" + "id: " + id + "\n" + "Email: " + email.toLowerCase()
+    );
 
-        const dataRef = doc(db, `${collectionName}/${id}`);
-        await setDoc(dataRef, data.toPlainObject());
-    } catch (error) {
-        console.error(`An error occurred while writing data:\n${error}`);
-    }
-}
-
-export const updateData = async (id:string, data:reportDataType) => {
     const dataRef = doc(db, `${collectionName}/${id}`);
-    const currentDate = new Date();
+    await setDoc(dataRef, data.toPlainObject());
+  } catch (error) {
+    console.error(`An error occurred while writing data:\n${error}`);
+  }
+};
 
+export const updateData = async (id: string, data: reportDataType) => {
+  const dataRef = doc(db, `${collectionName}/${id}`);
+  const currentDate = new Date();
 
-    try {
-        const encryptedData = encryptData(data);
-        await updateDoc(dataRef, encryptedData.toPlainObject());
-        await updateDoc(dataRef, {lastChange: `${currentDate.getHours()}:${currentDate.getMinutes()} - ${currentDate.getDay()}/${currentDate.getMonth()}/${currentDate.getFullYear()}`})
-    } catch (error) {
-        console.error(`Something went wrong updating data:\n${error}`)
-    }
-}
+  try {
+    const encryptedData = data;
+    await updateDoc(dataRef, encryptedData.toPlainObject());
+    await updateDoc(dataRef, {
+      lastChange: `${currentDate.getHours()}:${currentDate.getMinutes()} - ${currentDate.getDay()}/${currentDate.getMonth()}/${currentDate.getFullYear()}`,
+    });
+  } catch (error) {
+    console.error(`Something went wrong updating data:\n${error}`);
+  }
+};
 
 export const updateImages = async (
   id: string,
   images: FileList | null,
-  imageType: "GreenMobility" | "OtherParty"
+  imageType: 'GreenMobility' | 'OtherParty'
 ) => {
   const storageRef = ref(storage, `${id}/${imageType}`);
 
@@ -85,6 +76,7 @@ export const updateImages = async (
         const imageBlob = new Blob([image], { type: image.type });
 
         await uploadBytes(imageRef, imageBlob);
+        console.log(images)
       }
     } else {
       deleteAllImages(storageRef);
@@ -100,16 +92,19 @@ const deleteAllImages = async (StorageRef: StorageReference) => {
   try {
     const storedImages: ListResult = await listAll(StorageRef);
 
-        const deletedImages:Promise<void>[] = storedImages.items.map(async (image) => {
-            await deleteObject(image);
-        })
+    const deletedImages: Promise<void>[] = storedImages.items.map(
+      async (image) => {
+        await deleteObject(image);
+      }
+    );
 
-        await Promise.all(deletedImages)
-    }
-    catch ( error ) {
-        console.error(`Something went wrong deleting all images in ${StorageRef.name}:\n${error}\n`)
-    }
-}
+    await Promise.all(deletedImages);
+  } catch (error) {
+    console.error(
+      `Something went wrong deleting all images in ${StorageRef.name}:\n${error}\n`
+    );
+  }
+};
 
 export const getImages = async (id: string) => {
   const greenStorageRef = ref(storage, `${id}/GreenMobility`);
@@ -119,9 +114,9 @@ export const getImages = async (id: string) => {
     OtherParty: [],
   };
 
-    try {
-        const greenImageList: ListResult = await listAll(greenStorageRef);
-        const otherPartyImageList: ListResult = await listAll(otherPartyStorageRef);
+  try {
+    const greenImageList: ListResult = await listAll(greenStorageRef);
+    const otherPartyImageList: ListResult = await listAll(otherPartyStorageRef);
 
     /* Get images of GreenMobility car */
     const greenImageURLs: string[] = [];
@@ -171,63 +166,45 @@ export const getReportIds = async () => {
 };
 
 export const getReports = async () => {
-    const idList = await getReportIds();
-    const reportList: { id: string; data: reportDataType }[] = [];
+  const idList = await getReportIds();
+  const reportList: { id: string; data: reportDataType }[] = [];
 
-    if (idList.length > 0) {  
-        try {
-            await Promise.all(
-                idList.map(async (id) => {
-                  const docData = await getData(id);
-                  if (docData !== undefined) {
-                      reportList.push({ id: id, data: docData });
-                  }
-                })
-            );
-        } catch(error) {
-            console.error(`Something went wrong fecthing reports:\n${error}\n`)
-        }
+  if (idList.length > 0) {
+    try {
+      await Promise.all(
+        idList.map(async (id) => {
+          const docData = await getData(id);
+          if (docData !== undefined) {
+            reportList.push({ id: id, data: docData });
+          }
+        })
+      );
+    } catch (error) {
+      console.error(`Something went wrong fecthing reports:\n${error}\n`);
     }
+  }
 
   return reportList;
 };
 
 export const deleteReports = async (reportsToDelete: string[]) => {
-  reportsToDelete.map(async (report) => {
-    const reportRef = doc(db, `${collectionName}/${report}`);
+  if (reportsToDelete.length === 0) {
+      throw Error("No reports to delete");
+  }
 
-    try {
-      if (reportsToDelete.length === 0) {
-        throw Error("No reports to delete");
-      }
+  const deletePromises = reportsToDelete.map(report => {
+      const reportRef = doc(db, `${collectionName}/${report}`);
+      return deleteDoc(reportRef).catch(error => {
+          console.error(`Error deleting ${reportRef.path}: ${error}`);
+      });
+  });
 
-            for (const report of reportsToDelete) {
-                const reportRef = doc(db, `${collectionName}/${report}`);
-                await deleteDoc(reportRef);
-            }
-        } catch (error) {
-            console.error(`Error deleting ${reportRef.path}: ${error}`);
-        }
-    })
+  await Promise.all(deletePromises);
+  return;
 }
 
-export const checkEmailExists = async (email: string) => {
-    const collectionRef = collection(db, collectionName)
-    const q = query(collectionRef, where("userEmail", "==", email.toLowerCase()));
-    
-    try {
-      const querySnapshot = await getDocs(q);
-      querySnapshot.forEach(doc => (console.log(doc.id)))
+export const handleUploadMap = async (mapImg: Blob, id: string) => {
+  const storageRef = ref(storage, `${id}/admin/map`);
 
-      if (querySnapshot) {
-        const reportIDs = querySnapshot.docs.map((doc) => doc.id)
-        return reportIDs;
-      } else {
-
-        return [];
-      }
-    } catch (error) {
-      console.error(`An error occurred while checking email:\n${error}`);
-      return [];
-    }
-}
+  await uploadBytes(storageRef, mapImg);
+};

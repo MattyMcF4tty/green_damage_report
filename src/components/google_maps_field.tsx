@@ -5,7 +5,7 @@ import {
   Polyline,
   useJsApiLoader,
 } from "@react-google-maps/api";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Loading from "./loading";
 import { GetUserPosition, reportDataType } from "@/utils/utils";
 import { bikeInformation } from "./opposite_information/bike_information_form";
@@ -17,8 +17,7 @@ import ObjectIcon from "../../public/MapIcons/ObjectIcon.png";
 import GreenCarIcon from "../../public/MapIcons/GreenCarIcon.png";
 import { PedestrianInformation } from "./opposite_information/person_information_form";
 import { OtherInformation } from "./opposite_information/other_information_form";
-import Google from "./google";
-
+import html2canvas from "html2canvas";
 /* Design settings */
 const markerSize = { x: 30, z: 50 };
 
@@ -693,6 +692,7 @@ const GoogleMapsField = ({
           ) : isLoaded ? (
             <div>
               <GoogleMap
+                id="MyMap"
                 mapContainerClassName="w-full h-[400px] border-[1px] border-MainGreen-200 rounded-lg"
                 zoom={startZoom}
                 center={mapPos}

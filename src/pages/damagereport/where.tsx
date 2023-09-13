@@ -6,7 +6,7 @@ import { bikeInformation } from "../../components/opposite_information/bike_info
 import { OtherInformation } from "../../components/opposite_information/other_information_form";
 import BackButton from "@/components/buttons/back";
 import NextButton from "@/components/buttons/next";
-import { updateData } from "@/firebase/clientApp";
+import { handleUploadMap, updateData } from "@/firebase/clientApp";
 import { GetServerSidePropsContext, NextPage } from "next";
 import {
   getServerSidePropsWithRedirect,
@@ -18,7 +18,6 @@ import GoogleMapsField, {
   googleIndicator,
 } from "@/components/google_maps_field";
 import { useRouter } from "next/router";
-import Google from "@/components/google";
 import html2canvas from "html2canvas";
 
 export const getServerSideProps = async (
@@ -31,6 +30,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
   const router = useRouter();
   const serverData = new reportDataType();
   serverData.updateFields(data);
+  const [allowClick, setAllowClick] = useState(true);
 
   /* logic */
   const [otherPartyInvolved, setOtherPartyInvolved] = useState<boolean | null>(
@@ -40,12 +40,12 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
     boolean | null
   >(serverData.singleVehicleAccident);
 
+  // DATA
   const [indicators, setIndicators] = useState(
     data.googleIndicators.map(
       (info) => new googleIndicator(info.marker1, info.marker2, info.marker3)
     )
   );
-  /* Data */
   const [carInfo, setCarInfo] = useState(
     serverData.vehicleInfo.map(
       (info) =>
@@ -99,6 +99,33 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAllowClick(false);
+
+    function dataURItoBlob(dataURI: string): Blob {
+      const byteString = atob(dataURI.split(",")[1]);
+      const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+
+      return new Blob([ab], { type: mimeString });
+    }
+
+    const mapField = document.getElementById("MyMap"); 
+    if (mapField) {
+      const canvas = await html2canvas(mapField, {
+        useCORS: true,
+        scale: 17,
+      });
+
+      const dataUrl = canvas.toDataURL("image/png");
+      const mapBlob: Blob = dataURItoBlob(dataUrl);
+
+      await handleUploadMap(mapBlob, id);
+    }
 
     /* Data that gets sent to server */
     serverData.updateFields({
@@ -173,7 +200,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
         <div className="flex flex-col justify-left text-left w-full mb-4">
           <div id="whatvehicle" className="flex flex-col w-full">
             <div>
-              <label htmlFor="whatvehicle">What object?</label>
+              <label htmlFor="whatvehicle">Please select the object</label>
             </div>
             <div className="flex flex-row justify-between">
               <OtherPartyList
@@ -188,12 +215,14 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
               />
             </div>
           </div>
-          <div className="my-4 w-1/2">
+          <div className="my-4">
             <p className="break-words">
               Please indicate on the map where the GreenMobility car was
               located, as well as the location of the other partys, by using the
               markers. Please use the draggable line to mark the car's
               trajectory leading to the collision.
+
+              The green dot indicates the starting point, the yellow dot indicates the move leading to the incident and the red dot indicates the incident.
             </p>
           </div>
 
@@ -215,27 +244,6 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
               indicators={indicators}
               setIndicators={setIndicators}
             />
-          </div>
-        </div>
-      )}
-
-      {!otherPartyInvolved && (
-        <div className="w-full">
-          <div>
-            <YesNo
-              id="SingleVehicleAccident"
-              labelText="Single vehicle accident"
-              required={true}
-              value={isSingleVehicleChecked}
-              onChange={setIsSingleVehicleChecked} // Update the handler
-            />
-          </div>
-          <div className="w-full">
-            {isSingleVehicleChecked && (
-              <div />
-              /*                 <Google show={false} showAutocomplete={true} />
-               */
-            )}
           </div>
         </div>
       )}
@@ -273,7 +281,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
         </div>
 
         <div className="flex flex-row w-16 justify-end h-14 mr-10 lg:w-16">
-          <NextButton />
+          <NextButton allowClick={allowClick}/>
         </div>
       </div>
     </form>

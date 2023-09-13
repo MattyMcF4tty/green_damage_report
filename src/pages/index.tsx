@@ -1,6 +1,6 @@
 import { Inputfield } from "@/components/custom_inputfields";
-import { checkEmailExists, createDoc, updateData } from "@/firebase/clientApp";
-import { generateId, sendEmail } from "@/utils/utils";
+import { createDoc } from "@/firebase/clientApp";
+import { generateId, getReportsByEmail } from "@/utils/utils";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -12,7 +12,6 @@ const IndexPage = () => {
   const [email, setEmail] = useState("");
   const [showPopUp, setShowPopUp] = useState(false);
   const [ongoingReports, setOngoingReports] = useState<string[]>([])
-  const [id, setId] = useState(generateId());
 
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,24 +19,20 @@ const IndexPage = () => {
     const ID = await generateId()
 
     try {
-      const ongoingReports = await checkEmailExists(email);
+      const ongoingReports = await getReportsByEmail(email);
       if (ongoingReports.length == 0) { 
-        if (ID !== undefined) {
+        if (ID !== undefined && email !== "") {
           await createDoc(ID, email);
-          await sendEmail (
-            `${email}`, 
-            "GreenMobility Damage Report", 
-            `You started a Damagereport on: \n${router.asPath}/damagereport/what?id=${ID}`)
           router.push(`damagereport/what?id=${ID}`);
         } else {
-          throw new Error("Error creating id")
+          throw new Error("Error creating report Missing ID or Mail")
         } 
       } else {
         setOngoingReports(ongoingReports)
         setShowPopUp(true)
       }
     } catch ( error ) {
-      console.log(`Something went wrong:\n${error}`)
+      console.error(`Something went wrong:\n${error}`)
     }
 
   };
@@ -47,6 +42,11 @@ const IndexPage = () => {
       onSubmit={(e) => handleStart(e)}
       className="flex flex-col items-center"
     >
+      <img
+        src="../GreenLogos/GreenMobilityTextLogo.png"
+        alt="greenlogo"
+        className=""
+      />
       <div className="container mx-auto p-8">
         <div className="mb-4 ">
           <div className="flex flex-col ">
@@ -131,8 +131,9 @@ const IndexPage = () => {
 
       {showPopUp && (
         <EmailPopUp 
-        setId={(id) => (id)}
-        reportIDs={ongoingReports}
+          setVisibility={setShowPopUp}
+          reportIDs={ongoingReports}
+          email={email}
         />
       )}
     </form>

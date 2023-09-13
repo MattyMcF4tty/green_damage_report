@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
 import BackButton from "@/components/buttons/back";
 import { updateData } from "@/firebase/clientApp";
-import { getServerSidePropsWithRedirect, pageProps, reportDataType } from "@/utils/utils";
+import { getServerSidePropsWithRedirect, handleSendEmail, pageProps, reportDataType } from "@/utils/utils";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -16,13 +16,23 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
   const serverData = new reportDataType();
   serverData.updateFields(data);
 
+  useEffect(() => {
+    console.log(images)
+  }, [])
+
   let [confirmVis, setConfirmVis] = useState(false);
 
   const handleSend = async () => {
-    console.log("Damage Report done");
     serverData.updateFields({finished: true});
-
-    updateData(id, serverData)
+    await updateData(id, serverData)
+    /* TODO: EMAIL shouldnt be null, but might be. Create the correct action if email is null */
+    if (data.userEmail) {
+      await handleSendEmail(
+        data.userEmail, 
+        "GreenMobility Damage report",
+        `This is a confirmation that we have received your damage report for vehicle ${data.greenCarNumberPlate}. It will now be processed by our damage department. If you have any questions, please contact damage@greenmobility.com`
+        )
+    }
     Router.push("thankyou")
   };
 

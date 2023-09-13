@@ -51,7 +51,7 @@ const OtherInfoForm = ({ value, onChange }: OtherProps) => {
       <TextField
         id="descripeOther"
         maxLength={500}
-        labelText="Descripe other"
+        labelText="Please descripe other"
         required={true}
         value={descripeOther}
         onChange={setDescripeOther}
@@ -59,7 +59,7 @@ const OtherInfoForm = ({ value, onChange }: OtherProps) => {
       <TextField
         id="InformationOther"
         maxLength={500}
-        labelText="Information on other"
+        labelText="Please provide information on other"
         required={true}
         value={infoOther}
         onChange={setInfoOther}

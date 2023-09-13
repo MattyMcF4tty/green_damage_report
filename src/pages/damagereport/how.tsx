@@ -27,6 +27,7 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
   const router = useRouter();
   const serverData = new reportDataType();
   serverData.updateFields(data);
+  const [allowClick, setAllowClick] = useState(true);
 
   const [accidentDescription, setAccidentDescription] = useState(
     serverData.accidentDescription
@@ -56,6 +57,7 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setAllowClick(false);
 
     /* Make sure to clear typed data if police or witnesses were not present */
     if (witnessesPresent) {
@@ -97,7 +99,7 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
         <div className="">
           <TextField
             id="accidentDescription"
-            labelText="Description of the incident"
+            labelText="Please describe the incident"
             maxLength={200}
             required={true}
             value={accidentDescription}
@@ -124,7 +126,7 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
         <ImageField
           reportID={id}
           id="FrontImage"
-          labelText="Take pictures of damages to the GreenMobility car"
+          labelText="Please take pictures of the damage to the GreenMobility car"
           required={false}
           images={greenImages}
           imageType="GreenMobility"
@@ -134,7 +136,7 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
         <ImageField
           reportID={id}
           id="LeftImage"
-          labelText="Take pictures of damages to other partys"
+          labelText="Please take pictures of the damage to the other party"
           required={false}
           images={otherPartyImages}
           imageType="OtherParty"
@@ -158,7 +160,7 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
       {/* Police Report collection */}
       <div className="">
         <YesNo
-          labelText="Were there police present?"
+          labelText="Were the police present?"
           id="PolicePresent"
           required={true}
           value={policePresent}
@@ -193,7 +195,6 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
       </div>
 
       {/* Witnesses collection */}
-      {/* TODO: make witness array where marked */}
       <div>
         <YesNo
           id="WitnessesPresent"
@@ -213,7 +214,7 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
         </div>
 
         <div className="flex flex-row w-16 justify-end h-14 mr-10">
-          <NextButton />
+          <NextButton allowClick={allowClick}/>
         </div>
       </div>
     </form>

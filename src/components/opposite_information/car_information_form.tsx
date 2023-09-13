@@ -95,7 +95,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
     <div className="flex flex-col mt-4">
       <Inputfield
         labelText="
-        The license plate of the counterparty"
+        Please enter the license plate of the party involved"
         id="NumberPlateInput"
         required={true}
         type="text"
@@ -105,7 +105,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
       />
       <Inputfield
         labelText="
-        Counterpart's car model"
+        Please enter the car model of the party involved"
         id="ModelInput"
         required={true}
         type="text"
@@ -115,7 +115,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
       />
       <Inputfield
         labelText="
-        Full name of the other person involved"
+        Please enter the full name of the party involved"
         id="FullnameInput"
         required={true}
         type="text"
@@ -126,10 +126,10 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
       <PhoneNumber
         value={phoneNumber}
         onChange={setPhoneNumber}
-        labelText="Phone number of the other person involved"
+        labelText="Please enter the phone number of the party involved"
       />
       <Inputfield
-        labelText="Email of the other person involved"
+        labelText="Please enter the email address of the party involved"
         id="EmailInput"
         required={false}
         type="text"
@@ -138,7 +138,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
         placeHolder="Greenmobility@example.com"
       />
       <Inputfield
-        labelText="Driver license number of the other person involved"
+        labelText="Please enter the driver license number of the party involved"
         id="DriversLicenseNumberInput"
         required={false}
         type="text"
@@ -147,7 +147,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
         placeHolder="12345678"
       />
       <Inputfield
-        labelText="Insurance details of the other person"
+        labelText="Please enter the insurance details of the party involved"
         id="InsuranceInput"
         required={false}
         type="text"
