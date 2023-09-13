@@ -20,6 +20,7 @@ import GoogleMapsField, {
 import { useRouter } from "next/router";
 import html2canvas from "html2canvas";
 import ZoeDrawing from "@/components/carDrawings/zoe";
+import KangooDrawing from "@/components/carDrawings/kangoo";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -265,6 +266,11 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
         {currentCar === "zoe" && (
           <div>
             <ZoeDrawing />
+          </div>
+        )}
+        {currentCar === "van" && (
+          <div>
+            <KangooDrawing/>
           </div>
         )}
       </div>
