@@ -19,6 +19,7 @@ import GoogleMapsField, {
 } from "@/components/google_maps_field";
 import { useRouter } from "next/router";
 import html2canvas from "html2canvas";
+import ZoeDrawing from "@/components/carDrawings/zoe";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -31,6 +32,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
   const serverData = new reportDataType();
   serverData.updateFields(data);
   const [allowClick, setAllowClick] = useState(true);
+  const [currentCar, setCurrentCar] = useState<"zoe" | "van">("zoe");
 
   /* logic */
   const [otherPartyInvolved, setOtherPartyInvolved] = useState<boolean | null>(
@@ -114,7 +116,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
       return new Blob([ab], { type: mimeString });
     }
 
-    const mapField = document.getElementById("MyMap"); 
+    const mapField = document.getElementById("MyMap");
     if (mapField) {
       const canvas = await html2canvas(mapField, {
         useCORS: true,
@@ -220,9 +222,9 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
               Please indicate on the map where the GreenMobility car was
               located, as well as the location of the other partys, by using the
               markers. Please use the draggable line to mark the car's
-              trajectory leading to the collision.
-
-              The green dot indicates the starting point, the yellow dot indicates the move leading to the incident and the red dot indicates the incident.
+              trajectory leading to the collision. The green dot indicates the
+              starting point, the yellow dot indicates the move leading to the
+              incident and the red dot indicates the incident.
             </p>
           </div>
 
@@ -247,6 +249,25 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
           </div>
         </div>
       )}
+      <div>
+        what type of car is damaged?
+        <div>
+          <select
+            className="h-8 border border-neutral-500 rounded-md shadow-md outline-none"
+            id="FilterOptions"
+            value={currentCar}
+            onChange={(e) => setCurrentCar(e.target.value as "zoe" | "van")}
+          >
+            <option value="zoe">Zoe</option>
+            <option value="van">Kangoo</option>
+          </select>
+        </div>
+        {currentCar === "zoe" && (
+          <div>
+            <ZoeDrawing />
+          </div>
+        )}
+      </div>
 
       {/*       {isCollisionWithObjectChecked && (
         <ObjectInfoForm onchange={setObjectInfo} />
@@ -281,7 +302,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
         </div>
 
         <div className="flex flex-row w-16 justify-end h-14 mr-10 lg:w-16">
-          <NextButton allowClick={allowClick}/>
+          <NextButton allowClick={allowClick} />
         </div>
       </div>
     </form>
