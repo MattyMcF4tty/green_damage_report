@@ -252,7 +252,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
       )}
       <div>
         what type of car is damaged?
-        <div>
+        <div className="">
           <select
             className="h-8 border border-neutral-500 rounded-md shadow-md outline-none"
             id="FilterOptions"
@@ -264,13 +264,13 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
           </select>
         </div>
         {currentCar === "zoe" && (
-          <div>
+          <div className="">
             <ZoeDrawing />
           </div>
         )}
         {currentCar === "van" && (
           <div>
-            <KangooDrawing/>
+            <KangooDrawing />
           </div>
         )}
       </div>
