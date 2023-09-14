@@ -1,5 +1,5 @@
 import { WitnessInformation } from "@/components/otherPartys/witnessList";
-import { collectionName, getData, getImages, getReportIds } from "@/firebase/clientApp";
+import { collectionName, getData, getImages, getReportIds, updateData } from "@/firebase/clientApp";
 import CryptoJS from "crypto-js";
 import { GetServerSidePropsContext } from "next";
 import axios from "axios";
@@ -451,11 +451,9 @@ export const getReportsByEmail = async (email:string) => {
   }
 }
 
-export const handleGetRenter = async (id: string) => {
-  const reportData = await getData(id)
-  const numberplate = reportData.greenCarNumberPlate;
+export const handleGetRenter = async (numberplate: string) => {
   const data = {
-    numberplate: numberplate?.toUpperCase()
+    numberplate: numberplate.toUpperCase()
   }
 
   const response = await fetch(process.env.NEXT_PUBLIC_URL + '/api/wunderfleet/getRenter', {
@@ -468,13 +466,45 @@ export const handleGetRenter = async (id: string) => {
 
   const responseData = await response.json();
   if (response.ok) {
-    return (responseData.message, responseData.data)
+    console.log(responseData.message);
+    return responseData.data as {
+      customerId: number | null;
+      reservationId: number | null;
+      firstName: string | null;
+      lastName: string | null;
+      birthDate: string | null;
+      gender: string | null;
+      age: number | null;
+      insurance: boolean | null;
+    }
   } else {
     console.error(responseData.message)
-    return {}
+    return {
+      customerId: null,
+      reservationId: null,
+      firstName: null,
+      lastName: null,
+      birthDate: null,
+      gender: null,
+      age: null,
+      insurance: null,
+    }
   }
 }
 
+export const getAge = (birthDateString: string): number => {
+  const birthDate = new Date(birthDateString);
+  const currentDate = new Date();
+
+  let age = currentDate.getFullYear() - birthDate.getFullYear();
+  const m = currentDate.getMonth() - birthDate.getMonth();
+
+  if (m < 0 || (m === 0 && currentDate.getDate() < birthDate.getDate())) {
+    age--;
+  }
+
+  return age;
+}
 
 /* ---------------- classes and types ------------------------------ */
 export type pageProps = {
@@ -491,6 +521,17 @@ export type pageProps = {
       drivingLicenseNumber: string | null;
       phoneNumber: string | null;
       email: string | null;
+    };
+
+    renterInfo: {
+      customerId: number | null;
+      reservationId: number | null;
+      firstName: string | null;
+      lastName: string | null;
+      birthDate: string | null;
+      gender: string | null;
+      age: number | null;
+      insurance: boolean | null;
     };
 
     accidentLocation: { lat: number | null; lng: number | null };
@@ -573,6 +614,17 @@ export class reportDataType {
     email: string | null;
   };
 
+  renterInfo: {
+    customerId: number | null;
+    reservationId: number | null;
+    firstName: string | null;
+    lastName: string | null;
+    birthDate: string | null;
+    gender: string | null;
+    age: number | null;
+    insurance: boolean | null;
+  };
+
   accidentLocation: { lat: number | null; lng: number | null };
   time: string | null;
   date: string | null;
@@ -647,6 +699,16 @@ export class reportDataType {
       phoneNumber: null,
       email: null,
     };
+    this.renterInfo = {
+      customerId: null,
+      reservationId: null,
+      firstName: null,
+      lastName: null,
+      birthDate: null,
+      gender: null,
+      age: null,
+      insurance: null,
+    };
     this.accidentLocation = { lat: null, lng: null };
     this.time = null;
     this.date = null;
@@ -686,6 +748,16 @@ export class reportDataType {
         drivingLicenseNumber: this.driverInfo.drivingLicenseNumber,
         phoneNumber: this.driverInfo.phoneNumber,
         email: this.driverInfo.email,
+      },
+      renterInfo: {
+        customerId: this.renterInfo.customerId,
+        reservationId: this.renterInfo.reservationId,
+        firstName: this.renterInfo.firstName,
+        lastName: this.renterInfo.lastName,
+        birthDate: this.renterInfo.birthDate,
+        gender: this.renterInfo.gender,
+        age: this.renterInfo.age,
+        insurance: this.renterInfo.insurance,
       },
       accidentLocation: {
         lat: this.accidentLocation.lat,
