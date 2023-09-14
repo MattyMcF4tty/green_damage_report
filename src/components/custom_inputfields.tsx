@@ -133,56 +133,64 @@ export const Inputfield = ({
       setIsError(true);
     }
   };
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let newValue = e.target.value;
 
-    if (type === "ssn" && newValue.length === 6 && !newValue.includes("-")) {
-      newValue += "-";
-    } else if (
-      type === "ssn" &&
-      newValue.length === 7 &&
-      newValue.includes("-") &&
-      newValue.charAt(6) === "-"
-    ) {
-      newValue = newValue.slice(0, -1);
+    // Check if character was added or removed
+    const isCharAdded = (oldValue: string, newValue: string) =>
+      newValue.length > oldValue.length;
+
+    // SSN logic
+    if (type === "ssn") {
+      if (isCharAdded(currentValue, newValue)) {
+        if (newValue.length === 6 && !newValue.includes("-")) {
+          newValue += "-";
+        }
+      } else {
+        if (newValue.length === 6 && newValue.charAt(5) === "-") {
+          newValue = newValue.slice(0, -1);
+        }
+      }
     }
 
     // Police report format logic
     if (type === "journalNumber") {
-      // When the value is 4 characters long and doesn't have a hyphen yet
-      if (newValue.length === 4 && !newValue.includes("-")) {
-        newValue += "-";
-      } else if (newValue.length === 10 && newValue.charAt(9) !== "-") {
-        newValue += "-";
-      } else if (newValue.length === 16 && newValue.charAt(15) !== "-") {
-        newValue += "-";
-      } // Removing hyphens when characters are deleted
-      else if (newValue.length === 5 && newValue.charAt(4) === "-") {
-        newValue = newValue.slice(0, -1);
-      } else if (newValue.length === 11 && newValue.charAt(10) === "-") {
-        newValue = newValue.slice(0, -1);
-      } else if (newValue.length === 17 && newValue.charAt(16) === "-") {
-        newValue = newValue.slice(0, -1);
+      if (isCharAdded(currentValue, newValue)) {
+        if (
+          newValue.length === 4 ||
+          newValue.length === 10 ||
+          newValue.length === 16
+        ) {
+          newValue += "-";
+        }
+      } else {
+        if (
+          [5, 11, 17].includes(newValue.length) &&
+          newValue.charAt(newValue.length - 1) === "-"
+        ) {
+          newValue = newValue.slice(0, -1);
+        }
       }
     }
+
     // Numberplate format logic
     if (type === "numberplate") {
-      // When the value is 2 characters long and doesn't have a space yet
-      if (newValue.length === 2 && !newValue.includes(" ")) {
-        newValue += " ";
-      } else if (newValue.length === 5 && newValue.charAt(4) !== " ") {
-        newValue += " ";
-      } // Removing spaces when characters are deleted
-      else if (newValue.length === 3 && newValue.charAt(2) === " ") {
-        newValue = newValue.slice(0, -1);
-      } else if (newValue.length === 6 && newValue.charAt(5) === " ") {
-        newValue = newValue.slice(0, -1);
+      if (isCharAdded(currentValue, newValue)) {
+        if (newValue.length === 2 || newValue.length === 5) {
+          newValue += " ";
+        }
+      } else {
+        if (
+          [3, 6].includes(newValue.length) &&
+          newValue.charAt(newValue.length - 1) === " "
+        ) {
+          newValue = newValue.slice(0, -1);
+        }
       }
     }
 
     setCurrentValue(newValue);
-    onChange(newValue); // pass the possibly modified value back to the parent
+    onChange(newValue);
   };
 
   return (
