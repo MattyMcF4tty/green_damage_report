@@ -45,7 +45,7 @@ const IndexPage = () => {
       <img
         src="../GreenLogos/GreenMobilityTextLogo.png"
         alt="greenlogo"
-        className="mb-10 lg:absolute lg:top-52 lg:w-[58rem]"
+        className="mb-10 lg:absolute lg:top-0 lg:w-[40%] md:bg-inherit"
       />
 
       <div className="mb-6 flex flex-col mx-4 lg:text-center lg:mb-16 lg:text-xl lg:w-[56rem]">
@@ -54,7 +54,7 @@ const IndexPage = () => {
         </span>
         <span>
           Please ensure that you provide accurate information, as this report will be submitted to our insurance company to cover your side of the incident.
-          </span>
+        </span>
       </div>
 
       <div className="mx-4 lg:mx-auto lg:w-[25rem]">
