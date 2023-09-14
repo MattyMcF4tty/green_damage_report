@@ -48,7 +48,7 @@ const IndexPage = () => {
         className="mb-10 lg:absolute lg:top-0 lg:w-[40%] md:bg-inherit"
       />
 
-      <div className="mb-6 flex flex-col mx-4 lg:mb-16 lg:text-xl lg:w-[56rem]">
+      <div className="mb-6 flex flex-col mx-4 lg:text-center lg:mb-16 lg:text-xl lg:w-[56rem]">
         <span className="mb-2">
           The purpose of this damage report is to document and record information about your incident. Please ensure that you provide accurate information, as this report will be submitted to our insurance company to cover your side of the incident.
         </span>
