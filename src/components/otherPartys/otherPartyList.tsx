@@ -181,19 +181,28 @@ export const OtherPartyList = ({
       {showPopUp && (
         <NewObjectPopUp
           setVisibility={setShowPopUp}
-          vehicleValue={new carInformation("", "", "", "", "", "", "", {lat: null, lng: null})}
+          vehicleValue={
+            new carInformation("", "", "", "", "", "", "", {
+              lat: null,
+              lng: null,
+            })
+          }
           setVehicleValue={(newVehicleValue) =>
             setVehicleValue([...vehicleValue, newVehicleValue])
           }
-          bikeValue={new bikeInformation("", "", "", null, "", {lat: null, lng: null})}
+          bikeValue={
+            new bikeInformation("", "", "", null, "", { lat: null, lng: null })
+          }
           setBikeValue={(newBikeValue) =>
             setBikeValue([...bikeValue, newBikeValue])
           }
-          pedestrianValue={new PedestrianInformation("", "", "", "", {lat: null, lng: null})}
+          pedestrianValue={
+            new PedestrianInformation("", "", "", "", { lat: null, lng: null })
+          }
           setPedestrianValue={(newPedestrianValue) =>
             setPedestrianValue([...pedestrianValue, newPedestrianValue])
           }
-          otherValue={new OtherInformation("", "", {lat: null, lng: null})}
+          otherValue={new OtherInformation("", "", { lat: null, lng: null })}
           setOtherValue={(newOtherValue) =>
             setOtherInfoValue([...otherInfoValue, newOtherValue])
           }
@@ -271,18 +280,21 @@ const NewObjectPopUp = ({
   const [isOther, setIsOther] = useState<boolean>(false);
 
   const [currentBikeValue, setCurrentBikeValue] = useState<bikeInformation>(
-    bikeValue || new bikeInformation("", "", "", null, "", {lat: null, lng: null})
+    bikeValue ||
+      new bikeInformation("", "", "", null, "", { lat: null, lng: null })
   );
   const [currentVehicleValue, setCurrentVehicleValue] =
     useState<carInformation>(
-      vehicleValue || new carInformation("", "", "", "", "", "", "", {lat: null, lng: null})
+      vehicleValue ||
+        new carInformation("", "", "", "", "", "", "", { lat: null, lng: null })
     );
   const [currentPedestrianValue, setCurrentPedestranValue] =
     useState<PedestrianInformation>(
-      pedestrianValue || new PedestrianInformation("", "", "", "", {lat: null, lng: null})
+      pedestrianValue ||
+        new PedestrianInformation("", "", "", "", { lat: null, lng: null })
     );
   const [currentOtherValue, setCurrentOtherValue] = useState<OtherInformation>(
-    otherValue || new OtherInformation("", "", {lat: null, lng: null})
+    otherValue || new OtherInformation("", "", { lat: null, lng: null })
   );
 
   const handleSave = () => {
@@ -330,7 +342,7 @@ const NewObjectPopUp = ({
     <div className="fixed flex justify-center items-center z-20 inset-0 bg-black bg-opacity-75 overflow-auto">
       <div className="bg-white p-2 flex flex-col rounded-md w-96 max-h-[40rem] overflow-y-auto">
         <p className="top-0 w-full text-center mb-4 border-b-[3px] border-MainGreen-300 ">
-          New object
+          Select one of the following
         </p>
         <div className="flex justify-evenly mb-2">
           <Checkbox
@@ -444,10 +456,10 @@ const UpdateBike = ({
 
   const handleBikeDelete = () => {
     const updatedBikeValue = bikeValue;
-    updatedBikeValue.splice(index, 1)
+    updatedBikeValue.splice(index, 1);
     setBikeValue(updatedBikeValue);
     setVisibility(false);
-  }
+  };
 
   return (
     <div className="fixed flex justify-center items-center z-20 inset-0 bg-black bg-opacity-75 overflow-auto ">
@@ -464,7 +476,10 @@ const UpdateBike = ({
         <div>
           <div className="flex flex-row w-full justify-evenly h-10">
             <button
-              onClick={() => {handleBikeDelete(); setVisibility(false)}}
+              onClick={() => {
+                handleBikeDelete();
+                setVisibility(false);
+              }}
               className="bg-gray-300 w-1/4 h-full rounded-md hover:bg-red-500 hover:text-white lg:mt-6"
             >
               Delete
@@ -509,10 +524,10 @@ const UpdateVehicle = ({
 
   const handleVehicleDelete = () => {
     const updatedVehicleValue = vehicleValue;
-    updatedVehicleValue.splice(index, 1)
+    updatedVehicleValue.splice(index, 1);
     setVehicleValue(updatedVehicleValue);
     setVisibility(false);
-  }
+  };
 
   return (
     <div className="fixed flex justify-center items-center z-20 inset-0 bg-black bg-opacity-75 overflow-auto">
@@ -573,10 +588,10 @@ const UpdatePedestrian = ({
 
   const handlePedestrianDelete = () => {
     const updatedPedestrianValue = pedestrianValue;
-    updatedPedestrianValue.splice(index, 1)
+    updatedPedestrianValue.splice(index, 1);
     setPedestrianValue(updatedPedestrianValue);
     setVisibility(false);
-  }
+  };
 
   return (
     <div className="fixed flex justify-center items-center z-20 inset-0 bg-black bg-opacity-75 overflow-auto">
@@ -637,10 +652,10 @@ const UpdateOther = ({
 
   const handleOtherDelete = () => {
     const updatedOtherValue = otherValue;
-    updatedOtherValue.splice(index, 1)
+    updatedOtherValue.splice(index, 1);
     setOtherValue(updatedOtherValue);
     setVisibility(false);
-  }
+  };
 
   return (
     <div className="fixed flex justify-center items-center z-20 inset-0 bg-black bg-opacity-75 overflow-auto">
