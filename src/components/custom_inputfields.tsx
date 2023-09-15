@@ -3,6 +3,11 @@ import { updateImages } from "@/firebase/clientApp";
 import React, { useEffect, useState, useRef } from "react";
 import { GoogleMap, LoadScript } from "@react-google-maps/api";
 import usePlacesService from "react-google-autocomplete/lib/usePlacesAutocompleteService";
+import {
+  formatJournalNumber,
+  formatNumberplate,
+  formatSSN,
+} from "@/utils/formatUtils";
 
 /* import usePlacesAutocomplete, {
   getGeocode,
@@ -173,12 +178,13 @@ export const Inputfield = ({
         }
       }
     }
-
     // Numberplate format logic
     if (type === "numberplate") {
       if (isCharAdded(currentValue, newValue)) {
-        if (newValue.length === 2 || newValue.length === 5) {
-          newValue += " ";
+        if (newValue.length >= 3 && !newValue.includes(" ")) {
+          newValue = newValue.slice(0, 2) + " " + newValue.slice(2);
+        } else if (newValue.length >= 5 && !newValue.slice(4).includes(" ")) {
+          newValue = newValue.slice(0, 5) + " " + newValue.slice(5);
         }
       } else {
         if (
@@ -194,6 +200,27 @@ export const Inputfield = ({
     onChange(newValue);
   };
 
+  const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+
+    switch (type) {
+      case "numberplate":
+        value = formatNumberplate(value);
+        break;
+      case "journalNumber":
+        value = formatJournalNumber(value);
+        break;
+      case "ssn":
+        value = formatSSN(value);
+        break;
+      default:
+        break;
+    }
+
+    setCurrentValue(value);
+    onChange(value);
+  };
+
   return (
     <div className="flex flex-col mb-4">
       <label htmlFor={id} className="mb-2">
@@ -207,7 +234,10 @@ export const Inputfield = ({
         value={currentValue}
         onChange={handleInputChange}
         pattern={pattern}
-        onBlur={() => handleLeave()}
+        onBlur={(e) => {
+          handleLeave();
+          handleInputBlur(e);
+        }}
         onInvalid={() => handleCheck()}
         onFocus={() => setIsFocused(true)}
         placeholder={placeHolder ? placeHolder : ""}
