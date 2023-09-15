@@ -401,44 +401,43 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
               accidentLocation={accidentLocation}
             />
           </div>
+
+          {/* Picture of damages to green car collection */}
+          <div>
+            <ImageField
+              reportID={id}
+              id="LeftImage"
+              labelText="Please take pictures of the damage to the other party"
+              required={false}
+              images={otherPartyImages}
+              imageType="OtherParty"
+              multiple={true}
+            />
+          </div>
+
+          {/* Damage description collection */}
+          <div className="">
+            <TextField
+              id="damageDescription"
+              labelText="
+          Please provide a description of the damages incurred to the parties involved"
+              maxLength={500}
+              required={true}
+              value={damageDescription}
+              onChange={setDamageDescription}
+            />
+          </div>
         </div>
       )}
-
-      {/* Picture of damages to green car collection */}
-      <div>
-        <ImageField
-          reportID={id}
-          id="FrontImage"
-          labelText="Please take pictures of the damage to the GreenMobility car"
-          required={false}
-          images={greenImages}
-          imageType="GreenMobility"
-          multiple={true}
-        />
-
-        <ImageField
-          reportID={id}
-          id="LeftImage"
-          labelText="Please take pictures of the damage to the other party"
-          required={false}
-          images={otherPartyImages}
-          imageType="OtherParty"
-          multiple={true}
-        />
-      </div>
-
-      {/* Damage description collection */}
-      <div className="">
-        <TextField
-          id="damageDescription"
-          labelText="
-          Please provide a description of the damages incurred to the parties involved"
-          maxLength={500}
-          required={true}
-          value={damageDescription}
-          onChange={setDamageDescription}
-        />
-      </div>
+      <ImageField
+        reportID={id}
+        id="FrontImage"
+        labelText="Please take pictures of the damage to the GreenMobility car"
+        required={false}
+        images={greenImages}
+        imageType="GreenMobility"
+        multiple={true}
+      />
 
       {/* <div>
         What type of car is damaged?

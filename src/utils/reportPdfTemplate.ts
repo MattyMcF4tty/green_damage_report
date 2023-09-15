@@ -11,14 +11,14 @@ const addImageToPDF = (pdfDoc: jsPDF) => {
   const imageUrl = "../../GreenLogos/GreenMobilityTextLogo.png";
 
   pdfDoc.addImage(imageUrl, "JPEG", imageX, imageY, imageWidth, imageHeight);
-  
+
   return pdfDoc;
 };
 
 const createReportPDF = async (
   data: reportDataType,
   images: Record<string, string[]>,
-  map: string[],
+  map: string[]
 ) => {
   const doc = new jsPDF();
 
@@ -154,7 +154,7 @@ const createReportPDF = async (
   // Location
   doc.text("Location:", accidentInfoLeftX, accidentInfoY + 26);
   doc.text(
-    `${data.accidentLocation.lat || "-"}, ${data.accidentLocation.lng || "-"}`,
+    `${data.accidentAddress || "-"}`,
     accidentInfoRightX,
     accidentInfoY + 26
   );
@@ -921,9 +921,8 @@ const createReportPDF = async (
     if (Array.isArray(images["GreenMobility"])) {
       // Create a section header
       addImageSectionHeader("GreenMobility Damage Images");
-  
+
       for (const imageBase64 of images["GreenMobility"]) {
-  
         doc.addImage(
           imageBase64,
           "JPEG",
@@ -932,7 +931,7 @@ const createReportPDF = async (
           2, // FIX
           4 // FIX
         );
-        currentY += 2 // FIX;
+        currentY += 2; // FIX;
       }
     } else {
       addImageSectionHeader("GreenMobility Damage Images");
@@ -944,38 +943,32 @@ const createReportPDF = async (
   doc.addPage();
   currentY = 10;
 
+  // For OtherParty images
+  if (images["OtherParty"]) {
+    if (Array.isArray(images["OtherParty"])) {
+      addImageSectionHeader("OtherParty Damage Images");
 
+      for (const imageBase64 of images["OtherParty"]) {
+        doc.addImage(
+          imageBase64,
+          "JPEG",
+          15,
+          currentY,
+          150, // FIX
+          150 // FIX
+        );
 
-// For OtherParty images
-if (images["OtherParty"]) {
-
-
-  if (Array.isArray(images["OtherParty"])) {
-    addImageSectionHeader("OtherParty Damage Images");
-
-    for (const imageBase64 of images["OtherParty"]) {
-
-      doc.addImage(
-        imageBase64,
-        "JPEG",
-        15,
-        currentY,
-        150, // FIX
-        150// FIX
-      );
-
-      currentY += 4//FIX;
+        currentY += 4; //FIX;
+      }
     }
   }
-}
-doc.addPage();
+  doc.addPage();
   currentY = 10;
-
 
   if (map) {
     map.map((currentMap, index) => {
       addImageSectionHeader("Map Images");
-      
+
       doc.addImage(
         currentMap,
         "png",
@@ -984,18 +977,15 @@ doc.addPage();
         2, // FIX
         4 // FIX
       );
-      currentY += 2 // FIX;
-    })
-    
-  }
-  else {
+      currentY += 2; // FIX;
+    });
+  } else {
     addImageSectionHeader("Map Images");
     doc.text("No map images available.", 15, currentY);
     currentY += headerHeight;
   }
 
-
-  const pdfBlob = doc.output('blob');
+  const pdfBlob = doc.output("blob");
   return pdfBlob;
 };
 

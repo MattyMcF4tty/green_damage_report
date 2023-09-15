@@ -53,13 +53,12 @@ const What: NextPage<pageProps> = ({ data, id }) => {
   const [accidentDate, setAccidentDate] = useState(serverData.date);
   const [allowClick, setAllowClick] = useState(true);
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAllowClick(false);
 
     const renter = await handleGetRenter(greenCarNumberplate as string);
-    serverData.updateFields({ renterInfo: renter })
+    serverData.updateFields({ renterInfo: renter });
 
     /* TODO: Make function that gets information about current driver from green server */
     if (showDriverInfoForm !== true) {
@@ -114,7 +113,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
           labelText="
           Please enter the license plate of the GreenMobility car"
           id="greenCarNumberplateInput"
-          type="text"
+          type="numberplate"
           required={true}
           value={greenCarNumberplate}
           onChange={setgreenCarNumberplate}
@@ -215,7 +214,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
         </div>
 
         <div className="flex flex-row h-14 mt-4 w-16 justify-end mr-10">
-          <NextButton allowClick={allowClick}/>
+          <NextButton allowClick={allowClick} />
         </div>
       </div>
     </form>

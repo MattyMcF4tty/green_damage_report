@@ -3,7 +3,8 @@ import {
   collectionName,
   getData,
   getImages,
-  getReportIds, updateData,
+  getReportIds,
+  updateData,
 } from "@/firebase/clientApp";
 import CryptoJS from "crypto-js";
 import { GetServerSidePropsContext } from "next";
@@ -16,7 +17,6 @@ import { collection, getDocs, query, where } from "firebase/firestore";
 import { deleteObject, ref, uploadBytes } from "firebase/storage";
 import createReportPDF from "./reportPdfTemplate";
 import jsPDF from "jspdf";
-
 
 /* ------- utils config ----- */
 const firebaseCollectionName = collectionName;
@@ -418,45 +418,46 @@ export const handleDownloadImages = async (
 };
 
 export const handleGeneratePdf = async (id: string) => {
-export const handleGeneratePdf = async (id: string) => {
   try {
     let Images: Record<string, string[]> = {
       GreenMobility: [],
-      OtherParty: []
+      OtherParty: [],
     };
 
-    let map: string[] = [] // Assuming handleDownloadImages returns an array of strings for maps
+    let map: string[] = []; // Assuming handleDownloadImages returns an array of strings for maps
 
     try {
       Images = {
-        GreenMobility: await handleDownloadImages(`${id}/GreenMobility`, 'base64'),
-        OtherParty: await handleDownloadImages(`${id}/OtherParty`, 'base64'),
+        GreenMobility: await handleDownloadImages(
+          `${id}/GreenMobility`,
+          "base64"
+        ),
+        OtherParty: await handleDownloadImages(`${id}/OtherParty`, "base64"),
       };
-      map = await handleDownloadImages(`${id}/admin`, 'base64');
+      map = await handleDownloadImages(`${id}/admin`, "base64");
     } catch (error) {
       console.error("Error getting images");
     }
     const data: reportDataType = new reportDataType();
-    console.log(map)
+    console.log(map);
 
     try {
       data.updateFields(await getData(id));
     } catch (error) {
-      console.error("Error getting data")
+      console.error("Error getting data");
     }
-    let pdfBlob:Blob = new Blob()
+    let pdfBlob: Blob = new Blob();
     try {
       pdfBlob = await createReportPDF(data, Images, map);
     } catch (error) {
-      console.error("Error creating pdf:\n", error)
+      console.error("Error creating pdf:\n", error);
     }
-    
+
     try {
       await downloadToPc(pdfBlob, `DamageReport_${id}`);
     } catch (error) {
-      console.error("Error downloading pdf:\n", error)
+      console.error("Error downloading pdf:\n", error);
     }
-
 
     console.log(`PDF of ${id} generated and uploaded successfully.`);
   } catch (error: any) {
@@ -464,15 +465,13 @@ export const handleGeneratePdf = async (id: string) => {
   }
 };
 
-
 export const handleDownloadPdf = async (id: string) => {
   try {
-    const data = {id: id}
+    const data = { id: id };
     await handleGeneratePdf(id);
 
-
-    const response = await axios.post<ArrayBuffer>('/api/downloadpdf', data, {
-      responseType: 'arraybuffer' // Important: specify the response type as 'arraybuffer'
+    const response = await axios.post<ArrayBuffer>("/api/downloadpdf", data, {
+      responseType: "arraybuffer", // Important: specify the response type as 'arraybuffer'
     });
 
     if (!(response.status === 200)) {
@@ -514,20 +513,23 @@ export const getReportsByEmail = async (email: string) => {
       error.message
     );
   }
-}
+};
 
 export const handleGetRenter = async (numberplate: string) => {
   const data = {
-    numberplate: numberplate.toUpperCase()
-  }
+    numberplate: numberplate.toUpperCase(),
+  };
 
-  const response = await fetch(process.env.NEXT_PUBLIC_URL + '/api/wunderfleet/getRenter', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({numberplate: data})
-  })
+  const response = await fetch(
+    process.env.NEXT_PUBLIC_URL + "/api/wunderfleet/getRenter",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ numberplate: data }),
+    }
+  );
 
   const responseData = await response.json();
   if (response.ok) {
@@ -541,9 +543,9 @@ export const handleGetRenter = async (numberplate: string) => {
       gender: string | null;
       age: number | null;
       insurance: boolean | null;
-    }
+    };
   } else {
-    console.error(responseData.message)
+    console.error(responseData.message);
     return {
       customerId: null,
       reservationId: null,
@@ -553,9 +555,9 @@ export const handleGetRenter = async (numberplate: string) => {
       gender: null,
       age: null,
       insurance: null,
-    }
+    };
   }
-}
+};
 
 export const getAge = (birthDateString: string): number => {
   const birthDate = new Date(birthDateString);
@@ -569,7 +571,7 @@ export const getAge = (birthDateString: string): number => {
   }
 
   return age;
-}
+};
 
 /* ---------------- classes and types ------------------------------ */
 export type pageProps = {
