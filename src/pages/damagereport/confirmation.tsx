@@ -4,6 +4,8 @@ import { useRouter } from "next/router";
 import BackButton from "@/components/buttons/back";
 import { updateData } from "@/firebase/clientApp";
 import { getServerSidePropsWithRedirect, handleSendEmail, pageProps, reportDataType } from "@/utils/utils";
+import { getDownloadURL, ref } from "firebase/storage";
+import { FireStorage } from "@/firebase/firebaseConfig";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -15,9 +17,23 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
   const Router = useRouter();
   const serverData = new reportDataType();
   serverData.updateFields(data);
+  const [map, setMap] = useState<string | null>()
+
 
   useEffect(() => {
-    console.log(images)
+    const getMap = async() => {
+      const storageRef = ref(FireStorage, `${id}/admin/map`)
+      let serverMap:string | null = null;
+      try {
+        serverMap = await getDownloadURL(storageRef)
+      } catch (error) {
+        console.error("No map")
+      }
+      if (serverMap) {
+        setMap(serverMap);
+      }
+    }
+    getMap();
   }, [])
 
   let [confirmVis, setConfirmVis] = useState(false);
@@ -403,6 +419,18 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
           <p>No images</p>
         )}
       </div>
+
+      {/* Location of accident*/}
+      <p className="font-bold text-MainGreen-300 mb-2">
+        Location of accident
+      </p>
+      <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">        {map ? (
+          <img src={map} alt="GoogleMap" />
+        ) : (
+          <p>No map</p>
+        )}
+      </div>
+
       <div className="w-full h-full flex flex-row justify-between rounded-full mt-4">
         <div className="w-16 h-14 ml-10">
           <BackButton pageName={`where?id=${id}`} />

@@ -1,5 +1,5 @@
 import { WitnessInformation } from "@/components/otherPartys/witnessList";
-import { collectionName, getData, getImages, getReportIds } from "@/firebase/clientApp";
+import { collectionName, getData, getImages, getReportIds, updateData } from "@/firebase/clientApp";
 import CryptoJS from "crypto-js";
 import { GetServerSidePropsContext } from "next";
 import axios from "axios";
@@ -386,24 +386,51 @@ export const handleDownloadImages = async (path: string, type: 'url' | 'base64')
   }
 };
 
-export const handleGeneratePdf = async (id: string)  => {
+export const handleGeneratePdf = async (id: string) => {
   try {
-    const Images: Record<string, string[]> = {
-      GreenMobility: await handleDownloadImages(`${id}/GreenMobility`, 'base64'),
-      OtherParty: await handleDownloadImages(`${id}/OtherParty`, 'base64'),
+    let Images: Record<string, string[]> = {
+      GreenMobility: [],
+      OtherParty: []
+    };
+
+    let map: string[] = [] // Assuming handleDownloadImages returns an array of strings for maps
+
+    try {
+      Images = {
+        GreenMobility: await handleDownloadImages(`${id}/GreenMobility`, 'base64'),
+        OtherParty: await handleDownloadImages(`${id}/OtherParty`, 'base64'),
+      };
+      map = await handleDownloadImages(`${id}/admin`, 'base64');
+    } catch (error) {
+      console.error("Error getting images");
+    }
+    const data: reportDataType = new reportDataType();
+    console.log(map)
+
+    try {
+      data.updateFields(await getData(id));
+    } catch (error) {
+      console.error("Error getting data")
+    }
+    let pdfBlob:Blob = new Blob()
+    try {
+      pdfBlob = await createReportPDF(data, Images, map);
+    } catch (error) {
+      console.error("Error creating pdf:\n", error)
+    }
+    
+    try {
+      await downloadToPc(pdfBlob, `DamageReport_${id}`);
+    } catch (error) {
+      console.error("Error downloading pdf:\n", error)
     }
 
-    const data =  await getData(id)
-    const pdfBuffer = await createReportPDF(data, Images)   
-    const storageRef = ref(FireStorage, `${id}/admin/DamageReport.pdf`)
-    await deleteObject(storageRef)
-    await uploadBytes(storageRef, pdfBuffer)
- 
     console.log(`PDF of ${id} generated and uploaded successfully.`);
-  } catch (error:any) {
-    console.error(error.message)
+  } catch (error: any) {
+    console.error(error.message);
   }
-}
+};
+
 
 export const handleDownloadPdf = async (id: string) => {
   try {
@@ -451,6 +478,60 @@ export const getReportsByEmail = async (email:string) => {
   }
 }
 
+export const handleGetRenter = async (numberplate: string) => {
+  const data = {
+    numberplate: numberplate.toUpperCase()
+  }
+
+  const response = await fetch(process.env.NEXT_PUBLIC_URL + '/api/wunderfleet/getRenter', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({numberplate: data})
+  })
+
+  const responseData = await response.json();
+  if (response.ok) {
+    console.log(responseData.message);
+    return responseData.data as {
+      customerId: number | null;
+      reservationId: number | null;
+      firstName: string | null;
+      lastName: string | null;
+      birthDate: string | null;
+      gender: string | null;
+      age: number | null;
+      insurance: boolean | null;
+    }
+  } else {
+    console.error(responseData.message)
+    return {
+      customerId: null,
+      reservationId: null,
+      firstName: null,
+      lastName: null,
+      birthDate: null,
+      gender: null,
+      age: null,
+      insurance: null,
+    }
+  }
+}
+
+export const getAge = (birthDateString: string): number => {
+  const birthDate = new Date(birthDateString);
+  const currentDate = new Date();
+
+  let age = currentDate.getFullYear() - birthDate.getFullYear();
+  const m = currentDate.getMonth() - birthDate.getMonth();
+
+  if (m < 0 || (m === 0 && currentDate.getDate() < birthDate.getDate())) {
+    age--;
+  }
+
+  return age;
+}
 
 /* ---------------- classes and types ------------------------------ */
 export type pageProps = {
@@ -467,6 +548,17 @@ export type pageProps = {
       drivingLicenseNumber: string | null;
       phoneNumber: string | null;
       email: string | null;
+    };
+
+    renterInfo: {
+      customerId: number | null;
+      reservationId: number | null;
+      firstName: string | null;
+      lastName: string | null;
+      birthDate: string | null;
+      gender: string | null;
+      age: number | null;
+      insurance: boolean | null;
     };
 
     accidentLocation: { lat: number | null; lng: number | null };
@@ -549,6 +641,17 @@ export class reportDataType {
     email: string | null;
   };
 
+  renterInfo: {
+    customerId: number | null;
+    reservationId: number | null;
+    firstName: string | null;
+    lastName: string | null;
+    birthDate: string | null;
+    gender: string | null;
+    age: number | null;
+    insurance: boolean | null;
+  };
+
   accidentLocation: { lat: number | null; lng: number | null };
   time: string | null;
   date: string | null;
@@ -623,6 +726,16 @@ export class reportDataType {
       phoneNumber: null,
       email: null,
     };
+    this.renterInfo = {
+      customerId: null,
+      reservationId: null,
+      firstName: null,
+      lastName: null,
+      birthDate: null,
+      gender: null,
+      age: null,
+      insurance: null,
+    };
     this.accidentLocation = { lat: null, lng: null };
     this.time = null;
     this.date = null;
@@ -662,6 +775,16 @@ export class reportDataType {
         drivingLicenseNumber: this.driverInfo.drivingLicenseNumber,
         phoneNumber: this.driverInfo.phoneNumber,
         email: this.driverInfo.email,
+      },
+      renterInfo: {
+        customerId: this.renterInfo.customerId,
+        reservationId: this.renterInfo.reservationId,
+        firstName: this.renterInfo.firstName,
+        lastName: this.renterInfo.lastName,
+        birthDate: this.renterInfo.birthDate,
+        gender: this.renterInfo.gender,
+        age: this.renterInfo.age,
+        insurance: this.renterInfo.insurance,
       },
       accidentLocation: {
         lat: this.accidentLocation.lat,

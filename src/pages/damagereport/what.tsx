@@ -12,6 +12,7 @@ import { useRouter } from "next/router";
 import { updateData } from "@/firebase/clientApp";
 import {
   getServerSidePropsWithRedirect,
+  handleGetRenter,
   pageProps,
   reportDataType,
 } from "@/utils/utils";
@@ -56,7 +57,9 @@ const What: NextPage<pageProps> = ({ data, id }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAllowClick(false);
-    
+
+    const renter = await handleGetRenter(greenCarNumberplate as string);
+    serverData.updateFields({ renterInfo: renter })
 
     /* TODO: Make function that gets information about current driver from green server */
     if (showDriverInfoForm !== true) {
@@ -72,13 +75,13 @@ const What: NextPage<pageProps> = ({ data, id }) => {
       serverData.updateFields({ driverInfo: newDriverInfo });
     } else {
       const newDriverInfo = {
-        firstName: "John",
-        lastName: "Doe",
-        address: "Landgreven, 3, 31301, København",
-        phoneNumber: "+00 00 00 00 00",
-        socialSecurityNumber: "000000-0000",
-        drivingLicenseNumber: "00000000",
-        email: "JohnDoe@placeholder.com",
+        firstName: renter.firstName,
+        lastName: renter.lastName,
+        address: null,
+        phoneNumber: null,
+        socialSecurityNumber: null,
+        drivingLicenseNumber: null,
+        email: null,
       };
       serverData.updateFields({ driverInfo: newDriverInfo });
     }
