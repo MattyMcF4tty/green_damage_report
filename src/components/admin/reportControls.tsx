@@ -3,6 +3,7 @@ import {
   reportDataType,
   handleSendEmail,
   handleGetRenter,
+  handleGeneratePdf,
 } from "@/utils/utils";
 import {
   faCloudArrowDown,
@@ -40,7 +41,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
   ) => {
     setAllowPdf(false);
     selectedReports.map(async (report) => {
-      await handleDownloadPdf(report.id);
+      await handleGeneratePdf(report.id);
     });
     setAllowPdf(true);
   };

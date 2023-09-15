@@ -8,7 +8,7 @@ const addImageToPDF = (pdfDoc: jsPDF) => {
   const imageHeight = 20;
   const imageX = 65;
   const imageY = 10;
-  const imageUrl = "../GreenLogos/GreenMobilityTextLogo.png";
+  const imageUrl = "../../GreenLogos/GreenMobilityTextLogo.png";
 
   pdfDoc.addImage(imageUrl, "JPEG", imageX, imageY, imageWidth, imageHeight);
   
@@ -18,6 +18,7 @@ const addImageToPDF = (pdfDoc: jsPDF) => {
 const createReportPDF = async (
   data: reportDataType,
   images: Record<string, string[]>,
+  map: string[],
 ) => {
   const doc = new jsPDF();
 
@@ -943,17 +944,12 @@ const createReportPDF = async (
   doc.addPage();
   currentY = 10;
 
-  const totalOtherPartyHeight =
-  images["OtherParty"].length * maxImageHeight + headerHeight;
-const remainingSpaceOther = doc.internal.pageSize.height - currentY;
-const requiredHeightOtherParty = calculateRequiredHeight(
-  images["OtherParty"].length,
-  maxImageHeight,
-  headerHeight
-);
+
 
 // For OtherParty images
 if (images["OtherParty"]) {
+
+
   if (Array.isArray(images["OtherParty"])) {
     addImageSectionHeader("OtherParty Damage Images");
 
@@ -964,14 +960,39 @@ if (images["OtherParty"]) {
         "JPEG",
         15,
         currentY,
-        2, // FIX
-        2 // FIX
+        150, // FIX
+        150// FIX
       );
 
       currentY += 4//FIX;
     }
   }
 }
+doc.addPage();
+  currentY = 10;
+
+
+  if (map) {
+    map.map((currentMap, index) => {
+      addImageSectionHeader("Map Images");
+      
+      doc.addImage(
+        currentMap,
+        "png",
+        15,
+        currentY,
+        2, // FIX
+        4 // FIX
+      );
+      currentY += 2 // FIX;
+    })
+    
+  }
+  else {
+    addImageSectionHeader("Map Images");
+    doc.text("No map images available.", 15, currentY);
+    currentY += headerHeight;
+  }
 
 
   const pdfBlob = doc.output('blob');

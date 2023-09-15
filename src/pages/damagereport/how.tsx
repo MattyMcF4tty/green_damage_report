@@ -33,9 +33,7 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
     serverData.accidentDescription
   );
   const [greenDriverSpeed, setGreenDriverSpeed] = useState(serverData.speed);
-  const [damageDescription, setDamageDescription] = useState(
-    serverData.damageDescription
-  );
+
   const [policePresent, setPolicePresent] = useState(serverData.policePresent);
   const [policeReport, setPoliceReport] = useState(
     serverData.policeReportExist
@@ -48,12 +46,6 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
   );
   const [witnesses, setWitnesses] = useState(serverData.witnesses);
 
-  const [greenImages, setGreenImages] = useState<string[] | null>(
-    images?.["GreenMobility"] || null
-  );
-  const [otherPartyImages, setOtherPartyImages] = useState<string[] | null>(
-    images?.["OtherParty"] || null
-  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,7 +67,6 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
     serverData.updateFields({
       accidentDescription: accidentDescription,
       speed: greenDriverSpeed,
-      damageDescription: damageDescription,
       policeReportNumber: journalNumber,
 
       policePresent: policePresent,
@@ -118,42 +109,6 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
           value={greenDriverSpeed}
           onChange={setGreenDriverSpeed}
           placeHolder="km/h"
-        />
-      </div>
-
-      {/* Picture of damages to green car collection */}
-      <div>
-        <ImageField
-          reportID={id}
-          id="FrontImage"
-          labelText="Please take pictures of the damage to the GreenMobility car"
-          required={false}
-          images={greenImages}
-          imageType="GreenMobility"
-          multiple={true}
-        />
-
-        <ImageField
-          reportID={id}
-          id="LeftImage"
-          labelText="Please take pictures of the damage to the other party"
-          required={false}
-          images={otherPartyImages}
-          imageType="OtherParty"
-          multiple={true}
-        />
-      </div>
-
-      {/* Damage description collection */}
-      <div className="">
-        <TextField
-          id="damageDescription"
-          labelText="
-          Please provide a description of the damages incurred to the parties involved"
-          maxLength={500}
-          required={true}
-          value={damageDescription}
-          onChange={setDamageDescription}
         />
       </div>
 

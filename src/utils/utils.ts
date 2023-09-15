@@ -386,24 +386,51 @@ export const handleDownloadImages = async (path: string, type: 'url' | 'base64')
   }
 };
 
-export const handleGeneratePdf = async (id: string)  => {
+export const handleGeneratePdf = async (id: string) => {
   try {
-    const Images: Record<string, string[]> = {
-      GreenMobility: await handleDownloadImages(`${id}/GreenMobility`, 'base64'),
-      OtherParty: await handleDownloadImages(`${id}/OtherParty`, 'base64'),
+    let Images: Record<string, string[]> = {
+      GreenMobility: [],
+      OtherParty: []
+    };
+
+    let map: string[] = [] // Assuming handleDownloadImages returns an array of strings for maps
+
+    try {
+      Images = {
+        GreenMobility: await handleDownloadImages(`${id}/GreenMobility`, 'base64'),
+        OtherParty: await handleDownloadImages(`${id}/OtherParty`, 'base64'),
+      };
+      map = await handleDownloadImages(`${id}/admin`, 'base64');
+    } catch (error) {
+      console.error("Error getting images");
+    }
+    const data: reportDataType = new reportDataType();
+    console.log(map)
+
+    try {
+      data.updateFields(await getData(id));
+    } catch (error) {
+      console.error("Error getting data")
+    }
+    let pdfBlob:Blob = new Blob()
+    try {
+      pdfBlob = await createReportPDF(data, Images, map);
+    } catch (error) {
+      console.error("Error creating pdf:\n", error)
+    }
+    
+    try {
+      await downloadToPc(pdfBlob, `DamageReport_${id}`);
+    } catch (error) {
+      console.error("Error downloading pdf:\n", error)
     }
 
-    const data =  await getData(id)
-    const pdfBuffer = await createReportPDF(data, Images)   
-    const storageRef = ref(FireStorage, `${id}/admin/DamageReport.pdf`)
-    await deleteObject(storageRef)
-    await uploadBytes(storageRef, pdfBuffer)
- 
     console.log(`PDF of ${id} generated and uploaded successfully.`);
-  } catch (error:any) {
-    console.error(error.message)
+  } catch (error: any) {
+    console.error(error.message);
   }
-}
+};
+
 
 export const handleDownloadPdf = async (id: string) => {
   try {
