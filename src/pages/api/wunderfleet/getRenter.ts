@@ -68,7 +68,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             body: JSON.stringify(
                 {
                   "customerId": {
-                    "$eq": 1265
+                    "$eq": customerId
                   }
                 })
         })
