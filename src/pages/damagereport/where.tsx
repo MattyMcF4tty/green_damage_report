@@ -23,6 +23,7 @@ import ZoeDrawing from "@/components/carDrawings/zoe";
 import KangooDrawing from "@/components/carDrawings/kangoo";
 import VanDrawing from "@/components/carDrawings/kangoo";
 import NewDamageListPopUp from "@/components/otherPartys/damageList";
+import Google from "@/components/google";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -353,7 +354,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
           </div>
 
           <div className="w-full">
-            <GoogleMapsField
+            {/*   <GoogleMapsField
               showMap={true}
               startZoom={17}
               startPos={{ lat: 55.68292552469843, lng: 12.585443426890635 }}
@@ -369,7 +370,8 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
               setObjects={setOtherInfo}
               indicators={indicators}
               setIndicators={setIndicators}
-            />
+            /> */}
+            <Google show={true} showAutocomplete={true} />
           </div>
         </div>
       )}
