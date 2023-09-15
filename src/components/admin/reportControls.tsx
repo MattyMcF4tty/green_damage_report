@@ -1,24 +1,20 @@
 import {
-  handleDownloadImages,
   handleDownloadPdf,
   reportDataType,
   handleSendEmail,
+  handleGetRenter,
 } from "@/utils/utils";
 import {
   faCloudArrowDown,
   faEnvelope,
   faEye,
-  faMailBulk,
-  faMailForward,
-  faMailReply,
   faTrashCan,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ExpandedReport from "./expandedReport";
 import { deleteReports } from "@/firebase/clientApp";
-import generatePDF from "@/utils/reportPdfTemplate";
-import { ref, uploadBytes } from "firebase/storage";
+
 
 interface ReportControls {
   selectedReports: { id: string; data: reportDataType }[];
@@ -30,8 +26,13 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
 
   const [allowPdf, setAllowPdf] = useState(true);
 
-  const handleEmail = async () => {
-    await handleSendEmail("carloslundrodriguez@gmail.com", "sut din far", "dø");
+  const handleEmail = async ( 
+    selectedReports: { id: string; data: reportDataType }[]
+  ) => {
+    selectedReports.map(async (report, index) => {
+      const renter = await handleGetRenter(report.id)
+      console.log(renter)
+    })
   };
 
   const handleInstallPDF = async (
@@ -53,7 +54,6 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
 
     await deleteReports(selectedReportIDs);
 
-    /* TODO: Reloads before documents are deleted */
     location.reload();
   };
 
@@ -69,10 +69,13 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
       </button>
       <button
         className="bg-white text-black w-32 rounded-xl border-[1px]  border-gray-300 hover:bg-MainGreen-300 hover:text-white duration-150"
-        onClick={() => handleEmail()}
-      >
+        onClick={() => {
+          if (selectedReports.length > 0) {
+            handleEmail(selectedReports);
+          }
+        }}>
         <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
-        Send Email
+        WUNDER TEST
       </button>
       <button
         disabled={!allowPdf}

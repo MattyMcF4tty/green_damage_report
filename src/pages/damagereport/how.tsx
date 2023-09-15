@@ -195,7 +195,6 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
       </div>
 
       {/* Witnesses collection */}
-      {/* TODO: make witness array where marked */}
       <div>
         <YesNo
           id="WitnessesPresent"

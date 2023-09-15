@@ -12,6 +12,7 @@ import { useRouter } from "next/router";
 import { updateData } from "@/firebase/clientApp";
 import {
   getServerSidePropsWithRedirect,
+  handleGetRenter,
   pageProps,
   reportDataType,
 } from "@/utils/utils";
@@ -56,7 +57,9 @@ const What: NextPage<pageProps> = ({ data, id }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAllowClick(false);
-    
+
+    const renter = await handleGetRenter(greenCarNumberplate as string);
+    serverData.updateFields({ renterInfo: renter })
 
     /* TODO: Make function that gets information about current driver from green server */
     if (showDriverInfoForm !== true) {
@@ -72,13 +75,13 @@ const What: NextPage<pageProps> = ({ data, id }) => {
       serverData.updateFields({ driverInfo: newDriverInfo });
     } else {
       const newDriverInfo = {
-        firstName: "John",
-        lastName: "Doe",
-        address: "Landgreven, 3, 31301, København",
-        phoneNumber: "+00 00 00 00 00",
-        socialSecurityNumber: "000000-0000",
-        drivingLicenseNumber: "00000000",
-        email: "JohnDoe@placeholder.com",
+        firstName: renter.firstName,
+        lastName: renter.lastName,
+        address: null,
+        phoneNumber: null,
+        socialSecurityNumber: null,
+        drivingLicenseNumber: null,
+        email: null,
       };
       serverData.updateFields({ driverInfo: newDriverInfo });
     }
@@ -104,7 +107,6 @@ const What: NextPage<pageProps> = ({ data, id }) => {
     >
       {/* GreenMobility car numberplate collection */}
       <div>
-        {/* TODO: Make it so you can only type a valid numberplate for the country where the accident took place and get a list from a server with all the green numberplates */}
         <p className="text-MainGreen-300 mb-8 flex justify-start font-bold text-[20px]">
           Initial Event Inquiry
         </p>
@@ -152,14 +154,11 @@ const What: NextPage<pageProps> = ({ data, id }) => {
               onChange={setLastName}
               placeHolder="Doe"
             />
-            {/* TODO: make google autofill */}
             <AddressField
               labelText="Please enter the home address of the driver"
               value={address}
               onChange={setAddress}
             />
-            {/* TODO: Check if its a real phone number */}
-
             <Inputfield
               labelText="Please enter the social security number of the driver"
               id="SocialSecurityNumberInput"

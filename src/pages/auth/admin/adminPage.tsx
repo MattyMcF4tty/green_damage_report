@@ -1,14 +1,6 @@
 import React, { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faTrashCan,
-  faPrint,
-  faCloudArrowDown,
-  faEye,
-} from "@fortawesome/free-solid-svg-icons";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { handleVerifyUser, reportDataType } from "@/utils/utils";
-import ExpandedReport from "@/components/admin/expandedReport";
 import ReportList from "@/components/admin/reportList";
 import ReportControls from "@/components/admin/reportControls";
 
@@ -17,7 +9,6 @@ export const getServerSideProps = async (context: GetServerSidePropsContext) => 
   const userVerified = await handleVerifyUser(token);
 
   if (!userVerified) {
-    // Redirect to the admin page
     return {
       redirect: {
         destination: '/auth/signIn',
