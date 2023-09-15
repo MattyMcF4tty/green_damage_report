@@ -7,24 +7,54 @@ import {
   LoadScript,
 } from "@react-google-maps/api";
 
-const Center = { lat: 55.676098, lng: 12.568337 };
-const Zoom = 17;
-
 interface GoogleMapsFieldProps {
   show: boolean;
   showAutocomplete: boolean;
+  accidentAddress: string;
+  setAccidentAddress: (address: string) => void;
+  setAccidentLocation: (location: {
+    lat: number | null;
+    lng: number | null;
+  }) => void;
+  accidentLocation: { lat: number | null; lng: number | null };
 }
 
-const Google = ({ show, showAutocomplete }: GoogleMapsFieldProps) => {
+const Google = ({
+  show,
+  showAutocomplete,
+  accidentAddress,
+  setAccidentAddress,
+  accidentLocation,
+  setAccidentLocation,
+}: GoogleMapsFieldProps) => {
   const [autocomplete, setAutocomplete] =
     useState<google.maps.places.Autocomplete | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [marker, setMarker] = useState<google.maps.Marker | null>(null);
   const [geocoder, setGeocoder] = useState<google.maps.Geocoder | null>(null);
 
-  const [autocompleteValue, setAutocompleteValue] = useState<string>("");
+  const [autocompleteValue, setAutocompleteValue] =
+    useState<string>(accidentAddress);
   const [autocompleteBgColor, setAutocompleteBgColor] =
     useState<string>("bg-white");
+
+  const Center = {
+    lat: accidentLocation.lat ? accidentLocation.lat : 55.676098,
+    lng: accidentLocation.lng ? accidentLocation.lng : 12.568337,
+  };
+  const Zoom = 17;
+
+  const libraries: "places"[] = ["places"];
+
+  const { isLoaded, loadError } = useJsApiLoader({
+    id: "google-map-script",
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
+    libraries,
+  });
+
+  useEffect(() => {
+    setAccidentAddress(autocompleteValue);
+  }, [autocompleteValue]);
 
   /* Controls autocomplete field background */
   useEffect(() => {
@@ -68,6 +98,14 @@ const Google = ({ show, showAutocomplete }: GoogleMapsFieldProps) => {
     google.maps.event.addListener(initialMarker, "dragend", function () {
       const newPosition = initialMarker.getPosition();
       mapInstance.panTo(newPosition!);
+
+      if (newPosition) {
+        const verifiedPos = {
+          lat: newPosition.lat() ? newPosition.lat() : accidentLocation.lat,
+          lng: newPosition.lng() ? newPosition.lng() : accidentLocation.lng,
+        };
+        setAccidentLocation(verifiedPos);
+      }
 
       // Reverse geocode the new position to get the address
       if (geocoder) {
@@ -139,48 +177,57 @@ const Google = ({ show, showAutocomplete }: GoogleMapsFieldProps) => {
     }
   };
 
-  return (
-    <LoadScript
-      googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}
-      libraries={["places"]}
-    >
-      <div>
-        <button
-          type="button"
-          onClick={handleCurrentLocation}
-          className=" mb-2 rounded-md p-2 bg-MainGreen-300 text-white"
-        >
-          Use My Current Location
-        </button>
-        {showAutocomplete && (
-          <div className="mb-2">
-            {/* Container with spacing */}
-            <Autocomplete onLoad={setAutocomplete}>
-              <input
-                type="text"
-                placeholder="Enter the location of the incident"
-                className={`w-full h-10 text-lg p-1 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none ${autocompleteBgColor}`} // Apply the dynamic background color
-                value={autocompleteValue}
-                onChange={(e) => setAutocompleteValue(e.target.value)}
-              />
-            </Autocomplete>
-          </div>
-        )}
+  if (loadError) {
+    return <div>Error loading maps: {loadError.message}</div>;
+  }
 
-        {show && (
-          <div>
-            <div className="mb-4">
-              <GoogleMap
-                onLoad={handleMapLoad}
-                center={Center}
-                zoom={Zoom}
-                mapContainerClassName="w-full h-[400px] border-[1px] border-MainGreen-200 rounded-lg"
-              />
-            </div>
+  if (!isLoaded) {
+    return <div>Loading maps...</div>;
+  }
+
+  return (
+    /*   <LoadScript
+      googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}
+      libraries={libraries}
+    > */
+    <div>
+      <button
+        type="button"
+        onClick={handleCurrentLocation}
+        className=" mb-2 rounded-md p-2 bg-MainGreen-300 text-white"
+      >
+        Use My Current Location
+      </button>
+      {showAutocomplete && (
+        <div className="mb-2">
+          {/* Container with spacing */}
+          <Autocomplete onLoad={setAutocomplete}>
+            <input
+              type="text"
+              placeholder="Enter the location of the incident"
+              className={`w-full h-10 text-lg p-1 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none ${autocompleteBgColor}`} // Apply the dynamic background color
+              value={autocompleteValue}
+              onChange={(e) => setAutocompleteValue(e.target.value)}
+            />
+          </Autocomplete>
+        </div>
+      )}
+
+      {show && (
+        <div>
+          <div className="mb-4">
+            <GoogleMap
+              onLoad={handleMapLoad}
+              center={Center}
+              zoom={Zoom}
+              mapContainerClassName="w-full h-[400px] border-[1px] border-MainGreen-200 rounded-lg"
+            />
           </div>
-        )}
-      </div>
-    </LoadScript>
+        </div>
+      )}
+    </div>
+    /*     </LoadScript>
+     */
   );
 };
 

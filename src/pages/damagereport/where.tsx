@@ -223,6 +223,9 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
     lat: serverData.accidentLocation.lat,
     lng: serverData.accidentLocation.lng,
   });
+  const [accidentAddress, setAccidentAddress] = useState(
+    serverData.accidentAddress
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -293,6 +296,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
         marker3: info.marker3,
       })),
       accidentLocation: accidentLocation,
+      accidentAddress: accidentAddress,
 
       /* PAGE LOGIC */
       otherPartyInvolved: otherPartyInvolved,
@@ -371,7 +375,14 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
               indicators={indicators}
               setIndicators={setIndicators}
             /> */}
-            <Google show={true} showAutocomplete={true} />
+            <Google
+              show={true}
+              showAutocomplete={true}
+              accidentAddress={accidentAddress}
+              setAccidentAddress={setAccidentAddress}
+              setAccidentLocation={setAccidentLocation}
+              accidentLocation={accidentLocation}
+            />
           </div>
         </div>
       )}
