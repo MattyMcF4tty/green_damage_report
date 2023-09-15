@@ -5,8 +5,8 @@ import { NextApiRequest, NextApiResponse } from "next";
 export default async function (req: NextApiRequest, res: NextApiResponse) {
     try {
         const { numberplate } = req.body;
-        const wunderUrl = process.env.WUNDER_STAGING_DOMAIN as string;
-        const accessToken = process.env.WUNDER_STAGING_TOKEN as string;
+        const wunderUrl = process.env.WUNDER_DOMAIN as string;
+        const accessToken = process.env.WUNDER_ACCESS_TOKEN as string;
 
         if (!wunderUrl) {
             return res.status(400).json({ message: "Missing wunderfleet api url" })
