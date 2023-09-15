@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { TextField } from "../custom_inputfields";
+import { ImageField, TextField } from "../custom_inputfields";
 
 interface newDamageListPopUpProps {
+  id: string;
   damage: { description: string | null; imageUrl: string | null };
   setDamage: (damageList: {
     description: string | null;
@@ -14,12 +15,13 @@ const NewDamageListPopUp = ({
   setShowPopUp,
   setDamage,
   damage,
+  id,
 }: newDamageListPopUpProps) => {
   const [damageDescription, setDamageDescription] = useState<string>(
     damage.description ? damage.description : ""
   );
-  const [image, setImage] = useState<string>(
-    damage.imageUrl ? damage.imageUrl : ""
+  const [image, setImage] = useState<string | null>(
+    damage.imageUrl ? damage.imageUrl : null
   );
 
   const allowSave = damageDescription !== "";
@@ -65,6 +67,15 @@ const NewDamageListPopUp = ({
             onChange={setDamageDescription}
           />
         </div>
+        <ImageField
+          labelText="Please uploade pictures of the damage"
+          reportID={id}
+          images={image ? [image] : null}
+          required={false}
+          id="DamageImage"
+          imageType="Damage"
+          multiple={false}
+        />
         <button
           type="button"
           disabled={!allowSave}

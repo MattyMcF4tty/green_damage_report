@@ -447,7 +447,7 @@ interface ImageFieldProps {
   required: boolean;
   labelText: string;
   images: string[] | null;
-  imageType: "GreenMobility" | "OtherParty";
+  imageType: "GreenMobility" | "OtherParty" | "Damage";
   multiple: boolean;
 }
 
