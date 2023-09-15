@@ -1,6 +1,10 @@
 import React, { useState } from "react";
 import { PedestrianInformation } from "../../components/opposite_information/person_information_form";
-import { ImageField, TextField, YesNo } from "../../components/custom_inputfields";
+import {
+  ImageField,
+  TextField,
+  YesNo,
+} from "../../components/custom_inputfields";
 import { carInformation } from "../../components/opposite_information/car_information_form";
 import { bikeInformation } from "../../components/opposite_information/bike_information_form";
 import { OtherInformation } from "../../components/opposite_information/other_information_form";
@@ -23,7 +27,8 @@ import html2canvas from "html2canvas";
 import KangooDrawing from "@/components/carDrawings/kangoo";
 import VanDrawing from "@/components/carDrawings/kangoo";
 import DamagePopUp from "@/components/popups/damagePopup";
- */
+ */ import Google from "@/components/google";
+
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
@@ -35,7 +40,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
   const serverData = new reportDataType();
   serverData.updateFields(data);
   const [allowClick, setAllowClick] = useState(true);
-/*   const [currentCar, setCurrentCar] = useState<"zoe" | "van">("zoe");
+  /*   const [currentCar, setCurrentCar] = useState<"zoe" | "van">("zoe");
   const [showOne, setShowOne] = useState(false);
   const [showTwo, setShowTwo] = useState(false);
   const [showThree, setShowThree] = useState(false);
@@ -61,7 +66,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
   >(serverData.singleVehicleAccident);
 
   // DATA
-/*   const [damageOne, setDamageOne] = useState<{
+  /*   const [damageOne, setDamageOne] = useState<{
     description: string | null;
     imageUrl: string | null;
   }>({
@@ -233,6 +238,9 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
     lat: serverData.accidentLocation.lat,
     lng: serverData.accidentLocation.lng,
   });
+  const [accidentAddress, setAccidentAddress] = useState(
+    serverData.accidentAddress
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -305,6 +313,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
       })),
       accidentLocation: accidentLocation,
       damageDescription: damageDescription,
+      accidentAddress: accidentAddress,
 
       /* PAGE LOGIC */
       otherPartyInvolved: otherPartyInvolved,
@@ -366,7 +375,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
           </div>
 
           <div className="w-full">
-            <GoogleMapsField
+            {/*   <GoogleMapsField
               showMap={true}
               startZoom={17}
               startPos={{ lat: 55.68292552469843, lng: 12.585443426890635 }}
@@ -382,6 +391,14 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
               setObjects={setOtherInfo}
               indicators={indicators}
               setIndicators={setIndicators}
+            /> */}
+            <Google
+              show={true}
+              showAutocomplete={true}
+              accidentAddress={accidentAddress}
+              setAccidentAddress={setAccidentAddress}
+              setAccidentLocation={setAccidentLocation}
+              accidentLocation={accidentLocation}
             />
           </div>
         </div>

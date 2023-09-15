@@ -1,9 +1,14 @@
 import { WitnessInformation } from "@/components/otherPartys/witnessList";
-import { collectionName, getData, getImages, getReportIds, updateData } from "@/firebase/clientApp";
+import {
+  collectionName,
+  getData,
+  getImages,
+  getReportIds, updateData,
+} from "@/firebase/clientApp";
 import CryptoJS from "crypto-js";
 import { GetServerSidePropsContext } from "next";
 import axios from "axios";
-import Cookies from 'js-cookie';
+import Cookies from "js-cookie";
 import app, { FireDatabase, FireStorage } from "@/firebase/firebaseConfig";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/router";
@@ -14,8 +19,7 @@ import jsPDF from "jspdf";
 
 
 /* ------- utils config ----- */
-const firebaseCollectionName = collectionName
-
+const firebaseCollectionName = collectionName;
 
 export const generateId = async () => {
   const dataList = await getReportIds();
@@ -92,7 +96,7 @@ export const encryptData = (data: reportDataType) => {
       ).toString(),
     });
   }
-  
+
   return encryptedData;
 };
 
@@ -101,7 +105,7 @@ export const decryptData = (data: reportDataType) => {
   decryptedData.updateFields({ ...data });
   const secretKey = process.env.DATA_ENCRYPTION_KEY || "";
 
-  console.log('Before Decryption', decryptedData);
+  console.log("Before Decryption", decryptedData);
   /* Decryption driver info */
   Object.keys(decryptedData.driverInfo).forEach((item) => {
     if (
@@ -130,7 +134,7 @@ export const decryptData = (data: reportDataType) => {
     });
   }
 
-  console.log('After Decryption', decryptedData)
+  console.log("After Decryption", decryptedData);
   return decryptedData;
 };
 
@@ -139,33 +143,39 @@ export const getServerSidePropsWithRedirect = async (
 ) => {
   const id = context.query.id as string;
 
-/*   try {
- */    const data: reportDataType = await getData(id);
-    const GreenMobilityImages = await handleDownloadImages(`${id}/GreenMobility`, 'url');
-    const otherPartyImages = await handleDownloadImages(`${id}/OtherParty`, 'url');
-    const images: Record<string, string[]> = {
-      GreenMobility: GreenMobilityImages,
-      OtherParty: otherPartyImages
-    };
+  /*   try {
+   */ const data: reportDataType = await getData(id);
+  const GreenMobilityImages = await handleDownloadImages(
+    `${id}/GreenMobility`,
+    "url"
+  );
+  const otherPartyImages = await handleDownloadImages(
+    `${id}/OtherParty`,
+    "url"
+  );
+  const images: Record<string, string[]> = {
+    GreenMobility: GreenMobilityImages,
+    OtherParty: otherPartyImages,
+  };
 
-    if (data.finished === true) {
-      console.log(data.finished)
-      return {
-        redirect: {
-          destination: "/damagereport/reportfinished",
-          permanent: false,
-        },
-      };
-    }
-
+  if (data.finished === true) {
+    console.log(data.finished);
     return {
-      props: {
-        data: data.toPlainObject(),
-        images: images || null,
-        id: id,
+      redirect: {
+        destination: "/damagereport/reportfinished",
+        permanent: false,
       },
     };
-/*   } catch (error: any) {
+  }
+
+  return {
+    props: {
+      data: data.toPlainObject(),
+      images: images || null,
+      id: id,
+    },
+  };
+  /*   } catch (error: any) {
     console.error("Error in getServerSideProps:", error.message);
     context.res.statusCode = 500;
     return {
@@ -251,19 +261,18 @@ export const handleSendEmail = async (
   };
 
   try {
-    const response = await axios.post('/api/sendEmail', emailData);
+    const response = await axios.post("/api/sendEmail", emailData);
     console.log("Server response:", response.data.message);
   } catch (error) {
     console.error("Error sending email:", error);
   }
 };
 
-
-export const downloadToPc = async (file:Blob, fileName: string) => {
+export const downloadToPc = async (file: Blob, fileName: string) => {
   const url: string = window.URL.createObjectURL(file);
 
   // Create a 'download' anchor tag
-  const downloadLink: HTMLAnchorElement = document.createElement('a');
+  const downloadLink: HTMLAnchorElement = document.createElement("a");
   downloadLink.href = url;
   downloadLink.download = fileName;
 
@@ -274,41 +283,49 @@ export const downloadToPc = async (file:Blob, fileName: string) => {
   // Cleanup
   document.body.removeChild(downloadLink);
   window.URL.revokeObjectURL(url);
-}
+};
 
-export const handleSignUp = async (email:string, password:string) => {
+export const handleSignUp = async (email: string, password: string) => {
   const data = {
     email: email,
-    password: password
-  }
+    password: password,
+  };
 
-  const response = await fetch(process.env.NEXT_PUBLIC_URL + '/api/auth/signUp', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  })
+  const response = await fetch(
+    process.env.NEXT_PUBLIC_URL + "/api/auth/signUp",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
 
-  const responseData = await response.json()
+  const responseData = await response.json();
   if (response.ok) {
-    console.log("User created succesfully")
-    Cookies.set("AuthToken", responseData.userToken, {expires: 9999-12-31, secure: true});
+    console.log("User created succesfully");
+    Cookies.set("AuthToken", responseData.userToken, {
+      expires: 9999 - 12 - 31,
+      secure: true,
+    });
     return true;
   } else {
     return false;
   }
-}
+};
 
 export const handleVerifyUser = async (userToken: string | undefined) => {
-  
-  const response = await fetch(process.env.NEXT_PUBLIC_URL + '/api/auth/verifyAdmin', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({userToken: userToken})
-  })
+  const response = await fetch(
+    process.env.NEXT_PUBLIC_URL + "/api/auth/verifyAdmin",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userToken: userToken }),
+    }
+  );
 
   const responseData = await response.json();
   if (response.ok) {
@@ -318,65 +335,79 @@ export const handleVerifyUser = async (userToken: string | undefined) => {
     console.error(responseData.message);
     return false;
   }
-}
+};
 
 export const handleSignIn = async (email: string, password: string) => {
   try {
     const data = {
       email: email,
-      password: password
-    }
+      password: password,
+    };
 
-    const response = await fetch(process.env.NEXT_PUBLIC_URL + '/api/auth/signIn', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
+    const response = await fetch(
+      process.env.NEXT_PUBLIC_URL + "/api/auth/signIn",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+    );
 
     const responseData = await response.json();
     if (response.ok) {
-      console.log(responseData.message)
-      Cookies.set('AuthToken', responseData.userToken, {expires: 9999-12-31})
+      console.log(responseData.message);
+      Cookies.set("AuthToken", responseData.userToken, {
+        expires: 9999 - 12 - 31,
+      });
       return true;
+    } else {
+      throw new Error(responseData.message);
     }
-    else {
-      throw new Error(responseData.message)
-    }
-  } catch (error:any) {
-    console.error('Something went wrong signing in:\n', error.message)
+  } catch (error: any) {
+    console.error("Something went wrong signing in:\n", error.message);
     return false;
   }
-}
+};
 
 export const handleSignOut = () => {
   Cookies.remove("AuthToken");
-}
+};
 
-export const handleDownloadImages = async (path: string, type: 'url' | 'base64') => {
+export const handleDownloadImages = async (
+  path: string,
+  type: "url" | "base64"
+) => {
   try {
     const data = {
       path: path,
-      type: type
+      type: type,
     };
 
-    const response = await fetch(process.env.NEXT_PUBLIC_URL + '/api/downloadImages', {
-      method: 'POST',
-      headers: {
-          'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(data)
-    })
+    const response = await fetch(
+      process.env.NEXT_PUBLIC_URL + "/api/downloadImages",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+    );
 
     // Handling non-ok responses
     const responseData = await response.json();
 
     if (!response.ok) {
-      throw new Error(`Status ${response.status}: ${responseData.message || 'Something went wrong contacting the server'}`);
+      throw new Error(
+        `Status ${response.status}: ${
+          responseData.message || "Something went wrong contacting the server"
+        }`
+      );
     }
 
-    console.log(responseData.message)
+    console.log(responseData.message);
     const images: string[] = responseData.data;
 
     return images;
@@ -386,6 +417,7 @@ export const handleDownloadImages = async (path: string, type: 'url' | 'base64')
   }
 };
 
+export const handleGeneratePdf = async (id: string) => {
 export const handleGeneratePdf = async (id: string) => {
   try {
     let Images: Record<string, string[]> = {
@@ -425,6 +457,7 @@ export const handleGeneratePdf = async (id: string) => {
       console.error("Error downloading pdf:\n", error)
     }
 
+
     console.log(`PDF of ${id} generated and uploaded successfully.`);
   } catch (error: any) {
     console.error(error.message);
@@ -443,22 +476,24 @@ export const handleDownloadPdf = async (id: string) => {
     });
 
     if (!(response.status === 200)) {
-      throw new Error(`${response.status}`)
+      throw new Error(`${response.status}`);
     }
-    
+
     /* Convert pdfbuffer to blob and download to pc */
-    const pdfBlob: Blob = new Blob([response.data], { type: 'application/pdf' });
-  
+    const pdfBlob: Blob = new Blob([response.data], {
+      type: "application/pdf",
+    });
+
     console.log(`PDF of ${id} downloaded from server successfully.`);
     await downloadToPc(pdfBlob, `DamageReport_${id}`);
-  } catch (error:any) {
-    console.error('An error occurred:', error);
-    return new Error(`${Response}`)
+  } catch (error: any) {
+    console.error("An error occurred:", error);
+    return new Error(`${Response}`);
   }
-}
+};
 
-export const getReportsByEmail = async (email:string) => {
-  const collectionRef = collection(FireDatabase, firebaseCollectionName)
+export const getReportsByEmail = async (email: string) => {
+  const collectionRef = collection(FireDatabase, firebaseCollectionName);
   const reportIDs: string[] = [];
   const q = query(
     collectionRef,
@@ -468,13 +503,16 @@ export const getReportsByEmail = async (email:string) => {
 
   try {
     const querySnapshot = await getDocs(q);
-    querySnapshot.docs.map(async(doc) => {
-      reportIDs.push(doc.id)
-    })
+    querySnapshot.docs.map(async (doc) => {
+      reportIDs.push(doc.id);
+    });
 
     return reportIDs;
-  } catch (error:any) {
-    throw Error(`Something went wrong checking for ongoing reports:\n`, error.message)
+  } catch (error: any) {
+    throw Error(
+      `Something went wrong checking for ongoing reports:\n`,
+      error.message
+    );
   }
 }
 
@@ -562,6 +600,7 @@ export type pageProps = {
     };
 
     accidentLocation: { lat: number | null; lng: number | null };
+    accidentAddress: string;
     time: string | null;
     date: string | null;
     accidentDescription: string | null;
@@ -653,6 +692,7 @@ export class reportDataType {
   };
 
   accidentLocation: { lat: number | null; lng: number | null };
+  accidentAddress: string;
   time: string | null;
   date: string | null;
   accidentDescription: string | null;
@@ -737,6 +777,7 @@ export class reportDataType {
       insurance: null,
     };
     this.accidentLocation = { lat: null, lng: null };
+    this.accidentAddress = "";
     this.time = null;
     this.date = null;
     this.accidentDescription = null;
@@ -790,6 +831,7 @@ export class reportDataType {
         lat: this.accidentLocation.lat,
         lng: this.accidentLocation.lng,
       },
+      accidentAddress: this.accidentAddress,
       time: this.time,
       date: this.date,
       accidentDescription: this.accidentDescription,
