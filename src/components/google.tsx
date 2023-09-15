@@ -1,5 +1,4 @@
-import React from "react";
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   useJsApiLoader,
   GoogleMap,
@@ -7,9 +6,6 @@ import {
   Marker,
   LoadScript,
 } from "@react-google-maps/api";
-import ImageUrlRed from "../rødbil.png";
-import ImageUrlGreen from "../grønbil.png";
-import { start } from "repl";
 
 const Center = { lat: 55.676098, lng: 12.568337 };
 const Zoom = 17;
@@ -19,30 +15,18 @@ interface GoogleMapsFieldProps {
   showAutocomplete: boolean;
 }
 
-const Google =({show, showAutocomplete}: GoogleMapsFieldProps) => {
-  const googleApiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY || "";
-  const { isLoaded, loadError } = useJsApiLoader({
-    googleMapsApiKey: googleApiKey,
-  });
-
-  const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
+const Google = ({ show, showAutocomplete }: GoogleMapsFieldProps) => {
+  const [autocomplete, setAutocomplete] =
+    useState<google.maps.places.Autocomplete | null>(null);
   const [map, setMap] = useState<google.maps.Map | null>(null);
-  const [markers, setMarkers] = useState<google.maps.Marker[]>([]);
-  const [lines, setLines] = useState<google.maps.Polyline[]>([]);
+  const [marker, setMarker] = useState<google.maps.Marker | null>(null);
+  const [geocoder, setGeocoder] = useState<google.maps.Geocoder | null>(null);
 
   const [autocompleteValue, setAutocompleteValue] = useState<string>("");
-  const [autocompleteBgColor, setAutocompleteBgColor] = useState<string>("bg-white");
+  const [autocompleteBgColor, setAutocompleteBgColor] =
+    useState<string>("bg-white");
 
   /* Controls autocomplete field background */
-  useEffect(() => {
-    if (autocompleteValue === "") {
-      setAutocompleteBgColor("bg-white");
-    } else {
-      setAutocompleteBgColor("bg-MainGreen-100");
-    }
-  }, [autocompleteValue]);
-
-  /*  */
   useEffect(() => {
     if (map && autocomplete) {
       autocomplete.bindTo("bounds", map);
@@ -58,191 +42,112 @@ const Google =({show, showAutocomplete}: GoogleMapsFieldProps) => {
         if (location && map.panTo) {
           map.panTo(location);
 
-          // Clear existing markers
-          markers.forEach((marker) => marker.setMap(null));
+          // Update the marker's position instead of creating a new one
+          if (marker) {
+            marker.setPosition(location);
+            marker.setTitle(place.name);
 
-          const startLocation = new google.maps.LatLng(
-            location.lat() + 0.0001, // Slightly adjust latitude for the second start marker
-            location.lng()
-          );
-
-          const redIcon = {
-            url: "http://maps.google.com/mapfiles/ms/icons/red-dot.png", // Use the red marker icon URL
-            scaledSize: new google.maps.Size(32, 32),
-          };
-
-          const greenIcon = {
-            url: "http://maps.google.com/mapfiles/ms/icons/green-dot.png", // Use the green marker icon URL
-            scaledSize: new google.maps.Size(32, 32),
-          };
-
-          const redMarker = new google.maps.Marker({
-            position: startLocation,
-            map: map,
-            title: place.name,
-            draggable: true,
-            icon: redIcon,
-          });
-
-          const greenMarker = new google.maps.Marker({
-            position: location,
-            map: map,
-            title: place.name,
-            draggable: true,
-            icon: greenIcon,
-          });
-
-          setMarkers([redMarker, greenMarker]);
+            // Since you already have the place's address, you can set it directly
+            setAutocompleteValue(place.formatted_address || "");
+          }
         }
       });
     }
-  }, [map, autocomplete]);
-
-  const calculateMiddlePosition = (
-    start: google.maps.LatLng,
-    end: google.maps.LatLng
-  ): google.maps.LatLng => {
-    return new google.maps.LatLng(
-      (start.lat() + end.lat()) / 2,
-      (start.lng() + end.lng()) / 2
-    );
-  };
-
-  const addDraggableLine = () => {
-    if (map) {
-      const center = map.getCenter();
-      if (!center) {
-        return;
-      }
-
-      const position = new google.maps.LatLng(center.lat(), center.lng());
-
-      const startPosition = new google.maps.LatLng(
-        position.lat() + 0.00005, // Slightly adjust latitude for the second start marker
-        position.lng()
-      );
-
-      const startMarker = new google.maps.Marker({
-        position: position,
-        map: map,
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 8,
-          fillColor: "green",
-          fillOpacity: 1,
-          strokeWeight: 0,
-        },
-        draggable: true,
-      });
-
-      const endMarker = new google.maps.Marker({
-        position: startPosition,
-        map: map,
-
-        draggable: true,
-      });
-
-      const middleMarkerPosition = calculateMiddlePosition(
-        startMarker.getPosition()!,
-        endMarker.getPosition()!
-      );
-
-      const middleMarker = new google.maps.Marker({
-        position: middleMarkerPosition,
-        map: map,
-        icon: {
-          path: google.maps.SymbolPath.CIRCLE,
-          scale: 8,
-          fillColor: "yellow",
-          fillOpacity: 1,
-          strokeWeight: 0,
-        },
-        draggable: true,
-        zIndex: 2,
-      });
-
-      const line = new google.maps.Polyline({
-        path: [
-          startMarker.getPosition()!,
-          middleMarker.getPosition()!,
-          endMarker.getPosition()!,
-        ],
-        map: map,
-      });
-
-      startMarker.addListener("drag", () => {
-        const startMarkerPosition = startMarker.getPosition();
-        const endMarkerPosition = endMarker.getPosition();
-        if (startMarkerPosition && endMarkerPosition) {
-          line.setPath([
-            startMarkerPosition,
-            middleMarker.getPosition()!,
-            endMarkerPosition,
-          ]);
-          const newMiddleMarkerPosition = calculateMiddlePosition(
-            startMarkerPosition,
-            endMarkerPosition
-          );
-          middleMarker.setPosition(newMiddleMarkerPosition);
-        }
-      });
-
-      endMarker.addListener("drag", () => {
-        const startMarkerPosition = startMarker.getPosition();
-        const endMarkerPosition = endMarker.getPosition();
-        if (startMarkerPosition && endMarkerPosition) {
-          line.setPath([
-            startMarkerPosition,
-            middleMarker.getPosition()!,
-            endMarkerPosition,
-          ]);
-          const newMiddleMarkerPosition = calculateMiddlePosition(
-            startMarkerPosition,
-            endMarkerPosition
-          );
-          middleMarker.setPosition(newMiddleMarkerPosition);
-        }
-      });
-
-      middleMarker.addListener("drag", () => {
-        const startMarkerPosition = startMarker.getPosition();
-        const endMarkerPosition = endMarker.getPosition();
-        if (startMarkerPosition && endMarkerPosition) {
-          const middlePosition =
-            middleMarker.getPosition() as google.maps.LatLng;
-          line.setPath([
-            startMarkerPosition,
-            middlePosition,
-            endMarkerPosition,
-          ]);
-        }
-      });
-
-      setMarkers((prevMarkers) => [
-        ...prevMarkers,
-        startMarker,
-        middleMarker,
-        endMarker,
-      ]);
-      setLines((prevLines) => [...prevLines, line]);
-    }
-  };
+  }, [map, autocomplete, marker]);
 
   const handleMapLoad = (mapInstance: google.maps.Map) => {
     setMap(mapInstance);
+    setGeocoder(new google.maps.Geocoder());
+
+    const initialMarker = new google.maps.Marker({
+      position: Center,
+      map: mapInstance,
+      draggable: true,
+    });
+
+    google.maps.event.addListener(initialMarker, "dragend", function () {
+      const newPosition = initialMarker.getPosition();
+      mapInstance.panTo(newPosition!);
+
+      // Reverse geocode the new position to get the address
+      if (geocoder) {
+        geocoder.geocode({ location: newPosition }, function (results, status) {
+          if (status === "OK" && results && results.length > 0) {
+            setAutocompleteValue(results[0].formatted_address);
+          } else if (results && results.length === 0) {
+            console.error("No results found");
+          } else {
+            console.error("Geocoder failed due to: " + status);
+          }
+        });
+      }
+    });
+
+    setMarker(initialMarker);
   };
 
-  if (loadError) {
-    return <div>Error loading Google Maps</div>;
-  }
+  const handleCurrentLocation = () => {
+    // Check if geolocation is supported by the browser
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          };
 
-  if (!isLoaded) {
-    return <div>Loading Google Maps...</div>;
-  }
+          // Update map center and marker with user's location
+          if (map) {
+            map.panTo(pos);
+          }
+          if (marker) {
+            marker.setPosition(pos);
+          }
+
+          // Use the geocoder to update the address input
+          if (geocoder) {
+            geocoder.geocode(
+              { location: pos },
+              (
+                results: google.maps.GeocoderResult[] | null,
+                status: google.maps.GeocoderStatus
+              ) => {
+                if (
+                  status === google.maps.GeocoderStatus.OK &&
+                  results &&
+                  results.length > 0
+                ) {
+                  setAutocompleteValue(results[0].formatted_address);
+                } else {
+                  console.error("Geocoder failed due to: " + status);
+                }
+              }
+            );
+          }
+        },
+        (error) => {
+          console.warn(`ERROR(${error.code}): ${error.message}`);
+        },
+        {
+          enableHighAccuracy: true, // Get the best possible results
+          timeout: 5000, // Maximum time to wait for a position, in ms
+          maximumAge: 0, // Accept the last-known cached position up to a specified age in ms.
+        }
+      );
+    } else {
+      console.warn("Geolocation is not supported by this browser.");
+    }
+  };
 
   return (
-    <LoadScript googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_API_KEY || ""} libraries={["places"]}>
+    <LoadScript
+      googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}
+      libraries={["places"]}
+    >
       <div>
+        <button type="button" onClick={handleCurrentLocation}>
+          Use My Current Location
+        </button>
         {showAutocomplete && (
           <div className="mb-2">
             {/* Container with spacing */}
@@ -260,14 +165,6 @@ const Google =({show, showAutocomplete}: GoogleMapsFieldProps) => {
 
         {show && (
           <div>
-            <button
-              className="add-line-button border-[1px] border-MainGreen-200 rounded-md mb-2 bg-MainGreen-100 w-1/2"
-              onClick={addDraggableLine}
-              type="button"
-            >
-              Add Draggable Line
-            </button>
-
             <div className="mb-4">
               <GoogleMap
                 onLoad={handleMapLoad}
@@ -281,6 +178,6 @@ const Google =({show, showAutocomplete}: GoogleMapsFieldProps) => {
       </div>
     </LoadScript>
   );
-}
+};
 
 export default Google;
