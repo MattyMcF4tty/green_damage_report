@@ -19,11 +19,11 @@ import GoogleMapsField, {
 } from "@/components/google_maps_field";
 import { useRouter } from "next/router";
 import html2canvas from "html2canvas";
-import ZoeDrawing from "@/components/carDrawings/zoe";
+/* import ZoeDrawing from "@/components/carDrawings/zoe";
 import KangooDrawing from "@/components/carDrawings/kangoo";
 import VanDrawing from "@/components/carDrawings/kangoo";
 import DamagePopUp from "@/components/popups/damagePopup";
-
+ */
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
