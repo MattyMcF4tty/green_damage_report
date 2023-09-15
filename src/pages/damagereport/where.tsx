@@ -19,6 +19,10 @@ import GoogleMapsField, {
 } from "@/components/google_maps_field";
 import { useRouter } from "next/router";
 import html2canvas from "html2canvas";
+import ZoeDrawing from "@/components/carDrawings/zoe";
+import KangooDrawing from "@/components/carDrawings/kangoo";
+import VanDrawing from "@/components/carDrawings/kangoo";
+import NewDamageListPopUp from "@/components/otherPartys/damageList";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -31,6 +35,22 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
   const serverData = new reportDataType();
   serverData.updateFields(data);
   const [allowClick, setAllowClick] = useState(true);
+  const [currentCar, setCurrentCar] = useState<"zoe" | "van">("zoe");
+  const [showOne, setShowOne] = useState(false);
+  const [showTwo, setShowTwo] = useState(false);
+  const [showThree, setShowThree] = useState(false);
+  const [showFour, setShowFour] = useState(false);
+  const [showFive, setShowFive] = useState(false);
+  const [showSix, setShowSix] = useState(false);
+  const [showSeven, setShowSeven] = useState(false);
+  const [showEight, setShowEight] = useState(false);
+  const [showNine, setShowNine] = useState(false);
+  const [showTen, setShowTen] = useState(false);
+  const [showEleven, setShowEleven] = useState(false);
+  const [showTwelve, setShowTwelve] = useState(false);
+  const [showThirteen, setShowThirteen] = useState(false);
+  const [showFourteen, setShowFourteen] = useState(false);
+  const [showFifteen, setShowFifteen] = useState(false);
 
   /* logic */
   const [otherPartyInvolved, setOtherPartyInvolved] = useState<boolean | null>(
@@ -41,6 +61,112 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
   >(serverData.singleVehicleAccident);
 
   // DATA
+  const [damageOne, setDamageOne] = useState<{
+    description: string | null;
+    imageUrl: string | null;
+  }>({
+    description: null,
+    imageUrl: null,
+  });
+  const [damageTwo, setDamageTwo] = useState<{
+    description: string | null;
+    imageUrl: string | null;
+  }>({
+    description: null,
+    imageUrl: null,
+  });
+  const [damageThree, setDamageThree] = useState<{
+    description: string | null;
+    imageUrl: string | null;
+  }>({
+    description: null,
+    imageUrl: null,
+  });
+  const [damageFour, setDamageFour] = useState<{
+    description: string | null;
+    imageUrl: string | null;
+  }>({
+    description: null,
+    imageUrl: null,
+  });
+  const [damageFive, setDamageFive] = useState<{
+    description: string | null;
+    imageUrl: string | null;
+  }>({
+    description: null,
+    imageUrl: null,
+  });
+  const [damageSix, setDamageSix] = useState<{
+    description: string | null;
+    imageUrl: string | null;
+  }>({
+    description: null,
+    imageUrl: null,
+  });
+  const [damageSeven, setDamageSeven] = useState<{
+    description: string | null;
+    imageUrl: string | null;
+  }>({
+    description: null,
+    imageUrl: null,
+  });
+  const [damageEight, setDamageEight] = useState<{
+    description: string | null;
+    imageUrl: string | null;
+  }>({
+    description: null,
+    imageUrl: null,
+  });
+  const [damageNine, setDamageNine] = useState<{
+    description: string | null;
+    imageUrl: string | null;
+  }>({
+    description: null,
+    imageUrl: null,
+  });
+  const [damageTen, setDamageTen] = useState<{
+    description: string | null;
+    imageUrl: string | null;
+  }>({
+    description: null,
+    imageUrl: null,
+  });
+  const [damageEleven, setDamageEleven] = useState<{
+    description: string | null;
+    imageUrl: string | null;
+  }>({
+    description: null,
+    imageUrl: null,
+  });
+  const [damageTwelve, setDamageTwelve] = useState<{
+    description: string | null;
+    imageUrl: string | null;
+  }>({
+    description: null,
+    imageUrl: null,
+  });
+  const [damageThirteen, setDamageThirteen] = useState<{
+    description: string | null;
+    imageUrl: string | null;
+  }>({
+    description: null,
+    imageUrl: null,
+  });
+  const [damageFourteen, setDamageFourteen] = useState<{
+    description: string | null;
+    imageUrl: string | null;
+  }>({
+    description: null,
+    imageUrl: null,
+  });
+  const [damageFifteen, setDamageFifteen] = useState<{
+    description: string | null;
+    imageUrl: string | null;
+  }>({
+    description: null,
+    imageUrl: null,
+  });
+
   const [indicators, setIndicators] = useState(
     data.googleIndicators.map(
       (info) => new googleIndicator(info.marker1, info.marker2, info.marker3)
@@ -114,7 +240,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
       return new Blob([ab], { type: mimeString });
     }
 
-    const mapField = document.getElementById("MyMap"); 
+    const mapField = document.getElementById("MyMap");
     if (mapField) {
       const canvas = await html2canvas(mapField, {
         useCORS: true,
@@ -220,9 +346,9 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
               Please indicate on the map where the GreenMobility car was
               located, as well as the location of the other partys, by using the
               markers. Please use the draggable line to mark the car's
-              trajectory leading to the collision.
-
-              The green dot indicates the starting point, the yellow dot indicates the move leading to the incident and the red dot indicates the incident.
+              trajectory leading to the collision. The green dot indicates the
+              starting point, the yellow dot indicates the move leading to the
+              incident and the red dot indicates the incident.
             </p>
           </div>
 
@@ -247,6 +373,161 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
           </div>
         </div>
       )}
+      <div>
+        What type of car is damaged?
+        <div className="">
+          <select
+            className="h-8 border border-neutral-500 rounded-md shadow-md outline-none"
+            id="FilterOptions"
+            value={currentCar}
+            onChange={(e) => setCurrentCar(e.target.value as "zoe" | "van")}
+          >
+            <option value="zoe">Passenger vehicle</option>
+            <option value="van">Van</option>
+          </select>
+        </div>
+        {currentCar === "zoe" && (
+          <div className="">
+            <ZoeDrawing
+              setShowOne={setShowOne}
+              setShowTwo={setShowTwo}
+              setShowThree={setShowThree}
+              setShowFour={setShowFour}
+              setShowFive={setShowFive}
+              setShowSix={setShowSix}
+              setShowSeven={setShowSeven}
+              setShowEight={setShowEight}
+              setShowNine={setShowNine}
+              setShowTen={setShowTen}
+              setShowEleven={setShowEleven}
+              setShowTwelve={setShowTwelve}
+              setShowThirteen={setShowThirteen}
+              setShowFourteen={setShowFourteen}
+              setShowFifteen={setShowFifteen}
+            />
+          </div>
+        )}
+        {currentCar === "van" && (
+          <div>
+            <VanDrawing
+              setShowOne={setShowOne}
+              setShowTwo={setShowTwo}
+              setShowThree={setShowThree}
+              setShowFour={setShowFour}
+              setShowFive={setShowFive}
+              setShowSix={setShowSix}
+              setShowSeven={setShowSeven}
+              setShowEight={setShowEight}
+              setShowNine={setShowNine}
+            />
+          </div>
+        )}
+        {showOne && (
+          <NewDamageListPopUp
+            setShowPopUp={setShowOne}
+            damage={damageOne}
+            setDamage={setDamageOne}
+          />
+        )}
+        {showTwo && (
+          <NewDamageListPopUp
+            setShowPopUp={setShowTwo}
+            damage={damageTwo}
+            setDamage={setDamageTwo}
+          />
+        )}
+        {showThree && (
+          <NewDamageListPopUp
+            setShowPopUp={setShowThree}
+            damage={damageThree}
+            setDamage={setDamageThree}
+          />
+        )}
+        {showFour && (
+          <NewDamageListPopUp
+            setShowPopUp={setShowFour}
+            damage={damageFour}
+            setDamage={setDamageFour}
+          />
+        )}
+        {showFive && (
+          <NewDamageListPopUp
+            setShowPopUp={setShowFive}
+            damage={damageFive}
+            setDamage={setDamageFive}
+          />
+        )}
+        {showSix && (
+          <NewDamageListPopUp
+            setShowPopUp={setShowSix}
+            damage={damageSix}
+            setDamage={setDamageSix}
+          />
+        )}
+        {showSeven && (
+          <NewDamageListPopUp
+            setShowPopUp={setShowSeven}
+            damage={damageSeven}
+            setDamage={setDamageSeven}
+          />
+        )}
+        {showEight && (
+          <NewDamageListPopUp
+            setShowPopUp={setShowEight}
+            damage={damageEight}
+            setDamage={setDamageEight}
+          />
+        )}
+        {showNine && (
+          <NewDamageListPopUp
+            setShowPopUp={setShowNine}
+            damage={damageNine}
+            setDamage={setDamageNine}
+          />
+        )}
+        {showTen && (
+          <NewDamageListPopUp
+            setShowPopUp={setShowTen}
+            damage={damageTen}
+            setDamage={setDamageTen}
+          />
+        )}
+        {showEleven && (
+          <NewDamageListPopUp
+            setShowPopUp={setShowEleven}
+            damage={damageEleven}
+            setDamage={setDamageEleven}
+          />
+        )}
+        {showTwelve && (
+          <NewDamageListPopUp
+            setShowPopUp={setShowTwelve}
+            damage={damageTwelve}
+            setDamage={setDamageTwelve}
+          />
+        )}
+        {showThirteen && (
+          <NewDamageListPopUp
+            setShowPopUp={setShowThirteen}
+            damage={damageThirteen}
+            setDamage={setDamageThirteen}
+          />
+        )}
+        {showFourteen && (
+          <NewDamageListPopUp
+            setShowPopUp={setShowFourteen}
+            damage={damageFourteen}
+            setDamage={setDamageFourteen}
+          />
+        )}
+        {showFifteen && (
+          <NewDamageListPopUp
+            setShowPopUp={setShowFifteen}
+            damage={damageFifteen}
+            setDamage={setDamageFifteen}
+          />
+        )}
+      </div>
 
       {/*       {isCollisionWithObjectChecked && (
         <ObjectInfoForm onchange={setObjectInfo} />
@@ -281,7 +562,7 @@ const WherePage: NextPage<pageProps> = ({ data, id }) => {
         </div>
 
         <div className="flex flex-row w-16 justify-end h-14 mr-10 lg:w-16">
-          <NextButton allowClick={allowClick}/>
+          <NextButton allowClick={allowClick} />
         </div>
       </div>
     </form>

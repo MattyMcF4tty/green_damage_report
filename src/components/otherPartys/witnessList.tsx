@@ -10,8 +10,8 @@ interface WitnessListProps {
 }
 
 export class WitnessInformation {
-  name: string; 
-  phone: string; 
+  name: string;
+  phone: string;
   email: string;
 
   constructor(name: string, phone: string, email: string) {
@@ -25,8 +25,7 @@ const WitnessList = ({ value, onChange }: WitnessListProps) => {
   const [showNewWitness, setShowNewWitness] = useState<boolean>(false);
   const [showUpdateWitness, setShowUpdateWitness] = useState<boolean>(false);
   const [updateWitnessIndex, setupdateWitnessIndex] = useState<number>(-1);
-  const [witnesses, setWitnesses] =
-    useState<WitnessInformation[]>(value);
+  const [witnesses, setWitnesses] = useState<WitnessInformation[]>(value);
 
   useEffect(() => {
     onChange(witnesses);
@@ -116,7 +115,8 @@ const NewWitnessPopUp = ({
   const [witnessPhone, setWitnessPhone] = useState<string>("");
   const [witnessEmail, setWitnessEmail] = useState<string>("");
 
-  const allowSave = (witnessName !== "" || witnessPhone !== "" || witnessEmail !== "");
+  const allowSave =
+    witnessName !== "" || witnessPhone !== "" || witnessEmail !== "";
 
   const handleClosePopUp = () => {
     setWitnessName("");
@@ -161,7 +161,11 @@ const NewWitnessPopUp = ({
             value={witnessName}
             onChange={setWitnessName}
           />
-          <PhoneNumber labelText="Please enter the phone number of the witness" value={witnessPhone} onChange={setWitnessPhone} />
+          <PhoneNumber
+            labelText="Please enter the phone number of the witness"
+            value={witnessPhone}
+            onChange={setWitnessPhone}
+          />
           <Inputfield
             id="witnessEmail"
             labelText="Please enter the Email of the witness"
@@ -208,7 +212,8 @@ const UpdateWitnessPopUp = ({
     witnesses[index].email
   );
 
-  const allowSave = (witnessName !== "" || witnessPhone !== "" || witnessEmail !== "");
+  const allowSave =
+    witnessName !== "" || witnessPhone !== "" || witnessEmail !== "";
 
   const handleUpdateWitness = () => {
     const updatedWitness = {
@@ -255,7 +260,11 @@ const UpdateWitnessPopUp = ({
             value={witnessName}
             onChange={setWitnessName}
           />
-          <PhoneNumber labelText="Phone number" value={witnessPhone} onChange={setWitnessPhone} />
+          <PhoneNumber
+            labelText="Phone number"
+            value={witnessPhone}
+            onChange={setWitnessPhone}
+          />
           <Inputfield
             id="witnessEmail"
             labelText="Email"

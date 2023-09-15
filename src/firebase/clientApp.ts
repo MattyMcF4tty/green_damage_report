@@ -63,7 +63,7 @@ export const updateData = async (id: string, data: reportDataType) => {
 export const updateImages = async (
   id: string,
   images: FileList | null,
-  imageType: 'GreenMobility' | 'OtherParty'
+  imageType: 'GreenMobility' | 'OtherParty' | 'Damage'
 ) => {
   const storageRef = ref(storage, `${id}/${imageType}`);
 
