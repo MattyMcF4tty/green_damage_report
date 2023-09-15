@@ -38,7 +38,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         const carId = vehicleResponseData.data[0].vehicleId
 
         //Get reservation information from the cars id
-        const reservationResponse = await fetch(wunderUrl + "/api/v2/reservations/search", {
+        const reservationResponse = await fetch(wunderUrl + "/api/v2/reservations/search?sort=-reservationId", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -54,10 +54,11 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         if (!vehicleResponse.ok) {
             return res.status(500).json({ message: `Something went wrong fetching reservation info by carId`, error: reservationResponseData.errors})
         }
-        const reservations = reservationResponseData.data.length-1 as number;
-        const newestReservation = reservationResponseData.data[reservations];
-        const reservationId =  newestReservation.reservationId;
-        const customerId = newestReservation.customerId;
+
+        const reservations = reservationResponseData.data;
+        const reservationId = reservations[0];
+
+        const customerId = reservationId.customerId;
 
         const renterResponse = await fetch(wunderUrl + "/api/v2/customers/search", {
             method: "POST",
