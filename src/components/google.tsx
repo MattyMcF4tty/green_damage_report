@@ -145,7 +145,11 @@ const Google = ({ show, showAutocomplete }: GoogleMapsFieldProps) => {
       libraries={["places"]}
     >
       <div>
-        <button type="button" onClick={handleCurrentLocation}>
+        <button
+          type="button"
+          onClick={handleCurrentLocation}
+          className=" mb-2 rounded-md p-2 bg-MainGreen-300 text-white"
+        >
           Use My Current Location
         </button>
         {showAutocomplete && (
