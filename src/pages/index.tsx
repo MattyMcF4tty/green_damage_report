@@ -11,30 +11,29 @@ const IndexPage = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [showPopUp, setShowPopUp] = useState(false);
-  const [ongoingReports, setOngoingReports] = useState<string[]>([])
+  const [ongoingReports, setOngoingReports] = useState<string[]>([]);
 
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const ID = await generateId()
+    const ID = await generateId();
 
     try {
       const ongoingReports = await getReportsByEmail(email);
-      if (ongoingReports.length == 0) { 
+      if (ongoingReports.length == 0) {
         if (ID !== undefined && email !== "") {
           await createDoc(ID, email);
           router.push(`damagereport/what?id=${ID}`);
         } else {
-          throw new Error("Error creating report Missing ID or Mail")
-        } 
+          throw new Error("Error creating report Missing ID or Mail");
+        }
       } else {
-        setOngoingReports(ongoingReports)
-        setShowPopUp(true)
+        setOngoingReports(ongoingReports);
+        setShowPopUp(true);
       }
-    } catch ( error ) {
-      console.error(`Something went wrong:\n${error}`)
+    } catch (error) {
+      console.error(`Something went wrong:\n${error}`);
     }
-
   };
 
   return (
@@ -45,12 +44,15 @@ const IndexPage = () => {
       <img
         src="../GreenLogos/GreenMobilityTextLogo.png"
         alt="greenlogo"
-        className="mb-10 lg:absolute lg:top-0 lg:w-[40%] md:bg-inherit"
+        className="mb-10 lg:absolute lg:top-0 lg:w-[40%] md:bg-inherit w-3/4 mt-2"
       />
 
       <div className="mb-6 flex flex-col mx-4 lg:text-center lg:mb-16 lg:text-xl lg:w-[56rem]">
         <span className="mb-2">
-          The purpose of this damage report is to document and record information about your incident. Please ensure that you provide accurate information, as this report will be submitted to our insurance company to cover your side of the incident.
+          The purpose of this damage report is to document and record
+          information about your incident. Please ensure that you provide
+          accurate information, as this report will be submitted to our
+          insurance company to cover your side of the incident.
         </span>
       </div>
 
@@ -79,7 +81,7 @@ const IndexPage = () => {
       </div>
 
       {showPopUp && (
-        <EmailPopUp 
+        <EmailPopUp
           setVisibility={setShowPopUp}
           reportIDs={ongoingReports}
           email={email}

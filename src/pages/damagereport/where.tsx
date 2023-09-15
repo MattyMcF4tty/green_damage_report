@@ -363,19 +363,21 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
               />
             </div>
           </div>
-          <div className="my-4">
-            <p className="break-words">
-              Please indicate on the map where the GreenMobility car was
-              located, as well as the location of the other partys, by using the
-              markers. Please use the draggable line to mark the car's
-              trajectory leading to the collision. The green dot indicates the
-              starting point, the yellow dot indicates the move leading to the
-              incident and the red dot indicates the incident.
-            </p>
-          </div>
+        </div>
+      )}
+      <div className="my-4">
+        <p className="break-words">
+          Please indicate on the map where the GreenMobility car was located, as
+          well as the location of the other partys, by using the markers. Please
+          use the draggable line to mark the car's trajectory leading to the
+          collision. The green dot indicates the starting point, the yellow dot
+          indicates the move leading to the incident and the red dot indicates
+          the incident.
+        </p>
+      </div>
 
-          <div className="w-full">
-            {/*   <GoogleMapsField
+      <div className="w-full">
+        {/*   <GoogleMapsField
               showMap={true}
               startZoom={17}
               startPos={{ lat: 55.68292552469843, lng: 12.585443426890635 }}
@@ -392,43 +394,17 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
               indicators={indicators}
               setIndicators={setIndicators}
             /> */}
-            <Google
-              show={true}
-              showAutocomplete={true}
-              accidentAddress={accidentAddress}
-              setAccidentAddress={setAccidentAddress}
-              setAccidentLocation={setAccidentLocation}
-              accidentLocation={accidentLocation}
-            />
-          </div>
+        <Google
+          show={true}
+          showAutocomplete={true}
+          accidentAddress={accidentAddress}
+          setAccidentAddress={setAccidentAddress}
+          setAccidentLocation={setAccidentLocation}
+          accidentLocation={accidentLocation}
+        />
+      </div>
 
-          {/* Picture of damages to green car collection */}
-          <div>
-            <ImageField
-              reportID={id}
-              id="LeftImage"
-              labelText="Please take pictures of the damage to the other party"
-              required={false}
-              images={otherPartyImages}
-              imageType="OtherParty"
-              multiple={true}
-            />
-          </div>
-
-          {/* Damage description collection */}
-          <div className="">
-            <TextField
-              id="damageDescription"
-              labelText="
-          Please provide a description of the damages incurred to the parties involved"
-              maxLength={500}
-              required={true}
-              value={damageDescription}
-              onChange={setDamageDescription}
-            />
-          </div>
-        </div>
-      )}
+      {/* Picture of damages to green car collection */}
       <ImageField
         reportID={id}
         id="FrontImage"
@@ -438,6 +414,31 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         imageType="GreenMobility"
         multiple={true}
       />
+
+      <div>
+        <ImageField
+          reportID={id}
+          id="LeftImage"
+          labelText="Please take pictures of the damage to the other party"
+          required={false}
+          images={otherPartyImages}
+          imageType="OtherParty"
+          multiple={true}
+        />
+      </div>
+
+      {/* Damage description collection */}
+      <div className="">
+        <TextField
+          id="damageDescription"
+          labelText="
+          Please provide a description of the damages incurred to the parties involved"
+          maxLength={500}
+          required={true}
+          value={damageDescription}
+          onChange={setDamageDescription}
+        />
+      </div>
 
       {/* <div>
         What type of car is damaged?
