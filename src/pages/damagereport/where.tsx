@@ -261,6 +261,8 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
 
     const mapField = document.getElementById("MyMap");
     if (mapField) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
       const canvas = await html2canvas(mapField, {
         useCORS: true,
         scale: 17,
