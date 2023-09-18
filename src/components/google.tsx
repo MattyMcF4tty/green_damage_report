@@ -32,6 +32,10 @@ const Google = ({
   const [map, setMap] = useState<google.maps.Map | null>(null);
   const [marker, setMarker] = useState<google.maps.Marker | null>(null);
   const [geocoder, setGeocoder] = useState<google.maps.Geocoder | null>(null);
+  const [mapCenter, setMapCenter] = useState({
+    lat: 55.676098,
+    lng: 12.568337,
+  });
 
   const [autocompleteValue, setAutocompleteValue] =
     useState<string>(accidentAddress);
@@ -71,6 +75,10 @@ const Google = ({
         const location = place.geometry.location;
         if (location && map.panTo) {
           map.panTo(location);
+          setMapCenter({
+            lat: location.lat(),
+            lng: location.lng(),
+          });
 
           // Update the marker's position instead of creating a new one
           if (marker) {
@@ -135,33 +143,36 @@ const Google = ({
           };
 
           // Update map center and marker with user's location
+          // In handleCurrentLocation
           if (map) {
             map.panTo(pos);
+            setMapCenter(pos);
           }
+
           if (marker) {
             marker.setPosition(pos);
           }
-
-          // Use the geocoder to update the address input
-          if (geocoder) {
-            geocoder.geocode(
-              { location: pos },
-              (
-                results: google.maps.GeocoderResult[] | null,
-                status: google.maps.GeocoderStatus
-              ) => {
-                if (
-                  status === google.maps.GeocoderStatus.OK &&
-                  results &&
-                  results.length > 0
-                ) {
-                  setAutocompleteValue(results[0].formatted_address);
-                } else {
-                  console.error("Geocoder failed due to: " + status);
+          setTimeout(() => {
+            if (geocoder) {
+              geocoder.geocode(
+                { location: pos },
+                (
+                  results: google.maps.GeocoderResult[] | null,
+                  status: google.maps.GeocoderStatus
+                ) => {
+                  if (
+                    status === google.maps.GeocoderStatus.OK &&
+                    results &&
+                    results.length > 0
+                  ) {
+                    setAutocompleteValue(results[0].formatted_address);
+                  } else {
+                    console.error("Geocoder failed due to: " + status);
+                  }
                 }
-              }
-            );
-          }
+              );
+            }
+          }, 500);
         },
         (error) => {
           console.warn(`ERROR(${error.code}): ${error.message}`);
@@ -217,8 +228,9 @@ const Google = ({
         <div>
           <div className="mb-4">
             <GoogleMap
+              id="MyMap"
               onLoad={handleMapLoad}
-              center={Center}
+              center={mapCenter}
               zoom={Zoom}
               mapContainerClassName="w-full h-[400px] border-[1px] border-MainGreen-200 rounded-lg"
             />
