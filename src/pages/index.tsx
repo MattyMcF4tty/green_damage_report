@@ -44,7 +44,7 @@ const IndexPage = () => {
       <img
         src="../GreenLogos/GreenMobilityTextLogo.png"
         alt="greenlogo"
-        className="absolute top-0 lg:w-[40%] md:bg-inherit w-3/4 mt-2"
+        className="absolute top-4 lg:w-[20%] md:bg-inherit w-3/4 mt-2"
       />
       <div className="mx-8">
         <div className=" flex flex-col lg:text-center mb-8 lg:text-xl lg:w-[56rem]">
