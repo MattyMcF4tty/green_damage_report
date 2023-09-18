@@ -182,27 +182,24 @@ export const OtherPartyList = ({
         <NewObjectPopUp
           setVisibility={setShowPopUp}
           vehicleValue={
-            new carInformation("", "", "", "", "", "", "", {
-              lat: null,
-              lng: null,
-            })
+            new carInformation("", "", "", "", "", "", "")
           }
           setVehicleValue={(newVehicleValue) =>
             setVehicleValue([...vehicleValue, newVehicleValue])
           }
           bikeValue={
-            new bikeInformation("", "", "", null, "", { lat: null, lng: null })
+            new bikeInformation("", "", "", null, "")
           }
           setBikeValue={(newBikeValue) =>
             setBikeValue([...bikeValue, newBikeValue])
           }
           pedestrianValue={
-            new PedestrianInformation("", "", "", "", { lat: null, lng: null })
+            new PedestrianInformation("", "", "", "")
           }
           setPedestrianValue={(newPedestrianValue) =>
             setPedestrianValue([...pedestrianValue, newPedestrianValue])
           }
-          otherValue={new OtherInformation("", "", { lat: null, lng: null })}
+          otherValue={new OtherInformation("", "")}
           setOtherValue={(newOtherValue) =>
             setOtherInfoValue([...otherInfoValue, newOtherValue])
           }
@@ -281,20 +278,20 @@ const NewObjectPopUp = ({
 
   const [currentBikeValue, setCurrentBikeValue] = useState<bikeInformation>(
     bikeValue ||
-      new bikeInformation("", "", "", null, "", { lat: null, lng: null })
+      new bikeInformation("", "", "", null, "")
   );
   const [currentVehicleValue, setCurrentVehicleValue] =
     useState<carInformation>(
       vehicleValue ||
-        new carInformation("", "", "", "", "", "", "", { lat: null, lng: null })
+        new carInformation("", "", "", "", "", "", "")
     );
   const [currentPedestrianValue, setCurrentPedestranValue] =
     useState<PedestrianInformation>(
       pedestrianValue ||
-        new PedestrianInformation("", "", "", "", { lat: null, lng: null })
+        new PedestrianInformation("", "", "", "")
     );
   const [currentOtherValue, setCurrentOtherValue] = useState<OtherInformation>(
-    otherValue || new OtherInformation("", "", { lat: null, lng: null })
+    otherValue || new OtherInformation("", "")
   );
 
   const handleSave = () => {
