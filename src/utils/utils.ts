@@ -642,11 +642,6 @@ export type pageProps = {
       information: string;
       location: { lat: number | null; lng: number | null };
     }[];
-    googleIndicators: {
-      marker1: { lat: number; lng: number };
-      marker2: { lat: number; lng: number };
-      marker3: { lat: number; lng: number };
-    }[];
 
     witnesses: WitnessInformation[];
 
@@ -710,7 +705,6 @@ export class reportDataType {
     email: string;
     ebike: boolean | null;
     personDamage: string;
-    location: { lat: number | null; lng: number | null };
   }[];
   vehicleInfo: {
     name: string;
@@ -720,24 +714,16 @@ export class reportDataType {
     insurance: string;
     numberplate: string;
     model: string;
-    location: { lat: number | null; lng: number | null };
   }[];
   pedestrianInfo: {
     name: string;
     phone: string;
     email: string;
     personDamage: string;
-    location: { lat: number | null; lng: number | null };
   }[];
   otherObjectInfo: {
     description: string;
     information: string;
-    location: { lat: number | null; lng: number | null };
-  }[];
-  googleIndicators: {
-    marker1: { lat: number | null; lng: number | null };
-    marker2: { lat: number | null; lng: number | null };
-    marker3: { lat: number | null; lng: number | null };
   }[];
 
   witnesses: WitnessInformation[];
@@ -791,7 +777,6 @@ export class reportDataType {
     this.vehicleInfo = [];
     this.pedestrianInfo = [];
     this.otherObjectInfo = [];
-    this.googleIndicators = [];
     this.witnesses = [];
     this.driverRenter = null;
     this.policePresent = null;
@@ -845,7 +830,6 @@ export class reportDataType {
       vehicleInfo: this.vehicleInfo,
       pedestrianInfo: this.pedestrianInfo,
       otherObjectInfo: this.otherObjectInfo,
-      googleIndicators: this.googleIndicators,
       witnesses: this.witnesses,
       driverRenter: this.driverRenter,
       policePresent: this.policePresent,

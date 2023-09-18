@@ -6,16 +6,13 @@ import { TextField } from "../custom_inputfields";
 export class OtherInformation {
   description: string;
   information: string;
-  location: {lat: number | null, lng: number | null};
 
   constructor (
     description: string,
     information: string,
-    location: {lat: number | null, lng: number | null},
   ) {
     this.description = description;
     this.information = information;
-    this.location = location;
   }
 
   updateFields(fields: Partial<OtherInformation>) {
@@ -26,7 +23,6 @@ export class OtherInformation {
     return {
       description: this.description,
       information: this.information,
-      location: this.location,
     };
   }
 };
@@ -41,7 +37,7 @@ const OtherInfoForm = ({ value, onChange }: OtherProps) => {
   const [infoOther, setInfoOther] = useState<string>(value.information);
 
   useEffect(() => {
-    const newOtherInfo: OtherInformation = new OtherInformation(descripeOther, infoOther, {lat: null, lng: null})
+    const newOtherInfo: OtherInformation = new OtherInformation(descripeOther, infoOther)
   
     onChange(newOtherInfo);
   }, [descripeOther, infoOther]);

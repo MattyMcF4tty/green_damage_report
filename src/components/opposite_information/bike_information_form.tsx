@@ -8,7 +8,6 @@ export class bikeInformation {
   email: string;
   ebike: boolean | null;
   personDamage: string;
-  location: { lat: number | null; lng: number | null };
 
   constructor(
     name: string,
@@ -16,14 +15,12 @@ export class bikeInformation {
     email: string,
     ebike: boolean | null,
     personDamage: string,
-    location: { lat: number | null; lng: number | null }
   ) {
     this.name = name;
     this.phone = phone;
     this.email = email;
     this.ebike = ebike;
     this.personDamage = personDamage;
-    this.location = location;
   }
 
   updateFields(fields: Partial<bikeInformation>) {
@@ -37,7 +34,6 @@ export class bikeInformation {
       email: this.email,
       ebike: this.ebike,
       personDamage: this.personDamage,
-      location: this.location,
     };
   }
 }
@@ -61,7 +57,6 @@ const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
       email,
       ebike,
       personDamage,
-      { lat: null, lng: null }
     );
 
     onChange(newBikeInfo);

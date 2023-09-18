@@ -1,5 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRightLong } from "@fortawesome/free-solid-svg-icons";
+import { faArrowRightLong, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { useState } from "react";
 
 interface NextButtonProps {
@@ -7,16 +7,21 @@ interface NextButtonProps {
 }
 
 const NextButton = ({ allowClick }: NextButtonProps) => {
+  const [loading, setLoading] = useState(false)
+
   return (
-    <div className="w-full h-full">
       <button
         disabled={!allowClick}
+        onClick={() => setLoading(true)}
         type="submit"
-        className="text-white w-full bg-MainGreen-300 h-full rounded-full flex items-center"
+        className="text-white w-full bg-MainGreen-300 h-full rounded-full flex justify-center items-center"
       >
+        {!loading ? (
         <FontAwesomeIcon icon={faArrowRightLong} className="w-full text-xl" />
+        ) : (
+          <FontAwesomeIcon icon={faSpinner} spin />
+        )}
       </button>
-    </div>
   );
 };
 

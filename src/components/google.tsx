@@ -8,6 +8,7 @@ import {
 } from "@react-google-maps/api";
 
 interface GoogleMapsFieldProps {
+  id: string;
   show: boolean;
   showAutocomplete: boolean;
   accidentAddress: string;
@@ -19,7 +20,10 @@ interface GoogleMapsFieldProps {
   accidentLocation: { lat: number | null; lng: number | null };
 }
 
+const libraries: "places"[] = ["places"];
+
 const Google = ({
+  id,
   show,
   showAutocomplete,
   accidentAddress,
@@ -48,7 +52,6 @@ const Google = ({
   };
   const Zoom = 17;
 
-  const libraries: "places"[] = ["places"];
 
   const { isLoaded, loadError } = useJsApiLoader({
     id: "google-map-script",
@@ -197,10 +200,6 @@ const Google = ({
   }
 
   return (
-    /*   <LoadScript
-      googleMapsApiKey={process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || ""}
-      libraries={libraries}
-    > */
     <div>
       <button
         type="button"
@@ -228,7 +227,7 @@ const Google = ({
         <div>
           <div className="mb-4">
             <GoogleMap
-              id="MyMap"
+              id={id}
               onLoad={handleMapLoad}
               center={mapCenter}
               zoom={Zoom}
@@ -238,8 +237,6 @@ const Google = ({
         </div>
       )}
     </div>
-    /*     </LoadScript>
-     */
   );
 };
 

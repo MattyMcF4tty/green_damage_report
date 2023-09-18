@@ -11,7 +11,6 @@ export class carInformation {
   insurance: string;
   numberplate: string;
   model: string;
-  location: { lat: number | null; lng: number | null };
 
   constructor(
     name: string,
@@ -21,7 +20,6 @@ export class carInformation {
     insurance: string,
     numberplate: string,
     model: string,
-    location: { lat: number | null; lng: number | null }
   ) {
     this.name = name;
     this.phone = phone;
@@ -30,7 +28,6 @@ export class carInformation {
     this.insurance = insurance;
     this.numberplate = numberplate;
     this.model = model;
-    this.location = location;
   }
 
   updateFields(fields: Partial<carInformation>) {
@@ -46,7 +43,6 @@ export class carInformation {
       insurance: this.insurance,
       numberplate: this.numberplate,
       model: this.model,
-      location: this.location,
     };
   }
 }
@@ -76,7 +72,6 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
       insurance,
       numberplate,
       model,
-      { lat: null, lng: null }
     );
 
     onChange(newCarInfo);

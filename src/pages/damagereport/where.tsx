@@ -18,9 +18,6 @@ import {
   reportDataType,
 } from "@/utils/utils";
 import { OtherPartyList } from "@/components/otherPartys/otherPartyList";
-import GoogleMapsField, {
-  googleIndicator,
-} from "@/components/google_maps_field";
 import { useRouter } from "next/router";
 import html2canvas from "html2canvas";
 /* import ZoeDrawing from "@/components/carDrawings/zoe";
@@ -38,6 +35,7 @@ export const getServerSideProps = async (
 const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
   const router = useRouter();
   const serverData = new reportDataType();
+  const mapsId = "GoogleMap";
   serverData.updateFields(data);
   const [allowClick, setAllowClick] = useState(true);
   /*   const [currentCar, setCurrentCar] = useState<"zoe" | "van">("zoe");
@@ -183,11 +181,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
     images?.["OtherParty"] || null
   );
 
-  const [indicators, setIndicators] = useState(
-    data.googleIndicators.map(
-      (info) => new googleIndicator(info.marker1, info.marker2, info.marker3)
-    )
-  );
   const [carInfo, setCarInfo] = useState(
     serverData.vehicleInfo.map(
       (info) =>
@@ -199,7 +192,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
           info.insurance,
           info.numberplate,
           info.model,
-          info.location
         )
     )
   );
@@ -212,14 +204,13 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
           info.email,
           info.ebike,
           info.personDamage,
-          info.location
         )
     )
   );
   const [otherInfo, setOtherInfo] = useState(
     serverData.otherObjectInfo.map(
       (info) =>
-        new OtherInformation(info.description, info.information, info.location)
+        new OtherInformation(info.description, info.information)
     )
   );
   const [pedestrianInfo, setPedestrianInfo] = useState(
@@ -230,7 +221,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
           info.phone,
           info.email,
           info.personDamage,
-          info.location
         )
     )
   );
@@ -259,19 +249,21 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
       return new Blob([ab], { type: mimeString });
     }
 
-    const mapField = document.getElementById("MyMap");
+    const mapField = document.getElementById(mapsId);
     if (mapField) {
       await new Promise((resolve) => setTimeout(resolve, 2000));
 
       const canvas = await html2canvas(mapField, {
         useCORS: true,
-        scale: 17,
+        scale: 1,
       });
 
       const dataUrl = canvas.toDataURL("image/png");
       const mapBlob: Blob = dataURItoBlob(dataUrl);
 
+      console.log("map created")
       await handleUploadMap(mapBlob, id);
+      console.log("map done")
     }
 
     /* Data that gets sent to server */
@@ -285,7 +277,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         insurance: info.insurance,
         numberplate: info.numberplate,
         model: info.model,
-        location: info.location,
       })),
       bikerInfo: bikeInfo.map((info) => ({
         name: info.name,
@@ -293,26 +284,18 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         email: info.email,
         ebike: info.ebike,
         personDamage: info.personDamage,
-        location: info.location,
       })),
       otherObjectInfo: otherInfo.map((info) => ({
         description: info.description,
         information: info.information,
-        location: info.location,
       })),
       pedestrianInfo: pedestrianInfo.map((info) => ({
         name: info.name,
         phone: info.phone,
         email: info.email,
         personDamage: info.personDamage,
-        location: info.location,
       })),
 
-      googleIndicators: indicators.map((info) => ({
-        marker1: info.marker1,
-        marker2: info.marker2,
-        marker3: info.marker3,
-      })),
       accidentLocation: accidentLocation,
       damageDescription: damageDescription,
       accidentAddress: accidentAddress,
@@ -373,24 +356,8 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
           </div>
 
           <div className="w-full">
-            {/*   <GoogleMapsField
-              showMap={true}
-              startZoom={17}
-              startPos={{ lat: 55.68292552469843, lng: 12.585443426890635 }}
-              accidentLocation={accidentLocation}
-              setAccidentLocation={setAccidentLocation}
-              bikes={bikeInfo}
-              setBikes={setBikeInfo}
-              vehicles={carInfo}
-              setVehicles={setCarInfo}
-              pedestrians={pedestrianInfo}
-              setPedestrians={setPedestrianInfo}
-              objects={otherInfo}
-              setObjects={setOtherInfo}
-              indicators={indicators}
-              setIndicators={setIndicators}
-            /> */}
             <Google
+              id={mapsId}
               show={true}
               showAutocomplete={true}
               accidentAddress={accidentAddress}

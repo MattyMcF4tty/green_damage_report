@@ -7,20 +7,17 @@ export class PedestrianInformation {
   phone: string;
   email: string;
   personDamage: string;
-  location: { lat: number | null; lng: number | null };
 
   constructor(
     name: string,
     phone: string,
     email: string,
     personDamage: string,
-    location: { lat: number | null; lng: number | null }
   ) {
     this.name = name;
     this.phone = phone;
     this.email = email;
     this.personDamage = personDamage;
-    this.location = location;
   }
 
   updateFields(fields: Partial<PedestrianInformation>) {
@@ -33,7 +30,6 @@ export class PedestrianInformation {
       phone: this.phone,
       email: this.email,
       personDamage: this.personDamage,
-      location: this.location,
     };
   }
 }
@@ -55,7 +51,6 @@ const PedestrianInfoForm = ({ value, onChange }: PedestrianProps) => {
       phoneNumber,
       email,
       personDamage,
-      { lat: null, lng: null }
     );
 
     onChange(newPedestrianInfo);
