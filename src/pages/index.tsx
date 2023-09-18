@@ -39,7 +39,7 @@ const IndexPage = () => {
   return (
     <form
       onSubmit={(e) => handleStart(e)}
-      className="flex flex-col items-center justify-center lg:justify-center h-[80vh]"
+      className="flex flex-col items-center justify-center lg:justify-center h-[80vh] lg:h-[100vh]"
     >
       <img
         src="../GreenLogos/GreenMobilityTextLogo.png"
@@ -74,10 +74,11 @@ const IndexPage = () => {
       <button
         type="submit"
         className="absolute bottom-4 w-32 h-14 text-lg font-semibold rounded-full bg-MainGreen-300 text-white
-          lg:bottom-auto"
+          lg:bottom-auto lg:relative"
       >
         Start
       </button>
+
 
       {showPopUp && (
         <EmailPopUp
