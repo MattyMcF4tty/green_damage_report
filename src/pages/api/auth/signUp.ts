@@ -1,32 +1,119 @@
 import admin from '@/firebase/firebaseAdminConfig';
-import app from '@/firebase/firebaseConfig';
+import app, { FireAuth } from '@/firebase/firebaseConfig';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { Auth, getAuth, signInWithCustomToken } from 'firebase/auth';
+import { Auth, UserCredential, getAuth, signInWithCustomToken } from 'firebase/auth';
+import { apiResponse } from '@/utils/types';
+import { UserRecord } from 'firebase-admin/lib/auth/user-record';
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {
+    // Check if method is correct
+    if (req.method !== "POST") {
+      return res.status(405).json(new apiResponse(
+          "METHOD_NOT_ALLOWED",
+          [],
+          ["Method is not allowed"],
+          {}
+      ))
+    }
+
     const { email, password } = req.body;
 
-    if (!email || !password) {
-      return res.status(401).json({ message: 'Please provide an email and password' });
+    try {
+      if (!email || typeof email !== 'string') {
+        throw new Error("Please provide a valid Email")
+      }
+      if (!password || typeof password !== 'string') {
+        throw new Error("Please provide a valid password")
+      }
+    } catch ( error: any ) {
+      return res.status(400).json(new apiResponse(
+        "BAD_REQUEST",
+        [],
+        [error.message],
+        {}
+      ))
     }
 
-    const userRecord = await admin.auth().createUser({ email, password });
-    const customToken = await admin.auth().createCustomToken(userRecord.uid);
+    let userRecord: UserRecord;
+    try {
+      userRecord = await admin.auth().createUser({ email, password });
+    } catch ( error:any ) {
+      console.error("Something went wrong creating user")
+      return res.status(500).json(new apiResponse(
+        "SERVER_ERROR",
+        [],
+        ["Something went wrong"],
+        {}
+      ))
+    }
+
+    let customToken:string;
+    try {
+      customToken = await admin.auth().createCustomToken(userRecord.uid);
+    } catch ( error:any ) {
+      console.error("Something went wrong creating custom token for user")
+      return res.status(500).json(new apiResponse(
+        "SERVER_ERROR",
+        [],
+        ["Something went wrong"],
+        {}
+      ))
+    }
 
     // Sign in with the custom token using client SDK
-    const auth = getAuth(app)
-    const userCredential = await signInWithCustomToken(auth as Auth, customToken);
-    
-    // Get the ID token
-    const idToken = await userCredential.user?.getIdToken();
-
-    if (!idToken) {
-      return res.status(401).json({ message: 'Failed to obtain ID token' });
+    const auth = FireAuth;
+    if (!auth) {
+        console.error("Firebasebase Authentication not defined")
+        return res.status(500).json(new apiResponse(
+            "SERVER_ERROR",
+            [],
+            ["Something went wrong"],
+            {}
+        ))
     }
 
-    res.status(200).json({ userToken: idToken });
-  } catch (error) {
-    res.status(500).json({ message: 'Something went wrong '})
+    let userCredential: UserCredential
+    try {
+      userCredential = await signInWithCustomToken(auth as Auth, customToken);
+    } catch ( error:any ) {
+      console.error("Error signing in new user with custom token", error.code);
+      return res.status(500).json(new apiResponse(
+        "SERVER_ERROR",
+        [],
+        ['Something went wrong'],
+        {}
+      ))
+    }
+    
+    // Get the ID token
+
+    let userToken: string;
+    try {
+        userToken = await userCredential.user?.getIdToken();
+    } catch ( error:any ) {
+        console.error("Something went wrong getting user id token", error.code)
+        return res.status(500).json(new apiResponse(
+            "SERVER_ERROR",
+            [],
+            ["Something went wrong"],
+            {}
+        ))
+    }
+
+    res.status(200).json(new apiResponse(
+      "OK",
+      ["User created succesfully"],
+      [],
+      {}
+    ));
+  } catch (error:any) {
+    console.error("Something went wrong creating new user", error.message)
+    res.status(500).json(new apiResponse(
+      "SERVER_ERROR",
+      [],
+      ["Something went wrong"],
+      {}
+    ))
   }
 };

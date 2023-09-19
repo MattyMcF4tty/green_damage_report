@@ -1,3 +1,4 @@
+import { checkOrigin } from "@/utils/serverUtils";
 import { apiResponse } from "@/utils/types";
 import { getAge } from "@/utils/utils";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -5,6 +6,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
     try {
+        // Check if method is correct
         if (req.method !== "POST") {
             return res.status(405).json(new apiResponse(
                 "METHOD_NOT_ALLOWED",

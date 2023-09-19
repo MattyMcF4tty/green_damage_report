@@ -254,17 +254,27 @@ export const handleSendEmail = async (
   subject: string,
   text: string
 ) => {
-  const emailData = {
+  const data = {
     toEmail: toEmail,
     subject: subject,
     text: text,
   };
 
-  try {
-    const response = await axios.post("/api/sendEmail", emailData);
-    console.log("Server response:", response.data.message);
-  } catch (error) {
-    console.error("Error sending email:", error);
+  const response = await fetch(process.env.NEXT_PUBLIC_URL + '/api/sendEmail',     {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data),
+  })
+
+  const responseData = await response.json()
+  if (response.ok) {
+    console.log(responseData.messages);
+    return true;
+  } else {
+    console.error(responseData.errors)
+    return false;
   }
 };
 
@@ -304,9 +314,9 @@ export const handleSignUp = async (email: string, password: string) => {
 
   const responseData = await response.json();
   if (response.ok) {
-    console.log("User created succesfully");
-    Cookies.set("AuthToken", responseData.userToken, {
-      expires: 9999 - 12 - 31,
+    console.log(responseData.messages);
+    Cookies.set("AuthToken", responseData.data.userToken, {
+      expires: 365 * 100,
       secure: true,
     });
     return true;
@@ -329,10 +339,10 @@ export const handleVerifyUser = async (userToken: string | undefined) => {
 
   const responseData = await response.json();
   if (response.ok) {
-    console.log(responseData.message);
+    console.log(responseData.messages);
     return true;
   } else {
-    console.error(responseData.message);
+    console.error(responseData.errors);
     return false;
   }
 };
@@ -357,13 +367,13 @@ export const handleSignIn = async (email: string, password: string) => {
 
     const responseData = await response.json();
     if (response.ok) {
-      console.log(responseData.message);
-      Cookies.set("AuthToken", responseData.userToken, {
-        expires: 9999 - 12 - 31,
+      console.log(responseData.messages);
+      Cookies.set("AuthToken", responseData.data.userToken, {
+        expires: 365 * 100,
       });
       return true;
     } else {
-      throw new Error(responseData.message);
+      throw new Error(responseData.messages);
     }
   } catch (error: any) {
     console.error("Something went wrong signing in:\n", error.message);
@@ -379,7 +389,6 @@ export const handleDownloadImages = async (
   path: string,
   type: "url" | "base64"
 ) => {
-  try {
     const data = {
       path: path,
       type: type,
@@ -400,21 +409,13 @@ export const handleDownloadImages = async (
     const responseData = await response.json();
 
     if (!response.ok) {
-      throw new Error(
-        `Status ${response.status}: ${
-          responseData.message || "Something went wrong contacting the server"
-        }`
-      );
+      console.error(`${responseData.status}:`, responseData.errors)
     }
 
-    console.log(responseData.message);
-    const images: string[] = responseData.data;
+    console.log(responseData.messages);
+    const images: string[] = responseData.data.images;
 
     return images;
-  } catch (error: any) {
-    console.error(error.message);
-    return [];
-  }
 };
 
 export const handleGeneratePdf = async (id: string) => {
