@@ -379,7 +379,6 @@ export const handleDownloadImages = async (
   path: string,
   type: "url" | "base64"
 ) => {
-  try {
     const data = {
       path: path,
       type: type,
@@ -400,21 +399,13 @@ export const handleDownloadImages = async (
     const responseData = await response.json();
 
     if (!response.ok) {
-      throw new Error(
-        `Status ${response.status}: ${
-          responseData.message || "Something went wrong contacting the server"
-        }`
-      );
+      console.error(`${responseData.status}:`, responseData.errors)
     }
 
-    console.log(responseData.message);
-    const images: string[] = responseData.data;
+    console.log(responseData.messages);
+    const images: string[] = responseData.data.images;
 
     return images;
-  } catch (error: any) {
-    console.error(error.message);
-    return [];
-  }
 };
 
 export const handleGeneratePdf = async (id: string) => {

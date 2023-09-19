@@ -88,48 +88,62 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
 
       {/* Driver information collected */}
       <p className="font-bold text-MainGreen-300 mb-2">Driver information</p>
-      <div
+      {data.driverRenter ? (
+        <div
         className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full grid grid-cols-2 gap-y-4 mb-6"
-        onClick={() => Router.push("/what")}
-      >
-        {/* First name */}
-        <div className="row-start-1 col-span-2 justify-center">
-          <p className="text-xs italic">Name:</p>
-          <p>
-            {data.driverInfo.firstName} {data.driverInfo.lastName}
-          </p>
+        >
+          {/* First name */}
+          <div className="row-start-1 col-span-2 justify-center">
+            <p className="text-xs italic">Name:</p>
+            <p>
+              {data.renterInfo.firstName} {data.renterInfo.lastName}
+            </p>
+          </div>
         </div>
+      ) : (
+        <div
+          className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full grid grid-cols-2 gap-y-4 mb-6"
+        >
+          {/* First name */}
+          <div className="row-start-1 col-span-2 justify-center">
+            <p className="text-xs italic">Name:</p>
+            <p>
+              {data.driverInfo.firstName} {data.driverInfo.lastName}
+            </p>
+          </div>
 
-        {/* Phone number */}
-        <div className="row-start-2 col-start-1">
-          <p className="text-xs italic">Phone number:</p>
-          <p>{data.driverInfo.phoneNumber}</p>
-        </div>
+          {/* Phone number */}
+          <div className="row-start-2 col-start-1">
+            <p className="text-xs italic">Phone number:</p>
+            <p>{data.driverInfo.phoneNumber}</p>
+          </div>
 
-        {/* Address */}
-        <div className="row-start-2 col-start-2">
-          <p className="text-xs italic">Address:</p>
-          <p>{data.driverInfo.address}</p>
-        </div>
+          {/* Address */}
+          <div className="row-start-2 col-start-2">
+            <p className="text-xs italic">Address:</p>
+            <p>{data.driverInfo.address}</p>
+          </div>
 
-        {/* Email */}
-        <div className="row-start-3 col-span-2">
-          <p className="text-xs italic">Email:</p>
-          <p>{data.driverInfo.email}</p>
-        </div>
+          {/* Email */}
+          <div className="row-start-3 col-span-2">
+            <p className="text-xs italic">Email:</p>
+            <p>{data.driverInfo.email}</p>
+          </div>
 
-        {/* Social security number */}
-        <div className="row-start-4 col-start-1">
-          <p className="text-xs italic">Social Security Number:</p>
-          <p>{data.driverInfo.socialSecurityNumber}</p>
-        </div>
+          {/* Social security number */}
+          <div className="row-start-4 col-start-1">
+            <p className="text-xs italic">Social Security Number:</p>
+            <p>{data.driverInfo.socialSecurityNumber}</p>
+          </div>
 
-        {/* Driving license number */}
-        <div className="row-start-4 col-start-2">
-          <p className="text-xs italic">Driving License Number:</p>
-          <p>{data.driverInfo.drivingLicenseNumber}</p>
+          {/* Driving license number */}
+          <div className="row-start-4 col-start-2">
+            <p className="text-xs italic">Driving License Number:</p>
+            <p>{data.driverInfo.drivingLicenseNumber}</p>
+          </div>
         </div>
-      </div>
+      )}
+      
 
       {/* Information about accident */}
       <p className="font-bold text-MainGreen-300 mb-2">Accident information</p>

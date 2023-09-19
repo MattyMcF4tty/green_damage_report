@@ -31,8 +31,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
     selectedReports: { id: string; data: reportDataType }[]
   ) => {
     selectedReports.map(async (report, index) => {
-      const renter = await handleGetRenter(report.id)
-      console.log(renter)
+
     })
   };
 

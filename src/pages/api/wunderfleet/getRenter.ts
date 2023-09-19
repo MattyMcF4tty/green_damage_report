@@ -1,3 +1,4 @@
+import { checkOrigin } from "@/utils/serverUtils";
 import { apiResponse } from "@/utils/types";
 import { getAge } from "@/utils/utils";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -5,6 +6,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
     try {
+        // Check if method is correct
         if (req.method !== "POST") {
             return res.status(405).json(new apiResponse(
                 "METHOD_NOT_ALLOWED",
@@ -13,6 +15,27 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                 {}
             ))
         }
+
+        // Verify origin
+        const url = process.env.NEXT_PUBLIC_URL;
+        if (!url) {
+            console.error("NEXT_PUBLIC_URL enviroment variable not set")
+            return res.status(500).json(new apiResponse(
+                "SERVER_ERROR",
+                [],
+                ["Something went wrong"],
+                {}
+            ));
+        }
+        if (!checkOrigin(req, [`${url}`])) {
+            return res.status(403).json(new apiResponse(
+                "FORBIDDEN",
+                [],
+                ["Requests from this origin are not allowed."],
+                {}
+            ));
+        }
+
 
         const wunderUrl = process.env.WUNDER_DOMAIN;
         const accessToken = process.env.WUNDER_ACCESS_TOKEN;
