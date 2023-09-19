@@ -16,27 +16,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             ))
         }
 
-        // Verify origin
-        const url = process.env.NEXT_PUBLIC_URL;
-        if (!url) {
-            console.error("NEXT_PUBLIC_URL enviroment variable not set")
-            return res.status(500).json(new apiResponse(
-                "SERVER_ERROR",
-                [],
-                ["Something went wrong"],
-                {}
-            ));
-        }
-        if (!checkOrigin(req, [`${url}`])) {
-            return res.status(403).json(new apiResponse(
-                "FORBIDDEN",
-                [],
-                ["Requests from this origin are not allowed."],
-                {}
-            ));
-        }
-
-
         const wunderUrl = process.env.WUNDER_DOMAIN;
         const accessToken = process.env.WUNDER_ACCESS_TOKEN;
         const { numberplate, date } = req.body;

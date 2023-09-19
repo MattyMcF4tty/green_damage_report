@@ -112,7 +112,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             }
         }
 
-        console.log(images)
         res.status(200).json(new apiResponse(
             "OK",
             ["Downloading images finished succesfully"],
