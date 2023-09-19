@@ -1,22 +1,46 @@
+import { apiResponse } from "@/utils/types";
 import { getAge } from "@/utils/utils";
 import { NextApiRequest, NextApiResponse } from "next";
 
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
     try {
-        const { numberplate } = req.body;
-        const wunderUrl = process.env.WUNDER_DOMAIN as string;
-        const accessToken = process.env.WUNDER_ACCESS_TOKEN as string;
+        if (req.method !== "POST") {
+            return res.status(405).json(new apiResponse(
+                "METHOD_NOT_ALLOWED",
+                [],
+                ["Method is not allowed"],
+                {}
+            ))
+        }
 
-        if (!wunderUrl) {
-            return res.status(400).json({ message: "Missing wunderfleet api url" })
+        const wunderUrl = process.env.WUNDER_DOMAIN;
+        const accessToken = process.env.WUNDER_ACCESS_TOKEN;
+        const { numberplate, date } = req.body;
+        
+        try { 
+            if (!wunderUrl || typeof wunderUrl !== 'string') {
+                throw new Error("Incorrect Wunderfleet api url format");
+            }
+            if (!accessToken || typeof accessToken !== 'string') {
+                throw new Error("Incorrect accessToken format");
+            }
+            if (!numberplate || typeof numberplate !== 'string') {
+                throw new Error("Incorrect numberplate format");
+            }
+            if (!date || typeof date !== 'string') {
+                throw new Error("Incorrect date");
+            }
+        } catch (error: any) {
+            return res.status(400).json(new apiResponse(
+                "BAD_REQUEST",
+                [],
+                [error.message],
+                {}
+            ))
         }
-        if (!accessToken) {
-            return res.status(400).json({ message: "Missing wunderfleet access token" })
-        }
-        if (numberplate === null) {
-            return res.status(400).json({ message: "Missing numberplate" })
-        }
+        const accidentDate = new Date(date)
+        console.log(accidentDate)
 
         // Get information about vehicle
         const vehicleResponse = await fetch(wunderUrl + "/api/v2/vehicles/search", {
@@ -32,10 +56,30 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             })
         })
         const vehicleResponseData = await vehicleResponse.json();
-        if (!vehicleResponse.ok) {
-            return res.status(500).json({ message: `Something went wrong fetching vehicle info by numberplate`, error: vehicleResponseData.errors})
+
+        // Check if car exists and request returned ok
+        if (vehicleResponse.ok) {
+            if (!vehicleResponseData.data) {
+                return res.status(404).json(new apiResponse(
+                    "NOT_FOUND",
+                    [],
+                    ["Car not found"],
+                    {}
+                ))
+            }
+        } else {
+            //Logging actual error locally not to the client
+            console.error("Error getting car using numberplate from Wunderfleet", vehicleResponseData)
+            return res.status(500).json(new apiResponse(
+                "SERVER_ERROR",
+                [],
+                ["Something went wrong"],
+                {}
+            ))
         }
         const carId = vehicleResponseData.data[0].vehicleId
+        console.log(carId)
+
 
         //Get reservation information from the cars id
         const reservationResponse = await fetch(wunderUrl + "/api/v2/reservations/search?sort=-reservationId", {
@@ -50,16 +94,54 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                 }
             })
         })
+
         const reservationResponseData = await reservationResponse.json();
-        if (!vehicleResponse.ok) {
-            return res.status(500).json({ message: `Something went wrong fetching reservation info by carId`, error: reservationResponseData.errors})
+        if (vehicleResponse.ok) {
+            if (!reservationResponseData.data) {
+                return res.status(404).json(new apiResponse(
+                    "NOT_FOUND",
+                    [],
+                    ["No reservations were found on carId"],
+                    {}
+                ))            
+            }
+        } else {
+            //Logging actual error locally not to the client
+            console.error("Error getting reservation from Wunderfleet", reservationResponseData)
+            return res.status(500).json(new apiResponse(
+                "SERVER_ERROR",
+                [],
+                ["Something went wrong"],
+                {}
+            ))
         }
-
         const reservations = reservationResponseData.data;
-        const reservationId = reservations[0];
 
-        const customerId = reservationId.customerId;
+        // Find the correct reservation based on given date and time
+        const reservation = reservations.find((reservation: any) => {
+            const startTime: Date = new Date(reservation.startTime);
+            const endTime: Date = new Date(reservation.endTime);
+            if (accidentDate > startTime && accidentDate < endTime) {
+                return reservation;
+            }
+        });
+        if (!reservation) {
+            return res.status(404).json(new apiResponse(
+                "NOT_FOUND",
+                [],
+                ["No reservations were found on given date"],
+                {}
+            ))            
+        }
+        // Get reservationId from reservation
+        const reservationId = reservation.reservationId;
+        console.log('resvervation:', reservationId);
 
+        // Get customerId from reservation
+        const customerId = reservation.customerId;
+        console.log('customer:', customerId);
+
+        // Get customer information by customerId
         const renterResponse = await fetch(wunderUrl + "/api/v2/customers/search", {
             method: "POST",
             headers: {
@@ -74,15 +156,41 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                 })
         })
         const renterResponseData = await renterResponse.json();
-        if (!renterResponse.ok) {
-            return res.status(500).json({ message: `Something went wrong fetching reservation info by carId`, error: reservationResponseData.errors})
+        if (renterResponse.ok) {
+            if (!renterResponseData.data) {
+                return res.status(404).json(new apiResponse(
+                    "NOT_FOUND",
+                    [],
+                    ["No customers were found with customerId"],
+                    {}
+                ))            
+            }
+        } else {
+            //Logging actual error locally not to the client
+            console.error("Error getting customer by customerId from Wunderfleet", renterResponseData)
+            return res.status(500).json(new apiResponse(
+                "SERVER_ERROR",
+                [],
+                ["Something went wrong"],
+                {}
+            ))
         }
-
         const renterData = renterResponseData.data[0];
 
+        // Calculating age
+        const renterAge = getAge(renterData.birthDate);
 
-        const renterAge = getAge(renterData.birthDate)
+        // Assigning age to renter
+        let renterGender = "Unknown"
+        if (renterData === 0) {
+            renterGender = "Other"
+        } else if (renterData === 1) {
+            renterGender = "Male"
+        } else if (renterData === 2) {
+            renterGender === "Female"
+        }
 
+        // Collecting renter data in object
         const renterInfo = {
             customerId: customerId as number, 
             reservationId: reservationId as number,
@@ -95,9 +203,21 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         };
 
         
-        return res.status(200).json({ message: "Renter fecthing from wunderfleet completed succesfully", data: renterInfo})
-    } catch (error) {
-        return res.status(500).json({ message: `Something went wrong getting renter:\n${error}`})
+        return res.status(200).json(new apiResponse(
+            "OK",
+            ["User fetched succesfully"],
+            [],
+            renterInfo
+        ))
+
+    } catch (error: any) {
+        console.error("Error contacting Wunderfleet", error.message)
+        return res.status(500).json(new apiResponse(
+            "SERVER_ERROR",
+            [],
+            ["Something went wrong"],
+            {}
+        ))
     }
 
 }

@@ -6,7 +6,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     try {
         const { path, type } = req.body;
-
+        
         if (!path) {
             res.status(400).json({ message: 'Missing path to image', data: [] })
         }

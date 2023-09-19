@@ -56,8 +56,11 @@ const What: NextPage<pageProps> = ({ data, id }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAllowClick(false);
+    const combinedDateTime = `${accidentDate}T${accidentTime}`;
+    const date = new Date(combinedDateTime);
 
-    const renter = await handleGetRenter(greenCarNumberplate as string);
+    const renter = await handleGetRenter(greenCarNumberplate as string, date);
+    console.log(renter)
     serverData.updateFields({ renterInfo: renter });
 
     /* TODO: Make function that gets information about current driver from green server */

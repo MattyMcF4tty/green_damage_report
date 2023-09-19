@@ -515,9 +515,10 @@ export const getReportsByEmail = async (email: string) => {
   }
 };
 
-export const handleGetRenter = async (numberplate: string) => {
+export const handleGetRenter = async (numberplate: string, date: Date) => {
   const data = {
     numberplate: numberplate.toUpperCase(),
+    date: date,
   };
 
   const response = await fetch(
@@ -527,13 +528,13 @@ export const handleGetRenter = async (numberplate: string) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ numberplate: data }),
+      body: JSON.stringify( data ),
     }
   );
 
   const responseData = await response.json();
   if (response.ok) {
-    console.log(responseData.message);
+    console.log(responseData.messages);
     return responseData.data as {
       customerId: number | null;
       reservationId: number | null;
@@ -545,7 +546,7 @@ export const handleGetRenter = async (numberplate: string) => {
       insurance: boolean | null;
     };
   } else {
-    console.error(responseData.message);
+    console.error(responseData.errors);
     return {
       customerId: null,
       reservationId: null,
