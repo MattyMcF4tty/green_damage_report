@@ -912,29 +912,60 @@ const createReportPDF = async (
     currentY += headerHeight; // Add space for header
   };
 
+  const addImageWithSpacingCheck = (
+    imageBase64: string,
+    format: string,
+    x: number,
+    y: number,
+    width: number,
+    height: number,
+    rotation: number
+  ): number => {
+    // Check if there's enough space on the page
+    const remainingSpace = doc.internal.pageSize.height - y;
+
+    if (remainingSpace < height) {
+      doc.addPage();
+      y = 10; // Reset Y-coordinate to the top of the new page
+    }
+
+    doc.addImage(
+      imageBase64,
+      format,
+      x,
+      y,
+      width,
+      height,
+      undefined,
+      undefined,
+      rotation
+    );
+    return y + height + 10; // Returns new Y-coordinate after placing the image, with a 10-unit gap for next content
+  };
+
   // Images of damages to GreenMobility section
   const maxImageHeight = 200; // max height you're willing to allow an image to be
   const headerHeight = 20;
   currentY = 10;
 
   if (images["GreenMobility"]) {
-    if (Array.isArray(images["GreenMobility"])) {
-      // Create a section header
-      addImageSectionHeader("GreenMobility Damage Images");
+    addImageSectionHeader("GreenMobility Damage Images");
 
+    if (Array.isArray(images["GreenMobility"])) {
       for (const imageBase64 of images["GreenMobility"]) {
-        doc.addImage(
+        // Check if there's enough space on the page
+        currentY = addImageWithSpacingCheck(
           imageBase64,
           "JPEG",
           15,
           currentY,
-          2, // FIX
-          4 // FIX
+          100,
+          100,
+          0 // or appropriate rotation
         );
-        currentY += 2; // FIX;
+        currentY += 10; // space between images
       }
     } else {
-      addImageSectionHeader("GreenMobility Damage Images");
       doc.text("No GreenMobility images available.", 15, currentY);
       currentY += headerHeight;
     }
@@ -945,23 +976,24 @@ const createReportPDF = async (
 
   // For OtherParty images
   if (images["OtherParty"]) {
-    if (Array.isArray(images["OtherParty"])) {
-      addImageSectionHeader("OtherParty Damage Images");
+    addImageSectionHeader("OtherParty Damage Images");
 
+    if (Array.isArray(images["OtherParty"])) {
       for (const imageBase64 of images["OtherParty"]) {
-        doc.addImage(
+        currentY = addImageWithSpacingCheck(
           imageBase64,
           "JPEG",
           15,
           currentY,
-          150, // FIX
-          150 // FIX
+          100,
+          100,
+          0 // or appropriate rotation
         );
-
-        currentY += 4; //FIX;
+        currentY += 10; // space between images
       }
     }
   }
+
   doc.addPage();
   currentY = 10;
 
@@ -974,8 +1006,8 @@ const createReportPDF = async (
         "png",
         15,
         currentY,
-        2, // FIX
-        4 // FIX
+        100, // FIX
+        100 // FIX
       );
       currentY += 2; // FIX;
     });
