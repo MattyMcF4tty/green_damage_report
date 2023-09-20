@@ -7,7 +7,7 @@ interface NextButtonProps {
 }
 
 const NextButton = ({ allowClick }: NextButtonProps) => {
-  const [loading, setLoading] = useState(allowClick)
+  const [loading, setLoading] = useState(!allowClick)
 
   useEffect(() => {
     setLoading(!allowClick)
@@ -18,7 +18,7 @@ const NextButton = ({ allowClick }: NextButtonProps) => {
         type="submit"
         className="text-white w-full bg-MainGreen-300 h-full rounded-full flex justify-center items-center"
       >
-        {loading ? (
+        {!loading ? (
         <FontAwesomeIcon icon={faArrowRightLong} className="w-full text-xl" />
         ) : (
           <FontAwesomeIcon icon={faSpinner} spin />

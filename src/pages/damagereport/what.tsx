@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
   TimeDateField,
   Inputfield,
@@ -53,13 +53,39 @@ const What: NextPage<pageProps> = ({ data, id }) => {
   const [accidentDate, setAccidentDate] = useState(serverData.date);
   const [allowClick, setAllowClick] = useState(true);
 
+  const [invalidNumberplate, setInvalidNumberplate] = useState(false);
+  const [invalidTime, setInvalidTime] = useState(false)
+
+  useEffect(() => {
+    setInvalidNumberplate(false)
+  }, [greenCarNumberplate])
+
+  useEffect(() => {
+    setInvalidTime(false)
+  }, [greenCarNumberplate, accidentTime, accidentDate])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAllowClick(false);
+
     const combinedDateTime = `${accidentDate}T${accidentTime}`;
     const date = new Date(combinedDateTime);
 
-    const renter = await handleGetRenter(greenCarNumberplate as string, date);
+    let renter;
+    try {
+      renter = await handleGetRenter(greenCarNumberplate as string, date);
+    } catch (error: any) {
+      if (error.message === "Car not found") {
+        setInvalidNumberplate(true)
+      } else if (error.message === "No reservations were found on given date") {
+        setInvalidTime(true)
+      } else {
+        console.log(error.message)
+      }
+
+      setAllowClick(true);
+      return
+    }
     console.log(renter)
     serverData.updateFields({ renterInfo: renter });
 
@@ -112,16 +138,22 @@ const What: NextPage<pageProps> = ({ data, id }) => {
         <p className="text-MainGreen-300 mb-8 flex justify-start font-bold text-[20px]">
           Initial Event Inquiry
         </p>
+      </div>
+
+      <div className="mb-2">
         <Inputfield
-          labelText="
-          Please enter the license plate of the GreenMobility car"
-          id="greenCarNumberplateInput"
-          type="numberplate"
-          required={true}
-          value={greenCarNumberplate}
-          onChange={setgreenCarNumberplate}
-          placeHolder="DR12345"
-        />
+            labelText="
+            Please enter the license plate of the GreenMobility car"
+            id="greenCarNumberplateInput"
+            type="text"
+            required={true}
+            value={greenCarNumberplate}
+            onChange={setgreenCarNumberplate}
+            placeHolder="DR12345"
+          />
+          {invalidNumberplate && (
+            <p className="text-sm text-red-500 mt-[-1rem] mb-4">This numberplate does not belong to GreenMobility</p>
+          )}
       </div>
 
       {/* Driver information collection */}
@@ -209,6 +241,9 @@ const What: NextPage<pageProps> = ({ data, id }) => {
           timeValue={accidentTime}
           dateValue={accidentDate}
         />
+        {invalidTime && (
+            <p className="text-sm text-red-500 mt-[-1rem] mb-4">No reservation exist on the given point in time</p>
+        )}
       </div>
 
       <div className="flex flex-row justify-between">

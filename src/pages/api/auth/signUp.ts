@@ -13,7 +13,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           "METHOD_NOT_ALLOWED",
           [],
           ["Method is not allowed"],
-          {}
+          {},
+          []
       ))
     }
 
@@ -31,7 +32,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         "BAD_REQUEST",
         [],
         [error.message],
-        {}
+        {},
+        []
       ))
     }
 
@@ -44,7 +46,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         "SERVER_ERROR",
         [],
         ["Something went wrong"],
-        {}
+        {},
+        []
       ))
     }
 
@@ -57,7 +60,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         "SERVER_ERROR",
         [],
         ["Something went wrong"],
-        {}
+        {},
+        []
       ))
     }
 
@@ -69,7 +73,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             "SERVER_ERROR",
             [],
             ["Something went wrong"],
-            {}
+            {},
+            []
         ))
     }
 
@@ -82,7 +87,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         "SERVER_ERROR",
         [],
         ['Something went wrong'],
-        {}
+        {},
+        []
       ))
     }
     
@@ -97,7 +103,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             "SERVER_ERROR",
             [],
             ["Something went wrong"],
-            {}
+            {},
+            []
         ))
     }
 
@@ -105,7 +112,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       "OK",
       ["User created succesfully"],
       [],
-      {}
+      {},
+      []
     ));
   } catch (error:any) {
     console.error("Something went wrong creating new user", error.message)
@@ -113,7 +121,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       "SERVER_ERROR",
       [],
       ["Something went wrong"],
-      {}
+      {},
+      []
     ))
   }
 };

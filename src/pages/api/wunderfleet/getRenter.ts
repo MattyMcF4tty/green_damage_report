@@ -1,10 +1,13 @@
 import { checkOrigin } from "@/utils/serverUtils";
 import { apiResponse } from "@/utils/types";
 import { getAge } from "@/utils/utils";
+import { wunderToDate } from "@/utils/serverUtils";
 import { NextApiRequest, NextApiResponse } from "next";
 
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
+    const debug:string[] = [];
+
     try {
         // Check if method is correct
         if (req.method !== "POST") {
@@ -12,37 +15,48 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                 "METHOD_NOT_ALLOWED",
                 [],
                 ["Method is not allowed"],
-                {}
+                {},
+                debug
             ))
         }
+        debug.push("Method verified")
 
         const wunderUrl = process.env.WUNDER_DOMAIN;
         const accessToken = process.env.WUNDER_ACCESS_TOKEN;
         const { numberplate, date } = req.body;
-        
+
         try { 
             if (!wunderUrl || typeof wunderUrl !== 'string') {
                 throw new Error("Incorrect Wunderfleet api url format");
             }
+            debug.push("WunderUrl verified")
+
             if (!accessToken || typeof accessToken !== 'string') {
                 throw new Error("Incorrect accessToken format");
             }
+            debug.push("accessToken verified")
+
             if (!numberplate || typeof numberplate !== 'string') {
                 throw new Error("Incorrect numberplate format");
             }
+            debug.push("numberplate verified")
+
             if (!date || typeof date !== 'string') {
                 throw new Error("Incorrect date");
             }
+            debug.push("date verified")
         } catch (error: any) {
             return res.status(400).json(new apiResponse(
                 "BAD_REQUEST",
                 [],
                 [error.message],
-                {}
+                {},
+                debug
             ))
         }
+
         const accidentDate = new Date(date)
-        console.log(accidentDate)
+        debug.push(`${accidentDate}`)
 
         // Get information about vehicle
         const vehicleResponse = await fetch(wunderUrl + "/api/v2/vehicles/search", {
@@ -66,7 +80,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                     "NOT_FOUND",
                     [],
                     ["Car not found"],
-                    {}
+                    {},
+                    debug
                 ))
             }
         } else {
@@ -76,7 +91,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                 "SERVER_ERROR",
                 [],
                 ["Something went wrong"],
-                {}
+                {},
+                debug
             ))
         }
         const carId = vehicleResponseData.data[0].vehicleId
@@ -104,7 +120,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                     "NOT_FOUND",
                     [],
                     ["No reservations were found on carId"],
-                    {}
+                    {},
+                    debug
                 ))            
             }
         } else {
@@ -114,25 +131,32 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                 "SERVER_ERROR",
                 [],
                 ["Something went wrong"],
-                {}
+                {},
+                debug
             ))
         }
         const reservations = reservationResponseData.data;
 
         // Find the correct reservation based on given date and time
         const reservation = reservations.find((reservation: any) => {
-            const startTime: Date = new Date(reservation.startTime);
-            const endTime: Date = new Date(reservation.endTime);
+
+            const startTime = wunderToDate(reservation.startTime)
+
+            const endTime = wunderToDate(reservation.endTime)
+
             if (accidentDate > startTime && accidentDate < endTime) {
                 return reservation;
             }
         });
         if (!reservation) {
+        console.log(debug)
+
             return res.status(404).json(new apiResponse(
                 "NOT_FOUND",
                 [],
                 ["No reservations were found on given date"],
-                {}
+                {},
+                debug
             ))            
         }
         // Get reservationId from reservation
@@ -164,7 +188,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                     "NOT_FOUND",
                     [],
                     ["No customers were found with customerId"],
-                    {}
+                    {},
+                    debug
                 ))            
             }
         } else {
@@ -174,7 +199,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                 "SERVER_ERROR",
                 [],
                 ["Something went wrong"],
-                {}
+                {},
+                debug
             ))
         }
         const renterData = renterResponseData.data[0];
@@ -209,16 +235,18 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             "OK",
             ["User fetched succesfully"],
             [],
-            renterInfo
+            renterInfo,
+            debug
         ))
 
     } catch (error: any) {
-        console.error("Error contacting Wunderfleet", error.message)
+        console.error("Error at api/wunderfleet/getRenter.ts", error.message)
         return res.status(500).json(new apiResponse(
             "SERVER_ERROR",
             [],
             ["Something went wrong"],
-            {}
+            {},
+            debug
         ))
     }
 

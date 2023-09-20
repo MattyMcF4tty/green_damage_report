@@ -12,7 +12,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 "METHOD_NOT_ALLOWED",
                 [],
                 ["Method is not allowed"],
-                {}
+                {},
+                []
             ))
         }
 
@@ -23,7 +24,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 "SERVER_ERROR",
                 [],
                 ["Something went wrong"],
-                {}
+                {},
+                []
             ))
         }
         
@@ -41,7 +43,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 "BAD_REQUEST",
                 [],
                 [error.message],
-                {}
+                {},
+                []
             ))
         }
 
@@ -54,7 +57,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                     "UNAUTHORIZED",
                     [],
                     ["Wrong email or password"],
-                    {}
+                    {},
+                    []
                 ))
             } else {
                 console.error("Something went wrong signing in user", error.code, error.message)
@@ -62,7 +66,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                     "SERVER_ERROR",
                     [],
                     ["Something went wrong"],
-                    {}
+                    {},
+                    []
                 ))
             }
         }
@@ -76,7 +81,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 "SERVER_ERROR",
                 [],
                 ["Something went wrong"],
-                {}
+                {},
+                []
             ))
         }
         
@@ -85,7 +91,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             "OK",
             ["User succesfully signed in"],
             [],
-            {userToken: userToken}
+            {userToken: userToken},
+            []
         ))
     } catch (error:any) {
         console.error("Something went wrong signing in user", error.message)
@@ -93,7 +100,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             "SERVER_ERROR",
             [],
             ["Something went wrong"],
-            {}
+            {},
+            []
         ))    
     }
 }

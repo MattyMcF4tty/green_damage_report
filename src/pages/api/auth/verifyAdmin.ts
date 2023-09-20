@@ -12,7 +12,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 "UNAUTHORIZED",
                 [],
                 ['Missing verification token'],
-                {}
+                {},
+                []
             ))
         }
         try {
@@ -23,14 +24,16 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                     "UNAUTHORIZED",
                     [],
                     ['Invalid credentials'],
-                    {}
+                    {},
+                    []
                 ))
             } else if (error.code === 'auth/user-disabled') {
                 return res.status(403).json(new apiResponse(
                     "UNAUTHORIZED",
                     [],
                     ['User disabled'],
-                    {}
+                    {},
+                    []
                 ))
             } else {
                 console.error("Something went wrong verifying user", error.code)
@@ -38,7 +41,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                     "SERVER_ERROR",
                     [],
                     ['Something went wrong'],
-                    {}
+                    {},
+                    []
                 ))
             }
         }
@@ -47,7 +51,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             "OK",
             ['User verified'],
             [],
-            {}
+            {},
+            []
         ))
     } catch (error: any) {
         console.error("Something went wrong verifying user", error.message);
@@ -55,7 +60,8 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             "SERVER_ERROR",
             [],
             ['Something went wrong'],
-            {}
+            {},
+            []
         ))
     }
 }

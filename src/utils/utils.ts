@@ -534,30 +534,23 @@ export const handleGetRenter = async (numberplate: string, date: Date) => {
   );
 
   const responseData = await response.json();
-  if (response.ok) {
-    console.log(responseData.messages);
-    return responseData.data as {
-      customerId: number | null;
-      reservationId: number | null;
-      firstName: string | null;
-      lastName: string | null;
-      birthDate: string | null;
-      gender: string | null;
-      age: number | null;
-      insurance: boolean | null;
-    };
-  } else {
-    console.error(responseData.errors);
-    return {
-      customerId: null,
-      reservationId: null,
-      firstName: null,
-      lastName: null,
-      birthDate: null,
-      gender: null,
-      age: null,
-      insurance: null,
-    };
+
+  if (!response.ok) {
+    console.log(responseData.debug)
+    throw new Error(responseData.errors[0])
+  }
+
+
+  console.log(responseData.debug);
+  return responseData.data as {
+    customerId: number | null;
+    reservationId: number | null;
+    firstName: string | null;
+    lastName: string | null;
+    birthDate: string | null;
+    gender: string | null;
+    age: number | null;
+    insurance: boolean | null;
   }
 };
 
@@ -574,6 +567,15 @@ export const getAge = (birthDateString: string): number => {
 
   return age;
 };
+
+export const wunderToUTC = (wunderTime:string) => {
+  return wunderTime.replace(" ", "T") + "Z";
+}
+
+export const wunderToDate = (wunderTime: string) => {
+  return new Date(wunderToUTC(wunderTime));
+}
+
 
 /* ---------------- classes and types ------------------------------ */
 export type pageProps = {
