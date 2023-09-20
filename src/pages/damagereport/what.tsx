@@ -71,6 +71,8 @@ const What: NextPage<pageProps> = ({ data, id }) => {
     const combinedDateTime = `${accidentDate}T${accidentTime}`;
     const date = new Date(combinedDateTime);
 
+    console.log(`dato ${accidentDate} ${accidentTime}`)
+    console.log(date.toTimeString())
     let renter;
     try {
       renter = await handleGetRenter(greenCarNumberplate as string, date);
@@ -80,7 +82,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
       } else if (error.message === "No reservations were found on given date") {
         setInvalidTime(true)
       } else {
-        console.log(error.message)
+        console.error(error.message)
       }
 
       setAllowClick(true);

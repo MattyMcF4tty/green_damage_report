@@ -1,6 +1,6 @@
 import { checkOrigin } from "@/utils/serverUtils";
 import { apiResponse } from "@/utils/types";
-import { getAge } from "@/utils/utils";
+import { dateToWunder, getAge } from "@/utils/utils";
 import { wunderToDate } from "@/utils/serverUtils";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -100,16 +100,23 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
 
         //Get reservation information from the cars id
-        const reservationResponse = await fetch(wunderUrl + "/api/v2/reservations/search?sort=-reservationId", {
+        const reservationResponse = await fetch(wunderUrl + "/api/v2/reservations/search?sort=reservationId", {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${accessToken}`,
             },
             body: JSON.stringify({
-                "carId": {
-                    "$eq": carId
-                }
+                "$and": [
+                    {
+                        "endTime": {
+                            "$gte": `${dateToWunder(accidentDate)}`
+                        }
+                    },
+                    {
+                        "carId": carId
+                    }
+                ]
             })
         })
 
@@ -142,11 +149,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         const reservation = reservations.find((reservation: any) => {
 
             const startTime = wunderToDate(reservation.startTime)
-            debug.push(`ID: ${reservation.reservationId} startTime: ${startTime}`)
-
             const endTime = wunderToDate(reservation.endTime)
-            debug.push(`ID: ${reservation.reservationId} startTime: ${endTime}`)
 
+            debug.push(`Checking if ${dateToWunder(accidentDate)} is between ${reservation.startTime} and ${reservation.endTime}`)
             if (accidentDate > startTime && accidentDate < endTime) {
                 return reservation;
             }

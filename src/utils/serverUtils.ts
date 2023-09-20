@@ -11,11 +11,11 @@ export function checkOrigin(req: NextApiRequest, allowedOrigins: string[]): bool
 
 
 export const wunderToUTC = (wunderTime:string) => {
-    return wunderTime.replace(" ", "T") + "Z";
-  }
-  
-  export const wunderToDate = (wunderTime: string) => {
-    return new Date(wunderToUTC(wunderTime));
-  }
+return wunderTime.replace(" ", "T") + "Z";
+}
+
+export const wunderToDate = (wunderTime: string) => {
+return new Date(wunderToUTC(wunderTime));
+}
   
 // TODO: Create spam protection function
