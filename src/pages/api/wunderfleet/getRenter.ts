@@ -136,6 +136,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             ))
         }
         const reservations = reservationResponseData.data;
+        debug.push(`Reservations on car: ${reservations.length}`)
 
         // Find the correct reservation based on given date and time
         const reservation = reservations.find((reservation: any) => {
