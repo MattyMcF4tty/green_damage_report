@@ -56,7 +56,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         }
 
         const accidentDate = new Date(date)
-        debug.push(`${accidentDate}`)
+        debug.push(`Accident date: ${accidentDate}`)
 
         // Get information about vehicle
         const vehicleResponse = await fetch(wunderUrl + "/api/v2/vehicles/search", {
@@ -141,8 +141,10 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         const reservation = reservations.find((reservation: any) => {
 
             const startTime = wunderToDate(reservation.startTime)
+            debug.push(`ID: ${reservation.reservationId} startTime: ${startTime}`)
 
             const endTime = wunderToDate(reservation.endTime)
+            debug.push(`ID: ${reservation.reservationId} startTime: ${endTime}`)
 
             if (accidentDate > startTime && accidentDate < endTime) {
                 return reservation;
@@ -225,7 +227,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             firstName: `${renterData.firstName}`,
             lastName: `${renterData.lastName}`,
             birthDate: `${renterData.birthDate}`,
-            gender: `${renterData.gender}`,
+            gender: renterGender,
             age: renterAge,
             insurance: null,
         };
