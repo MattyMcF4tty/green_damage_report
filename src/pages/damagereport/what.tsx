@@ -38,6 +38,9 @@ const What: NextPage<pageProps> = ({ data, id }) => {
   const [drivingLicenseNumber, setDrivingLicenseNumber] = useState(
     serverData.driverInfo.drivingLicenseNumber
   );
+  const [validDriversLicense, setValidDriversLicense] = useState<
+    null | boolean
+  >(null);
   const [phoneNumber, setPhoneNumber] = useState(
     serverData.driverInfo.phoneNumber
   );
@@ -60,7 +63,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
     const date = new Date(combinedDateTime);
 
     const renter = await handleGetRenter(greenCarNumberplate as string, date);
-    console.log(renter)
+    console.log(renter);
     serverData.updateFields({ renterInfo: renter });
 
     /* TODO: Make function that gets information about current driver from green server */
@@ -73,6 +76,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
         socialSecurityNumber: socialSecurityNumber,
         drivingLicenseNumber: drivingLicenseNumber,
         email: email,
+        validDriversLicense: validDriversLicense,
       };
       serverData.updateFields({ driverInfo: newDriverInfo });
     } else {
@@ -84,6 +88,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
         socialSecurityNumber: null,
         drivingLicenseNumber: null,
         email: null,
+        validDriversLicense: null,
       };
       serverData.updateFields({ driverInfo: newDriverInfo });
     }
@@ -169,6 +174,14 @@ const What: NextPage<pageProps> = ({ data, id }) => {
               value={socialSecurityNumber}
               onChange={setSocialSecurityNumber}
               placeHolder="123456-1234"
+            />
+
+            <YesNo
+              id="drivers license"
+              labelText="Does the driver have a valid driver license?"
+              required={true}
+              onChange={setValidDriversLicense}
+              value={validDriversLicense}
             />
 
             <Inputfield

@@ -260,20 +260,20 @@ export const handleSendEmail = async (
     text: text,
   };
 
-  const response = await fetch(process.env.NEXT_PUBLIC_URL + '/api/sendEmail',     {
+  const response = await fetch(process.env.NEXT_PUBLIC_URL + "/api/sendEmail", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify(data),
-  })
+  });
 
-  const responseData = await response.json()
+  const responseData = await response.json();
   if (response.ok) {
     console.log(responseData.messages);
     return true;
   } else {
-    console.error(responseData.errors)
+    console.error(responseData.errors);
     return false;
   }
 };
@@ -389,33 +389,33 @@ export const handleDownloadImages = async (
   path: string,
   type: "url" | "base64"
 ) => {
-    const data = {
-      path: path,
-      type: type,
-    };
+  const data = {
+    path: path,
+    type: type,
+  };
 
-    const response = await fetch(
-      process.env.NEXT_PUBLIC_URL + "/api/downloadImages",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      }
-    );
-
-    // Handling non-ok responses
-    const responseData = await response.json();
-
-    if (!response.ok) {
-      console.error(`${responseData.status}:`, responseData.errors)
+  const response = await fetch(
+    process.env.NEXT_PUBLIC_URL + "/api/downloadImages",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
     }
+  );
 
-    console.log(responseData.messages);
-    const images: string[] = responseData.data.images;
+  // Handling non-ok responses
+  const responseData = await response.json();
 
-    return images;
+  if (!response.ok) {
+    console.error(`${responseData.status}:`, responseData.errors);
+  }
+
+  console.log(responseData.messages);
+  const images: string[] = responseData.data.images;
+
+  return images;
 };
 
 export const handleGeneratePdf = async (id: string) => {
@@ -529,7 +529,7 @@ export const handleGetRenter = async (numberplate: string, date: Date) => {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify( data ),
+      body: JSON.stringify(data),
     }
   );
 
@@ -590,6 +590,7 @@ export type pageProps = {
       drivingLicenseNumber: string | null;
       phoneNumber: string | null;
       email: string | null;
+      validDriversLicense: null | boolean;
     };
 
     renterInfo: {
@@ -677,6 +678,7 @@ export class reportDataType {
     drivingLicenseNumber: string | null;
     phoneNumber: string | null;
     email: string | null;
+    validDriversLicense: null | boolean;
   };
 
   renterInfo: {
@@ -755,6 +757,7 @@ export class reportDataType {
       drivingLicenseNumber: null,
       phoneNumber: null,
       email: null,
+      validDriversLicense: null,
     };
     this.renterInfo = {
       customerId: null,
@@ -805,6 +808,7 @@ export class reportDataType {
         drivingLicenseNumber: this.driverInfo.drivingLicenseNumber,
         phoneNumber: this.driverInfo.phoneNumber,
         email: this.driverInfo.email,
+        validDriversLicense: this.driverInfo.validDriversLicense,
       },
       renterInfo: {
         customerId: this.renterInfo.customerId,

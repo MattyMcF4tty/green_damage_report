@@ -2,6 +2,7 @@ import jsPDF from "jspdf";
 import { reportDataType } from "@/utils/utils";
 import axios from "axios";
 import sharp from "sharp";
+import * as EXIF from "exif-js";
 
 const addImageToPDF = (pdfDoc: jsPDF) => {
   const imageWidth = 80;
@@ -61,7 +62,7 @@ const createReportPDF = async (
   const name =
     data.driverInfo.firstName && data.driverInfo.lastName
       ? `${data.driverInfo.firstName} ${data.driverInfo.lastName}`
-      : "-";
+      : `${data.renterInfo.firstName} ${data.renterInfo.lastName}`;
 
   const phoneNumber = data.driverInfo.phoneNumber
     ? data.driverInfo.phoneNumber
@@ -912,15 +913,81 @@ const createReportPDF = async (
     currentY += headerHeight; // Add space for header
   };
 
-  const addImageWithSpacingCheck = (
+  function dataURItoBlob(dataURI: string): Blob {
+    const byteString = atob(dataURI.split(",")[1]);
+    const mimeString = dataURI.split(",")[0].split(":")[1].split(";")[0];
+    const buffer = new ArrayBuffer(byteString.length);
+    const dataView = new Uint8Array(buffer);
+    for (let i = 0; i < byteString.length; i++) {
+      dataView[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([buffer], { type: mimeString });
+  }
+
+  const getRequiredRotation = (imgBase64: string): Promise<number> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+
+      // Base64 Prefix Checking
+      const BASE64_PREFIX = "data:image/jpeg;base64,";
+      if (!imgBase64.startsWith(BASE64_PREFIX)) {
+        imgBase64 = BASE64_PREFIX + imgBase64;
+      }
+
+      img.onload = function () {
+        // Create a temporary blob URL
+        const blob = dataURItoBlob(imgBase64);
+        const blobURL = URL.createObjectURL(blob);
+
+        EXIF.getData(blobURL, function (this: any) {
+          const orientation = EXIF.getTag(this, "Orientation");
+          let rotation = 0;
+
+          switch (orientation) {
+            case 2:
+              // mirror horizontal - not a common case
+              break;
+            case 3:
+              // 180°
+              rotation = 180;
+              break;
+            case 4:
+              // mirror vertical - not a common case
+              break;
+            case 5:
+              // mirror horizontal and rotate 270° CW - not a common case
+              break;
+            case 6:
+              // rotate 90° CW
+              rotation = 90;
+              break;
+            case 7:
+              // mirror horizontal and rotate 90° CW - not a common case
+              break;
+            case 8:
+              // rotate 270° CW
+              rotation = 270;
+              break;
+            default:
+              // no rotation required
+              break;
+          }
+          resolve(rotation);
+        });
+      };
+
+      img.src = imgBase64;
+    });
+  };
+
+  const addImageWithSpacingCheck = async (
     imageBase64: string,
     format: string,
     x: number,
     y: number,
     width: number,
-    height: number,
-    rotation: number
-  ): number => {
+    height: number
+  ): Promise<number> => {
     // Check if there's enough space on the page
     const remainingSpace = doc.internal.pageSize.height - y;
 
@@ -928,6 +995,9 @@ const createReportPDF = async (
       doc.addPage();
       y = 10; // Reset Y-coordinate to the top of the new page
     }
+
+    // Determine the required rotation
+    const rotation = await getRequiredRotation(imageBase64);
 
     doc.addImage(
       imageBase64,
@@ -940,6 +1010,7 @@ const createReportPDF = async (
       undefined,
       rotation
     );
+
     return y + height + 10; // Returns new Y-coordinate after placing the image, with a 10-unit gap for next content
   };
 
@@ -947,21 +1018,18 @@ const createReportPDF = async (
   const maxImageHeight = 200; // max height you're willing to allow an image to be
   const headerHeight = 20;
   currentY = 10;
-
   if (images["GreenMobility"]) {
     addImageSectionHeader("GreenMobility Damage Images");
 
     if (Array.isArray(images["GreenMobility"])) {
       for (const imageBase64 of images["GreenMobility"]) {
-        // Check if there's enough space on the page
-        currentY = addImageWithSpacingCheck(
+        currentY = await addImageWithSpacingCheck(
           imageBase64,
           "JPEG",
           15,
           currentY,
           100,
-          100,
-          0 // or appropriate rotation
+          100
         );
         currentY += 10; // space between images
       }
@@ -980,14 +1048,13 @@ const createReportPDF = async (
 
     if (Array.isArray(images["OtherParty"])) {
       for (const imageBase64 of images["OtherParty"]) {
-        currentY = addImageWithSpacingCheck(
+        currentY = await addImageWithSpacingCheck(
           imageBase64,
           "JPEG",
           15,
           currentY,
           100,
-          100,
-          0 // or appropriate rotation
+          100
         );
         currentY += 10; // space between images
       }
