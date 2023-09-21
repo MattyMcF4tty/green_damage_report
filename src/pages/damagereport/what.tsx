@@ -71,8 +71,6 @@ const What: NextPage<pageProps> = ({ data, id }) => {
     const combinedDateTime = `${accidentDate}T${accidentTime}`;
     const date = new Date(combinedDateTime);
 
-    console.log(`dato ${accidentDate} ${accidentTime}`)
-    console.log(date.toTimeString())
     let renter;
     try {
       renter = await handleGetRenter(greenCarNumberplate as string, date);
@@ -88,7 +86,6 @@ const What: NextPage<pageProps> = ({ data, id }) => {
       setAllowClick(true);
       return
     }
-    console.log(renter)
     serverData.updateFields({ renterInfo: renter });
 
     /* TODO: Make function that gets information about current driver from green server */
