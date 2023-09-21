@@ -536,12 +536,9 @@ export const handleGetRenter = async (numberplate: string, date: Date) => {
   const responseData = await response.json();
 
   if (!response.ok) {
-    console.log(responseData.debug)
     throw new Error(responseData.errors[0])
   }
 
-
-  console.log(responseData.debug);
   return responseData.data as {
     customerId: number | null;
     reservationId: number | null;
@@ -568,6 +565,10 @@ export const getAge = (birthDateString: string): number => {
   return age;
 };
 
+export const isDateInRange = (startDate: Date, targetDate: Date, endDate: Date): boolean => {
+  return targetDate > startDate && targetDate < endDate;
+}
+
 export const dateToWunder = (date:Date) => {
   const yyyy = date.getUTCFullYear();
   const MM = String(date.getUTCMonth() + 1).padStart(2, '0');
@@ -579,6 +580,24 @@ export const dateToWunder = (date:Date) => {
   return `${yyyy}-${MM}-${dd} ${HH}:${mm}:${ss}`;
 }
 
+export const wunderToUTC = (wunderTime:string) => {
+  return wunderTime.replace(" ", "T") + "Z";
+}
+
+export const wunderToDate = (wunderTime: string | null) => {
+  console.log(wunderTime)
+  if (!wunderTime) {
+      return null
+  }
+
+  const parsed = new Date(wunderToUTC(wunderTime));
+
+  if (isNaN(parsed.getTime())) {
+      return null;
+  }
+
+  return parsed;
+}
 
 /* ---------------- classes and types ------------------------------ */
 export type pageProps = {

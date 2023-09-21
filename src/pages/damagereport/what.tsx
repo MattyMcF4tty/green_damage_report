@@ -79,7 +79,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
     } catch (error: any) {
       if (error.message === "Car not found") {
         setInvalidNumberplate(true)
-      } else if (error.message === "No reservations were found on given date") {
+      } else if (error.message === "No reservations were ongoing at that point in time") {
         setInvalidTime(true)
       } else {
         console.error(error.message)

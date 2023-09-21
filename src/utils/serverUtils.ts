@@ -14,8 +14,19 @@ export const wunderToUTC = (wunderTime:string) => {
 return wunderTime.replace(" ", "T") + "Z";
 }
 
-export const wunderToDate = (wunderTime: string) => {
-return new Date(wunderToUTC(wunderTime));
+export const wunderToDate = (wunderTime: string | null) => {
+    console.log(wunderTime)
+    if (!wunderTime) {
+        return null
+    }
+
+    const parsed = new Date(wunderToUTC(wunderTime));
+
+    if (isNaN(parsed.getTime())) {
+        return null;
+    }
+
+    return parsed;
 }
-  
+
 // TODO: Create spam protection function
