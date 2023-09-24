@@ -26,7 +26,7 @@ import app from "./firebaseConfig";
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-export const collectionName = "DamageReport";
+export const collectionName = "DamageReports";
 
 export const getData = async (id: string) => {
   console.log("fetchind docID: " + id);

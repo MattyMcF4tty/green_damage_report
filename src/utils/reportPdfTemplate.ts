@@ -2,7 +2,7 @@ import jsPDF from "jspdf";
 import { reportDataType } from "@/utils/utils";
 import axios from "axios";
 import sharp from "sharp";
-import * as EXIF from "exif-js";
+import EXIF from "exif-js";
 
 const addImageToPDF = (pdfDoc: jsPDF) => {
   const imageWidth = 80;
@@ -895,10 +895,34 @@ const createReportPDF = async (
   //images section
   doc.addPage();
 
-  const getRotationAngle = (imgBase64: string): Promise<number> => {
-    let angle = 0;
+  const rotateImage = (imgBase64: string, angle: number): Promise<string> => {
+    return new Promise((resolve) => {
+      const image = new Image();
+      image.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
 
-    // Convert Base64 image to Blob
+        if (angle === 90 || angle === 270) {
+          canvas.width = image.height;
+          canvas.height = image.width;
+        } else {
+          canvas.width = image.width;
+          canvas.height = image.height;
+        }
+
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate((angle * Math.PI) / 180);
+        ctx.drawImage(image, -image.width / 2, -image.height / 2);
+
+        resolve(canvas.toDataURL("image/jpeg"));
+      };
+      image.src = imgBase64;
+    });
+  };
+
+  const getRotationAngle = async (imgBase64: string): Promise<number> => {
+    let angle = 0;
     const byteString = atob(imgBase64.split(",")[1]);
     const mimeString = imgBase64.split(",")[0].split(":")[1].split(";")[0];
     const buffer = new ArrayBuffer(byteString.length);
@@ -907,38 +931,47 @@ const createReportPDF = async (
       data[i] = byteString.charCodeAt(i);
     }
     const blob = new Blob([buffer], { type: mimeString });
-
-    // Create Object URL from blob
     const objectURL = URL.createObjectURL(blob);
-
-    // Create an Image element
     const img = new Image();
-    img.src = objectURL; // Use Object URL
+    img.src = objectURL;
 
-    return new Promise((resolve) => {
+    return new Promise((resolve, reject) => {
+      img.onerror = reject; // Handle image loading errors
       img.onload = () => {
-        // Make sure image is loaded
         (EXIF.getData as any)(img, function (this: any) {
           const orientation = EXIF.getTag(this, "Orientation");
-
           switch (orientation) {
+            case 1:
+              angle = 0;
+              break;
             case 3:
-              angle = 90;
-              break;
-            case 6:
-              angle = 270;
-              break;
-            case 8:
               angle = 180;
               break;
+            case 6:
+              angle = 90;
+              break;
+            case 8:
+              angle = 270;
+              break;
+            // Additional cases for flipping can be added if necessary.
             default:
               angle = 0;
           }
+          console.log(`Image orientation: ${orientation}, Rotation: ${angle}`); // Log for debugging
+
           resolve(angle);
         });
       };
     });
   };
+
+  const getCorrectlyOrientedImage = async (
+    imgBase64: string
+  ): Promise<string> => {
+    const angle = await getRotationAngle(imgBase64);
+    return rotateImage(imgBase64, angle);
+  };
+
   // Function to add header for image sections
   const addImageSectionHeader = (text: string) => {
     doc.setFont("bold");
@@ -954,14 +987,15 @@ const createReportPDF = async (
     x: number,
     currentY: number,
     width: number,
-    height: number,
-    angle: number
+    height: number
   ): Promise<number> => {
     // Check if there's enough space on the page
-    const remainingSpace = doc.internal.pageSize.height - currentY; // 10 is the margin
+    const margin = 10;
+    const requiredSpace = height + margin;
+    const remainingSpace = doc.internal.pageSize.height - currentY;
 
     // If the image doesn't fit vertically, add a new page
-    if (remainingSpace < height) {
+    if (remainingSpace < requiredSpace) {
       doc.addPage();
       currentY = 10; // Reset y-coordinate to the top of the new page
     }
@@ -975,11 +1009,13 @@ const createReportPDF = async (
       width,
       height,
       undefined,
-      undefined,
-      angle
+      undefined
     );
 
-    return currentY; // Update currentY after adding image
+    currentY += height; // Adjust currentY for the height of the image
+    currentY += margin; // Add some margin after the image for spacing
+
+    return currentY; // Return updated currentY after adding image
   };
 
   // Images of damages to GreenMobility section
@@ -992,15 +1028,16 @@ const createReportPDF = async (
 
     if (Array.isArray(images["GreenMobility"])) {
       for (const imageBase64 of images["GreenMobility"]) {
-        const angle = await getRotationAngle(imageBase64); // Fetch the rotation angle
+        const correctedImageBase64 = await getCorrectlyOrientedImage(
+          imageBase64
+        );
         currentY = await addImageWithSpacingCheck(
-          imageBase64,
+          correctedImageBase64,
           "JPEG",
           15,
           currentY,
           100,
-          100,
-          angle
+          100
         );
       }
     } else {
@@ -1018,15 +1055,16 @@ const createReportPDF = async (
 
     if (Array.isArray(images["OtherParty"])) {
       for (const imageBase64 of images["OtherParty"]) {
-        const angle = await getRotationAngle(imageBase64); // Fetch the rotation angle
+        const correctedImageBase64 = await getCorrectlyOrientedImage(
+          imageBase64
+        );
         currentY = await addImageWithSpacingCheck(
-          imageBase64,
+          correctedImageBase64,
           "JPEG",
           15,
           currentY,
           100,
-          100,
-          angle
+          100
         );
       }
     }
