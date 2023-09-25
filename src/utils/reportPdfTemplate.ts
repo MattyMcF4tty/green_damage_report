@@ -922,24 +922,23 @@ const createReportPDF = async (
   };
 
   const getRotationAngle = async (imgBase64: string): Promise<number> => {
-    let angle = 0;
-    const byteString = atob(imgBase64.split(",")[1]);
-    const mimeString = imgBase64.split(",")[0].split(":")[1].split(";")[0];
-    const buffer = new ArrayBuffer(byteString.length);
-    const data = new Uint8Array(buffer);
-    for (let i = 0; i < byteString.length; i++) {
-      data[i] = byteString.charCodeAt(i);
-    }
-    const blob = new Blob([buffer], { type: mimeString });
-    const objectURL = URL.createObjectURL(blob);
-    const img = new Image();
-    img.src = objectURL;
-
     return new Promise((resolve, reject) => {
-      img.onerror = reject; // Handle image loading errors
+      const byteString = atob(imgBase64.split(",")[1]);
+      const mimeString = imgBase64.split(",")[0].split(":")[1].split(";")[0];
+      const buffer = new ArrayBuffer(byteString.length);
+      const data = new Uint8Array(buffer);
+      for (let i = 0; i < byteString.length; i++) {
+        data[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([buffer], { type: mimeString });
+      const objectURL = URL.createObjectURL(blob);
+      const img = new Image();
+      img.src = objectURL;
+      img.onerror = reject;
       img.onload = () => {
         (EXIF.getData as any)(img, function (this: any) {
           const orientation = EXIF.getTag(this, "Orientation");
+          let angle = 0;
           switch (orientation) {
             case 1:
               angle = 0;
@@ -948,17 +947,14 @@ const createReportPDF = async (
               angle = 180;
               break;
             case 6:
-              angle = 90;
+              angle = 0;
               break;
             case 8:
               angle = 270;
               break;
-            // Additional cases for flipping can be added if necessary.
             default:
               angle = 0;
           }
-          console.log(`Image orientation: ${orientation}, Rotation: ${angle}`); // Log for debugging
-
           resolve(angle);
         });
       };
@@ -1031,6 +1027,7 @@ const createReportPDF = async (
         const correctedImageBase64 = await getCorrectlyOrientedImage(
           imageBase64
         );
+
         currentY = await addImageWithSpacingCheck(
           correctedImageBase64,
           "JPEG",
@@ -1058,6 +1055,7 @@ const createReportPDF = async (
         const correctedImageBase64 = await getCorrectlyOrientedImage(
           imageBase64
         );
+
         currentY = await addImageWithSpacingCheck(
           correctedImageBase64,
           "JPEG",
