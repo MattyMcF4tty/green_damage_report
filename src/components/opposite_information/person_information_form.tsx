@@ -12,7 +12,7 @@ export class PedestrianInformation {
     name: string,
     phone: string,
     email: string,
-    personDamage: string,
+    personDamage: string
   ) {
     this.name = name;
     this.phone = phone;
@@ -50,7 +50,7 @@ const PedestrianInfoForm = ({ value, onChange }: PedestrianProps) => {
       name,
       phoneNumber,
       email,
-      personDamage,
+      personDamage
     );
 
     onChange(newPedestrianInfo);
@@ -76,7 +76,7 @@ const PedestrianInfoForm = ({ value, onChange }: PedestrianProps) => {
         id="EmailPedestrian"
         labelText="Please enter the email adress of the party involved"
         required={false}
-        type="text"
+        type="email"
         value={email}
         onChange={setEmail}
         placeHolder="Greenmobility@example.com"
