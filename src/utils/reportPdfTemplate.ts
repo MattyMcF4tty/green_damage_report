@@ -84,10 +84,22 @@ const createReportPDF = async (
 
   const driverRenter = data.driverRenter;
 
+  const validLicense = data.driverInfo.validDriversLicense;
+
+  const maxLocationWidth = 80;
+  const addressLines = doc.splitTextToSize(
+    `Address: ${address}`,
+    maxLocationWidth
+  );
+
   doc.text(`Name: ${name}`, 15, driverInfoY);
   doc.text(`Phone number: ${phoneNumber}`, 15, driverInfoY + 8);
   doc.text(`Email: ${email}`, 15, driverInfoY + 16);
-  doc.text(`Address: ${address}`, 15, driverInfoY + 24);
+  let yOffset = driverInfoY + 24; // starting y-coordinate for the address
+  for (let line of addressLines) {
+    doc.text(line, 15, yOffset);
+    yOffset += 8; // adjust by the height of one line, you can change this value if needed
+  }
   doc.text(`Social security number: ${socialSecurityNumber}`, 105, driverInfoY);
   doc.text(
     `Driving License Number: ${drivingLicenseNumber}`,
@@ -100,6 +112,13 @@ const createReportPDF = async (
     doc.text("Driver and renter is the same", 105, driverInfoY + 16);
   } else {
     doc.text("Driver and renter is not the same", 105, driverInfoY + 16);
+  }
+  if (validLicense === null) {
+    doc.text("Valid drivers license? -", 105, driverInfoY + 24);
+  } else if (validLicense === true) {
+    doc.text("Valid drivers license? Yes", 105, driverInfoY + 24);
+  } else {
+    doc.text("Valid drivers license? No", 105, driverInfoY + 24);
   }
 
   // Add space between driver information and accident information
