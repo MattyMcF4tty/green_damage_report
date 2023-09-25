@@ -191,7 +191,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
           info.driversLicenseNumber,
           info.insurance,
           info.numberplate,
-          info.model,
+          info.model
         )
     )
   );
@@ -203,14 +203,13 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
           info.phone,
           info.email,
           info.ebike,
-          info.personDamage,
+          info.personDamage
         )
     )
   );
   const [otherInfo, setOtherInfo] = useState(
     serverData.otherObjectInfo.map(
-      (info) =>
-        new OtherInformation(info.description, info.information)
+      (info) => new OtherInformation(info.description, info.information)
     )
   );
   const [pedestrianInfo, setPedestrianInfo] = useState(
@@ -220,7 +219,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
           info.name,
           info.phone,
           info.email,
-          info.personDamage,
+          info.personDamage
         )
     )
   );
@@ -261,9 +260,9 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
       const dataUrl = canvas.toDataURL("image/png");
       const mapBlob: Blob = dataURItoBlob(dataUrl);
 
-      console.log("map created")
+      console.log("map created");
       await handleUploadMap(mapBlob, id);
-      console.log("map done")
+      console.log("map done");
     }
 
     /* Data that gets sent to server */
@@ -321,6 +320,23 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         <p className="text-MainGreen-300 mb-8 flex justify-start font-bold text-[20px]">
           Vital Information
         </p>
+        <div className="my-4">
+          <p className="break-words">
+            Please indicate on the map where the GreenMobility car was located.
+          </p>
+        </div>
+
+        <div className="w-full">
+          <Google
+            id={mapsId}
+            show={true}
+            showAutocomplete={true}
+            accidentAddress={accidentAddress}
+            setAccidentAddress={setAccidentAddress}
+            setAccidentLocation={setAccidentLocation}
+            accidentLocation={accidentLocation}
+          />
+        </div>
         <YesNo
           required={true}
           id="collisionWithOtherParty"
@@ -347,24 +363,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
                 setOtherInfoValue={setOtherInfo}
               />
             </div>
-          </div>
-          <div className="my-4">
-            <p className="break-words">
-              Please indicate on the map where the GreenMobility car was
-              located.
-            </p>
-          </div>
-
-          <div className="w-full">
-            <Google
-              id={mapsId}
-              show={true}
-              showAutocomplete={true}
-              accidentAddress={accidentAddress}
-              setAccidentAddress={setAccidentAddress}
-              setAccidentLocation={setAccidentLocation}
-              accidentLocation={accidentLocation}
-            />
           </div>
 
           {/* Picture of damages to green car collection */}
