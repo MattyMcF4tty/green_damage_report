@@ -13,7 +13,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 [],
                 ["Method is not allowed"],
                 {},
-                []
             ))
         }
 
@@ -25,7 +24,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 [],
                 ["Something went wrong"],
                 {},
-                []
             ))
         }
         
@@ -44,7 +42,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 [],
                 [error.message],
                 {},
-                []
             ))
         }
 
@@ -58,7 +55,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                     [],
                     ["Wrong email or password"],
                     {},
-                    []
                 ))
             } else {
                 console.error("Something went wrong signing in user", error.code, error.message)
@@ -67,7 +63,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                     [],
                     ["Something went wrong"],
                     {},
-                    []
                 ))
             }
         }
@@ -82,7 +77,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 [],
                 ["Something went wrong"],
                 {},
-                []
             ))
         }
         
@@ -92,7 +86,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             ["User succesfully signed in"],
             [],
             {userToken: userToken},
-            []
         ))
     } catch (error:any) {
         console.error("Something went wrong signing in user", error.message)
@@ -101,7 +94,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             [],
             ["Something went wrong"],
             {},
-            []
         ))    
     }
 }

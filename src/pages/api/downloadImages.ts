@@ -15,7 +15,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 [],
                 ["Method is not allowed"],
                 {},
-                []
             ))
         }
 
@@ -34,7 +33,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 [],
                 [error.message],
                 {},
-                []
             ))
         }
 
@@ -45,7 +43,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 [],
                 ["Something went wrong"],
                 {},
-                []
             ))
         }
         const storageRef = ref(FireStorage, path)
@@ -60,7 +57,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 [],
                 ["Something went wrong"],
                 {},
-                []
             ))
         }
 
@@ -80,7 +76,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 [],
                 ["Something went wrong"],
                 {},
-                []
             ))
         }
 
@@ -109,7 +104,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                         [],
                         ["Something went wrong"],
                         {},
-                        []
                     ))
                 }
     
@@ -123,7 +117,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             ["Downloading images finished succesfully"],
             [],
             {images: images},
-            []
         ))
     } catch (error:any) {
         console.error("Something went wrong trying to run downloadImages", error.message)
@@ -132,7 +125,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             [],
             ["Something went wrong"],
             {},
-            []
         ))
     }
 }

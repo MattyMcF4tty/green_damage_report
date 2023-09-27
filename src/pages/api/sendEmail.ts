@@ -11,7 +11,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       [],
       ["Method is not allowed"],
       {},
-      []
     ))  
   }
     const { toEmail, subject, text } = req.body;
@@ -32,7 +31,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         [],
         [error.message],
         {},
-        []
       ))
     }
 
@@ -53,7 +51,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         [],
         ["Something went wrong"],
         {},
-        []
       ))  
     }
 
@@ -80,7 +77,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           ["Mail send successfully"],
           [],
           {},
-          []
         ))
       } catch (error: any) {
         console.error("Something went wrong sending email", error.message)
@@ -89,7 +85,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           [],
           ["Something went wrong"],
           {},
-          []
         ))  
       }
 };

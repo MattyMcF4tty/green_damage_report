@@ -1,6 +1,6 @@
 import { Inputfield } from "@/components/custom_inputfields";
 import { createDoc } from "@/firebase/clientApp";
-import { generateId, getReportsByEmail } from "@/utils/utils";
+import { generateId, getReportsByEmail, handleCreateNewReport } from "@/utils/utils";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -16,24 +16,32 @@ const IndexPage = () => {
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const ID = await generateId();
-
+    // Check for ongoing reports with that email.
+    let ongoingReports: string[] = [];
     try {
-      const ongoingReports = await getReportsByEmail(email);
-      if (ongoingReports.length == 0) {
-        if (ID !== undefined && email !== "") {
-          await createDoc(ID, email);
-          router.push(`damagereport/what?id=${ID}`);
-        } else {
-          throw new Error("Error creating report Missing ID or Mail");
-        }
-      } else {
-        setOngoingReports(ongoingReports);
-        setShowPopUp(true);
-      }
-    } catch (error) {
-      console.error(`Something went wrong:\n${error}`);
+      ongoingReports = await getReportsByEmail(email);
+    } catch (error:any) {
+      console.error(error)
+      return;
     }
+
+    if (ongoingReports.length !== 0) {
+      setOngoingReports(ongoingReports);
+      setShowPopUp(true);
+      return;
+    }
+
+    // Create a new report
+    let reportId: string;
+    try {
+      reportId = await handleCreateNewReport(email);
+    } catch ( error:any ) {
+      console.error(error)
+      return;
+    }
+
+    //Push to start of damage report
+    router.push(`/damagereport/what?id=${reportId}`)
   };
 
   return (

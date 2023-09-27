@@ -14,7 +14,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
           [],
           ["Method is not allowed"],
           {},
-          []
       ))
     }
 
@@ -33,7 +32,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         [],
         [error.message],
         {},
-        []
       ))
     }
 
@@ -47,7 +45,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         [],
         ["Something went wrong"],
         {},
-        []
       ))
     }
 
@@ -61,7 +58,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         [],
         ["Something went wrong"],
         {},
-        []
       ))
     }
 
@@ -74,7 +70,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             [],
             ["Something went wrong"],
             {},
-            []
         ))
     }
 
@@ -88,7 +83,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         [],
         ['Something went wrong'],
         {},
-        []
       ))
     }
     
@@ -104,7 +98,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             [],
             ["Something went wrong"],
             {},
-            []
         ))
     }
 
@@ -113,7 +106,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       ["User created succesfully"],
       [],
       {},
-      []
     ));
   } catch (error:any) {
     console.error("Something went wrong creating new user", error.message)
@@ -122,7 +114,6 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
       [],
       ["Something went wrong"],
       {},
-      []
     ))
   }
 };
