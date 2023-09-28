@@ -50,7 +50,7 @@ const createReportPDF = async (
   // Driver information header
   doc.setTextColor(0);
   doc.setFont("bold");
-  doc.text("Driver information", 15, 123);
+  doc.text("Renter information", 15, 123);
   doc.setLineWidth(0.5);
   doc.line(15, 125, 80, 125);
 
@@ -86,44 +86,85 @@ const createReportPDF = async (
 
   const validLicense = data.driverInfo.validDriversLicense;
 
+  const renterFullName =
+    data.renterInfo.firstName && data.renterInfo.lastName
+      ? `${data.renterInfo.firstName} ${data.renterInfo.lastName}`
+      : "-";
+
   const maxLocationWidth = 80;
   const addressLines = doc.splitTextToSize(
     `Address: ${address}`,
     maxLocationWidth
   );
 
-  doc.text(`Name: ${name}`, 15, driverInfoY);
-  doc.text(`Phone number: ${phoneNumber}`, 15, driverInfoY + 8);
-  doc.text(`Email: ${email}`, 15, driverInfoY + 16);
-  let yOffset = driverInfoY + 24; // starting y-coordinate for the address
-  for (let line of addressLines) {
-    doc.text(line, 15, yOffset);
-    yOffset += 8; // adjust by the height of one line, you can change this value if needed
-  }
-  doc.text(`Social security number: ${socialSecurityNumber}`, 105, driverInfoY);
-  doc.text(
-    `Driving License Number: ${drivingLicenseNumber}`,
-    105,
-    driverInfoY + 8
-  );
-  if (driverRenter === null) {
-    doc.text("Is driver and renter the same? -", 105, driverInfoY + 16);
-  } else if (driverRenter === true) {
-    doc.text("Driver and renter is the same", 105, driverInfoY + 16);
-  } else {
-    doc.text("Driver and renter is not the same", 105, driverInfoY + 16);
-  }
-  if (validLicense === null) {
-    doc.text("Valid drivers license? -", 105, driverInfoY + 24);
-  } else if (validLicense === true) {
-    doc.text("Valid drivers license? Yes", 105, driverInfoY + 24);
-  } else {
-    doc.text("Valid drivers license? No", 105, driverInfoY + 24);
+  doc.text(`Name: ${renterFullName}`, 15, driverInfoY);
+  /*   doc.text(`Phone number: ${data.renterInfo.phoneNumber}`, 15, driverInfoY + 8);
+   */ /* doc.text(`Email: ${data.renterInfo.email}`, 15, driverInfoY + 16); */
+  const addDriverInfoToPDF = (
+    doc: jsPDF,
+    startY: number,
+    data: reportDataType
+  ) => {
+    const renterInfoY = startY; // Starting Y-coordinate for Renter information
+
+    // Draw a rectangle for the box with rounded corners around Renter information
+    doc.setFillColor("#E6EEE5");
+    doc.roundedRect(10, driverInfoY + 5, 190, 60, 5, 5, "F"); // You can adjust the dimensions accordingly
+
+    // driver information header
+    doc.setFont("bold");
+    doc.text("Driver information", 15, driverInfoY + 23);
+    doc.setLineWidth(0.5);
+    doc.line(15, driverInfoY + 24, 80, driverInfoY + 24);
+
+    doc.setFont("normal");
+
+    doc.text(`Name: ${name}`, 15, driverInfoY + 36);
+    doc.text(`Phone number: ${phoneNumber}`, 15, driverInfoY + 44);
+    doc.text(`Email: ${email}`, 15, driverInfoY + 52);
+    let yOffset = driverInfoY + 60; // starting y-coordinate for the address
+    for (let line of addressLines) {
+      doc.text(line, 15, yOffset);
+      yOffset += 8; // adjust by the height of one line, you can change this value if needed
+    }
+    doc.text(
+      `Social security number: ${socialSecurityNumber}`,
+      105,
+      driverInfoY + 36
+    );
+    doc.text(
+      `Driving License Number: ${drivingLicenseNumber}`,
+      105,
+      driverInfoY + 44
+    );
+    if (driverRenter === null) {
+      doc.text("Is driver and renter the same? -", 105, driverInfoY + 52);
+    } else if (driverRenter === true) {
+      doc.text("Driver and renter is the same", 105, driverInfoY + 52);
+    } else {
+      doc.text("Driver and renter is not the same", 105, driverInfoY + 52);
+    }
+    if (validLicense === null) {
+      doc.text("Valid drivers license? -", 105, driverInfoY + 60);
+    } else if (validLicense === true) {
+      doc.text("Valid drivers license? Yes", 105, driverInfoY + 60);
+    } else {
+      doc.text("Valid drivers license? No", 105, driverInfoY + 60);
+    }
+
+    return driverInfoY + 60 + 10; // Return the Y-coordinate after drawing the Renter info + some gap for the next section
+  };
+
+  let nextSectionStartY = driverInfoY + 34; // Use the Y-coordinate after the Driver information
+
+  if (driverRenter === false) {
+    // If driver and renter are not the same, add the Renter section
+    nextSectionStartY = addDriverInfoToPDF(doc, nextSectionStartY, data);
   }
 
   // Add space between driver information and accident information
   const spaceBetweenSections = 10;
-  const accidentInfoY = driverInfoY + 40 + spaceBetweenSections;
+  const accidentInfoY = driverInfoY + 70 + spaceBetweenSections;
 
   const lineHeight = 6; // Adjust as needed
 
@@ -141,7 +182,7 @@ const createReportPDF = async (
   const accidentDescriptionHeight = numAccidentDescriptionLines * lineHeight;
 
   // Calculate the height of the green box based on the description length
-  const accidentInfoBoxTopY = driverInfoY + 40 + spaceBetweenSections - 8; // Adjust Y-coordinate as needed
+  const accidentInfoBoxTopY = driverInfoY + 70 + spaceBetweenSections - 8; // Adjust Y-coordinate as needed
   const accidentInfoBoxHeight = accidentDescriptionHeight + 64; // Adjust as needed
 
   doc.setFillColor("#E6EEE5"); // Light gray color for the background
@@ -254,7 +295,7 @@ const createReportPDF = async (
   doc.setTextColor(0);
 
   // Green car numberplate
-  doc.text("Green car numberplate:", accidentInfoLeftX, 37); // Adjust Y-coordinate as needed
+  doc.text("GreenMobility car:", accidentInfoLeftX, 37); // Adjust Y-coordinate as needed
   doc.text(data.greenCarNumberPlate || "-", accidentInfoRightX, 37); // Adjust Y-coordinate as needed
 
   // Speed

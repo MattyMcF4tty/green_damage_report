@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PedestrianInformation } from "../../components/opposite_information/person_information_form";
 import {
   ImageField,
@@ -20,11 +20,12 @@ import {
 import { OtherPartyList } from "@/components/otherPartys/otherPartyList";
 import { useRouter } from "next/router";
 import html2canvas from "html2canvas";
-/* import ZoeDrawing from "@/components/carDrawings/zoe";
+import ZoeDrawing from "@/components/carDrawings/zoe";
 import KangooDrawing from "@/components/carDrawings/kangoo";
 import VanDrawing from "@/components/carDrawings/kangoo";
-import DamagePopUp from "@/components/popups/damagePopup";
- */ import Google from "@/components/google";
+import DamagePopUp from "@/components/popups/damagePopUp";
+import Google from "@/components/google";
+import DamageList from "@/components/carDrawings/damageList";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -38,7 +39,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
   const mapsId = "GoogleMap";
   serverData.updateFields(data);
   const [allowClick, setAllowClick] = useState(true);
-  /*   const [currentCar, setCurrentCar] = useState<"zoe" | "van">("zoe");
+  const [currentCar, setCurrentCar] = useState<"zoe" | "van">("zoe");
   const [showOne, setShowOne] = useState(false);
   const [showTwo, setShowTwo] = useState(false);
   const [showThree, setShowThree] = useState(false);
@@ -53,7 +54,14 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
   const [showTwelve, setShowTwelve] = useState(false);
   const [showThirteen, setShowThirteen] = useState(false);
   const [showFourteen, setShowFourteen] = useState(false);
-  const [showFifteen, setShowFifteen] = useState(false); */
+  const [showFifteen, setShowFifteen] = useState(false);
+  const [damages, setDamages] = useState<
+    {
+      position: string | null;
+      description: string | null;
+      images: string[];
+    }[]
+  >(serverData.damages);
 
   /* logic */
   const [otherPartyInvolved, setOtherPartyInvolved] = useState<boolean | null>(
@@ -63,112 +71,263 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
     boolean | null
   >(serverData.singleVehicleAccident);
 
+  console.log(damages);
   // DATA
-  /*   const [damageOne, setDamageOne] = useState<{
+  const [damageOne, setDamageOne] = useState<{
+    position: string | null;
     description: string | null;
-    imageUrl: string | null;
-  }>({
-    description: null,
-    imageUrl: null,
-  });
+    images: string[];
+  }>(
+    damages[0]
+      ? {
+          position: damages[0].position,
+          description: damages[0].description,
+          images: damages[0].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
   const [damageTwo, setDamageTwo] = useState<{
+    position: string | null;
     description: string | null;
-    imageUrl: string | null;
-  }>({
-    description: null,
-    imageUrl: null,
-  });
+    images: string[];
+  }>(
+    damages[1]
+      ? {
+          position: damages[1].position,
+          description: damages[1].description,
+          images: damages[1].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
   const [damageThree, setDamageThree] = useState<{
+    position: string | null;
     description: string | null;
-    imageUrl: string | null;
-  }>({
-    description: null,
-    imageUrl: null,
-  });
+    images: string[];
+  }>(
+    damages[2]
+      ? {
+          position: damages[2].position,
+          description: damages[2].description,
+          images: damages[2].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
   const [damageFour, setDamageFour] = useState<{
+    position: string | null;
     description: string | null;
-    imageUrl: string | null;
-  }>({
-    description: null,
-    imageUrl: null,
-  });
+    images: string[];
+  }>(
+    damages[3]
+      ? {
+          position: damages[3].position,
+          description: damages[3].description,
+          images: damages[3].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
   const [damageFive, setDamageFive] = useState<{
+    position: string | null;
     description: string | null;
-    imageUrl: string | null;
-  }>({
-    description: null,
-    imageUrl: null,
-  });
+    images: string[];
+  }>(
+    damages[4]
+      ? {
+          position: damages[4].position,
+          description: damages[4].description,
+          images: damages[4].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
   const [damageSix, setDamageSix] = useState<{
+    position: string | null;
     description: string | null;
-    imageUrl: string | null;
-  }>({
-    description: null,
-    imageUrl: null,
-  });
+    images: string[];
+  }>(
+    damages[5]
+      ? {
+          position: damages[5].position,
+          description: damages[5].description,
+          images: damages[5].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
   const [damageSeven, setDamageSeven] = useState<{
+    position: string | null;
     description: string | null;
-    imageUrl: string | null;
-  }>({
-    description: null,
-    imageUrl: null,
-  });
+    images: string[];
+  }>(
+    damages[6]
+      ? {
+          position: damages[6].position,
+          description: damages[6].description,
+          images: damages[6].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
   const [damageEight, setDamageEight] = useState<{
+    position: string | null;
     description: string | null;
-    imageUrl: string | null;
-  }>({
-    description: null,
-    imageUrl: null,
-  });
+    images: string[];
+  }>(
+    damages[7]
+      ? {
+          position: damages[7].position,
+          description: damages[7].description,
+          images: damages[7].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
   const [damageNine, setDamageNine] = useState<{
+    position: string | null;
     description: string | null;
-    imageUrl: string | null;
-  }>({
-    description: null,
-    imageUrl: null,
-  });
+    images: string[];
+  }>(
+    damages[8]
+      ? {
+          position: damages[8].position,
+          description: damages[8].description,
+          images: damages[8].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
   const [damageTen, setDamageTen] = useState<{
+    position: string | null;
     description: string | null;
-    imageUrl: string | null;
-  }>({
-    description: null,
-    imageUrl: null,
-  });
+    images: string[];
+  }>(
+    damages[9]
+      ? {
+          position: damages[9].position,
+          description: damages[9].description,
+          images: damages[9].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
   const [damageEleven, setDamageEleven] = useState<{
+    position: string | null;
     description: string | null;
-    imageUrl: string | null;
-  }>({
-    description: null,
-    imageUrl: null,
-  });
+    images: string[];
+  }>(
+    damages[10]
+      ? {
+          position: damages[10].position,
+          description: damages[10].description,
+          images: damages[10].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
   const [damageTwelve, setDamageTwelve] = useState<{
+    position: string | null;
     description: string | null;
-    imageUrl: string | null;
-  }>({
-    description: null,
-    imageUrl: null,
-  });
+    images: string[];
+  }>(
+    damages[11]
+      ? {
+          position: damages[11].position,
+          description: damages[11].description,
+          images: damages[11].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
   const [damageThirteen, setDamageThirteen] = useState<{
+    position: string | null;
     description: string | null;
-    imageUrl: string | null;
-  }>({
-    description: null,
-    imageUrl: null,
-  });
+    images: string[];
+  }>(
+    damages[12]
+      ? {
+          position: damages[12].position,
+          description: damages[12].description,
+          images: damages[12].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
   const [damageFourteen, setDamageFourteen] = useState<{
+    position: string | null;
     description: string | null;
-    imageUrl: string | null;
-  }>({
-    description: null,
-    imageUrl: null,
-  });
+    images: string[];
+  }>(
+    damages[13]
+      ? {
+          position: damages[13].position,
+          description: damages[13].description,
+          images: damages[13].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
   const [damageFifteen, setDamageFifteen] = useState<{
+    position: string | null;
     description: string | null;
-    imageUrl: string | null;
-  }>({
-    description: null,
-    imageUrl: null,
-  }); */
+    images: string[];
+  }>(
+    damages[14]
+      ? {
+          position: damages[14].position,
+          description: damages[14].description,
+          images: damages[14].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
 
   const [damageDescription, setDamageDescription] = useState(
     serverData.damageDescription
@@ -302,6 +461,8 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
       /* PAGE LOGIC */
       otherPartyInvolved: otherPartyInvolved,
       singleVehicleAccident: isSingleVehicleChecked,
+
+      damages: damages,
     });
 
     await updateData(id, serverData);
@@ -310,6 +471,44 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
   /*   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
    */
   /*     <LoadScript googleMapsApiKey={apiKey || ""} libraries={["places"]}> */
+
+  useEffect(() => {
+    const newDamageArray = [
+      damageOne,
+      damageTwo,
+      damageThree,
+      damageFour,
+      damageFive,
+      damageSix,
+      damageSeven,
+      damageEight,
+      damageNine,
+      damageTen,
+      damageEleven,
+      damageTwelve,
+      damageThirteen,
+      damageFourteen,
+      damageFifteen,
+    ];
+
+    setDamages(newDamageArray);
+  }, [
+    damageOne,
+    damageTwo,
+    damageThree,
+    damageFour,
+    damageFive,
+    damageSix,
+    damageSeven,
+    damageEight,
+    damageNine,
+    damageTen,
+    damageEleven,
+    damageTwelve,
+    damageThirteen,
+    damageFourteen,
+    damageFifteen,
+  ]);
 
   return (
     <form
@@ -340,7 +539,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         <YesNo
           required={true}
           id="collisionWithOtherParty"
-          labelText="Collision with another object?"
+          labelText="Damage to other object?"
           value={otherPartyInvolved}
           onChange={setOtherPartyInvolved}
         />
@@ -402,7 +601,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         multiple={true}
       />
 
-      {/* <div>
+      <div>
         What type of car is damaged?
         <div className="">
           <select
@@ -453,7 +652,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         )}
         {showOne && (
           <DamagePopUp
-            id={id}
             setShowPopUp={setShowOne}
             damage={damageOne}
             setDamage={setDamageOne}
@@ -461,7 +659,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         )}
         {showTwo && (
           <DamagePopUp
-            id={id}
             setShowPopUp={setShowTwo}
             damage={damageTwo}
             setDamage={setDamageTwo}
@@ -469,7 +666,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         )}
         {showThree && (
           <DamagePopUp
-            id={id}
             setShowPopUp={setShowThree}
             damage={damageThree}
             setDamage={setDamageThree}
@@ -477,7 +673,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         )}
         {showFour && (
           <DamagePopUp
-            id={id}
             setShowPopUp={setShowFour}
             damage={damageFour}
             setDamage={setDamageFour}
@@ -485,7 +680,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         )}
         {showFive && (
           <DamagePopUp
-            id={id}
             setShowPopUp={setShowFive}
             damage={damageFive}
             setDamage={setDamageFive}
@@ -493,7 +687,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         )}
         {showSix && (
           <DamagePopUp
-            id={id}
             setShowPopUp={setShowSix}
             damage={damageSix}
             setDamage={setDamageSix}
@@ -501,7 +694,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         )}
         {showSeven && (
           <DamagePopUp
-            id={id}
             setShowPopUp={setShowSeven}
             damage={damageSeven}
             setDamage={setDamageSeven}
@@ -509,7 +701,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         )}
         {showEight && (
           <DamagePopUp
-            id={id}
             setShowPopUp={setShowEight}
             damage={damageEight}
             setDamage={setDamageEight}
@@ -517,7 +708,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         )}
         {showNine && (
           <DamagePopUp
-            id={id}
             setShowPopUp={setShowNine}
             damage={damageNine}
             setDamage={setDamageNine}
@@ -525,7 +715,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         )}
         {showTen && (
           <DamagePopUp
-            id={id}
             setShowPopUp={setShowTen}
             damage={damageTen}
             setDamage={setDamageTen}
@@ -533,7 +722,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         )}
         {showEleven && (
           <DamagePopUp
-            id={id}
             setShowPopUp={setShowEleven}
             damage={damageEleven}
             setDamage={setDamageEleven}
@@ -541,7 +729,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         )}
         {showTwelve && (
           <DamagePopUp
-            id={id}
             setShowPopUp={setShowTwelve}
             damage={damageTwelve}
             setDamage={setDamageTwelve}
@@ -549,7 +736,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         )}
         {showThirteen && (
           <DamagePopUp
-            id={id}
             setShowPopUp={setShowThirteen}
             damage={damageThirteen}
             setDamage={setDamageThirteen}
@@ -557,7 +743,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         )}
         {showFourteen && (
           <DamagePopUp
-            id={id}
             setShowPopUp={setShowFourteen}
             damage={damageFourteen}
             setDamage={setDamageFourteen}
@@ -565,13 +750,16 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         )}
         {showFifteen && (
           <DamagePopUp
-            id={id}
             setShowPopUp={setShowFifteen}
             damage={damageFifteen}
             setDamage={setDamageFifteen}
           />
         )}
-      </div> */}
+      </div>
+
+      <div>
+        <DamageList damages={damages} setDamages={setDamages} />
+      </div>
 
       <div className="flex flex-row justify-between w-full mt-4 ">
         <div className="flex flex-row w-16 justify-start h-14 ml-10 lg:w-16">

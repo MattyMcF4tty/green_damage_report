@@ -647,6 +647,11 @@ export type pageProps = {
     }[];
 
     witnesses: WitnessInformation[];
+    damages: {
+      position: string | null;
+      description: string | null;
+      images: string[];
+    }[];
 
     /* SITE LOGIC */
     /* What */
@@ -732,6 +737,12 @@ export class reportDataType {
 
   witnesses: WitnessInformation[];
 
+  damages: {
+    position: string | null;
+    description: string | null;
+    images: string[];
+  }[];
+
   /* SITE LOGIC */
   /* What */
   driverRenter: boolean | null;
@@ -783,6 +794,7 @@ export class reportDataType {
     this.pedestrianInfo = [];
     this.otherObjectInfo = [];
     this.witnesses = [];
+    this.damages = [];
     this.driverRenter = null;
     this.policePresent = null;
     this.policeReportExist = null;
@@ -837,6 +849,7 @@ export class reportDataType {
       pedestrianInfo: this.pedestrianInfo,
       otherObjectInfo: this.otherObjectInfo,
       witnesses: this.witnesses,
+      damages: this.damages,
       driverRenter: this.driverRenter,
       policePresent: this.policePresent,
       policeReportExist: this.policeReportExist,

@@ -181,21 +181,15 @@ export const OtherPartyList = ({
       {showPopUp && (
         <NewObjectPopUp
           setVisibility={setShowPopUp}
-          vehicleValue={
-            new carInformation("", "", "", "", "", "", "")
-          }
+          vehicleValue={new carInformation("", "", "", "", "", "", "")}
           setVehicleValue={(newVehicleValue) =>
             setVehicleValue([...vehicleValue, newVehicleValue])
           }
-          bikeValue={
-            new bikeInformation("", "", "", null, "")
-          }
+          bikeValue={new bikeInformation("", "", "", null, "")}
           setBikeValue={(newBikeValue) =>
             setBikeValue([...bikeValue, newBikeValue])
           }
-          pedestrianValue={
-            new PedestrianInformation("", "", "", "")
-          }
+          pedestrianValue={new PedestrianInformation("", "", "", "")}
           setPedestrianValue={(newPedestrianValue) =>
             setPedestrianValue([...pedestrianValue, newPedestrianValue])
           }
@@ -277,18 +271,15 @@ const NewObjectPopUp = ({
   const [isOther, setIsOther] = useState<boolean>(false);
 
   const [currentBikeValue, setCurrentBikeValue] = useState<bikeInformation>(
-    bikeValue ||
-      new bikeInformation("", "", "", null, "")
+    bikeValue || new bikeInformation("", "", "", null, "")
   );
   const [currentVehicleValue, setCurrentVehicleValue] =
     useState<carInformation>(
-      vehicleValue ||
-        new carInformation("", "", "", "", "", "", "")
+      vehicleValue || new carInformation("", "", "", "", "", "", "")
     );
   const [currentPedestrianValue, setCurrentPedestranValue] =
     useState<PedestrianInformation>(
-      pedestrianValue ||
-        new PedestrianInformation("", "", "", "")
+      pedestrianValue || new PedestrianInformation("", "", "", "")
     );
   const [currentOtherValue, setCurrentOtherValue] = useState<OtherInformation>(
     otherValue || new OtherInformation("", "")
@@ -376,9 +367,7 @@ const NewObjectPopUp = ({
         </div>
         <div className="w-full overflow-x-hidden overflow-y-auto no-scrollbar">
           {!isBike && !isVehicle && !isPedestrian && !isOther && (
-            <p className="w-full text-center mt-2">
-              Select one of the following
-            </p>
+            <p className="w-full text-center mt-2"></p>
           )}
           {isBike && (
             <BikeInfoForm

@@ -7,26 +7,28 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { FireStorage } from "@/firebase/firebaseConfig";
 
 interface DamagePopUpProps {
-  id: string;
-  damage: { description: string | null; imageUrl: string | null };
-  setDamage: (damageList: {
+  damage: {
     description: string | null;
-    imageUrl: string | null;
+    images: string[];
+    position: string | null;
+  };
+  setDamage: (damageList: {
+    position: string | null;
+    description: string | null;
+    images: string[];
   }) => void;
   setShowPopUp: (show: boolean) => void;
 }
 
-const DamagePopUp = ({
-  setShowPopUp,
-  setDamage,
-  damage,
-  id,
-}: DamagePopUpProps) => {
+const DamagePopUp = ({ setShowPopUp, setDamage, damage }: DamagePopUpProps) => {
   const [damageDescription, setDamageDescription] = useState<string>(
     damage.description ? damage.description : ""
   );
-  const [image, setImage] = useState<string | null>(
-    damage.imageUrl ? damage.imageUrl : null
+  const [position, setPosition] = useState<string>(
+    damage.position ? damage.position : ""
+  );
+  const [images, setImages] = useState<string[]>(
+    damage.images ? damage.images : []
   );
   const [currentImage, setCurrentImage] = useState<string>();
 
@@ -34,19 +36,20 @@ const DamagePopUp = ({
 
   const handleClosePopUp = () => {
     setDamageDescription("");
-    setImage("");
+    setImages([]);
     setShowPopUp(false);
   };
 
   const handleNewDamageList = async () => {
-    const storageRef = ref(FireStorage, `${id}/Damage/${currentImage}`)
-    const imageUrl = await getDownloadURL(storageRef);
+    /*     const storageRef = ref(FireStorage, `${id}/Damage/${currentImage}`);
+    const images = await getDownloadURL(storageRef); */
 
     const newDamage = {
+      position: position,
       description: damageDescription,
-      imageUrl: imageUrl,
+      images: images,
     };
-    console.log(newDamage)
+    console.log(newDamage);
     setDamage(newDamage);
     handleClosePopUp();
   };
@@ -76,25 +79,30 @@ const DamagePopUp = ({
             onChange={setDamageDescription}
           />
         </div>
-        <div>
+        {/*    <div>
           <label htmlFor="Please uploade pictures of the damage"></label>
-          <input 
-          type="file" 
-          required={false}
-          multiple={false}
-          accept="image/png, image/jpeg"
-          value={currentImage}
-          onChange={async (e) => {
-            const fieldImage = e.target.files;
-            if (fieldImage) {
-              const imageBlob = new Blob([fieldImage[0]], { type: fieldImage[0].type })
-              const storageRef = ref(FireStorage, `${id}/Damage/${fieldImage[0].name}`)
-              await uploadBytes(storageRef, imageBlob)
-              setCurrentImage(fieldImage[0].name)
-            }
-          }}
+          <input
+            type="file"
+            required={false}
+            multiple={false}
+            accept="image/png, image/jpeg"
+            value={currentImage}
+            onChange={async (e) => {
+              const fieldImage = e.target.files;
+              if (fieldImage) {
+                const imageBlob = new Blob([fieldImage[0]], {
+                  type: fieldImage[0].type,
+                });
+                const storageRef = ref(
+                  FireStorage,
+                  `${id}/Damage/${fieldImage[0].name}`
+                );
+                await uploadBytes(storageRef, imageBlob);
+                setCurrentImage(fieldImage[0].name);
+              }
+            }}
           />
-        </div>
+        </div> */}
         <button
           type="button"
           disabled={!allowSave}
