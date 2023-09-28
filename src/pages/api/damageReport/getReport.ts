@@ -1,13 +1,14 @@
 import { FireDatabase } from "@/firebase/firebaseConfig";
+import { decryptReport } from "@/utils/securityUtils";
 import { apiResponse } from "@/utils/types";
-import { reportDataType } from "@/utils/utils";
+import { decryptData, reportDataType } from "@/utils/utils";
 import { doc, getDoc } from "firebase/firestore";
 import { NextApiRequest, NextApiResponse } from "next";
 
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
 
-        // Check request
+    // Check method
     if (req.method !== "POST") {
         return res.status(405).json(new apiResponse(
             "METHOD_NOT_ALLOWED",
@@ -18,6 +19,13 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     }
 
     const { reportId } = req.body;
+    const { authorization } = req.headers;
+    let isAdmin = false;
+
+    if (authorization) {
+        isAdmin = true;
+    }
+
 
     try {
         if (!reportId || typeof reportId !== 'string') {
@@ -94,14 +102,25 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     const report = new reportDataType();
     report.updateFields(documentData);
 
-    const reportObject = report.toPlainObject();
+    const lowEncryptionKey = process.env.LOW_ENCRYPTION_KEY;
+    if (!lowEncryptionKey) {
+        console.error("LOW_ENCRYPTION_KEY is not defined in enviroment")
+        return res.status(500).json(new apiResponse(
+            "SERVER_ERROR",
+            [],
+            ["Something went wrong"],
+            {}
+        ))
+    }
+
     // Decrypt here
-    
+    const decryptedReport = decryptReport(report, false)
+    const decryptedReportObject = decryptedReport.toPlainObject();
 
     return res.status(200).json(new apiResponse(
         "OK",
         [],
         [],
-        reportObject
+        decryptedReportObject
     ))
 }

@@ -14,6 +14,7 @@ import { handleUploadMap, updateData } from "@/firebase/clientApp";
 import { GetServerSidePropsContext, NextPage } from "next";
 import {
   getServerSidePropsWithRedirect,
+  handleUpdateReport,
   pageProps,
   reportDataType,
 } from "@/utils/utils";
@@ -305,7 +306,13 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
       singleVehicleAccident: isSingleVehicleChecked,
     });
 
-    await updateData(id, serverData);
+    try {
+      await handleUpdateReport(id, serverData);
+    } catch (error) {
+      setAllowClick(true);
+      return;
+    }
+
     router.push(`confirmation?id=${id}`);
   };
   /*   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;

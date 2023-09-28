@@ -13,10 +13,10 @@ import Cookies from "js-cookie";
 import app, { FireDatabase, FireStorage } from "@/firebase/firebaseConfig";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/router";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { deleteObject, ref, uploadBytes } from "firebase/storage";
+import { collection, doc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import createReportPDF from "./reportPdfTemplate";
 import jsPDF from "jspdf";
+import { getReportDoc } from "./firebaseUtils/firestoreUtils";
 
 /* ------- utils config ----- */
 const firebaseCollectionName = collectionName;
@@ -148,7 +148,7 @@ export const getServerSidePropsWithRedirect = async (
 ) => {
   const id = context.query.id as string;
 
-  const reportData = await handleGetReportData(id);
+  const reportData = await getReportDoc(id, false);
   console.log(reportData)
   const GreenMobilityImages = await handleDownloadImages(
     `${id}/GreenMobility`,
@@ -537,13 +537,15 @@ export const handleGetRenter = async (numberplate: string, date: Date) => {
   }
 
   return responseData.data as {
-    customerId: number | null;
-    reservationId: number | null;
+    customerId: string | null;
+    reservationId: string | null;
     firstName: string | null;
     lastName: string | null;
     birthDate: string | null;
+    email: string | null;
+    phoneNumber: string |null;
     gender: string | null;
-    age: number | null;
+    age: string | null;
     insurance: boolean | null;
   }
 };
@@ -674,6 +676,53 @@ export const handleGetReportData = async (reportId: string) => {
   return report;
 }
 
+export const handleUpdateReport = async (reportId:string, reportData:reportDataType) => {
+
+  const data = {
+    reportId: reportId,
+    reportData: reportData.toPlainObject(),
+  }
+
+  const url = process.env.NEXT_PUBLIC_URL;
+  if (!url || typeof url !== 'string') {
+    throw new Error("NEXT_PUBLIC_URL is not defined in enviroment")
+  }
+
+  const response = await fetch(url + '/api/damageReport/updateReport', {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data)
+  })
+
+  const responseJson = await response.json();
+  if (!response.ok) {
+    const newError = new Error(responseJson.errors[0]);
+    newError.name = responseJson.status;
+    throw newError;
+  }
+
+  return;
+}
+
+export const isJSONSerializable = (data:any) => {
+  try {
+    JSON.stringify(data);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+export const createError = (name:string, message:string) => {
+  let newError = new Error();
+  newError.name = name;
+  newError.message = message;
+
+  return newError
+}
+
 /* ---------------- classes and types ------------------------------ */
 export type pageProps = {
   data: {
@@ -695,13 +744,15 @@ export type pageProps = {
     };
 
     renterInfo: {
-      customerId: number | null;
-      reservationId: number | null;
+      customerId: string | null;
+      reservationId: string | null;
       firstName: string | null;
       lastName: string | null;
+      email: string | null;
+      phoneNumber: string | null;
       birthDate: string | null;
       gender: string | null;
-      age: number | null;
+      age: string | null;
       insurance: boolean | null;
     };
 
@@ -747,7 +798,11 @@ export type pageProps = {
       location: { lat: number | null; lng: number | null };
     }[];
 
-    witnesses: WitnessInformation[];
+    witnesses: {
+      name: string | null,
+      phone: string | null,
+      email: string | null,
+    }[];
 
     /* SITE LOGIC */
     /* What */
@@ -787,13 +842,15 @@ export class reportDataType {
   };
 
   renterInfo: {
-    customerId: number | null;
-    reservationId: number | null;
+    customerId: string | null;
+    reservationId: string | null;
     firstName: string | null;
     lastName: string | null;
+    email: string | null;
+    phoneNumber: string | null;
     birthDate: string | null;
     gender: string | null;
-    age: number | null;
+    age: string | null;
     insurance: boolean | null;
   };
 
@@ -835,7 +892,11 @@ export class reportDataType {
     information: string;
   }[];
 
-  witnesses: WitnessInformation[];
+  witnesses: {
+    name: string | null,
+    phone: string | null,
+    email: string | null,
+  }[];
 
   /* SITE LOGIC */
   /* What */
@@ -872,6 +933,8 @@ export class reportDataType {
       reservationId: null,
       firstName: null,
       lastName: null,
+      email: null,
+      phoneNumber: null,
       birthDate: null,
       gender: null,
       age: null,
@@ -929,6 +992,8 @@ export class reportDataType {
         reservationId: this.renterInfo.reservationId,
         firstName: this.renterInfo.firstName,
         lastName: this.renterInfo.lastName,
+        email: this.renterInfo.email,
+        phoneNumber: this.renterInfo.phoneNumber,
         birthDate: this.renterInfo.birthDate,
         gender: this.renterInfo.gender,
         age: this.renterInfo.age,

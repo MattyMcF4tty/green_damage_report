@@ -1,4 +1,8 @@
-import { NextApiRequest } from "next";
+import { NextApiRequest, NextApiResponse } from "next";
+import { apiResponse } from "./types";
+import { decryptText, encryptText, reportDataType } from "./utils";
+import { doc, updateDoc } from "firebase/firestore";
+import { FireDatabase } from "@/firebase/firebaseConfig";
 
 // TODO: Improve to be more secure, right now you can add a / to url and it will pass.
 export function checkOrigin(req: NextApiRequest, allowedOrigins: string[]): boolean {
@@ -10,7 +14,6 @@ export function checkOrigin(req: NextApiRequest, allowedOrigins: string[]): bool
 }
 
 // TODO: Create spam protection function
-
 
 
 export const wunderToUTC = (wunderTime:string) => {

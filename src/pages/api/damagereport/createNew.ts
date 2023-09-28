@@ -1,5 +1,6 @@
 import admin from "@/firebase/firebaseAdminConfig";
 import { FireDatabase } from "@/firebase/firebaseConfig";
+import { lowEncryptText } from "@/utils/securityUtils";
 import { getCustomerFromCustomerId, getReservationFromReservationId } from "@/utils/serverUtils";
 import { apiResponse } from "@/utils/types";
 import { generateId, getAge, reportDataType, wunderToDate, wunderToGender } from "@/utils/utils";
@@ -61,7 +62,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
     const newDamageReport = new reportDataType();
     const currentDate = new Date();
     newDamageReport.updateFields({
-        userEmail: email, 
+        userEmail: lowEncryptText(email), 
         openedDate: currentDate.toString(),
     });
 

@@ -6,6 +6,7 @@ import { updateData } from "@/firebase/clientApp";
 import {
   getServerSidePropsWithRedirect,
   handleSendEmail,
+  handleUpdateReport,
   pageProps,
   reportDataType,
 } from "@/utils/utils";
@@ -23,6 +24,7 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
   const serverData = new reportDataType();
   serverData.updateFields(data);
   const [map, setMap] = useState<string | null>();
+  const [allowClick, setAllowClick] = useState(true);
 
   useEffect(() => {
     const getMap = async () => {
@@ -43,8 +45,14 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
   let [confirmVis, setConfirmVis] = useState(false);
 
   const handleSend = async () => {
+    setAllowClick(false);
     serverData.updateFields({ finished: true });
-    await updateData(id, serverData);
+    try {
+      await handleUpdateReport(id, serverData);
+    } catch (error) {
+      setAllowClick(true);
+      return;
+    }
     /* TODO: EMAIL shouldnt be null, but might be. Create the correct action if email is null */
     if (data.userEmail) {
       await handleSendEmail(
@@ -76,6 +84,7 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
               </button>
 
               <button
+                disabled={!allowClick}
                 onClick={() => handleSend()}
                 className="bg-MainGreen-300 p-1 w-2/5 text-white"
               >

@@ -1,3 +1,4 @@
+import { highEncryptText, lowEncryptText } from "@/utils/securityUtils";
 import { checkOrigin } from "@/utils/serverUtils";
 import { apiResponse } from "@/utils/types";
 import { dateToWunder, getAge, isDateInRange, wunderToDate } from "@/utils/utils";
@@ -284,18 +285,20 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             renterGender === "Female"
         }
 
+
         // Collecting renter data in object
         const renterInfo = {
-            customerId: customerId as number, 
-            reservationId: reservationId as number,
-            firstName: `${renterData.firstName}`,
-            lastName: `${renterData.lastName}`,
-            birthDate: `${renterData.birthDate}`,
-            gender: renterGender,
-            age: renterAge,
+            customerId: highEncryptText(`${customerId}`), 
+            reservationId: highEncryptText(`${reservationId}`),
+            firstName: lowEncryptText(`${renterData.firstName}`),
+            lastName: lowEncryptText(`${renterData.lastName}`),
+            birthDate: highEncryptText(`${renterData.birthDate}`),
+            email: highEncryptText(`${renterData.email}`),
+            phoneNumber: highEncryptText(`${renterData.mobilePhone}`),
+            gender: highEncryptText(renterGender),
+            age: highEncryptText(`${renterAge}`),
             insurance: null,
         };
-
         
         return res.status(200).json(new apiResponse(
             "OK",
