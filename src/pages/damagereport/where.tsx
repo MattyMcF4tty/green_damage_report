@@ -565,7 +565,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
           </div>
 
           {/* Picture of damages to green car collection */}
-          <div>
+          <div className="bg-MainGreen-300">
             <ImageField
               reportID={id}
               id="LeftImage"
@@ -601,11 +601,11 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         multiple={true}
       />
 
-      <div>
+      <div className="">
         What type of car is damaged?
         <div className="">
           <select
-            className="h-8 border border-neutral-500 rounded-md shadow-md outline-none"
+            className="h-8 border border-MainGreen-300 bg-MainGreen-200 rounded-md shadow-md outline-none"
             id="FilterOptions"
             value={currentCar}
             onChange={(e) => setCurrentCar(e.target.value as "zoe" | "van")}
@@ -757,7 +757,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         )}
       </div>
 
-      <div>
+      <div className="w-full">
         <DamageList damages={damages} setDamages={setDamages} />
       </div>
 
