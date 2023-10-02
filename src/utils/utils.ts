@@ -70,23 +70,6 @@ export const encryptData = (data: reportDataType) => {
   encryptedData.updateFields({ ...data });
   const secretKey = process.env.DATA_ENCRYPTION_KEY || "";
 
-  /* Encrypting driver info */
-  Object.keys(encryptedData.driverInfo).forEach((item) => {
-    if (
-      typeof encryptedData.driverInfo[
-        item as keyof typeof encryptedData.driverInfo
-      ] === "string"
-    ) {
-      encryptedData.driverInfo[item as keyof typeof encryptedData.driverInfo] =
-        CryptoJS.AES.encrypt(
-          encryptedData.driverInfo[
-            item as keyof typeof encryptedData.driverInfo
-          ] as string,
-          secretKey
-        ).toString();
-    }
-  });
-
   /* Encrypting police journal number */
   if (encryptedData.policeReportNumber) {
     encryptedData.updateFields({
@@ -106,23 +89,6 @@ export const decryptData = (data: reportDataType) => {
   const secretKey = process.env.DATA_ENCRYPTION_KEY || "";
 
   console.log("Before Decryption", decryptedData);
-  /* Decryption driver info */
-  Object.keys(decryptedData.driverInfo).forEach((item) => {
-    if (
-      typeof decryptedData.driverInfo[
-        item as keyof typeof decryptedData.driverInfo
-      ] === "string"
-    ) {
-      const decryptedValue = CryptoJS.AES.decrypt(
-        decryptedData.driverInfo[
-          item as keyof typeof decryptedData.driverInfo
-        ] as string,
-        secretKey
-      ).toString(CryptoJS.enc.Utf8); // Convert the decrypted value to UTF-8 string
-      decryptedData.driverInfo[item as keyof typeof decryptedData.driverInfo] =
-        decryptedValue;
-    }
-  });
 
   /* Decrypting police journal number */
   if (decryptedData.policeReportNumber) {
@@ -536,7 +502,7 @@ export const handleGetRenter = async (numberplate: string, date: Date) => {
   const responseData = await response.json();
 
   if (!response.ok) {
-    throw new Error(responseData.errors[0])
+    throw new Error(responseData.errors[0]);
   }
 
   return responseData.data as {
@@ -548,7 +514,7 @@ export const handleGetRenter = async (numberplate: string, date: Date) => {
     gender: string | null;
     age: number | null;
     insurance: boolean | null;
-  }
+  };
 };
 
 export const getAge = (birthDateString: string): number => {
@@ -565,39 +531,43 @@ export const getAge = (birthDateString: string): number => {
   return age;
 };
 
-export const isDateInRange = (startDate: Date, targetDate: Date, endDate: Date): boolean => {
+export const isDateInRange = (
+  startDate: Date,
+  targetDate: Date,
+  endDate: Date
+): boolean => {
   return targetDate > startDate && targetDate < endDate;
-}
+};
 
-export const dateToWunder = (date:Date) => {
+export const dateToWunder = (date: Date) => {
   const yyyy = date.getUTCFullYear();
-  const MM = String(date.getUTCMonth() + 1).padStart(2, '0');
-  const dd = String(date.getUTCDate()).padStart(2, '0');
-  const HH = String(date.getUTCHours()).padStart(2, '0');
-  const mm = String(date.getUTCMinutes()).padStart(2, '0');
-  const ss = String(date.getUTCSeconds()).padStart(2, '0');
+  const MM = String(date.getUTCMonth() + 1).padStart(2, "0");
+  const dd = String(date.getUTCDate()).padStart(2, "0");
+  const HH = String(date.getUTCHours()).padStart(2, "0");
+  const mm = String(date.getUTCMinutes()).padStart(2, "0");
+  const ss = String(date.getUTCSeconds()).padStart(2, "0");
 
   return `${yyyy}-${MM}-${dd} ${HH}:${mm}:${ss}`;
-}
+};
 
-export const wunderToUTC = (wunderTime:string) => {
+export const wunderToUTC = (wunderTime: string) => {
   return wunderTime.replace(" ", "T") + "Z";
-}
+};
 
 export const wunderToDate = (wunderTime: string | null) => {
-  console.log(wunderTime)
+  console.log(wunderTime);
   if (!wunderTime) {
-      return null
+    return null;
   }
 
   const parsed = new Date(wunderToUTC(wunderTime));
 
   if (isNaN(parsed.getTime())) {
-      return null;
+    return null;
   }
 
   return parsed;
-}
+};
 
 /* ---------------- classes and types ------------------------------ */
 export type pageProps = {
