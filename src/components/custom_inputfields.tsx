@@ -514,7 +514,9 @@ export const ImageField = ({
 
   return (
     <div className="flex flex-col mb-4">
-      <label htmlFor={id}>{labelText}</label>
+      <label className="" htmlFor={id}>
+        {labelText}
+      </label>
       <input
         type="text"
         required={imagesUploaded}

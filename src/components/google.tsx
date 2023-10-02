@@ -52,7 +52,6 @@ const Google = ({
   };
   const Zoom = 17;
 
-
   const { isLoaded, loadError } = useJsApiLoader({
     id: "google-map-script",
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
@@ -209,13 +208,13 @@ const Google = ({
         Use My Current Location
       </button>
       {showAutocomplete && (
-        <div className="mb-2">
+        <div className="mb-2 md:w-[800px]">
           {/* Container with spacing */}
           <Autocomplete onLoad={setAutocomplete}>
             <input
               type="text"
               placeholder="Enter the location of the incident"
-              className={`w-full h-10 text-lg p-1 rounded-none border-[1px] focus:border-[3px] border-MainGreen-200 outline-none ${autocompleteBgColor}`} // Apply the dynamic background color
+              className={`w-full h-10 text-lg p-1 rounded-none border-[1px]  focus:border-[3px] border-MainGreen-200 outline-none ${autocompleteBgColor}`} // Apply the dynamic background color
               value={autocompleteValue}
               onChange={(e) => setAutocompleteValue(e.target.value)}
             />
@@ -225,13 +224,13 @@ const Google = ({
 
       {show && (
         <div>
-          <div className="mb-4">
+          <div className="mb-4 ">
             <GoogleMap
               id={id}
               onLoad={handleMapLoad}
               center={mapCenter}
               zoom={Zoom}
-              mapContainerClassName="w-full h-[400px] border-[1px] border-MainGreen-200 rounded-lg"
+              mapContainerClassName="md:w-[800px] w-full h-[400px] border-[1px] border-MainGreen-200 rounded-lg"
             />
           </div>
         </div>

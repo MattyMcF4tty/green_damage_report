@@ -2,6 +2,7 @@ import jsPDF from "jspdf";
 import { reportDataType } from "@/utils/utils";
 import axios from "axios";
 import sharp from "sharp";
+import EXIF from "exif-js";
 
 const addImageToPDF = (pdfDoc: jsPDF) => {
   const imageWidth = 80;
@@ -49,7 +50,7 @@ const createReportPDF = async (
   // Driver information header
   doc.setTextColor(0);
   doc.setFont("bold");
-  doc.text("Driver information", 15, 123);
+  doc.text("Renter information", 15, 123);
   doc.setLineWidth(0.5);
   doc.line(15, 125, 80, 125);
 
@@ -61,7 +62,7 @@ const createReportPDF = async (
   const name =
     data.driverInfo.firstName && data.driverInfo.lastName
       ? `${data.driverInfo.firstName} ${data.driverInfo.lastName}`
-      : "-";
+      : `${data.renterInfo.firstName} ${data.renterInfo.lastName}`;
 
   const phoneNumber = data.driverInfo.phoneNumber
     ? data.driverInfo.phoneNumber
@@ -83,27 +84,87 @@ const createReportPDF = async (
 
   const driverRenter = data.driverRenter;
 
-  doc.text(`Name: ${name}`, 15, driverInfoY);
-  doc.text(`Phone number: ${phoneNumber}`, 15, driverInfoY + 8);
-  doc.text(`Email: ${email}`, 15, driverInfoY + 16);
-  doc.text(`Address: ${address}`, 15, driverInfoY + 24);
-  doc.text(`Social security number: ${socialSecurityNumber}`, 105, driverInfoY);
-  doc.text(
-    `Driving License Number: ${drivingLicenseNumber}`,
-    105,
-    driverInfoY + 8
+  const validLicense = data.driverInfo.validDriversLicense;
+
+  const renterFullName =
+    data.renterInfo.firstName && data.renterInfo.lastName
+      ? `${data.renterInfo.firstName} ${data.renterInfo.lastName}`
+      : "-";
+
+  const maxLocationWidth = 80;
+  const addressLines = doc.splitTextToSize(
+    `Address: ${address}`,
+    maxLocationWidth
   );
-  if (driverRenter === null) {
-    doc.text("Is driver and renter the same? -", 105, driverInfoY + 16);
-  } else if (driverRenter === true) {
-    doc.text("Driver and renter is the same", 105, driverInfoY + 16);
-  } else {
-    doc.text("Driver and renter is not the same", 105, driverInfoY + 16);
+
+  doc.text(`Name: ${renterFullName}`, 15, driverInfoY);
+  /*   doc.text(`Phone number: ${data.renterInfo.phoneNumber}`, 15, driverInfoY + 8);
+   */ /* doc.text(`Email: ${data.renterInfo.email}`, 15, driverInfoY + 16); */
+  const addDriverInfoToPDF = (
+    doc: jsPDF,
+    startY: number,
+    data: reportDataType
+  ) => {
+    const renterInfoY = startY; // Starting Y-coordinate for Renter information
+
+    // Draw a rectangle for the box with rounded corners around Renter information
+    doc.setFillColor("#E6EEE5");
+    doc.roundedRect(10, driverInfoY + 5, 190, 60, 5, 5, "F"); // You can adjust the dimensions accordingly
+
+    // driver information header
+    doc.setFont("bold");
+    doc.text("Driver information", 15, driverInfoY + 23);
+    doc.setLineWidth(0.5);
+    doc.line(15, driverInfoY + 24, 80, driverInfoY + 24);
+
+    doc.setFont("normal");
+
+    doc.text(`Name: ${name}`, 15, driverInfoY + 36);
+    doc.text(`Phone number: ${phoneNumber}`, 15, driverInfoY + 44);
+    doc.text(`Email: ${email}`, 15, driverInfoY + 52);
+    let yOffset = driverInfoY + 60; // starting y-coordinate for the address
+    for (let line of addressLines) {
+      doc.text(line, 15, yOffset);
+      yOffset += 8; // adjust by the height of one line, you can change this value if needed
+    }
+    doc.text(
+      `Social security number: ${socialSecurityNumber}`,
+      105,
+      driverInfoY + 36
+    );
+    doc.text(
+      `Driving License Number: ${drivingLicenseNumber}`,
+      105,
+      driverInfoY + 44
+    );
+    if (driverRenter === null) {
+      doc.text("Is driver and renter the same? -", 105, driverInfoY + 52);
+    } else if (driverRenter === true) {
+      doc.text("Driver and renter is the same", 105, driverInfoY + 52);
+    } else {
+      doc.text("Driver and renter is not the same", 105, driverInfoY + 52);
+    }
+    if (validLicense === null) {
+      doc.text("Valid drivers license? -", 105, driverInfoY + 60);
+    } else if (validLicense === true) {
+      doc.text("Valid drivers license? Yes", 105, driverInfoY + 60);
+    } else {
+      doc.text("Valid drivers license? No", 105, driverInfoY + 60);
+    }
+
+    return driverInfoY + 60 + 10; // Return the Y-coordinate after drawing the Renter info + some gap for the next section
+  };
+
+  let nextSectionStartY = driverInfoY + 34; // Use the Y-coordinate after the Driver information
+
+  if (driverRenter === false) {
+    // If driver and renter are not the same, add the Renter section
+    nextSectionStartY = addDriverInfoToPDF(doc, nextSectionStartY, data);
   }
 
   // Add space between driver information and accident information
   const spaceBetweenSections = 10;
-  const accidentInfoY = driverInfoY + 40 + spaceBetweenSections;
+  const accidentInfoY = driverInfoY + 70 + spaceBetweenSections;
 
   const lineHeight = 6; // Adjust as needed
 
@@ -121,7 +182,7 @@ const createReportPDF = async (
   const accidentDescriptionHeight = numAccidentDescriptionLines * lineHeight;
 
   // Calculate the height of the green box based on the description length
-  const accidentInfoBoxTopY = driverInfoY + 40 + spaceBetweenSections - 8; // Adjust Y-coordinate as needed
+  const accidentInfoBoxTopY = driverInfoY + 70 + spaceBetweenSections - 8; // Adjust Y-coordinate as needed
   const accidentInfoBoxHeight = accidentDescriptionHeight + 64; // Adjust as needed
 
   doc.setFillColor("#E6EEE5"); // Light gray color for the background
@@ -234,7 +295,7 @@ const createReportPDF = async (
   doc.setTextColor(0);
 
   // Green car numberplate
-  doc.text("Green car numberplate:", accidentInfoLeftX, 37); // Adjust Y-coordinate as needed
+  doc.text("GreenMobility car:", accidentInfoLeftX, 37); // Adjust Y-coordinate as needed
   doc.text(data.greenCarNumberPlate || "-", accidentInfoRightX, 37); // Adjust Y-coordinate as needed
 
   // Speed
@@ -894,12 +955,77 @@ const createReportPDF = async (
   //images section
   doc.addPage();
 
-  const calculateRequiredHeight = (
-    numImages: number,
-    imageHeight: number,
-    headerHeight: number
-  ) => {
-    return numImages * imageHeight + headerHeight;
+  const rotateImage = (imgBase64: string, angle: number): Promise<string> => {
+    return new Promise((resolve) => {
+      const image = new Image();
+      image.onload = () => {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return;
+
+        if (angle === 90 || angle === 270) {
+          canvas.width = image.height;
+          canvas.height = image.width;
+        } else {
+          canvas.width = image.width;
+          canvas.height = image.height;
+        }
+
+        ctx.translate(canvas.width / 2, canvas.height / 2);
+        ctx.rotate((angle * Math.PI) / 180);
+        ctx.drawImage(image, -image.width / 2, -image.height / 2);
+
+        resolve(canvas.toDataURL("image/jpeg"));
+      };
+      image.src = imgBase64;
+    });
+  };
+
+  const getRotationAngle = async (imgBase64: string): Promise<number> => {
+    return new Promise((resolve, reject) => {
+      const byteString = atob(imgBase64.split(",")[1]);
+      const mimeString = imgBase64.split(",")[0].split(":")[1].split(";")[0];
+      const buffer = new ArrayBuffer(byteString.length);
+      const data = new Uint8Array(buffer);
+      for (let i = 0; i < byteString.length; i++) {
+        data[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([buffer], { type: mimeString });
+      const objectURL = URL.createObjectURL(blob);
+      const img = new Image();
+      img.src = objectURL;
+      img.onerror = reject;
+      img.onload = () => {
+        (EXIF.getData as any)(img, function (this: any) {
+          const orientation = EXIF.getTag(this, "Orientation");
+          let angle = 0;
+          switch (orientation) {
+            case 1:
+              angle = 0;
+              break;
+            case 3:
+              angle = 180;
+              break;
+            case 6:
+              angle = 0;
+              break;
+            case 8:
+              angle = 270;
+              break;
+            default:
+              angle = 0;
+          }
+          resolve(angle);
+        });
+      };
+    });
+  };
+
+  const getCorrectlyOrientedImage = async (
+    imgBase64: string
+  ): Promise<string> => {
+    const angle = await getRotationAngle(imgBase64);
+    return rotateImage(imgBase64, angle);
   };
 
   // Function to add header for image sections
@@ -911,36 +1037,41 @@ const createReportPDF = async (
     doc.setFont("normal");
     currentY += headerHeight; // Add space for header
   };
-
-  const addImageWithSpacingCheck = (
+  const addImageWithSpacingCheck = async (
     imageBase64: string,
     format: string,
     x: number,
-    y: number,
+    currentY: number,
     width: number,
-    height: number,
-    rotation: number
-  ): number => {
+    height: number
+  ): Promise<number> => {
     // Check if there's enough space on the page
-    const remainingSpace = doc.internal.pageSize.height - y;
+    const margin = 10;
+    const requiredSpace = height + margin;
+    const remainingSpace = doc.internal.pageSize.height - currentY;
 
-    if (remainingSpace < height) {
+    // If the image doesn't fit vertically, add a new page
+    if (remainingSpace < requiredSpace) {
       doc.addPage();
-      y = 10; // Reset Y-coordinate to the top of the new page
+      currentY = 10; // Reset y-coordinate to the top of the new page
     }
 
+    // Add the image with the adjusted x-coordinate and the angle
     doc.addImage(
       imageBase64,
       format,
       x,
-      y,
+      currentY,
       width,
       height,
       undefined,
-      undefined,
-      rotation
+      undefined
     );
-    return y + height + 10; // Returns new Y-coordinate after placing the image, with a 10-unit gap for next content
+
+    currentY += height; // Adjust currentY for the height of the image
+    currentY += margin; // Add some margin after the image for spacing
+
+    return currentY; // Return updated currentY after adding image
   };
 
   // Images of damages to GreenMobility section
@@ -953,17 +1084,18 @@ const createReportPDF = async (
 
     if (Array.isArray(images["GreenMobility"])) {
       for (const imageBase64 of images["GreenMobility"]) {
-        // Check if there's enough space on the page
-        currentY = addImageWithSpacingCheck(
-          imageBase64,
+        const correctedImageBase64 = await getCorrectlyOrientedImage(
+          imageBase64
+        );
+
+        currentY = await addImageWithSpacingCheck(
+          correctedImageBase64,
           "JPEG",
           15,
           currentY,
           100,
-          100,
-          0 // or appropriate rotation
+          100
         );
-        currentY += 10; // space between images
       }
     } else {
       doc.text("No GreenMobility images available.", 15, currentY);
@@ -980,16 +1112,18 @@ const createReportPDF = async (
 
     if (Array.isArray(images["OtherParty"])) {
       for (const imageBase64 of images["OtherParty"]) {
-        currentY = addImageWithSpacingCheck(
-          imageBase64,
+        const correctedImageBase64 = await getCorrectlyOrientedImage(
+          imageBase64
+        );
+
+        currentY = await addImageWithSpacingCheck(
+          correctedImageBase64,
           "JPEG",
           15,
           currentY,
           100,
-          100,
-          0 // or appropriate rotation
+          100
         );
-        currentY += 10; // space between images
       }
     }
   }
@@ -1009,14 +1143,108 @@ const createReportPDF = async (
         100, // FIX
         100 // FIX
       );
-      currentY += 2; // FIX;
+      currentY += 105; // FIX;
+      doc.text(`lat: ${data.accidentLocation.lat || "-"}`, 15, currentY);
+      currentY += 4;
+      doc.text(`lng: ${data.accidentLocation.lng || "-"}`, 15, currentY);
+      currentY += 4; // Adjust as needed.
     });
   } else {
     addImageSectionHeader("Map Images");
     doc.text("No map images available.", 15, currentY);
     currentY += headerHeight;
   }
+  currentY += 20; // Damage information for each damage in the array
 
+  const damagePositionLineHeight = 6; // Adjust as needed
+  const maxDamagePositionDescriptionLines = 15; // Maximum lines for the damage description
+  const damagePositionDescriptionMaxWidth = 90; // Adjust as needed
+  const pageHeight = 297; // A4 page height in mm
+  const bottomMargin = 20; // Minimum space you want to leave at the bottom of each page
+
+  // Calculate required space for a damage entry
+  function calculateDamageSpaceRequired(
+    damageDescriptionHeight: number
+  ): number {
+    return 70 + damageDescriptionHeight; // Include headers, footers, and some buffer
+  }
+  data.damages &&
+    data.damages.forEach((damage, index) => {
+      const damagePositionDescriptionLines = doc.splitTextToSize(
+        damage.description || "No damage description has been provided",
+        damagePositionDescriptionMaxWidth
+      );
+      const numDamagePositionDescriptionLines = Math.min(
+        maxDamagePositionDescriptionLines,
+        damagePositionDescriptionLines.length
+      );
+      const damagePositionDescriptionHeight =
+        numDamagePositionDescriptionLines * damagePositionLineHeight;
+
+      if (
+        currentY +
+          calculateDamageSpaceRequired(damagePositionDescriptionHeight) >
+        pageHeight - bottomMargin
+      ) {
+        doc.addPage();
+        currentY = 10;
+      }
+      // Calculate the height of the green box based on the description length
+      const damagePositionInfoBoxHeight = damagePositionDescriptionHeight + 50; // Additional space for other data
+
+      // Green box for the damage entry
+      doc.setFillColor("#E6EEE5");
+      doc.roundedRect(
+        10,
+        currentY, // Use currentY instead of the fixed value
+        190,
+        damagePositionInfoBoxHeight,
+        5, // Corner radius
+        5, // Corner radius
+        "F"
+      );
+
+      // Damage information header
+      doc.setFont("bold");
+      doc.text("Damage position information", 15, currentY + 10); // Use currentY
+      doc.setLineWidth(0.5);
+      doc.line(15, currentY + 12, 80, currentY + 12); // Use currentY
+
+      doc.setFont("normal");
+
+      // Position
+      doc.text("Position:", 15, currentY + 22); // Use currentY
+      doc.text(damage.position || "-", 85, currentY + 22); // Use currentY
+
+      // Damage description
+      doc.text("Damage description:", 15, currentY + 30); // Use currentY
+      for (let i = 0; i < numDamagePositionDescriptionLines; i++) {
+        doc.text(
+          damagePositionDescriptionLines[i],
+          15, // Starting at the left edge
+          currentY + 40 + i * damagePositionLineHeight // Use currentY
+        );
+      }
+
+      // Images
+      doc.text(
+        "Images:",
+        15,
+        currentY +
+          40 +
+          numDamagePositionDescriptionLines * damagePositionLineHeight
+      );
+      doc.text(
+        damage.images.join(", "),
+        85,
+        currentY +
+          40 +
+          numDamagePositionDescriptionLines * damagePositionLineHeight
+      );
+
+      currentY +=
+        calculateDamageSpaceRequired(damagePositionDescriptionHeight) + 5;
+    });
   const pdfBlob = doc.output("blob");
   return pdfBlob;
 };

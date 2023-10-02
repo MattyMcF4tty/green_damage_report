@@ -11,6 +11,13 @@ import {
 } from "@/utils/utils";
 import { getDownloadURL, ref } from "firebase/storage";
 import { FireStorage } from "@/firebase/firebaseConfig";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import {
+  faBicycle,
+  faBox,
+  faCar,
+  faPerson,
+} from "@fortawesome/free-solid-svg-icons";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -89,61 +96,73 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
       {/* Driver information collected */}
       <p className="font-bold text-MainGreen-300 mb-2">Driver information</p>
       {data.driverRenter ? (
-        <div
-        className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full grid grid-cols-2 gap-y-4 mb-6"
-        >
+        <div className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full grid grid-cols-2 gap-y-4 mb-6">
           {/* First name */}
           <div className="row-start-1 col-span-2 justify-center">
             <p className="text-xs italic">Name:</p>
             <p>
-              {data.renterInfo.firstName} {data.renterInfo.lastName}
+              {data.renterInfo.firstName ? data.renterInfo.firstName : "-"}{" "}
+              {data.renterInfo.lastName ? data.renterInfo.lastName : ""}
             </p>
           </div>
         </div>
       ) : (
-        <div
-          className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full grid grid-cols-2 gap-y-4 mb-6"
-        >
+        <div className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full grid grid-cols-2 gap-y-4 mb-6">
           {/* First name */}
-          <div className="row-start-1 col-span-2 justify-center">
+          <div className="row-start-1 col-span-1 justify-center">
             <p className="text-xs italic">Name:</p>
             <p>
-              {data.driverInfo.firstName} {data.driverInfo.lastName}
+              {data.driverInfo.firstName ? data.driverInfo.firstName : "-"}
+              {data.driverInfo.lastName ? data.driverInfo.firstName : ""}
             </p>
+          </div>
+
+          {/* Driving license number */}
+          <div className="row-start-1 col-start-2">
+            <p className="text-xs italic">Valid drivers license:</p>
+            {data.driverInfo.validDriversLicense ? <p>Yes</p> : <p>No</p>}
           </div>
 
           {/* Phone number */}
           <div className="row-start-2 col-start-1">
             <p className="text-xs italic">Phone number:</p>
-            <p>{data.driverInfo.phoneNumber}</p>
+            <p>
+              {data.driverInfo.phoneNumber ? data.driverInfo.phoneNumber : "-"}
+            </p>
           </div>
 
           {/* Address */}
           <div className="row-start-2 col-start-2">
             <p className="text-xs italic">Address:</p>
-            <p>{data.driverInfo.address}</p>
+            <p>{data.driverInfo.address ? data.driverInfo.address : "-"}</p>
           </div>
 
           {/* Email */}
           <div className="row-start-3 col-span-2">
             <p className="text-xs italic">Email:</p>
-            <p>{data.driverInfo.email}</p>
+            <p>{data.driverInfo.email ? data.driverInfo.email : "-"}</p>
           </div>
 
           {/* Social security number */}
           <div className="row-start-4 col-start-1">
             <p className="text-xs italic">Social Security Number:</p>
-            <p>{data.driverInfo.socialSecurityNumber}</p>
+            <p>
+              {data.driverInfo.socialSecurityNumber
+                ? data.driverInfo.socialSecurityNumber
+                : "-"}
+            </p>
           </div>
 
-          {/* Driving license number */}
           <div className="row-start-4 col-start-2">
             <p className="text-xs italic">Driving License Number:</p>
-            <p>{data.driverInfo.drivingLicenseNumber}</p>
+            <p>
+              {data.driverInfo.drivingLicenseNumber
+                ? data.driverInfo.drivingLicenseNumber
+                : "-"}
+            </p>
           </div>
         </div>
       )}
-      
 
       {/* Information about accident */}
       <p className="font-bold text-MainGreen-300 mb-2">Accident information</p>
@@ -151,35 +170,33 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
         {/* Date of accident */}
         <div className="row-start-1 col-start-1">
           <p className="text-xs italic">Date of accident:</p>
-          <p>{data.date}</p>
+          <p>{data.date ? data.date : "-"}</p>
         </div>
 
         {/* Time of accident */}
         <div className="row-start-1 col-start-2">
           <p className="text-xs italic">Time of accident:</p>
-          <p>{data.time}</p>
-        </div>
-
-        {/* Location */}
-        <div className="row-start-2 col-span-2">
-          <p className="text-xs italic">Location:</p>
-          <p>{`${data.accidentAddress}`}</p>
+          <p>{data.time ? data.time : "-"}</p>
         </div>
 
         {/* Police journal */}
         <div className="row-start-3 col-span-2">
           <p className="text-xs italic">Police journal number:</p>
-          {data.policeReportNumber !== "" ? (
-            <p>{data.policeReportNumber}</p>
-          ) : (
-            <p>No police report was filed</p>
-          )}
+          <p>
+            {data.policeReportNumber
+              ? data.policeReportNumber
+              : "No police report was filed"}
+          </p>
         </div>
 
         {/* Accident description */}
         <div className="row-start-4 col-span-2">
           <p className="text-xs italic">Accident description:</p>
-          <span className="break-words">{data.accidentDescription}</span>
+          <span className="break-words">
+            {data.accidentDescription
+              ? data.accidentDescription
+              : "No accident description provided"}
+          </span>
         </div>
       </div>
 
@@ -189,19 +206,23 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
         {/* Green car numberplate */}
         <div className="row-start-1 col-start-1">
           <p className="text-xs italic">Green car numberplate:</p>
-          <p>{data.greenCarNumberPlate}</p>
+          <p>{data.greenCarNumberPlate ? data.greenCarNumberPlate : "-"}</p>
         </div>
 
         {/* Speed */}
         <div className="row-start-1 col-start-2">
           <p className="text-xs italic">Speed:</p>
-          <p>{data.speed} km/h</p>
+          <p>{data.speed ? data.speed : "-"} km/h</p>
         </div>
 
         {/* Damage description */}
         <div className="row-start-2 col-span-2">
           <p className="text-xs italic">Damage description:</p>
-          <span className="break-words">{data.damageDescription}</span>
+          <span className="break-words">
+            {data.damageDescription
+              ? data.damageDescription
+              : "No damage description provided"}
+          </span>
         </div>
       </div>
 
@@ -211,177 +232,196 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
       <p className="font-bold text-MainGreen-300 mb-2">
         Others involved in crash
       </p>
-      <div className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
-        {/* Bike information */}
-        <div className="w-full">
-          <p className="text-sm font-semibold">Biker information:</p>
-          {data.bikerInfo.length > 0 ? (
-            data.bikerInfo.map((currentBike, index) => (
-              <div
-                key={index}
-                className="grid grid-cols-2 gap-y-2 pl-4 py-1 mb-2"
-              >
-                {/* Name of biker */}
-                <div className="row-start-1 col-start-1">
-                  <p className="text-xs italic">Name:</p>
-                  <p>{currentBike.name}</p>
-                </div>
+      <div className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6 flex flex-col">
+        {data.bikerInfo.length == 0 &&
+        data.vehicleInfo.length == 0 &&
+        data.otherObjectInfo.length == 0 &&
+        data.pedestrianInfo.length == 0 ? (
+          <div>
+            <p>No others was involved in crash</p>
+          </div>
+        ) : (
+          <div className="">
+            <div className="w-full">
+              {data.bikerInfo.length > 0 &&
+                data.bikerInfo.map((currentBike, index) => (
+                  <div className="flex flex-row items-center">
+                    <FontAwesomeIcon icon={faBicycle} />
+                    <div
+                      key={index}
+                      className="grid grid-cols-2 gap-y-2 pl-5 ml-[0.76rem] py-1 border-l-2 border-MainGreen-300"
+                    >
+                      {/* Name of biker */}
+                      <div className="row-start-1 col-start-1">
+                        <p className="text-xs italic">Name:</p>
+                        <p>{currentBike.name}</p>
+                      </div>
 
-                {/* Was the bike an electric bike */}
-                <div className="row-start-1 col-start-2">
-                  <p className="text-xs italic">Electric bike:</p>
-                  {currentBike.ebike ? <p>Yes</p> : <p>No</p>}
-                </div>
+                      {/* Was the bike an electric bike */}
+                      <div className="row-start-1 col-start-2">
+                        <p className="text-xs italic">Electric bike:</p>
+                        {currentBike.ebike ? <p>Yes</p> : <p>No</p>}
+                      </div>
 
-                {/* phone of biker */}
-                <div className="row-start-2 col-start-1">
-                  <p className="text-xs italic">Phone:</p>
-                  <p>{currentBike.phone}</p>
-                </div>
+                      {/* phone of biker */}
+                      <div className="row-start-2 col-start-1">
+                        <p className="text-xs italic">Phone:</p>
+                        <p>{currentBike.phone}</p>
+                      </div>
 
-                {/* mail of biker */}
-                <div className="row-start-3 col-span-2">
-                  <p className="text-xs italic">Email:</p>
-                  <p>{currentBike.email}</p>
-                </div>
+                      {/* mail of biker */}
+                      <div className="row-start-3 col-span-2">
+                        <p className="text-xs italic">Email:</p>
+                        <p>{currentBike.email}</p>
+                      </div>
 
-                {/* Person damage */}
-                <div className="row-start-4 col-span-2">
-                  <p className="text-xs italic">Injuries:</p>
-                  {currentBike.personDamage !== "" ? (
-                    <span>{currentBike.personDamage}</span>
-                  ) : (
-                    <p>No</p>
-                  )}
-                </div>
+                      {/* Person damage */}
+                      <div className="row-start-4 col-span-2">
+                        <p className="text-xs italic">Injuries:</p>
+                        {currentBike.personDamage !== "" ? (
+                          <span>{currentBike.personDamage}</span>
+                        ) : (
+                          <p>No</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+
+            {/* Vehicle info */}
+            <div className="w-full mt-4">
+              {data.vehicleInfo.length > 0 &&
+                data.vehicleInfo.map((currentVehicle, index) => (
+                  <div className="flex flex-row items-center">
+                    <FontAwesomeIcon icon={faCar} />
+                    <div
+                      key={index}
+                      className="grid grid-cols-2 gap-y-2 pl-5 ml-[0.99rem] py-1 border-l-2 border-MainGreen-300"
+                    >
+                      {/* Name of vehicles driver */}
+                      <div className="row-start-1 col-span-2">
+                        <p className="text-xs italic">Name:</p>
+                        <p className="break-words">{currentVehicle.name}</p>
+                      </div>
+
+                      {/* drivers license number of vehicles driver */}
+                      <div className="row-start-2 col-start-2">
+                        <p className="text-xs italic">Driver license number:</p>
+                        <p>{currentVehicle.driversLicenseNumber}</p>
+                      </div>
+
+                      {/* Phone number of vehicle driver */}
+                      <div className="row-start-2 col-start-1">
+                        <p className="text-xs italic">Phone number:</p>
+                        <p>{currentVehicle.phone}</p>
+                      </div>
+
+                      {/* Mail of vehicle driver */}
+                      <div className="row-start-3 col-span-2">
+                        <p className="text-xs italic">Email:</p>
+                        <p>{currentVehicle.email}</p>
+                      </div>
+
+                      {/* numberplate of vehicle */}
+                      <div className="row-start-4 col-start-1">
+                        <p className="text-xs italic">Numberplate:</p>
+                        <p>{currentVehicle.numberplate}</p>
+                      </div>
+
+                      {/* insurance of vehicle */}
+                      <div className="row-start-4 col-start-2">
+                        <p className="text-xs italic">Insurance:</p>
+                        <p>{currentVehicle.insurance}</p>
+                      </div>
+
+                      {/* model of vehicle */}
+                      <div className="row-start-5 col-start-1">
+                        <p className="text-xs italic">Vehicle model:</p>
+                        <p>{currentVehicle.model}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+            </div>
+            <div>
+              <div className="w-full mt-4">
+                {data.pedestrianInfo.length > 0 &&
+                  data.pedestrianInfo.map((currenPedestrian, index) => (
+                    <div className="flex flex-row items-center">
+                      <FontAwesomeIcon icon={faPerson} />
+                      <div
+                        key={index}
+                        className="grid grid-cols-2 gap-y-2 pl-5 ml-[1.38rem] py-1 border-l-2 border-MainGreen-300"
+                      >
+                        {/* Name of pedestrian */}
+                        <div className="row-start-1 col-start-1">
+                          <p className="text-xs italic">Name:</p>
+                          <p className="break-words">{currenPedestrian.name}</p>
+                        </div>
+
+                        {/* Phone number of pedestrian */}
+                        <div className="row-start-1 col-start-2">
+                          <p className="text-xs italic">Phone number:</p>
+                          <p>{currenPedestrian.phone}</p>
+                        </div>
+
+                        {/* Mail of pedestrian */}
+                        <div className="row-start-2 col-span-2">
+                          <p className="text-xs italic">Email:</p>
+                          <p>{currenPedestrian.email}</p>
+                        </div>
+
+                        {/* Damage of pedestrian */}
+                        <div className="row-start-3 col-span-2">
+                          <p className="text-xs italic">Injuries:</p>
+                          {currenPedestrian.personDamage !== "" ? (
+                            <p>{currenPedestrian.personDamage}</p>
+                          ) : (
+                            <p>No damage</p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
               </div>
-            ))
-          ) : (
-            <p className="ml-4">No biker was hit</p>
-          )}
-        </div>
+            </div>
+            <div>
+              <div className="w-full mt-4">
+                {data.otherObjectInfo.length > 0 &&
+                  data.otherObjectInfo.map((currentObject, index) => (
+                    <div className="flex flex-row items-center">
+                      <FontAwesomeIcon icon={faBox} />
+                      <div
+                        key={index}
+                        className="grid grid-cols-2 gap-y-2 pl-5 ml-[1.1rem] py-1 border-l-2 border-MainGreen-300"
+                      >
+                        {/* Description */}
+                        <div className="row-start-1 col-span-2">
+                          <p className="text-xs italic">
+                            Description of object:
+                          </p>
+                          <span className="break-words">
+                            {currentObject.description}
+                          </span>
+                        </div>
 
-        {/* Other vechicle information */}
-        <div className="w-full mt-4">
-          <p className="text-sm font-semibold">Other vehicle information:</p>
-          {data.vehicleInfo.length > 0 ? (
-            data.vehicleInfo.map((currentVehicle, index) => (
-              <div key={index} className="grid grid-cols-2 gap-y-2 pl-4 py-1">
-                {/* Name of vehicles driver */}
-                <div className="row-start-1 col-span-2">
-                  <p className="text-xs italic">Name:</p>
-                  <p className="break-words">{currentVehicle.name}</p>
-                </div>
-
-                {/* drivers license number of vehicles driver */}
-                <div className="row-start-2 col-start-2">
-                  <p className="text-xs italic">Driver license number:</p>
-                  <p>{currentVehicle.driversLicenseNumber}</p>
-                </div>
-
-                {/* Phone number of vehicle driver */}
-                <div className="row-start-2 col-start-1">
-                  <p className="text-xs italic">Phone number:</p>
-                  <p>{currentVehicle.phone}</p>
-                </div>
-
-                {/* Mail of vehicle driver */}
-                <div className="row-start-3 col-span-2">
-                  <p className="text-xs italic">Email:</p>
-                  <p>{currentVehicle.email}</p>
-                </div>
-
-                {/* numberplate of vehicle */}
-                <div className="row-start-4 col-start-1">
-                  <p className="text-xs italic">Numberplate:</p>
-                  <p>{currentVehicle.numberplate}</p>
-                </div>
-
-                {/* insurance of vehicle */}
-                <div className="row-start-4 col-start-2">
-                  <p className="text-xs italic">Insurance:</p>
-                  <p>{currentVehicle.insurance}</p>
-                </div>
-
-                {/* model of vehicle */}
-                <div className="row-start-5 col-start-1">
-                  <p className="text-xs italic">Vehicle model:</p>
-                  <p>{currentVehicle.model}</p>
-                </div>
+                        {/* Information */}
+                        <div className="row-start-2 col-span-2">
+                          <p className="text-xs italic">
+                            Information about object:
+                          </p>
+                          <span className="break-words">
+                            {currentObject.information}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
               </div>
-            ))
-          ) : (
-            <p className="ml-4">No other vehicles involved</p>
-          )}
-        </div>
-
-        {/* Pedestrian information */}
-        <div className="w-full mt-4">
-          <p className="text-sm font-semibold">Pedestrian information:</p>
-          {data.pedestrianInfo.length > 0 ? (
-            data.pedestrianInfo.map((currenPedestrian, index) => (
-              <div key={index} className="grid grid-cols-2 gap-y-2 pl-4 py-1">
-                {/* Name of pedestrian */}
-                <div className="row-start-1 col-start-1">
-                  <p className="text-xs italic">Name:</p>
-                  <p className="break-words">{currenPedestrian.name}</p>
-                </div>
-
-                {/* Phone number of pedestrian */}
-                <div className="row-start-1 col-start-2">
-                  <p className="text-xs italic">Phone number:</p>
-                  <p>{currenPedestrian.phone}</p>
-                </div>
-
-                {/* Mail of pedestrian */}
-                <div className="row-start-2 col-span-2">
-                  <p className="text-xs italic">Email:</p>
-                  <p>{currenPedestrian.email}</p>
-                </div>
-
-                {/* Damage of pedestrian */}
-                <div className="row-start-3 col-span-2">
-                  <p className="text-xs italic">Injuries:</p>
-                  {currenPedestrian.personDamage !== "" ? (
-                    <p>{currenPedestrian.personDamage}</p>
-                  ) : (
-                    <p>No damage</p>
-                  )}
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="ml-4">No pedestrian was harmed</p>
-          )}
-        </div>
-
-        {/* Pedestrian information */}
-        <div className="w-full mt-4">
-          <p className="text-sm font-semibold">Other object information:</p>
-          {data.otherObjectInfo.length > 0 ? (
-            data.otherObjectInfo.map((currentObject, index) => (
-              <div key={index} className="grid grid-cols-2 gap-y-2 pl-4 py-1">
-                {/* Description */}
-                <div className="row-start-1 col-span-2">
-                  <p className="text-xs italic">Description of object:</p>
-                  <span className="break-words">
-                    {currentObject.description}
-                  </span>
-                </div>
-
-                {/* Information */}
-                <div className="row-start-2 col-span-2">
-                  <p className="text-xs italic">Information about object:</p>
-                  <span className="break-words">
-                    {currentObject.information}
-                  </span>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="ml-4">No collision with other object</p>
-          )}
-        </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Witnesses information */}
@@ -419,7 +459,7 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
 
       {/* Images of damages to GreenMobility car*/}
       <p className="font-bold text-MainGreen-300 mb-2">
-        Damages to GreenMobility car
+        Pictures of the damages to the GreenMobility car
       </p>
       <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
         {images &&
@@ -434,7 +474,7 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
       </div>
       {/* Images of damages to otherparty car*/}
       <p className="font-bold text-MainGreen-300 mb-2">
-        Damages to other party car
+        Pictures of the damages to the other Party involved
       </p>
       <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
         {images && images["OtherParty"] && images["OtherParty"].length > 0 ? (
@@ -447,10 +487,46 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
       </div>
 
       {/* Location of accident*/}
-      <p className="font-bold text-MainGreen-300 mb-2">Location of accident</p>
-      <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
-        {" "}
-        {map ? <img src={map} alt="GoogleMap" /> : <p>No map</p>}
+      <div>
+        <p className="font-bold text-MainGreen-300 mb-2">
+          Location for where the incident occurred
+        </p>
+        {data.accidentAddress.length > 0 ? (
+          <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
+            {data.accidentAddress}
+          </div>
+        ) : (
+          <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
+            <p>No location has been given</p>
+          </div>
+        )}
+      </div>
+
+      <div>
+        <p className="font-bold text-MainGreen-300 mb-2">
+          Positions of damages
+        </p>
+
+        {serverData.damages.length > 0 ? (
+          <div>
+            {serverData.damages.map((damage, index) => (
+              <div
+                className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6"
+                key={index}
+              >
+                <p className="break-words">Position: {damage.position}</p>
+                <p className="break-words">Description: {damage.description}</p>
+                <p className="break-words">
+                  Images: {damage.images.join(", ")}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
+            <p>No damage positions</p>
+          </div>
+        )}
       </div>
 
       <div className="w-full h-full flex flex-row justify-between rounded-full mt-4">

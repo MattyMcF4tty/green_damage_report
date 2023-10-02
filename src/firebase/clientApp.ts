@@ -1,34 +1,53 @@
-import { collection, deleteDoc, doc, getDoc, getDocs, getFirestore, query, setDoc, updateDoc, where } from "firebase/firestore";
-import { ListResult, StorageReference, deleteObject, getDownloadURL, getStorage, listAll, ref, uploadBytes } from "firebase/storage"
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  getDocs,
+  getFirestore,
+  query,
+  setDoc,
+  updateDoc,
+  where,
+} from "firebase/firestore";
+import {
+  ListResult,
+  StorageReference,
+  deleteObject,
+  getDownloadURL,
+  getStorage,
+  listAll,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
 import { decryptData, encryptData, reportDataType } from "@/utils/utils";
 import app from "./firebaseConfig";
 
 const db = getFirestore(app);
 const storage = getStorage(app);
 
-export const collectionName = "DamageReports"
+export const collectionName = "DamageReports";
 
 export const getData = async (id: string) => {
-  console.log("fetchind docID: " + id)
+  console.log("fetchind docID: " + id);
   const docRef = doc(db, `${collectionName}/${id}`);
-  const data = new reportDataType()
+  const data = new reportDataType();
 
   try {
-    const docSnapshot = await getDoc(docRef)
+    const docSnapshot = await getDoc(docRef);
     if (docSnapshot.exists()) {
       const fetchedData = docSnapshot.data();
-      data.updateFields(fetchedData)
-    } 
-    else {
+      data.updateFields(fetchedData);
+    } else {
       throw new Error("Document does not exist");
     }
   } catch (error) {
-    console.error(`Something went wrong fetching data:\n${error}\n`)
+    console.error(`Something went wrong fetching data:\n${error}\n`);
   }
   const decryptedData = data;
 
   return decryptedData;
-}
+};
 
 export const createDoc = async (id: string, email: string) => {
   try {
@@ -63,7 +82,7 @@ export const updateData = async (id: string, data: reportDataType) => {
 export const updateImages = async (
   id: string,
   images: FileList | null,
-  imageType: 'GreenMobility' | 'OtherParty' | 'Damage'
+  imageType: "GreenMobility" | "OtherParty" | "Damage"
 ) => {
   const storageRef = ref(storage, `${id}/${imageType}`);
 
@@ -76,7 +95,7 @@ export const updateImages = async (
         const imageBlob = new Blob([image], { type: image.type });
 
         await uploadBytes(imageRef, imageBlob);
-        console.log(images)
+        console.log(images);
       }
     } else {
       deleteAllImages(storageRef);
@@ -189,19 +208,19 @@ export const getReports = async () => {
 
 export const deleteReports = async (reportsToDelete: string[]) => {
   if (reportsToDelete.length === 0) {
-      throw Error("No reports to delete");
+    throw Error("No reports to delete");
   }
 
-  const deletePromises = reportsToDelete.map(report => {
-      const reportRef = doc(db, `${collectionName}/${report}`);
-      return deleteDoc(reportRef).catch(error => {
-          console.error(`Error deleting ${reportRef.path}: ${error}`);
-      });
+  const deletePromises = reportsToDelete.map((report) => {
+    const reportRef = doc(db, `${collectionName}/${report}`);
+    return deleteDoc(reportRef).catch((error) => {
+      console.error(`Error deleting ${reportRef.path}: ${error}`);
+    });
   });
 
   await Promise.all(deletePromises);
   return;
-}
+};
 
 export const handleUploadMap = async (mapImg: Blob, id: string) => {
   const storageRef = ref(storage, `${id}/admin/map`);

@@ -19,7 +19,7 @@ export class carInformation {
     driversLicenseNumber: string,
     insurance: string,
     numberplate: string,
-    model: string,
+    model: string
   ) {
     this.name = name;
     this.phone = phone;
@@ -71,7 +71,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
       drivingLicenseNumber,
       insurance,
       numberplate,
-      model,
+      model
     );
 
     onChange(newCarInfo);
@@ -93,7 +93,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
         Please enter the license plate of the party involved"
         id="NumberPlateInput"
         required={true}
-        type="text"
+        type="numberplate"
         value={numberplate}
         onChange={setNumberplate}
         placeHolder="DR12345"
@@ -127,7 +127,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
         labelText="Please enter the email address of the party involved"
         id="EmailInput"
         required={false}
-        type="text"
+        type="email"
         value={email}
         onChange={setEmail}
         placeHolder="Greenmobility@example.com"
@@ -136,7 +136,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
         labelText="Please enter the driver license number of the party involved"
         id="DriversLicenseNumberInput"
         required={false}
-        type="text"
+        type="license"
         value={drivingLicenseNumber}
         onChange={setDrivingLicenseNumber}
         placeHolder="12345678"

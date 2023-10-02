@@ -14,7 +14,7 @@ export class bikeInformation {
     phone: string,
     email: string,
     ebike: boolean | null,
-    personDamage: string,
+    personDamage: string
   ) {
     this.name = name;
     this.phone = phone;
@@ -56,7 +56,7 @@ const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
       phoneNumber,
       email,
       ebike,
-      personDamage,
+      personDamage
     );
 
     onChange(newBikeInfo);
@@ -92,7 +92,7 @@ const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
           labelText="Please enter the email address of the party involved"
           id="EmailInput"
           required={false}
-          type="text"
+          type="email"
           value={email}
           onChange={setEmail}
           placeHolder="Greenmobility@example.com"

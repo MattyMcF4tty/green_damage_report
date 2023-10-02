@@ -38,6 +38,9 @@ const What: NextPage<pageProps> = ({ data, id }) => {
   const [drivingLicenseNumber, setDrivingLicenseNumber] = useState(
     serverData.driverInfo.drivingLicenseNumber
   );
+  const [validDriversLicense, setValidDriversLicense] = useState<
+    null | boolean
+  >(null);
   const [phoneNumber, setPhoneNumber] = useState(
     serverData.driverInfo.phoneNumber
   );
@@ -54,15 +57,15 @@ const What: NextPage<pageProps> = ({ data, id }) => {
   const [allowClick, setAllowClick] = useState(true);
 
   const [invalidNumberplate, setInvalidNumberplate] = useState(false);
-  const [invalidTime, setInvalidTime] = useState(false)
+  const [invalidTime, setInvalidTime] = useState(false);
 
   useEffect(() => {
-    setInvalidNumberplate(false)
-  }, [greenCarNumberplate])
+    setInvalidNumberplate(false);
+  }, [greenCarNumberplate]);
 
   useEffect(() => {
-    setInvalidTime(false)
-  }, [greenCarNumberplate, accidentTime, accidentDate])
+    setInvalidTime(false);
+  }, [greenCarNumberplate, accidentTime, accidentDate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -76,15 +79,17 @@ const What: NextPage<pageProps> = ({ data, id }) => {
       renter = await handleGetRenter(greenCarNumberplate as string, date);
     } catch (error: any) {
       if (error.message === "Car not found") {
-        setInvalidNumberplate(true)
-      } else if (error.message === "No reservations were ongoing at that point in time") {
-        setInvalidTime(true)
+        setInvalidNumberplate(true);
+      } else if (
+        error.message === "No reservations were ongoing at that point in time"
+      ) {
+        setInvalidTime(true);
       } else {
-        console.error(error.message)
+        console.error(error.message);
       }
 
       setAllowClick(true);
-      return
+      return;
     }
     serverData.updateFields({ renterInfo: renter });
 
@@ -98,6 +103,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
         socialSecurityNumber: socialSecurityNumber,
         drivingLicenseNumber: drivingLicenseNumber,
         email: email,
+        validDriversLicense: validDriversLicense,
       };
       serverData.updateFields({ driverInfo: newDriverInfo });
     } else {
@@ -109,6 +115,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
         socialSecurityNumber: null,
         drivingLicenseNumber: null,
         email: null,
+        validDriversLicense: null,
       };
       serverData.updateFields({ driverInfo: newDriverInfo });
     }
@@ -141,18 +148,20 @@ const What: NextPage<pageProps> = ({ data, id }) => {
 
       <div className="mb-2">
         <Inputfield
-            labelText="
+          labelText="
             Please enter the license plate of the GreenMobility car"
-            id="greenCarNumberplateInput"
-            type="text"
-            required={true}
-            value={greenCarNumberplate}
-            onChange={setgreenCarNumberplate}
-            placeHolder="DR12345"
-          />
-          {invalidNumberplate && (
-            <p className="text-sm text-red-500 mt-[-1rem] mb-4">This numberplate does not belong to GreenMobility</p>
-          )}
+          id="greenCarNumberplateInput"
+          type="text"
+          required={true}
+          value={greenCarNumberplate}
+          onChange={setgreenCarNumberplate}
+          placeHolder="DR12345"
+        />
+        {invalidNumberplate && (
+          <p className="text-sm text-red-500 mt-[-1rem] mb-4">
+            This numberplate does not belong to GreenMobility
+          </p>
+        )}
       </div>
 
       {/* Driver information collection */}
@@ -202,6 +211,14 @@ const What: NextPage<pageProps> = ({ data, id }) => {
               placeHolder="123456-1234"
             />
 
+            <YesNo
+              id="drivers license"
+              labelText="Does the driver have a valid driver license?"
+              required={true}
+              onChange={setValidDriversLicense}
+              value={validDriversLicense}
+            />
+
             <Inputfield
               labelText="Please enter the driving license number of the driver"
               id="DrivingLicenseNumberInput"
@@ -241,7 +258,9 @@ const What: NextPage<pageProps> = ({ data, id }) => {
           dateValue={accidentDate}
         />
         {invalidTime && (
-            <p className="text-sm text-red-500 mt-[-1rem] mb-4">No reservation exist on the given point in time</p>
+          <p className="text-sm text-red-500 mt-[-1rem] mb-4">
+            No reservation exist on the given point in time
+          </p>
         )}
       </div>
 
