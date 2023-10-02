@@ -1143,7 +1143,9 @@ const createReportPDF = async (
         100, // FIX
         100 // FIX
       );
-      currentY += 2; // FIX;
+      currentY += 105; // FIX;
+      doc.text(`lat: ${data.accidentLocation.lat || "-"}`, 15, currentY); //FIX!!
+      doc.text(`lng: ${data.accidentLocation.lng || "-"}`, 15, currentY + 4); //FIX!!
     });
   } else {
     addImageSectionHeader("Map Images");

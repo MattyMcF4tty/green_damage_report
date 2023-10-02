@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import { PedestrianInformation } from "../../components/opposite_information/person_information_form";
 import {
   ImageField,
@@ -39,22 +39,9 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
   const mapsId = "GoogleMap";
   serverData.updateFields(data);
   const [allowClick, setAllowClick] = useState(true);
-  const [currentCar, setCurrentCar] = useState<"zoe" | "van">("zoe");
-  const [showOne, setShowOne] = useState(false);
-  const [showTwo, setShowTwo] = useState(false);
-  const [showThree, setShowThree] = useState(false);
-  const [showFour, setShowFour] = useState(false);
-  const [showFive, setShowFive] = useState(false);
-  const [showSix, setShowSix] = useState(false);
-  const [showSeven, setShowSeven] = useState(false);
-  const [showEight, setShowEight] = useState(false);
-  const [showNine, setShowNine] = useState(false);
-  const [showTen, setShowTen] = useState(false);
-  const [showEleven, setShowEleven] = useState(false);
-  const [showTwelve, setShowTwelve] = useState(false);
-  const [showThirteen, setShowThirteen] = useState(false);
-  const [showFourteen, setShowFourteen] = useState(false);
-  const [showFifteen, setShowFifteen] = useState(false);
+  const [currentCar, setCurrentCar] = useState<"zoe" | "van">(
+    serverData.greenCarType || "zoe"
+  );
   const [damages, setDamages] = useState<
     {
       position: string | null;
@@ -73,261 +60,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
 
   console.log(damages);
   // DATA
-  const [damageOne, setDamageOne] = useState<{
-    position: string | null;
-    description: string | null;
-    images: string[];
-  }>(
-    damages[0]
-      ? {
-          position: damages[0].position,
-          description: damages[0].description,
-          images: damages[0].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
-  const [damageTwo, setDamageTwo] = useState<{
-    position: string | null;
-    description: string | null;
-    images: string[];
-  }>(
-    damages[1]
-      ? {
-          position: damages[1].position,
-          description: damages[1].description,
-          images: damages[1].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
-  const [damageThree, setDamageThree] = useState<{
-    position: string | null;
-    description: string | null;
-    images: string[];
-  }>(
-    damages[2]
-      ? {
-          position: damages[2].position,
-          description: damages[2].description,
-          images: damages[2].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
-  const [damageFour, setDamageFour] = useState<{
-    position: string | null;
-    description: string | null;
-    images: string[];
-  }>(
-    damages[3]
-      ? {
-          position: damages[3].position,
-          description: damages[3].description,
-          images: damages[3].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
-  const [damageFive, setDamageFive] = useState<{
-    position: string | null;
-    description: string | null;
-    images: string[];
-  }>(
-    damages[4]
-      ? {
-          position: damages[4].position,
-          description: damages[4].description,
-          images: damages[4].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
-  const [damageSix, setDamageSix] = useState<{
-    position: string | null;
-    description: string | null;
-    images: string[];
-  }>(
-    damages[5]
-      ? {
-          position: damages[5].position,
-          description: damages[5].description,
-          images: damages[5].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
-  const [damageSeven, setDamageSeven] = useState<{
-    position: string | null;
-    description: string | null;
-    images: string[];
-  }>(
-    damages[6]
-      ? {
-          position: damages[6].position,
-          description: damages[6].description,
-          images: damages[6].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
-  const [damageEight, setDamageEight] = useState<{
-    position: string | null;
-    description: string | null;
-    images: string[];
-  }>(
-    damages[7]
-      ? {
-          position: damages[7].position,
-          description: damages[7].description,
-          images: damages[7].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
-  const [damageNine, setDamageNine] = useState<{
-    position: string | null;
-    description: string | null;
-    images: string[];
-  }>(
-    damages[8]
-      ? {
-          position: damages[8].position,
-          description: damages[8].description,
-          images: damages[8].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
-  const [damageTen, setDamageTen] = useState<{
-    position: string | null;
-    description: string | null;
-    images: string[];
-  }>(
-    damages[9]
-      ? {
-          position: damages[9].position,
-          description: damages[9].description,
-          images: damages[9].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
-  const [damageEleven, setDamageEleven] = useState<{
-    position: string | null;
-    description: string | null;
-    images: string[];
-  }>(
-    damages[10]
-      ? {
-          position: damages[10].position,
-          description: damages[10].description,
-          images: damages[10].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
-  const [damageTwelve, setDamageTwelve] = useState<{
-    position: string | null;
-    description: string | null;
-    images: string[];
-  }>(
-    damages[11]
-      ? {
-          position: damages[11].position,
-          description: damages[11].description,
-          images: damages[11].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
-  const [damageThirteen, setDamageThirteen] = useState<{
-    position: string | null;
-    description: string | null;
-    images: string[];
-  }>(
-    damages[12]
-      ? {
-          position: damages[12].position,
-          description: damages[12].description,
-          images: damages[12].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
-  const [damageFourteen, setDamageFourteen] = useState<{
-    position: string | null;
-    description: string | null;
-    images: string[];
-  }>(
-    damages[13]
-      ? {
-          position: damages[13].position,
-          description: damages[13].description,
-          images: damages[13].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
-  const [damageFifteen, setDamageFifteen] = useState<{
-    position: string | null;
-    description: string | null;
-    images: string[];
-  }>(
-    damages[14]
-      ? {
-          position: damages[14].position,
-          description: damages[14].description,
-          images: damages[14].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
 
   const [damageDescription, setDamageDescription] = useState(
     serverData.damageDescription
@@ -463,6 +195,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
       singleVehicleAccident: isSingleVehicleChecked,
 
       damages: damages,
+      greenCarType: currentCar,
     });
 
     await updateData(id, serverData);
@@ -471,44 +204,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
   /*   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;
    */
   /*     <LoadScript googleMapsApiKey={apiKey || ""} libraries={["places"]}> */
-
-  useEffect(() => {
-    const newDamageArray = [
-      damageOne,
-      damageTwo,
-      damageThree,
-      damageFour,
-      damageFive,
-      damageSix,
-      damageSeven,
-      damageEight,
-      damageNine,
-      damageTen,
-      damageEleven,
-      damageTwelve,
-      damageThirteen,
-      damageFourteen,
-      damageFifteen,
-    ];
-
-    setDamages(newDamageArray);
-  }, [
-    damageOne,
-    damageTwo,
-    damageThree,
-    damageFour,
-    damageFive,
-    damageSix,
-    damageSeven,
-    damageEight,
-    damageNine,
-    damageTen,
-    damageEleven,
-    damageTwelve,
-    damageThirteen,
-    damageFourteen,
-    damageFifteen,
-  ]);
 
   return (
     <form
@@ -565,7 +260,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
           </div>
 
           {/* Picture of damages to green car collection */}
-          <div className="bg-MainGreen-300">
+          <div className="">
             <ImageField
               reportID={id}
               id="LeftImage"
@@ -608,7 +303,10 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
             className="h-8 border border-MainGreen-300 bg-MainGreen-200 rounded-md shadow-md outline-none"
             id="FilterOptions"
             value={currentCar}
-            onChange={(e) => setCurrentCar(e.target.value as "zoe" | "van")}
+            onChange={(e) => {
+              setCurrentCar(e.target.value as "zoe" | "van");
+              setDamages([]);
+            }}
           >
             <option value="zoe">Passenger vehicle</option>
             <option value="van">Van</option>
@@ -616,144 +314,13 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         </div>
         {currentCar === "zoe" && (
           <div className="">
-            <ZoeDrawing
-              setShowOne={setShowOne}
-              setShowTwo={setShowTwo}
-              setShowThree={setShowThree}
-              setShowFour={setShowFour}
-              setShowFive={setShowFive}
-              setShowSix={setShowSix}
-              setShowSeven={setShowSeven}
-              setShowEight={setShowEight}
-              setShowNine={setShowNine}
-              setShowTen={setShowTen}
-              setShowEleven={setShowEleven}
-              setShowTwelve={setShowTwelve}
-              setShowThirteen={setShowThirteen}
-              setShowFourteen={setShowFourteen}
-              setShowFifteen={setShowFifteen}
-            />
+            <ZoeDrawing damages={damages} setDamages={setDamages} />
           </div>
         )}
         {currentCar === "van" && (
           <div>
-            <VanDrawing
-              setShowOne={setShowOne}
-              setShowTwo={setShowTwo}
-              setShowThree={setShowThree}
-              setShowFour={setShowFour}
-              setShowFive={setShowFive}
-              setShowSix={setShowSix}
-              setShowSeven={setShowSeven}
-              setShowEight={setShowEight}
-              setShowNine={setShowNine}
-            />
+            <VanDrawing damages={damages} setDamages={setDamages} />
           </div>
-        )}
-        {showOne && (
-          <DamagePopUp
-            setShowPopUp={setShowOne}
-            damage={damageOne}
-            setDamage={setDamageOne}
-          />
-        )}
-        {showTwo && (
-          <DamagePopUp
-            setShowPopUp={setShowTwo}
-            damage={damageTwo}
-            setDamage={setDamageTwo}
-          />
-        )}
-        {showThree && (
-          <DamagePopUp
-            setShowPopUp={setShowThree}
-            damage={damageThree}
-            setDamage={setDamageThree}
-          />
-        )}
-        {showFour && (
-          <DamagePopUp
-            setShowPopUp={setShowFour}
-            damage={damageFour}
-            setDamage={setDamageFour}
-          />
-        )}
-        {showFive && (
-          <DamagePopUp
-            setShowPopUp={setShowFive}
-            damage={damageFive}
-            setDamage={setDamageFive}
-          />
-        )}
-        {showSix && (
-          <DamagePopUp
-            setShowPopUp={setShowSix}
-            damage={damageSix}
-            setDamage={setDamageSix}
-          />
-        )}
-        {showSeven && (
-          <DamagePopUp
-            setShowPopUp={setShowSeven}
-            damage={damageSeven}
-            setDamage={setDamageSeven}
-          />
-        )}
-        {showEight && (
-          <DamagePopUp
-            setShowPopUp={setShowEight}
-            damage={damageEight}
-            setDamage={setDamageEight}
-          />
-        )}
-        {showNine && (
-          <DamagePopUp
-            setShowPopUp={setShowNine}
-            damage={damageNine}
-            setDamage={setDamageNine}
-          />
-        )}
-        {showTen && (
-          <DamagePopUp
-            setShowPopUp={setShowTen}
-            damage={damageTen}
-            setDamage={setDamageTen}
-          />
-        )}
-        {showEleven && (
-          <DamagePopUp
-            setShowPopUp={setShowEleven}
-            damage={damageEleven}
-            setDamage={setDamageEleven}
-          />
-        )}
-        {showTwelve && (
-          <DamagePopUp
-            setShowPopUp={setShowTwelve}
-            damage={damageTwelve}
-            setDamage={setDamageTwelve}
-          />
-        )}
-        {showThirteen && (
-          <DamagePopUp
-            setShowPopUp={setShowThirteen}
-            damage={damageThirteen}
-            setDamage={setDamageThirteen}
-          />
-        )}
-        {showFourteen && (
-          <DamagePopUp
-            setShowPopUp={setShowFourteen}
-            damage={damageFourteen}
-            setDamage={setDamageFourteen}
-          />
-        )}
-        {showFifteen && (
-          <DamagePopUp
-            setShowPopUp={setShowFifteen}
-            damage={damageFifteen}
-            setDamage={setDamageFifteen}
-          />
         )}
       </div>
 

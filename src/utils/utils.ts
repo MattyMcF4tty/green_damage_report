@@ -611,6 +611,7 @@ export type pageProps = {
     accidentDescription: string | null;
 
     greenCarNumberPlate: string | null;
+    greenCarType: "zoe" | "van" | null;
     speed: string | null;
     damageDescription: string | null;
     policeReportNumber: string | null;
@@ -704,6 +705,7 @@ export class reportDataType {
   accidentDescription: string | null;
 
   greenCarNumberPlate: string | null;
+  greenCarType: "zoe" | "van" | null;
   speed: string | null;
   damageDescription: string | null;
   policeReportNumber: string | null;
@@ -786,6 +788,7 @@ export class reportDataType {
     this.date = null;
     this.accidentDescription = null;
     this.greenCarNumberPlate = null;
+    this.greenCarType = null;
     this.speed = null;
     this.damageDescription = null;
     this.policeReportNumber = null;
@@ -841,6 +844,7 @@ export class reportDataType {
       date: this.date,
       accidentDescription: this.accidentDescription,
       greenCarNumberPlate: this.greenCarNumberPlate,
+      greenCarType: this.greenCarType,
       speed: this.speed,
       damageDescription: this.damageDescription,
       policeReportNumber: this.policeReportNumber,

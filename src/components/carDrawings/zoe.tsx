@@ -1,40 +1,331 @@
 import { useEffect, useState } from "react";
+import DamagePopUp from "../popups/damagePopUp";
 
 interface ZoeDrawingProps {
-  setShowOne: (visible: boolean) => void;
-  setShowTwo: (visible: boolean) => void;
-  setShowThree: (visible: boolean) => void;
-  setShowFour: (visible: boolean) => void;
-  setShowFive: (visible: boolean) => void;
-  setShowSix: (visible: boolean) => void;
-  setShowSeven: (visible: boolean) => void;
-  setShowEight: (visible: boolean) => void;
-  setShowNine: (visible: boolean) => void;
-  setShowTen: (visible: boolean) => void;
-  setShowEleven: (visible: boolean) => void;
-  setShowTwelve: (visible: boolean) => void;
-  setShowThirteen: (visible: boolean) => void;
-  setShowFourteen: (visible: boolean) => void;
-  setShowFifteen: (visible: boolean) => void;
+  damages: {
+    position: string | null;
+    description: string | null;
+    images: string[];
+  }[];
+  setDamages: (
+    damages: {
+      position: string | null;
+      description: string | null;
+      images: string[];
+    }[]
+  ) => void;
 }
+const ZoeDrawing = ({ damages, setDamages }: ZoeDrawingProps) => {
+  const [showOne, setShowOne] = useState(false);
+  const [showTwo, setShowTwo] = useState(false);
+  const [showThree, setShowThree] = useState(false);
+  const [showFour, setShowFour] = useState(false);
+  const [showFive, setShowFive] = useState(false);
+  const [showSix, setShowSix] = useState(false);
+  const [showSeven, setShowSeven] = useState(false);
+  const [showEight, setShowEight] = useState(false);
+  const [showNine, setShowNine] = useState(false);
+  const [showTen, setShowTen] = useState(false);
+  const [showEleven, setShowEleven] = useState(false);
+  const [showTwelve, setShowTwelve] = useState(false);
+  const [showThirteen, setShowThirteen] = useState(false);
+  const [showFourteen, setShowFourteen] = useState(false);
+  const [showFifteen, setShowFifteen] = useState(false);
 
-const ZoeDrawing = ({
-  setShowOne,
-  setShowTwo,
-  setShowThree,
-  setShowFour,
-  setShowFive,
-  setShowSix,
-  setShowSeven,
-  setShowEight,
-  setShowNine,
-  setShowTen,
-  setShowEleven,
-  setShowTwelve,
-  setShowThirteen,
-  setShowFourteen,
-  setShowFifteen,
-}: ZoeDrawingProps) => {
+  const [damageOne, setDamageOne] = useState<{
+    position: string | null;
+    description: string | null;
+    images: string[];
+  }>(
+    damages[0]
+      ? {
+          position: damages[0].position,
+          description: damages[0].description,
+          images: damages[0].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
+  const [damageTwo, setDamageTwo] = useState<{
+    position: string | null;
+    description: string | null;
+    images: string[];
+  }>(
+    damages[1]
+      ? {
+          position: damages[1].position,
+          description: damages[1].description,
+          images: damages[1].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
+  const [damageThree, setDamageThree] = useState<{
+    position: string | null;
+    description: string | null;
+    images: string[];
+  }>(
+    damages[2]
+      ? {
+          position: damages[2].position,
+          description: damages[2].description,
+          images: damages[2].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
+  const [damageFour, setDamageFour] = useState<{
+    position: string | null;
+    description: string | null;
+    images: string[];
+  }>(
+    damages[3]
+      ? {
+          position: damages[3].position,
+          description: damages[3].description,
+          images: damages[3].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
+  const [damageFive, setDamageFive] = useState<{
+    position: string | null;
+    description: string | null;
+    images: string[];
+  }>(
+    damages[4]
+      ? {
+          position: damages[4].position,
+          description: damages[4].description,
+          images: damages[4].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
+  const [damageSix, setDamageSix] = useState<{
+    position: string | null;
+    description: string | null;
+    images: string[];
+  }>(
+    damages[5]
+      ? {
+          position: damages[5].position,
+          description: damages[5].description,
+          images: damages[5].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
+  const [damageSeven, setDamageSeven] = useState<{
+    position: string | null;
+    description: string | null;
+    images: string[];
+  }>(
+    damages[6]
+      ? {
+          position: damages[6].position,
+          description: damages[6].description,
+          images: damages[6].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
+  const [damageEight, setDamageEight] = useState<{
+    position: string | null;
+    description: string | null;
+    images: string[];
+  }>(
+    damages[7]
+      ? {
+          position: damages[7].position,
+          description: damages[7].description,
+          images: damages[7].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
+  const [damageNine, setDamageNine] = useState<{
+    position: string | null;
+    description: string | null;
+    images: string[];
+  }>(
+    damages[8]
+      ? {
+          position: damages[8].position,
+          description: damages[8].description,
+          images: damages[8].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
+  const [damageTen, setDamageTen] = useState<{
+    position: string | null;
+    description: string | null;
+    images: string[];
+  }>(
+    damages[9]
+      ? {
+          position: damages[9].position,
+          description: damages[9].description,
+          images: damages[9].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
+  const [damageEleven, setDamageEleven] = useState<{
+    position: string | null;
+    description: string | null;
+    images: string[];
+  }>(
+    damages[10]
+      ? {
+          position: damages[10].position,
+          description: damages[10].description,
+          images: damages[10].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
+  const [damageTwelve, setDamageTwelve] = useState<{
+    position: string | null;
+    description: string | null;
+    images: string[];
+  }>(
+    damages[11]
+      ? {
+          position: damages[11].position,
+          description: damages[11].description,
+          images: damages[11].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
+  const [damageThirteen, setDamageThirteen] = useState<{
+    position: string | null;
+    description: string | null;
+    images: string[];
+  }>(
+    damages[12]
+      ? {
+          position: damages[12].position,
+          description: damages[12].description,
+          images: damages[12].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
+  const [damageFourteen, setDamageFourteen] = useState<{
+    position: string | null;
+    description: string | null;
+    images: string[];
+  }>(
+    damages[13]
+      ? {
+          position: damages[13].position,
+          description: damages[13].description,
+          images: damages[13].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
+  const [damageFifteen, setDamageFifteen] = useState<{
+    position: string | null;
+    description: string | null;
+    images: string[];
+  }>(
+    damages[14]
+      ? {
+          position: damages[14].position,
+          description: damages[14].description,
+          images: damages[14].images,
+        }
+      : {
+          position: null,
+          description: null,
+          images: [],
+        }
+  );
+
+  useEffect(() => {
+    const newDamageArray = [
+      damageOne,
+      damageTwo,
+      damageThree,
+      damageFour,
+      damageFive,
+      damageSix,
+      damageSeven,
+      damageEight,
+      damageNine,
+      damageTen,
+      damageEleven,
+      damageTwelve,
+      damageThirteen,
+      damageFourteen,
+      damageFifteen,
+    ];
+
+    setDamages(newDamageArray);
+  }, [
+    damageOne,
+    damageTwo,
+    damageThree,
+    damageFour,
+    damageFive,
+    damageSix,
+    damageSeven,
+    damageEight,
+    damageNine,
+    damageTen,
+    damageEleven,
+    damageTwelve,
+    damageThirteen,
+    damageFourteen,
+    damageFifteen,
+  ]);
+
   return (
     <div className="w-[22rem] md:w-[40rem] relative">
       <button
@@ -173,6 +464,127 @@ const ZoeDrawing = ({
         15
       </button>
       <img src="../carDrawings/zoePlantegning.png" alt="ZoeDrawing" />
+
+      {showOne && (
+        <DamagePopUp
+          position="Front left wheel"
+          setShowPopUp={setShowOne}
+          damage={damageOne}
+          setDamage={setDamageOne}
+        />
+      )}
+      {showTwo && (
+        <DamagePopUp
+          position="Front left door"
+          setShowPopUp={setShowTwo}
+          damage={damageTwo}
+          setDamage={setDamageTwo}
+        />
+      )}
+      {showThree && (
+        <DamagePopUp
+          position="Back left door"
+          setShowPopUp={setShowThree}
+          damage={damageThree}
+          setDamage={setDamageThree}
+        />
+      )}
+      {showFour && (
+        <DamagePopUp
+          position="Back left wheel"
+          setShowPopUp={setShowFour}
+          damage={damageFour}
+          setDamage={setDamageFour}
+        />
+      )}
+      {showFive && (
+        <DamagePopUp
+          position="Front bumper"
+          setShowPopUp={setShowFive}
+          damage={damageFive}
+          setDamage={setDamageFive}
+        />
+      )}
+      {showSix && (
+        <DamagePopUp
+          position="Hood"
+          setShowPopUp={setShowSix}
+          damage={damageSix}
+          setDamage={setDamageSix}
+        />
+      )}
+      {showSeven && (
+        <DamagePopUp
+          position="Windshield"
+          setShowPopUp={setShowSeven}
+          damage={damageSeven}
+          setDamage={setDamageSeven}
+        />
+      )}
+      {showEight && (
+        <DamagePopUp
+          position="Roof"
+          setShowPopUp={setShowEight}
+          damage={damageEight}
+          setDamage={setDamageEight}
+        />
+      )}
+      {showNine && (
+        <DamagePopUp
+          position="Rear window"
+          setShowPopUp={setShowNine}
+          damage={damageNine}
+          setDamage={setDamageNine}
+        />
+      )}
+      {showTen && (
+        <DamagePopUp
+          position="Trunk"
+          setShowPopUp={setShowTen}
+          damage={damageTen}
+          setDamage={setDamageTen}
+        />
+      )}
+      {showEleven && (
+        <DamagePopUp
+          position="Rear bumper"
+          setShowPopUp={setShowEleven}
+          damage={damageEleven}
+          setDamage={setDamageEleven}
+        />
+      )}
+      {showTwelve && (
+        <DamagePopUp
+          position="Front right wheel"
+          setShowPopUp={setShowTwelve}
+          damage={damageTwelve}
+          setDamage={setDamageTwelve}
+        />
+      )}
+      {showThirteen && (
+        <DamagePopUp
+          position="Front right door"
+          setShowPopUp={setShowThirteen}
+          damage={damageThirteen}
+          setDamage={setDamageThirteen}
+        />
+      )}
+      {showFourteen && (
+        <DamagePopUp
+          position="Back right door"
+          setShowPopUp={setShowFourteen}
+          damage={damageFourteen}
+          setDamage={setDamageFourteen}
+        />
+      )}
+      {showFifteen && (
+        <DamagePopUp
+          position="Back right wheel"
+          setShowPopUp={setShowFifteen}
+          damage={damageFifteen}
+          setDamage={setDamageFifteen}
+        />
+      )}
     </div>
   );
 };

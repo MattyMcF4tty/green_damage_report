@@ -7,6 +7,7 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { FireStorage } from "@/firebase/firebaseConfig";
 
 interface DamagePopUpProps {
+  position: string;
   damage: {
     description: string | null;
     images: string[];
@@ -20,12 +21,14 @@ interface DamagePopUpProps {
   setShowPopUp: (show: boolean) => void;
 }
 
-const DamagePopUp = ({ setShowPopUp, setDamage, damage }: DamagePopUpProps) => {
+const DamagePopUp = ({
+  setShowPopUp,
+  setDamage,
+  damage,
+  position,
+}: DamagePopUpProps) => {
   const [damageDescription, setDamageDescription] = useState<string>(
     damage.description ? damage.description : ""
-  );
-  const [position, setPosition] = useState<string>(
-    damage.position ? damage.position : ""
   );
   const [images, setImages] = useState<string[]>(
     damage.images ? damage.images : []

@@ -41,6 +41,7 @@ const DamageList = ({ damages, setDamages }: damageListProps) => {
     <div className="w-full">
       {editingIndex !== null && (
         <DamagePopUp
+          position={damages[editingIndex].position || ""}
           setShowPopUp={(show) =>
             show ? setEditingIndex(editingIndex) : setEditingIndex(null)
           }
