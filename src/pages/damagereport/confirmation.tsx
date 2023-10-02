@@ -101,7 +101,8 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
           <div className="row-start-1 col-span-2 justify-center">
             <p className="text-xs italic">Name:</p>
             <p>
-              {data.renterInfo.firstName} {data.renterInfo.lastName}
+              {data.renterInfo.firstName ? data.renterInfo.firstName : "-"}{" "}
+              {data.renterInfo.lastName ? data.renterInfo.lastName : ""}
             </p>
           </div>
         </div>
@@ -111,7 +112,8 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
           <div className="row-start-1 col-span-1 justify-center">
             <p className="text-xs italic">Name:</p>
             <p>
-              {data.driverInfo.firstName} {data.driverInfo.lastName}
+              {data.driverInfo.firstName ? data.driverInfo.firstName : "-"}
+              {data.driverInfo.lastName ? data.driverInfo.firstName : ""}
             </p>
           </div>
 
@@ -124,30 +126,40 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
           {/* Phone number */}
           <div className="row-start-2 col-start-1">
             <p className="text-xs italic">Phone number:</p>
-            <p>{data.driverInfo.phoneNumber}</p>
+            <p>
+              {data.driverInfo.phoneNumber ? data.driverInfo.phoneNumber : "-"}
+            </p>
           </div>
 
           {/* Address */}
           <div className="row-start-2 col-start-2">
             <p className="text-xs italic">Address:</p>
-            <p>{data.driverInfo.address}</p>
+            <p>{data.driverInfo.address ? data.driverInfo.address : "-"}</p>
           </div>
 
           {/* Email */}
           <div className="row-start-3 col-span-2">
             <p className="text-xs italic">Email:</p>
-            <p>{data.driverInfo.email}</p>
+            <p>{data.driverInfo.email ? data.driverInfo.email : "-"}</p>
           </div>
 
           {/* Social security number */}
           <div className="row-start-4 col-start-1">
             <p className="text-xs italic">Social Security Number:</p>
-            <p>{data.driverInfo.socialSecurityNumber}</p>
+            <p>
+              {data.driverInfo.socialSecurityNumber
+                ? data.driverInfo.socialSecurityNumber
+                : "-"}
+            </p>
           </div>
 
           <div className="row-start-4 col-start-2">
             <p className="text-xs italic">Driving License Number:</p>
-            <p>{data.driverInfo.drivingLicenseNumber}</p>
+            <p>
+              {data.driverInfo.drivingLicenseNumber
+                ? data.driverInfo.drivingLicenseNumber
+                : "-"}
+            </p>
           </div>
         </div>
       )}
@@ -158,29 +170,33 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
         {/* Date of accident */}
         <div className="row-start-1 col-start-1">
           <p className="text-xs italic">Date of accident:</p>
-          <p>{data.date}</p>
+          <p>{data.date ? data.date : "-"}</p>
         </div>
 
         {/* Time of accident */}
         <div className="row-start-1 col-start-2">
           <p className="text-xs italic">Time of accident:</p>
-          <p>{data.time}</p>
+          <p>{data.time ? data.time : "-"}</p>
         </div>
 
         {/* Police journal */}
         <div className="row-start-3 col-span-2">
           <p className="text-xs italic">Police journal number:</p>
-          {data.policeReportNumber !== "" ? (
-            <p>{data.policeReportNumber}</p>
-          ) : (
-            <p>No police report was filed</p>
-          )}
+          <p>
+            {data.policeReportNumber
+              ? data.policeReportNumber
+              : "No police report was filed"}
+          </p>
         </div>
 
         {/* Accident description */}
         <div className="row-start-4 col-span-2">
           <p className="text-xs italic">Accident description:</p>
-          <span className="break-words">{data.accidentDescription}</span>
+          <span className="break-words">
+            {data.accidentDescription
+              ? data.accidentDescription
+              : "No accident description provided"}
+          </span>
         </div>
       </div>
 
@@ -190,19 +206,23 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
         {/* Green car numberplate */}
         <div className="row-start-1 col-start-1">
           <p className="text-xs italic">Green car numberplate:</p>
-          <p>{data.greenCarNumberPlate}</p>
+          <p>{data.greenCarNumberPlate ? data.greenCarNumberPlate : "-"}</p>
         </div>
 
         {/* Speed */}
         <div className="row-start-1 col-start-2">
           <p className="text-xs italic">Speed:</p>
-          <p>{data.speed} km/h</p>
+          <p>{data.speed ? data.speed : "-"} km/h</p>
         </div>
 
         {/* Damage description */}
         <div className="row-start-2 col-span-2">
           <p className="text-xs italic">Damage description:</p>
-          <span className="break-words">{data.damageDescription}</span>
+          <span className="break-words">
+            {data.damageDescription
+              ? data.damageDescription
+              : "No damage description provided"}
+          </span>
         </div>
       </div>
 
@@ -439,7 +459,7 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
 
       {/* Images of damages to GreenMobility car*/}
       <p className="font-bold text-MainGreen-300 mb-2">
-        Damages to GreenMobility car
+        Pictures of the damages to the GreenMobility car
       </p>
       <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
         {images &&
@@ -454,7 +474,7 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
       </div>
       {/* Images of damages to otherparty car*/}
       <p className="font-bold text-MainGreen-300 mb-2">
-        Damages to other party car
+        Pictures of the damages to the other Party involved
       </p>
       <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
         {images && images["OtherParty"] && images["OtherParty"].length > 0 ? (
@@ -467,9 +487,46 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
       </div>
 
       {/* Location of accident*/}
-      <p className="font-bold text-MainGreen-300 mb-2">Location of accident</p>
-      <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
-        {data.accidentAddress}
+      <div>
+        <p className="font-bold text-MainGreen-300 mb-2">
+          Location for where the incident occurred
+        </p>
+        {data.accidentAddress.length > 0 ? (
+          <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
+            {data.accidentAddress}
+          </div>
+        ) : (
+          <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
+            <p>No location has been given</p>
+          </div>
+        )}
+      </div>
+
+      <div>
+        <p className="font-bold text-MainGreen-300 mb-2">
+          Positions of damages
+        </p>
+
+        {serverData.damages.length > 0 ? (
+          <div>
+            {serverData.damages.map((damage, index) => (
+              <div
+                className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6"
+                key={index}
+              >
+                <p className="break-words">Position: {damage.position}</p>
+                <p className="break-words">Description: {damage.description}</p>
+                <p className="break-words">
+                  Images: {damage.images.join(", ")}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
+            <p>No damage positions</p>
+          </div>
+        )}
       </div>
 
       <div className="w-full h-full flex flex-row justify-between rounded-full mt-4">

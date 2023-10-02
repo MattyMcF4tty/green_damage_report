@@ -36,276 +36,129 @@ const ZoeDrawing = ({ damages, setDamages }: ZoeDrawingProps) => {
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
-    damages[0]
-      ? {
-          position: damages[0].position,
-          description: damages[0].description,
-          images: damages[0].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
+  } | null>(damages[0]);
   const [damageTwo, setDamageTwo] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
-    damages[1]
-      ? {
-          position: damages[1].position,
-          description: damages[1].description,
-          images: damages[1].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
+  } | null>(damages[1]);
   const [damageThree, setDamageThree] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
-    damages[2]
-      ? {
-          position: damages[2].position,
-          description: damages[2].description,
-          images: damages[2].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
+  } | null>(damages[2]);
   const [damageFour, setDamageFour] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
-    damages[3]
-      ? {
-          position: damages[3].position,
-          description: damages[3].description,
-          images: damages[3].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
+  } | null>(damages[3]);
   const [damageFive, setDamageFive] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
-    damages[4]
-      ? {
-          position: damages[4].position,
-          description: damages[4].description,
-          images: damages[4].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
+  } | null>(damages[4]);
   const [damageSix, setDamageSix] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
-    damages[5]
-      ? {
-          position: damages[5].position,
-          description: damages[5].description,
-          images: damages[5].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
+  } | null>(damages[5]);
   const [damageSeven, setDamageSeven] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
-    damages[6]
-      ? {
-          position: damages[6].position,
-          description: damages[6].description,
-          images: damages[6].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
+  } | null>(damages[6]);
   const [damageEight, setDamageEight] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
-    damages[7]
-      ? {
-          position: damages[7].position,
-          description: damages[7].description,
-          images: damages[7].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
+  } | null>(damages[7]);
   const [damageNine, setDamageNine] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
-    damages[8]
-      ? {
-          position: damages[8].position,
-          description: damages[8].description,
-          images: damages[8].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
+  } | null>(damages[8]);
   const [damageTen, setDamageTen] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
-    damages[9]
-      ? {
-          position: damages[9].position,
-          description: damages[9].description,
-          images: damages[9].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
+  } | null>(damages[9]);
   const [damageEleven, setDamageEleven] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
-    damages[10]
-      ? {
-          position: damages[10].position,
-          description: damages[10].description,
-          images: damages[10].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
+  } | null>(damages[10]);
   const [damageTwelve, setDamageTwelve] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
-    damages[11]
-      ? {
-          position: damages[11].position,
-          description: damages[11].description,
-          images: damages[11].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
+  } | null>(damages[11]);
   const [damageThirteen, setDamageThirteen] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
-    damages[12]
-      ? {
-          position: damages[12].position,
-          description: damages[12].description,
-          images: damages[12].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
+  } | null>(damages[12]);
   const [damageFourteen, setDamageFourteen] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
-    damages[13]
-      ? {
-          position: damages[13].position,
-          description: damages[13].description,
-          images: damages[13].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
+  } | null>(damages[13]);
   const [damageFifteen, setDamageFifteen] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
-    damages[14]
-      ? {
-          position: damages[14].position,
-          description: damages[14].description,
-          images: damages[14].images,
-        }
-      : {
-          position: null,
-          description: null,
-          images: [],
-        }
-  );
+  } | null>(damages[14]);
 
   useEffect(() => {
-    const newDamageArray = [
-      damageOne,
-      damageTwo,
-      damageThree,
-      damageFour,
-      damageFive,
-      damageSix,
-      damageSeven,
-      damageEight,
-      damageNine,
-      damageTen,
-      damageEleven,
-      damageTwelve,
-      damageThirteen,
-      damageFourteen,
-      damageFifteen,
-    ];
+    const newDamageArray: {
+      position: string | null;
+      description: string | null;
+      images: string[];
+    }[] = [];
+    if (damageOne) {
+      newDamageArray.push(damageOne);
+    }
+    if (damageTwo) {
+      newDamageArray.push(damageTwo);
+    }
+    if (damageThree) {
+      newDamageArray.push(damageThree);
+    }
+    if (damageFour) {
+      newDamageArray.push(damageFour);
+    }
+    if (damageFive) {
+      newDamageArray.push(damageFive);
+    }
+    if (damageSix) {
+      newDamageArray.push(damageSix);
+    }
+    if (damageSeven) {
+      newDamageArray.push(damageSeven);
+    }
+    if (damageEight) {
+      newDamageArray.push(damageEight);
+    }
+    if (damageNine) {
+      newDamageArray.push(damageNine);
+    }
+    if (damageTen) {
+      newDamageArray.push(damageTen);
+    }
+    if (damageEleven) {
+      newDamageArray.push(damageEleven);
+    }
+    if (damageTwelve) {
+      newDamageArray.push(damageTwelve);
+    }
+    if (damageThirteen) {
+      newDamageArray.push(damageThirteen);
+    }
+    if (damageFourteen) {
+      newDamageArray.push(damageFourteen);
+    }
+    if (damageFifteen) {
+      newDamageArray.push(damageFifteen);
+    }
 
     setDamages(newDamageArray);
   }, [

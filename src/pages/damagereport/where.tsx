@@ -58,7 +58,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
     boolean | null
   >(serverData.singleVehicleAccident);
 
-  console.log(damages);
   // DATA
 
   const [damageDescription, setDamageDescription] = useState(

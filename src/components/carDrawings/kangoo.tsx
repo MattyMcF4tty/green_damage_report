@@ -31,7 +31,7 @@ const VanDrawing = ({ damages, setDamages }: vanDrawingProps) => {
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
+  } | null>(
     damages[0]
       ? {
           position: damages[0].position,
@@ -48,7 +48,7 @@ const VanDrawing = ({ damages, setDamages }: vanDrawingProps) => {
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
+  } | null>(
     damages[1]
       ? {
           position: damages[1].position,
@@ -65,7 +65,7 @@ const VanDrawing = ({ damages, setDamages }: vanDrawingProps) => {
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
+  } | null>(
     damages[2]
       ? {
           position: damages[2].position,
@@ -82,7 +82,7 @@ const VanDrawing = ({ damages, setDamages }: vanDrawingProps) => {
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
+  } | null>(
     damages[3]
       ? {
           position: damages[3].position,
@@ -99,7 +99,7 @@ const VanDrawing = ({ damages, setDamages }: vanDrawingProps) => {
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
+  } | null>(
     damages[4]
       ? {
           position: damages[4].position,
@@ -116,7 +116,7 @@ const VanDrawing = ({ damages, setDamages }: vanDrawingProps) => {
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
+  } | null>(
     damages[5]
       ? {
           position: damages[5].position,
@@ -133,7 +133,7 @@ const VanDrawing = ({ damages, setDamages }: vanDrawingProps) => {
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
+  } | null>(
     damages[6]
       ? {
           position: damages[6].position,
@@ -150,7 +150,7 @@ const VanDrawing = ({ damages, setDamages }: vanDrawingProps) => {
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
+  } | null>(
     damages[7]
       ? {
           position: damages[7].position,
@@ -167,7 +167,7 @@ const VanDrawing = ({ damages, setDamages }: vanDrawingProps) => {
     position: string | null;
     description: string | null;
     images: string[];
-  }>(
+  } | null>(
     damages[8]
       ? {
           position: damages[8].position,
@@ -182,18 +182,32 @@ const VanDrawing = ({ damages, setDamages }: vanDrawingProps) => {
   );
 
   useEffect(() => {
-    const newDamageArray = [
-      damageOne,
-      damageTwo,
-      damageThree,
-      damageFour,
-      damageFive,
-      damageSix,
-      damageSeven,
-      damageEight,
-      damageNine,
-    ];
-
+    const newDamageArray: {
+      position: string | null;
+      description: string | null;
+      images: string[];
+    }[] = [];
+    if (damageOne) {
+      newDamageArray.push(damageOne);
+    }
+    if (damageTwo) {
+      newDamageArray.push(damageTwo);
+    }
+    if (damageThree) {
+      newDamageArray.push(damageThree);
+    }
+    if (damageFour) {
+      newDamageArray.push(damageFour);
+    }
+    if (damageFive) {
+      newDamageArray.push(damageFive);
+    }
+    if (damageSix) {
+      newDamageArray.push(damageSix);
+    }
+    if (damageNine) {
+      newDamageArray.push(damageNine);
+    }
     setDamages(newDamageArray);
   }, [
     damageOne,

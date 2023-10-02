@@ -12,7 +12,7 @@ interface DamagePopUpProps {
     description: string | null;
     images: string[];
     position: string | null;
-  };
+  } | null;
   setDamage: (damageList: {
     position: string | null;
     description: string | null;
@@ -28,10 +28,10 @@ const DamagePopUp = ({
   position,
 }: DamagePopUpProps) => {
   const [damageDescription, setDamageDescription] = useState<string>(
-    damage.description ? damage.description : ""
+    damage && damage.description ? damage.description : ""
   );
   const [images, setImages] = useState<string[]>(
-    damage.images ? damage.images : []
+    damage && damage.images ? damage.images : []
   );
   const [currentImage, setCurrentImage] = useState<string>();
 
