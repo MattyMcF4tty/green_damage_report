@@ -1144,15 +1144,107 @@ const createReportPDF = async (
         100 // FIX
       );
       currentY += 105; // FIX;
-      doc.text(`lat: ${data.accidentLocation.lat || "-"}`, 15, currentY); //FIX!!
-      doc.text(`lng: ${data.accidentLocation.lng || "-"}`, 15, currentY + 4); //FIX!!
+      doc.text(`lat: ${data.accidentLocation.lat || "-"}`, 15, currentY);
+      currentY += 4;
+      doc.text(`lng: ${data.accidentLocation.lng || "-"}`, 15, currentY);
+      currentY += 4; // Adjust as needed.
     });
   } else {
     addImageSectionHeader("Map Images");
     doc.text("No map images available.", 15, currentY);
     currentY += headerHeight;
   }
+  currentY += 20; // Damage information for each damage in the array
 
+  const damagePositionLineHeight = 6; // Adjust as needed
+  const maxDamagePositionDescriptionLines = 15; // Maximum lines for the damage description
+  const damagePositionDescriptionMaxWidth = 90; // Adjust as needed
+  const pageHeight = 297; // A4 page height in mm
+  const bottomMargin = 20; // Minimum space you want to leave at the bottom of each page
+
+  // Calculate required space for a damage entry
+  function calculateDamageSpaceRequired(
+    damageDescriptionHeight: number
+  ): number {
+    return 70 + damageDescriptionHeight; // Include headers, footers, and some buffer
+  }
+  data.damages &&
+    data.damages.forEach((damage, index) => {
+      const damagePositionDescriptionLines = doc.splitTextToSize(
+        damage.description || "No damage description has been provided",
+        damagePositionDescriptionMaxWidth
+      );
+      const numDamagePositionDescriptionLines = Math.min(
+        maxDamagePositionDescriptionLines,
+        damagePositionDescriptionLines.length
+      );
+      const damagePositionDescriptionHeight =
+        numDamagePositionDescriptionLines * damagePositionLineHeight;
+
+      if (
+        currentY +
+          calculateDamageSpaceRequired(damagePositionDescriptionHeight) >
+        pageHeight - bottomMargin
+      ) {
+        doc.addPage();
+        currentY = 10;
+      }
+      // Calculate the height of the green box based on the description length
+      const damagePositionInfoBoxHeight = damagePositionDescriptionHeight + 50; // Additional space for other data
+
+      // Green box for the damage entry
+      doc.setFillColor("#E6EEE5");
+      doc.roundedRect(
+        10,
+        currentY, // Use currentY instead of the fixed value
+        190,
+        damagePositionInfoBoxHeight,
+        5, // Corner radius
+        5, // Corner radius
+        "F"
+      );
+
+      // Damage information header
+      doc.setFont("bold");
+      doc.text("Damage position information", 15, currentY + 10); // Use currentY
+      doc.setLineWidth(0.5);
+      doc.line(15, currentY + 12, 80, currentY + 12); // Use currentY
+
+      doc.setFont("normal");
+
+      // Position
+      doc.text("Position:", 15, currentY + 22); // Use currentY
+      doc.text(damage.position || "-", 85, currentY + 22); // Use currentY
+
+      // Damage description
+      doc.text("Damage description:", 15, currentY + 30); // Use currentY
+      for (let i = 0; i < numDamagePositionDescriptionLines; i++) {
+        doc.text(
+          damagePositionDescriptionLines[i],
+          15, // Starting at the left edge
+          currentY + 40 + i * damagePositionLineHeight // Use currentY
+        );
+      }
+
+      // Images
+      doc.text(
+        "Images:",
+        15,
+        currentY +
+          40 +
+          numDamagePositionDescriptionLines * damagePositionLineHeight
+      );
+      doc.text(
+        damage.images.join(", "),
+        85,
+        currentY +
+          40 +
+          numDamagePositionDescriptionLines * damagePositionLineHeight
+      );
+
+      currentY +=
+        calculateDamageSpaceRequired(damagePositionDescriptionHeight) + 5;
+    });
   const pdfBlob = doc.output("blob");
   return pdfBlob;
 };
