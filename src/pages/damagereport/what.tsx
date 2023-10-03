@@ -13,6 +13,7 @@ import { updateData } from "@/firebase/clientApp";
 import {
   getServerSidePropsWithRedirect,
   handleGetRenter,
+  handleUpdateReport,
   pageProps,
   reportDataType,
 } from "@/utils/utils";
@@ -73,6 +74,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
 
     const combinedDateTime = `${accidentDate}T${accidentTime}`;
     const date = new Date(combinedDateTime);
+    console.log(date)
 
     let renter;
     try {
@@ -127,7 +129,12 @@ const What: NextPage<pageProps> = ({ data, id }) => {
       date: accidentDate,
     });
 
-    await updateData(id, serverData);
+    try {
+      await handleUpdateReport(id, serverData);
+    } catch (error) {
+      setAllowClick(true);
+      return;
+    }
 
     router.push(`how?id=${id}`);
   };

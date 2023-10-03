@@ -2,6 +2,8 @@ import React, { use, useEffect, useState } from "react";
 import { PedestrianInformation } from "../../components/opposite_information/person_information_form";
 import {
   ImageField,
+  MultipleImageField,
+  SingleImagefield,
   TextField,
   YesNo,
 } from "../../components/custom_inputfields";
@@ -14,6 +16,7 @@ import { handleUploadMap, updateData } from "@/firebase/clientApp";
 import { GetServerSidePropsContext, NextPage } from "next";
 import {
   getServerSidePropsWithRedirect,
+  handleUpdateReport,
   pageProps,
   reportDataType,
 } from "@/utils/utils";
@@ -197,7 +200,13 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
       greenCarType: currentCar,
     });
 
-    await updateData(id, serverData);
+    try {
+      await handleUpdateReport(id, serverData);
+    } catch (error) {
+      setAllowClick(true);
+      return;
+    }
+
     router.push(`confirmation?id=${id}`);
   };
   /*   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_API_KEY;

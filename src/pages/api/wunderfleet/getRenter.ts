@@ -1,3 +1,4 @@
+import { highEncryptText, lowEncryptText } from "@/utils/securityUtils";
 import { checkOrigin } from "@/utils/serverUtils";
 import { apiResponse } from "@/utils/types";
 import { dateToWunder, getAge, isDateInRange, wunderToDate } from "@/utils/utils";
@@ -15,7 +16,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                 [],
                 ["Method is not allowed"],
                 {},
-                debug
             ))
         }
         debug.push("Method verified")
@@ -50,7 +50,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                 [],
                 [error.message],
                 {},
-                debug
             ))
         }
 
@@ -83,7 +82,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                 [],
                 ["Something went wrong"],
                 {},
-                debug
             ))
         }
         debug.push(`VehicleResponse returned ${vehicleResponse.status}`)
@@ -97,7 +95,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                 [],
                 ["Car not found"],
                 {},
-                debug
             ))
         }
 
@@ -138,7 +135,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                 [],
                 ["Something went wrong"],
                 {},
-                debug
             ))
         }
         debug.push(`reservationResponse returned ${reservationResponse.status}`)
@@ -169,7 +165,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                     [],
                     ["Something went wrong"],
                     {},
-                    debug
                 ))
             }
             const activeReservationResponseData = await activeReservationResponse.json()
@@ -188,7 +183,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                 [],
                 ["Something went wrong"],
                 {},
-                debug
             ))   
         }
         debug.push(`ReservationId: ${reservation[0].reservationId}`)
@@ -212,7 +206,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                 [],
                 ["Something went wrong"],
                 {},
-                debug
             ))
         }
         debug.push(`Reservation startTime: ${startTime}`)
@@ -227,7 +220,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                 [],
                 ["No reservations were ongoing at that point in time"],
                 {},
-                debug
             ))     
         }
         debug.push("Date in range")
@@ -262,7 +254,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                     [],
                     ["No customers were found with customerId"],
                     {},
-                    debug
                 ))            
             }
         } else {
@@ -273,13 +264,16 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
                 [],
                 ["Something went wrong"],
                 {},
-                debug
             ))
         }
         const renterData = renterResponseData.data[0];
 
-        // Calculating age
-        const renterAge = getAge(renterData.birthDate);
+    // Calculate age if we got a birthdate
+    const renterBirthDate = wunderToDate(renterData.birthDate);
+    let renterAge = null;
+    if (renterBirthDate) {
+       renterAge = getAge(renterBirthDate)
+    }
 
         // Assigning age to renter
         let renterGender = "Unknown"
@@ -291,25 +285,26 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             renterGender === "Female"
         }
 
+
         // Collecting renter data in object
         const renterInfo = {
-            customerId: customerId as number, 
-            reservationId: reservationId as number,
-            firstName: `${renterData.firstName}`,
-            lastName: `${renterData.lastName}`,
-            birthDate: `${renterData.birthDate}`,
-            gender: renterGender,
-            age: renterAge,
+            customerId: highEncryptText(`${customerId}`), 
+            reservationId: highEncryptText(`${reservationId}`),
+            firstName: lowEncryptText(`${renterData.firstName}`),
+            lastName: lowEncryptText(`${renterData.lastName}`),
+            birthDate: highEncryptText(`${renterData.birthDate}`),
+            email: highEncryptText(`${renterData.email}`),
+            phoneNumber: highEncryptText(`${renterData.mobilePhone}`),
+            gender: highEncryptText(renterGender),
+            age: highEncryptText(`${renterAge}`),
             insurance: null,
         };
-
         
         return res.status(200).json(new apiResponse(
             "OK",
             ["User fetched succesfully"],
             [],
             renterInfo,
-            debug
         ))
 
     } catch (error: any) {
@@ -319,7 +314,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             [],
             ["Something went wrong"],
             {},
-            debug
         ))
     }
 

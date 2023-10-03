@@ -1,7 +1,6 @@
 import { WitnessInformation } from "@/components/otherPartys/witnessList";
 import {
   collectionName,
-  getData,
   getImages,
   getReportIds,
   updateData,
@@ -13,31 +12,36 @@ import Cookies from "js-cookie";
 import app, { FireDatabase, FireStorage } from "@/firebase/firebaseConfig";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/router";
-import { collection, getDocs, query, where } from "firebase/firestore";
-import { deleteObject, ref, uploadBytes } from "firebase/storage";
+import { collection, doc, getDocs, query, updateDoc, where } from "firebase/firestore";
 import createReportPDF from "./reportPdfTemplate";
 import jsPDF from "jspdf";
+import { getReportDoc } from "./firebaseUtils/firestoreUtils";
 
 /* ------- utils config ----- */
 const firebaseCollectionName = collectionName;
 
 export const generateId = async () => {
-  const dataList = await getReportIds();
-  let validId = false;
-  let id = "";
-  const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let dataList: string[];
+  try {
+    dataList = await getReportIds();
+  } catch ( error: any ) {
+    throw new Error(error.message);
+  }
+
+  let id: string | null = null;
+
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
   /* Generates random id from chars and checks if this id is not already taken */
-  while (!validId) {
-    id = Array.from(crypto.getRandomValues(new Uint16Array(16)))
-      .map((randomValue) => chars[randomValue % chars.length])
-      .join("");
+  while (!id) {
+    const newId =Array.from(crypto.getRandomValues(new Uint16Array(16)))
+    .map((randomValue) => chars[randomValue % chars.length])
+    .join("");
 
-    const existingData = dataList?.find((docId: string) => docId === id);
+    const existingId = dataList.find((docId: string) => docId === newId);
 
-    if (!existingData) {
-      validId = true;
+    if (!existingId) {
+      id = newId;
     }
   }
 
@@ -109,8 +113,8 @@ export const getServerSidePropsWithRedirect = async (
 ) => {
   const id = context.query.id as string;
 
-  /*   try {
-   */ const data: reportDataType = await getData(id);
+  const reportData = await getReportDoc(id, false);
+  console.log(reportData)
   const GreenMobilityImages = await handleDownloadImages(
     `${id}/GreenMobility`,
     "url"
@@ -124,8 +128,9 @@ export const getServerSidePropsWithRedirect = async (
     OtherParty: otherPartyImages,
   };
 
-  if (data.finished === true) {
-    console.log(data.finished);
+  reportData.isExpired();
+
+  if (reportData.isFinished()) {
     return {
       redirect: {
         destination: "/damagereport/reportfinished",
@@ -134,23 +139,14 @@ export const getServerSidePropsWithRedirect = async (
     };
   }
 
+
   return {
     props: {
-      data: data.toPlainObject(),
+      data: reportData.toPlainObject(),
       images: images || null,
       id: id,
     },
   };
-  /*   } catch (error: any) {
-    console.error("Error in getServerSideProps:", error.message);
-    context.res.statusCode = 500;
-    return {
-      props: {
-        errorMessage: "An internal error occurred.",
-        statusCode: 500
-      }
-    };
-  } */
 };
 
 export const reportSearch = (
@@ -226,7 +222,12 @@ export const handleSendEmail = async (
     text: text,
   };
 
-  const response = await fetch(process.env.NEXT_PUBLIC_URL + "/api/sendEmail", {
+  const url = process.env.NEXT_PUBLIC_URL;
+  if (!url) {
+    throw new Error("NEXT_PUBLIC_URL is not defined")
+  }
+
+  const response = await fetch(url + '/api/sendEmail', {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -234,12 +235,12 @@ export const handleSendEmail = async (
     body: JSON.stringify(data),
   });
 
-  const responseData = await response.json();
+  const responseData = await response.json()
   if (response.ok) {
     console.log(responseData.messages);
     return true;
   } else {
-    console.error(responseData.errors);
+    console.error(responseData.errors)
     return false;
   }
 };
@@ -409,7 +410,7 @@ export const handleGeneratePdf = async (id: string) => {
     console.log(map);
 
     try {
-      data.updateFields(await getData(id));
+      data.updateFields(await getReportDoc(id, true));
     } catch (error) {
       console.error("Error getting data");
     }
@@ -506,19 +507,20 @@ export const handleGetRenter = async (numberplate: string, date: Date) => {
   }
 
   return responseData.data as {
-    customerId: number | null;
-    reservationId: number | null;
+    customerId: string | null;
+    reservationId: string | null;
     firstName: string | null;
     lastName: string | null;
     birthDate: string | null;
+    email: string | null;
+    phoneNumber: string |null;
     gender: string | null;
-    age: number | null;
+    age: string | null;
     insurance: boolean | null;
   };
 };
 
-export const getAge = (birthDateString: string): number => {
-  const birthDate = new Date(birthDateString);
+export const getAge = (birthDate: Date): number => {
   const currentDate = new Date();
 
   let age = currentDate.getFullYear() - birthDate.getFullYear();
@@ -567,14 +569,139 @@ export const wunderToDate = (wunderTime: string | null) => {
   }
 
   return parsed;
-};
+}
+
+
+export const wunderToGender = (gender: number | null) => {
+
+  if (!gender) {
+    return "Unknown"
+  } 
+
+  switch (gender) {
+    case 1:
+      return "Male"
+    case 2:
+      return "Female"
+  }
+
+  return "Other"
+}
+
+export const handleGetReportData = async (reportId: string) => {
+  const url = process.env.NEXT_PUBLIC_URL;
+  if (!url) {
+    throw new Error("NEXT_PUBLIC_URL not defined")
+  }
+
+  const data = {reportId: reportId}
+
+  const response = await fetch(url + "/api/damageReport/getReport", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data)
+  })
+
+
+  const responseJson = await response.json();
+  console.log(responseJson)
+  if (!response.ok) {
+    const newError = new Error(responseJson.errors[0]);
+    newError.name = responseJson.status;
+    throw newError;
+  }
+
+  const report = new reportDataType();
+  report.updateFields(responseJson.data)
+
+  return report;
+}
+
+export const handleUpdateReport = async (reportId:string, reportData:reportDataType) => {
+
+  const data = {
+    reportId: reportId,
+    reportData: reportData.toPlainObject(),
+  }
+
+  const url = process.env.NEXT_PUBLIC_URL;
+  if (!url || typeof url !== 'string') {
+    throw new Error("NEXT_PUBLIC_URL is not defined in enviroment")
+  }
+
+  const response = await fetch(url + '/api/damageReport/updateReport', {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(data)
+  })
+
+  const responseJson = await response.json();
+  if (!response.ok) {
+    const newError = new Error(responseJson.errors[0]);
+    newError.name = responseJson.status;
+    throw newError;
+  }
+
+  return;
+}
+
+export const isJSONSerializable = (data:any) => {
+  try {
+    JSON.stringify(data);
+    return true;
+  } catch (error) {
+    return false;
+  }
+}
+
+export const trimArrayToLimit = (limit: number, array: any[]) => {
+  if (array.length > limit) {
+      return array.slice(0, limit);
+  }
+  return array;
+}
+
+export const blobToBase64 = async (blob: Blob): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+export const base64ToBuffer = (base64: string, contentType: string = '') => {
+  const base64Regex = /^data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,(.*)$/;
+  const matches = base64.match(base64Regex);
+  if (!matches || matches.length !== 3) {
+    throw new Error('Invalid input string format');
+  }
+  contentType = matches[1];
+  base64 = matches[2];
+  return Buffer.from(base64, 'base64');
+}
+
+export const arrayBufferToBlob = (arrayBuffer: ArrayBuffer, contentType: string) => {
+  return new Blob([arrayBuffer], { type: contentType });
+}
+
+export const replaceLastSlash = (path:string, replacement:string) => {
+  return path.replace(/\/([^\/]*)$/, replacement + '$1');
+}
 
 /* ---------------- classes and types ------------------------------ */
 export type pageProps = {
   data: {
     userEmail: string | null;
+    userPhoneNumber: string | null;
     finished: boolean;
     lastChange: string;
+
+    creationDate: string;
 
     driverInfo: {
       firstName: string | null;
@@ -588,13 +715,15 @@ export type pageProps = {
     };
 
     renterInfo: {
-      customerId: number | null;
-      reservationId: number | null;
+      customerId: string | null;
+      reservationId: string | null;
       firstName: string | null;
       lastName: string | null;
+      email: string | null;
+      phoneNumber: string | null;
       birthDate: string | null;
       gender: string | null;
-      age: number | null;
+      age: string | null;
       insurance: boolean | null;
     };
 
@@ -642,11 +771,6 @@ export type pageProps = {
     }[];
 
     witnesses: WitnessInformation[];
-    damages: {
-      position: string | null;
-      description: string | null;
-      images: string[];
-    }[];
 
     /* SITE LOGIC */
     /* What */
@@ -667,8 +791,13 @@ export type pageProps = {
 
 export class reportDataType {
   userEmail: string | null;
+  userPhoneNumber: string | null;
   finished: boolean;
   lastChange: string;
+
+  openedDate: string | null;
+  closedDate: string | null;
+
 
   driverInfo: {
     firstName: string | null;
@@ -682,13 +811,15 @@ export class reportDataType {
   };
 
   renterInfo: {
-    customerId: number | null;
-    reservationId: number | null;
+    customerId: string | null;
+    reservationId: string | null;
     firstName: string | null;
     lastName: string | null;
+    email: string | null;
+    phoneNumber: string | null;
     birthDate: string | null;
     gender: string | null;
-    age: number | null;
+    age: string | null;
     insurance: boolean | null;
   };
 
@@ -731,7 +862,11 @@ export class reportDataType {
     information: string;
   }[];
 
-  witnesses: WitnessInformation[];
+  witnesses: {
+    name: string | null,
+    phone: string | null,
+    email: string | null,
+  }[];
 
   damages: {
     position: string | null;
@@ -753,8 +888,12 @@ export class reportDataType {
   singleVehicleAccident: boolean | null;
 
   constructor() {
-    this.userEmail = "";
+    this.userEmail = null;
+    this.userPhoneNumber = null;
     this.finished = false;
+
+    this.openedDate = null;
+    this.closedDate = null;
     this.lastChange = `${new Date().getHours()}:${new Date().getMinutes()} - ${new Date().getDay()}/${new Date().getMonth()}/${new Date().getFullYear()}`;
     this.driverInfo = {
       firstName: null,
@@ -771,6 +910,8 @@ export class reportDataType {
       reservationId: null,
       firstName: null,
       lastName: null,
+      email: null,
+      phoneNumber: null,
       birthDate: null,
       gender: null,
       age: null,
@@ -804,10 +945,35 @@ export class reportDataType {
     Object.assign(this, fields);
   }
 
+  isFinished() {
+    return this.finished;
+  }
+
+  isExpired() {
+    const ExpiredTime = 72 * 60 * 60 * 1000 // 72 hours
+
+    if (this.openedDate) {
+      const openedDate = new Date(this.openedDate);
+      const currentDate = new Date();
+  
+      // If the difference between the current date and the opened date is more than 72 hours
+      if (currentDate.getTime() - openedDate.getTime() > ExpiredTime) {
+        this.finished = true;
+        this.closedDate = `${new Date}`
+        return true;
+      }
+      return false;
+    }
+    return false;
+  }
+
   toPlainObject() {
     return {
       userEmail: this.userEmail,
+      userPhoneNumber: this.userPhoneNumber,
       finished: this.finished,
+      openedDate: this.openedDate,
+      closedDate: this.closedDate,
       lastChange: this.lastChange,
       driverInfo: {
         firstName: this.driverInfo.firstName,
@@ -824,6 +990,8 @@ export class reportDataType {
         reservationId: this.renterInfo.reservationId,
         firstName: this.renterInfo.firstName,
         lastName: this.renterInfo.lastName,
+        email: this.renterInfo.email,
+        phoneNumber: this.renterInfo.phoneNumber,
         birthDate: this.renterInfo.birthDate,
         gender: this.renterInfo.gender,
         age: this.renterInfo.age,

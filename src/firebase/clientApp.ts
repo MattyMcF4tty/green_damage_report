@@ -48,6 +48,7 @@ export const getData = async (id: string) => {
 
   return decryptedData;
 };
+export const collectionName = "DamageReports"
 
 export const createDoc = async (id: string, email: string) => {
   try {
@@ -184,27 +185,6 @@ export const getReportIds = async () => {
   return idList;
 };
 
-export const getReports = async () => {
-  const idList = await getReportIds();
-  const reportList: { id: string; data: reportDataType }[] = [];
-
-  if (idList.length > 0) {
-    try {
-      await Promise.all(
-        idList.map(async (id) => {
-          const docData = await getData(id);
-          if (docData !== undefined) {
-            reportList.push({ id: id, data: docData });
-          }
-        })
-      );
-    } catch (error) {
-      console.error(`Something went wrong fecthing reports:\n${error}\n`);
-    }
-  }
-
-  return reportList;
-};
 
 export const deleteReports = async (reportsToDelete: string[]) => {
   if (reportsToDelete.length === 0) {

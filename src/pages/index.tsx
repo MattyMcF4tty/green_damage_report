@@ -6,34 +6,45 @@ import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRightLong } from "@fortawesome/free-solid-svg-icons";
 import EmailPopUp from "@/components/popups/emailPopUp";
+import { handleCreateNewReport } from "@/utils/firebaseUtils/apiRoutes";
 
 const IndexPage = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [showPopUp, setShowPopUp] = useState(false);
   const [ongoingReports, setOngoingReports] = useState<string[]>([]);
+  const [isError, setIsError] = useState<string | null>(null)
 
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const ID = await generateId();
-
+    // Check for ongoing reports with that email.
+    let ongoingReports: string[] = [];
     try {
-      const ongoingReports = await getReportsByEmail(email);
-      if (ongoingReports.length == 0) {
-        if (ID !== undefined && email !== "") {
-          await createDoc(ID, email);
-          router.push(`damagereport/what?id=${ID}`);
-        } else {
-          throw new Error("Error creating report Missing ID or Mail");
-        }
-      } else {
-        setOngoingReports(ongoingReports);
-        setShowPopUp(true);
-      }
-    } catch (error) {
-      console.error(`Something went wrong:\n${error}`);
+      ongoingReports = await getReportsByEmail(email);
+    } catch (error:any) {
+      console.error(error)
+      return;
     }
+
+    if (ongoingReports.length !== 0) {
+      setOngoingReports(ongoingReports);
+      setShowPopUp(true);
+      return;
+    }
+
+    // Create a new report
+    let reportId: string;
+    try {
+      reportId = await handleCreateNewReport(email);
+    } catch ( error:any ) {
+      console.error(error)
+      setIsError(error.message)
+      return;
+    }
+
+    //Push to start of damage report
+    router.push(`/damagereport/what?id=${reportId}`)
   };
 
   return (
@@ -71,6 +82,9 @@ const IndexPage = () => {
         </div>
       </div>
 
+      {isError && (
+        <p className="text-sm text-red-500">{isError}</p>
+      )}
       <button
         type="submit"
         className="absolute bottom-4 w-32 h-14 text-lg font-semibold rounded-full bg-MainGreen-300 text-white

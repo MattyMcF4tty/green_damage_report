@@ -11,6 +11,7 @@ import { useRouter } from "next/router";
 import { GetServerSidePropsContext, NextPage } from "next";
 import {
   getServerSidePropsWithRedirect,
+  handleUpdateReport,
   pageProps,
   reportDataType,
 } from "@/utils/utils";
@@ -75,8 +76,13 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
       witnesses: witnesses,
     });
 
-    await updateData(id, serverData);
-
+    try {
+      await handleUpdateReport(id, serverData);
+    } catch (error) {
+      setAllowClick(true);
+      return;
+    }
+    
     router.push(`where?id=${id}`);
   };
 

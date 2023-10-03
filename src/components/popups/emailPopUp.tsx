@@ -1,5 +1,5 @@
 import { createDoc } from "@/firebase/clientApp";
-import { generateId } from "@/utils/utils";
+import { handleCreateNewReport } from "@/utils/firebaseUtils/apiRoutes";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 
@@ -15,9 +15,17 @@ const EmailPopUp = ({reportIDs, setVisibility, email}: EmailPopUpProps) => {
 
     const handleNewReport = async() => {
         setEnableButtons(false);
-        const id = await generateId()
-        await createDoc(id, email);
-        Router.push(`damagereport/what?id=${id}`);
+        
+        let reportId: string;
+        try {
+            reportId = await handleCreateNewReport(email)
+        } catch ( error:any ) {
+            console.error(error);
+            setEnableButtons(true);
+            return;
+        }
+
+        Router.push(`damagereport/what?id=${reportId}`);
     }
 
     return (
