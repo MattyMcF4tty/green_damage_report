@@ -239,7 +239,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         />
       </div>
       {otherPartyInvolved && (
-        <div className="flex flex-col justify-left text-left w-full mb-4">
+        <div className="flex flex-col justify-left text-left w-full ">
           <div id="whatvehicle" className="flex flex-col w-full">
             <div>
               <label htmlFor="whatvehicle">Please select the object</label>
@@ -258,19 +258,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
             </div>
           </div>
 
-          {/* Picture of damages to green car collection */}
-          <div className="">
-            <ImageField
-              reportID={id}
-              id="LeftImage"
-              labelText="Please take pictures of the damage to the other party"
-              required={false}
-              images={otherPartyImages}
-              imageType="OtherParty"
-              multiple={true}
-            />
-          </div>
-
           {/* Damage description collection */}
           <div className="">
             <TextField
@@ -281,6 +268,18 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
               required={true}
               value={damageDescription}
               onChange={setDamageDescription}
+            />
+          </div>
+          {/* Picture of damages to green car collection */}
+          <div className="">
+            <ImageField
+              reportID={id}
+              id="LeftImage"
+              labelText="Please take pictures of the damage to the other party"
+              required={false}
+              images={otherPartyImages}
+              imageType="OtherParty"
+              multiple={true}
             />
           </div>
         </div>
