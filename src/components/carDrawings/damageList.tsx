@@ -1,7 +1,9 @@
 import { useState } from "react";
 import DamagePopUp from "../popups/damagePopUp";
 import ZoeDrawing from "./zoe";
+import { deleteReportFile, deleteStorageFile } from "@/utils/firebaseUtils/storageUtils";
 interface damageListProps {
+  reportId: string;
   damages: {
     position: string | null;
     description: string | null;
@@ -15,7 +17,7 @@ interface damageListProps {
     }[]
   ) => void;
 }
-const DamageList = ({ damages, setDamages }: damageListProps) => {
+const DamageList = ({ damages, setDamages, reportId }: damageListProps) => {
   // Combine showPopUp and currentEditingIndex
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
 
@@ -30,8 +32,13 @@ const DamageList = ({ damages, setDamages }: damageListProps) => {
     setEditingIndex(null);
   };
 
-  const handleDelete = (index: number) => {
+  const handleDelete = async (index: number) => {
     const updatedDamages = [...damages];
+    try {
+      await deleteReportFile(reportId, `GreenDamage/${updatedDamages[index].position}`)
+    } catch(error) {
+      console.error(error)
+    }
     updatedDamages.splice(index, 1);
     setDamages(updatedDamages);
     setEditingIndex(null); // Close the pop-up if it's opened.
@@ -41,6 +48,7 @@ const DamageList = ({ damages, setDamages }: damageListProps) => {
     <div className="w-full">
       {editingIndex !== null && (
         <DamagePopUp
+        reportId={reportId}
           position={damages[editingIndex].position || ""}
           setShowPopUp={(show) =>
             show ? setEditingIndex(editingIndex) : setEditingIndex(null)
@@ -54,9 +62,14 @@ const DamageList = ({ damages, setDamages }: damageListProps) => {
           <div className="p-2 mb-4  bg-MainGreen-100 rounded-md" key={index}>
             <p className="break-words">Position: {damage.position}</p>
             <p className="break-words">Description: {damage.description}</p>
-            <p className="break-words mb-4">
-              Images: {damage.images.join(", ")}
-            </p>
+            <div className="mb-4">
+              <p>Images:</p>
+              {damage.images[0].length > 0 && (
+                <img className="h-14 w-14"
+                src={damage.images[0]} alt="Damage" />
+              )}
+            </div>
+
             <button
               className="rounded-full w-16 mr-2 bg-MainGreen-300 text-white"
               type="button"

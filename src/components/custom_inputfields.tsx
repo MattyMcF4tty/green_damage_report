@@ -731,9 +731,10 @@ interface singleImagefield {
   labelText: string;
   required: boolean;
   filePath: string;
+  setImage?: (image: string) => void;
 }
 
-export const SingleImagefield = ({id, reportId, labelText, required, filePath}: singleImagefield) => {
+export const SingleImagefield = ({id, reportId, labelText, required, filePath, setImage}: singleImagefield) => {
   const [disabled, setDisabled] = useState(false);
   const [imageUrl, setImageUrl] = useState('')
   const [isError, setIsError] = useState<null | string>(null)
@@ -785,6 +786,9 @@ export const SingleImagefield = ({id, reportId, labelText, required, filePath}: 
 
   useEffect(() => {
     console.log(imageUrl)
+    if (setImage) {
+      setImage(imageUrl)
+    }
   }, [imageUrl])
 
   async function getImg() {
@@ -793,7 +797,6 @@ export const SingleImagefield = ({id, reportId, labelText, required, filePath}: 
     try {
       imageInStorage = await getReportFile(reportId, filePath)
     } catch (error:any) {
-      setIsError(error.message)
       setDisabled(false);
       return;
     }
@@ -803,7 +806,11 @@ export const SingleImagefield = ({id, reportId, labelText, required, filePath}: 
   }
 
   useEffect(() => {
-    getImg()
+    try {
+      getImg()
+    } catch (error) {
+      return
+    }
   }, [])
 
   const handleDeleteImage = async (path:string) => {
@@ -860,6 +867,9 @@ export const SingleImagefield = ({id, reportId, labelText, required, filePath}: 
               alt={`DamageImage`} 
             />
           </div>
+        )}
+        {isError && (
+          <p className="text-sm text-red-500">{isError}</p>
         )}
     </div>
   )

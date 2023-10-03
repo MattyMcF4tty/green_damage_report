@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import DamagePopUp from "../popups/damagePopUp";
 
 interface vanDrawingProps {
+  reportId: string;
   damages: {
     position: string | null;
     description: string | null;
@@ -16,7 +17,7 @@ interface vanDrawingProps {
   ) => void;
 }
 
-const VanDrawing = ({ damages, setDamages }: vanDrawingProps) => {
+const VanDrawing = ({ damages, setDamages, reportId }: vanDrawingProps) => {
   const [showOne, setShowOne] = useState(false);
   const [showTwo, setShowTwo] = useState(false);
   const [showThree, setShowThree] = useState(false);
@@ -309,6 +310,7 @@ const VanDrawing = ({ damages, setDamages }: vanDrawingProps) => {
 
       {showOne && (
         <DamagePopUp
+          reportId={reportId}
           position="Front left wheel"
           setShowPopUp={setShowOne}
           damage={damageOne}
@@ -317,6 +319,7 @@ const VanDrawing = ({ damages, setDamages }: vanDrawingProps) => {
       )}
       {showTwo && (
         <DamagePopUp
+          reportId={reportId}
           position="Front left door"
           setShowPopUp={setShowTwo}
           damage={damageTwo}
@@ -325,6 +328,7 @@ const VanDrawing = ({ damages, setDamages }: vanDrawingProps) => {
       )}
       {showThree && (
         <DamagePopUp
+          reportId={reportId}
           position="Rear left door"
           setShowPopUp={setShowThree}
           damage={damageThree}
@@ -333,6 +337,7 @@ const VanDrawing = ({ damages, setDamages }: vanDrawingProps) => {
       )}
       {showFour && (
         <DamagePopUp
+        reportId={reportId}
           position="Back left wheel"
           setShowPopUp={setShowFour}
           damage={damageFour}
@@ -341,6 +346,7 @@ const VanDrawing = ({ damages, setDamages }: vanDrawingProps) => {
       )}
       {showFive && (
         <DamagePopUp
+        reportId={reportId}
           position="Front bumper"
           setShowPopUp={setShowFive}
           damage={damageFive}
@@ -349,7 +355,8 @@ const VanDrawing = ({ damages, setDamages }: vanDrawingProps) => {
       )}
       {showSix && (
         <DamagePopUp
-          position="Hood"
+        reportId={reportId}
+        position="Hood"
           setShowPopUp={setShowSix}
           damage={damageSix}
           setDamage={setDamageSix}
@@ -357,7 +364,8 @@ const VanDrawing = ({ damages, setDamages }: vanDrawingProps) => {
       )}
       {showSeven && (
         <DamagePopUp
-          position="Windshield"
+        reportId={reportId}
+        position="Windshield"
           setShowPopUp={setShowSeven}
           damage={damageSeven}
           setDamage={setDamageSeven}
@@ -365,7 +373,8 @@ const VanDrawing = ({ damages, setDamages }: vanDrawingProps) => {
       )}
       {showEight && (
         <DamagePopUp
-          position="Roof"
+        reportId={reportId}
+        position="Roof"
           setShowPopUp={setShowEight}
           damage={damageEight}
           setDamage={setDamageEight}
@@ -373,7 +382,8 @@ const VanDrawing = ({ damages, setDamages }: vanDrawingProps) => {
       )}
       {showNine && (
         <DamagePopUp
-          position="Back door"
+        reportId={reportId}
+        position="Back door"
           setShowPopUp={setShowNine}
           damage={damageNine}
           setDamage={setDamageNine}

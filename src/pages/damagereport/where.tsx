@@ -268,15 +268,14 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
           </div>
 
           {/* Picture of damages to green car collection */}
-          <div className="">
-            <ImageField
-              reportID={id}
-              id="LeftImage"
-              labelText="Please take pictures of the damage to the other party"
+          <div className="mb-4">
+            <MultipleImageField
+              reportId={id}
+              id="FrontImage"
+              labelText="Please take pictures of the damage to the other partys"
               required={false}
-              images={otherPartyImages}
-              imageType="OtherParty"
-              multiple={true}
+              imageLimit={20}
+              folderPath="OtherPartyDamages/"        
             />
           </div>
 
@@ -294,15 +293,6 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
           </div>
         </div>
       )}
-      <ImageField
-        reportID={id}
-        id="FrontImage"
-        labelText="Please take pictures of the damage to the GreenMobility car"
-        required={false}
-        images={greenImages}
-        imageType="GreenMobility"
-        multiple={true}
-      />
 
       <div className="">
         What type of car is damaged?
@@ -322,18 +312,18 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         </div>
         {currentCar === "zoe" && (
           <div className="">
-            <ZoeDrawing damages={damages} setDamages={setDamages} />
+            <ZoeDrawing reportId={id} damages={damages} setDamages={setDamages} />
           </div>
         )}
         {currentCar === "van" && (
           <div>
-            <VanDrawing damages={damages} setDamages={setDamages} />
+            <VanDrawing reportId={id} damages={damages} setDamages={setDamages} />
           </div>
         )}
       </div>
 
       <div className="w-full">
-        <DamageList damages={damages} setDamages={setDamages} />
+        <DamageList reportId={id} damages={damages} setDamages={setDamages} />
       </div>
 
       <div className="flex flex-row justify-between w-full mt-4 ">

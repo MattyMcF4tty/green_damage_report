@@ -525,9 +525,13 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
               >
                 <p className="break-words">Position: {damage.position}</p>
                 <p className="break-words">Description: {damage.description}</p>
-                <p className="break-words">
-                  Images: {damage.images.join(", ")}
-                </p>
+                <div className="">
+                  <p>Images:</p>
+                  {damage.images[0].length > 0 && (
+                    <img className="h-14 w-14"
+                    src={damage.images[0]} alt="Damage" />
+                  )}
+                </div>
               </div>
             ))}
           </div>

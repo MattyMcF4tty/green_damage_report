@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import DamagePopUp from "../popups/damagePopUp";
 
 interface ZoeDrawingProps {
+  reportId: string;
   damages: {
     position: string | null;
     description: string | null;
@@ -15,7 +16,7 @@ interface ZoeDrawingProps {
     }[]
   ) => void;
 }
-const ZoeDrawing = ({ damages, setDamages }: ZoeDrawingProps) => {
+const ZoeDrawing = ({ damages, setDamages, reportId }: ZoeDrawingProps) => {
   const [showOne, setShowOne] = useState(false);
   const [showTwo, setShowTwo] = useState(false);
   const [showThree, setShowThree] = useState(false);
@@ -320,7 +321,8 @@ const ZoeDrawing = ({ damages, setDamages }: ZoeDrawingProps) => {
 
       {showOne && (
         <DamagePopUp
-          position="Front left wheel"
+        reportId={reportId}
+        position="Front left wheel"
           setShowPopUp={setShowOne}
           damage={damageOne}
           setDamage={setDamageOne}
@@ -328,7 +330,8 @@ const ZoeDrawing = ({ damages, setDamages }: ZoeDrawingProps) => {
       )}
       {showTwo && (
         <DamagePopUp
-          position="Front left door"
+        reportId={reportId}
+        position="Front left door"
           setShowPopUp={setShowTwo}
           damage={damageTwo}
           setDamage={setDamageTwo}
@@ -336,7 +339,8 @@ const ZoeDrawing = ({ damages, setDamages }: ZoeDrawingProps) => {
       )}
       {showThree && (
         <DamagePopUp
-          position="Back left door"
+        reportId={reportId}
+        position="Back left door"
           setShowPopUp={setShowThree}
           damage={damageThree}
           setDamage={setDamageThree}
@@ -344,7 +348,8 @@ const ZoeDrawing = ({ damages, setDamages }: ZoeDrawingProps) => {
       )}
       {showFour && (
         <DamagePopUp
-          position="Back left wheel"
+        reportId={reportId}
+        position="Back left wheel"
           setShowPopUp={setShowFour}
           damage={damageFour}
           setDamage={setDamageFour}
@@ -352,7 +357,8 @@ const ZoeDrawing = ({ damages, setDamages }: ZoeDrawingProps) => {
       )}
       {showFive && (
         <DamagePopUp
-          position="Front bumper"
+        reportId={reportId}
+        position="Front bumper"
           setShowPopUp={setShowFive}
           damage={damageFive}
           setDamage={setDamageFive}
@@ -360,7 +366,8 @@ const ZoeDrawing = ({ damages, setDamages }: ZoeDrawingProps) => {
       )}
       {showSix && (
         <DamagePopUp
-          position="Hood"
+        reportId={reportId}
+        position="Hood"
           setShowPopUp={setShowSix}
           damage={damageSix}
           setDamage={setDamageSix}
@@ -368,7 +375,8 @@ const ZoeDrawing = ({ damages, setDamages }: ZoeDrawingProps) => {
       )}
       {showSeven && (
         <DamagePopUp
-          position="Windshield"
+        reportId={reportId}
+        position="Windshield"
           setShowPopUp={setShowSeven}
           damage={damageSeven}
           setDamage={setDamageSeven}
@@ -376,7 +384,8 @@ const ZoeDrawing = ({ damages, setDamages }: ZoeDrawingProps) => {
       )}
       {showEight && (
         <DamagePopUp
-          position="Roof"
+        reportId={reportId}
+        position="Roof"
           setShowPopUp={setShowEight}
           damage={damageEight}
           setDamage={setDamageEight}
@@ -384,7 +393,8 @@ const ZoeDrawing = ({ damages, setDamages }: ZoeDrawingProps) => {
       )}
       {showNine && (
         <DamagePopUp
-          position="Rear window"
+        reportId={reportId}
+        position="Rear window"
           setShowPopUp={setShowNine}
           damage={damageNine}
           setDamage={setDamageNine}
@@ -392,7 +402,8 @@ const ZoeDrawing = ({ damages, setDamages }: ZoeDrawingProps) => {
       )}
       {showTen && (
         <DamagePopUp
-          position="Trunk"
+        reportId={reportId}
+        position="Trunk"
           setShowPopUp={setShowTen}
           damage={damageTen}
           setDamage={setDamageTen}
@@ -400,7 +411,8 @@ const ZoeDrawing = ({ damages, setDamages }: ZoeDrawingProps) => {
       )}
       {showEleven && (
         <DamagePopUp
-          position="Rear bumper"
+        reportId={reportId}
+        position="Rear bumper"
           setShowPopUp={setShowEleven}
           damage={damageEleven}
           setDamage={setDamageEleven}
@@ -408,7 +420,8 @@ const ZoeDrawing = ({ damages, setDamages }: ZoeDrawingProps) => {
       )}
       {showTwelve && (
         <DamagePopUp
-          position="Front right wheel"
+        reportId={reportId}
+        position="Front right wheel"
           setShowPopUp={setShowTwelve}
           damage={damageTwelve}
           setDamage={setDamageTwelve}
@@ -416,7 +429,8 @@ const ZoeDrawing = ({ damages, setDamages }: ZoeDrawingProps) => {
       )}
       {showThirteen && (
         <DamagePopUp
-          position="Front right door"
+        reportId={reportId}
+        position="Front right door"
           setShowPopUp={setShowThirteen}
           damage={damageThirteen}
           setDamage={setDamageThirteen}
@@ -424,7 +438,8 @@ const ZoeDrawing = ({ damages, setDamages }: ZoeDrawingProps) => {
       )}
       {showFourteen && (
         <DamagePopUp
-          position="Back right door"
+        reportId={reportId}
+        position="Back right door"
           setShowPopUp={setShowFourteen}
           damage={damageFourteen}
           setDamage={setDamageFourteen}
@@ -432,7 +447,8 @@ const ZoeDrawing = ({ damages, setDamages }: ZoeDrawingProps) => {
       )}
       {showFifteen && (
         <DamagePopUp
-          position="Back right wheel"
+        reportId={reportId}
+        position="Back right wheel"
           setShowPopUp={setShowFifteen}
           damage={damageFifteen}
           setDamage={setDamageFifteen}

@@ -48,7 +48,6 @@ export const getData = async (id: string) => {
 
   return decryptedData;
 };
-export const collectionName = "DamageReports"
 
 export const createDoc = async (id: string, email: string) => {
   try {

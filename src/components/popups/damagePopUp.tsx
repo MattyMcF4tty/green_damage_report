@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ImageField, TextField } from "../custom_inputfields";
+import { ImageField, SingleImagefield, TextField } from "../custom_inputfields";
 import { handleDownloadImages } from "@/utils/utils";
 import { updateImages } from "@/firebase/clientApp";
 import { url } from "inspector";
@@ -7,6 +7,7 @@ import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { FireStorage } from "@/firebase/firebaseConfig";
 
 interface DamagePopUpProps {
+  reportId: string;
   position: string;
   damage: {
     description: string | null;
@@ -22,6 +23,7 @@ interface DamagePopUpProps {
 }
 
 const DamagePopUp = ({
+  reportId,
   setShowPopUp,
   setDamage,
   damage,
@@ -82,30 +84,18 @@ const DamagePopUp = ({
             onChange={setDamageDescription}
           />
         </div>
-        {/*    <div>
-          <label htmlFor="Please uploade pictures of the damage"></label>
-          <input
-            type="file"
+          <div>
+            <SingleImagefield 
+            reportId={reportId}
+            id={"DamageImage"}
+            labelText="Please take picture of damage"
             required={false}
-            multiple={false}
-            accept="image/png, image/jpeg"
-            value={currentImage}
-            onChange={async (e) => {
-              const fieldImage = e.target.files;
-              if (fieldImage) {
-                const imageBlob = new Blob([fieldImage[0]], {
-                  type: fieldImage[0].type,
-                });
-                const storageRef = ref(
-                  FireStorage,
-                  `${id}/Damage/${fieldImage[0].name}`
-                );
-                await uploadBytes(storageRef, imageBlob);
-                setCurrentImage(fieldImage[0].name);
-              }
+            filePath={`GreenDamage/${position}`}
+            setImage={(image) => {
+              setImages([image])
             }}
-          />
-        </div> */}
+            />
+          </div>
         <button
           type="button"
           disabled={!allowSave}
