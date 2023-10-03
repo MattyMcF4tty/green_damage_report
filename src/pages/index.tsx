@@ -1,17 +1,19 @@
 import { Inputfield } from "@/components/custom_inputfields";
 import { createDoc } from "@/firebase/clientApp";
-import { generateId, getReportsByEmail, handleCreateNewReport } from "@/utils/utils";
+import { generateId, getReportsByEmail } from "@/utils/utils";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowRightLong } from "@fortawesome/free-solid-svg-icons";
 import EmailPopUp from "@/components/popups/emailPopUp";
+import { handleCreateNewReport } from "@/utils/firebaseUtils/apiRoutes";
 
 const IndexPage = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [showPopUp, setShowPopUp] = useState(false);
   const [ongoingReports, setOngoingReports] = useState<string[]>([]);
+  const [isError, setIsError] = useState<string | null>(null)
 
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +39,7 @@ const IndexPage = () => {
       reportId = await handleCreateNewReport(email);
     } catch ( error:any ) {
       console.error(error)
+      setIsError(error.message)
       return;
     }
 
@@ -79,6 +82,9 @@ const IndexPage = () => {
         </div>
       </div>
 
+      {isError && (
+        <p className="text-sm text-red-500">{isError}</p>
+      )}
       <button
         type="submit"
         className="absolute bottom-4 w-32 h-14 text-lg font-semibold rounded-full bg-MainGreen-300 text-white

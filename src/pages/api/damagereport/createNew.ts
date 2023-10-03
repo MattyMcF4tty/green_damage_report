@@ -1,5 +1,6 @@
 import admin from "@/firebase/firebaseAdminConfig";
 import { FireDatabase } from "@/firebase/firebaseConfig";
+import { createReportDoc } from "@/utils/firebaseUtils/firestoreUtils";
 import { lowEncryptText } from "@/utils/securityUtils";
 import { getCustomerFromCustomerId, getReservationFromReservationId } from "@/utils/serverUtils";
 import { apiResponse } from "@/utils/types";
@@ -37,63 +38,14 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         ))
     }
 
-
-    const damageReportColName = process.env.DAMAGE_REPORT_FIRESTORE_COLLECTION;
-    const firebaseDatabase = FireDatabase;
-    if (!damageReportColName || typeof damageReportColName !== 'string') {
-        console.error("FIRESTORE_DAMAGEREPORT_COLLECTION is not defined in enviroment")
-        return res.status(500).json(new apiResponse(
-            "SERVER_ERROR",
-            [],
-            ["Something went wrong"],
-            {}
-        ))
-    }
-    if (!firebaseDatabase) {
-        console.error("FireDatabase is not initialized")
-        return res.status(500).json(new apiResponse(
-            "SERVER_ERROR",
-            [],
-            ["Something went wrong"],
-            {}
-        ))
-    }
-
-    const newDamageReport = new reportDataType();
-    const currentDate = new Date();
-    newDamageReport.updateFields({
-        userEmail: lowEncryptText(email), 
-        openedDate: currentDate.toString(),
-    });
-
-    let reportId
+    let reportId: string;
     try {
-        reportId = await generateId();
-    } catch ( error:any ) {
-        console.error("Something went wrong generating report for report", error.message)
+        reportId = await createReportDoc(email);
+    } catch (error:any) {
         return res.status(500).json(new apiResponse(
-            "SERVER_ERROR",
+            error.name,
             [],
-            ["Something went wrong"],
-            {}
-        ));
-    }
-
-    const reportRef = doc(FireDatabase, `${damageReportColName}/${reportId}`);
-
-    try {
-        await setDoc(reportRef, newDamageReport.toPlainObject())
-    } catch ( error:any ) {
-        console.error(
-            "Something went wrong creating document with this data:", 
-            {newDamageReport}, 
-            "Error:", 
-            error.message
-        )
-        return res.status(500).json(new apiResponse(
-            "SERVER_ERROR",
-            [],
-            ["Something went wrong"],
+            [error.message],
             {}
         ))
     }

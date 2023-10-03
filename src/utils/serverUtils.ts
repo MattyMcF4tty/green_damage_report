@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { apiResponse } from "./types";
-import { decryptText, encryptText, reportDataType } from "./utils";
+import { reportDataType } from "./utils";
 import { doc, updateDoc } from "firebase/firestore";
 import { FireDatabase } from "@/firebase/firebaseConfig";
 

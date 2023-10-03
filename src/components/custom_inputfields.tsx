@@ -8,6 +8,11 @@ import {
   formatNumberplate,
   formatSSN,
 } from "@/utils/formatUtils";
+import { trimArrayToLimit } from "@/utils/utils";
+import { deleteReportFile, deleteStorageFile, getReportFile, getReportFolder, getStorageFolderDownloadUrls, uploadReportFile } from "@/utils/firebaseUtils/storageUtils";
+import { handleUploadFile } from "@/utils/firebaseUtils/apiRoutes";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faCamera, faX } from "@fortawesome/free-solid-svg-icons";
 
 /* import usePlacesAutocomplete, {
   getGeocode,
@@ -547,6 +552,316 @@ export const ImageField = ({
     </div>
   );
 };
+
+// ----------------------- MULTIPLE IMAGES FIELD --------------------------------------------------
+
+interface multipleImageFieldProps {
+  id: string;
+  reportId: string;
+  imageLimit: number;
+  labelText: string;
+  required: boolean;
+  folderPath: string;
+}
+
+export const MultipleImageField = ({id, reportId, imageLimit, labelText, required, folderPath}: multipleImageFieldProps) => {
+  const [isRequired, setIsRequired] = useState(required);
+  const [imageURLs, setImageURLs] = useState<{url:string, path:string}[]>([])
+  const [disabled, setDisabled] = useState(false);
+  const [isError, setIsError] = useState<string | null>()
+
+
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsError(null)
+    // Disable inputfield while handling the new images
+    setDisabled(true);
+
+    // Check if files is empty
+    if (!e.target.files) {
+      setDisabled(true);
+      return;
+    }
+
+    // Make filelist to an array
+    let newImages = Array.from(e.target.files);
+
+
+    if (imageURLs.length + newImages.length > imageLimit) {
+      // Calculate the remaining space and remove exceeding images
+      const remainingSpace = imageLimit - imageURLs.length;
+      newImages = trimArrayToLimit(remainingSpace, newImages);
+
+      // Set error so user understands why not all their images where uploaded.
+      setIsError("Image limit exceeded")
+    }
+
+    if (newImages.length > 0) {
+      await Promise.all(newImages.map(image => {
+        let imageBlob = new Blob([image], { type:image.type });
+        return uploadReportFile(reportId, folderPath + image.name + `${imageURLs.length}`, imageBlob);
+      }));      
+    }
+
+    let imagesInStorage:{url: string, path:string}[];
+    try {
+      imagesInStorage = await getReportFolder(reportId, folderPath)
+    } catch (error:any) {
+      setIsError(error.message)
+      setDisabled(false);
+      return;
+    }
+
+    setImageURLs(imagesInStorage)
+
+    setDisabled(false);
+  }
+
+
+  // Disable button if imagelimit is reached or exceeded
+  useEffect(() => {
+    if (imageURLs.length >= imageLimit) {
+      setIsError('Image limit reached')
+      setDisabled(true);
+    }
+    console.log(imageURLs)
+  }, [imageURLs])
+
+  async function getImg() {
+    setDisabled(true);
+    let imagesInStorage:{url: string, path:string}[];
+    try {
+      imagesInStorage = await getReportFolder(reportId, folderPath)
+    } catch (error:any) {
+      setIsError(error.message)
+      setDisabled(false);
+      return;
+    }
+
+    setImageURLs(imagesInStorage)
+    setDisabled(false);
+  }
+
+  useEffect(() => {
+    getImg()
+  }, [])
+
+  const handleDeleteImage = async (path:string, index:number) => {
+    setDisabled(true);
+
+    await deleteStorageFile(path);
+    getImg()
+    setIsError(null)
+
+    setDisabled(false);
+  }
+
+  return (
+    <div className="w-full h-full flex flex-col">
+      <label htmlFor={id}>{labelText}</label>
+      <div id={id} className="flex flex-col">
+      <div className="flex flex-row items-center">
+          {/* Custom designed input */}
+          <div 
+          className={`w-36 relative flex items-center 
+          ${imageURLs.length >= 3 ? 'rounded-t-md' : imageURLs.length > 0 ? 'rounded-t-md rounded-r-md' : 'rounded-md'}
+          ${disabled ? 'bg-MainGreen-200' : 'bg-MainGreen-300'}`}>
+            <input
+              className="opacity-0 z-20"
+              type="file" 
+              accept="image/png, image/jpeg"
+              required={isRequired}
+              disabled={imageURLs.length >= imageLimit || disabled}
+              onChange={(e) => handleChange(e)}
+              multiple={true}
+            />
+            <div className="absolute z-10 text-white ml-2 flex flex-row items-center">
+              <FontAwesomeIcon icon={faCamera} className="mr-2"/>
+              <p>
+                Select images 
+              </p>
+            </div>
+
+          </div>
+          {/* Display how many files can be uploaded */}
+          <p className="ml-2 italic">{`${imageLimit-imageURLs.length}`} left</p>
+      </div>
+
+        {/* Map over the images and display them */}
+        <div className="flex flex-col">
+
+          {/* Make a new line every five images */}
+          {Array.from({ length: Math.ceil(imageURLs.length / 5) }).map((_, rowIndex) => (
+            <div key={rowIndex} className="flex flex-row">
+              {imageURLs.slice(rowIndex * 5, rowIndex * 5 + 5).map((imageURL, index) => (
+                <div key={index} className="relative w-14 h-14">
+                  
+                  {/* X icon, for deletion */}
+                  <FontAwesomeIcon 
+                    className="z-10 h-4 w-4 absolute top-0 right-0 text-red-500" 
+                    icon={faX} 
+                    onClick={() => handleDeleteImage(imageURL.path, index + rowIndex * 5)}
+                  />
+                  
+                  {/* The image */}
+                  <img 
+                    className="h-full w-full z-0"
+                    src={imageURL.url} 
+                    alt={`DamageImage${index}`} 
+                  />
+                </div>
+              ))}
+            </div>
+          ))}
+        </div>
+
+        {isError && (
+          <p className="text-sm text-red-500">{isError}</p>
+        )}
+      </div>
+    </div>
+  )
+}
+
+// -------------------------------- SINGLE IMAGE FIELD ----------------------------------
+interface singleImagefield {
+  id: string;
+  reportId: string;
+  labelText: string;
+  required: boolean;
+  filePath: string;
+}
+
+export const SingleImagefield = ({id, reportId, labelText, required, filePath}: singleImagefield) => {
+  const [disabled, setDisabled] = useState(false);
+  const [imageUrl, setImageUrl] = useState('')
+  const [isError, setIsError] = useState<null | string>(null)
+
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsError(null)
+    // Disable inputfield while handling the new images
+    setDisabled(true);
+
+    // Check if files is empty
+    if (!e.target.files) {
+      setDisabled(true);
+      return;
+    }
+
+    // Make filelist to an array
+    let newImages = Array.from(e.target.files);
+
+
+    if (imageUrl.length + newImages.length > 1) {
+      // Calculate the remaining space and remove exceeding images
+      const remainingSpace = 1 - imageUrl.length;
+      newImages = trimArrayToLimit(remainingSpace, newImages);
+
+      // Set error so user understands why not all their images where uploaded.
+      setIsError("Image limit exceeded")
+    }
+
+    if (newImages.length > 0) {
+      await Promise.all(newImages.map(image => {
+        let imageBlob = new Blob([image], { type:image.type });
+        return uploadReportFile(reportId, filePath, imageBlob);
+      }));      
+    }
+
+    let imageInStorage:string;
+    try {
+      imageInStorage = await getReportFile(reportId, filePath)
+    } catch (error:any) {
+      setIsError(error.message)
+      setDisabled(false);
+      return;
+    }
+
+    setImageUrl(imageInStorage)
+
+    setDisabled(false);
+  }
+
+  useEffect(() => {
+    console.log(imageUrl)
+  }, [imageUrl])
+
+  async function getImg() {
+    setDisabled(true);
+    let imageInStorage:string;
+    try {
+      imageInStorage = await getReportFile(reportId, filePath)
+    } catch (error:any) {
+      setIsError(error.message)
+      setDisabled(false);
+      return;
+    }
+
+    setImageUrl(imageInStorage)
+    setDisabled(false);
+  }
+
+  useEffect(() => {
+    getImg()
+  }, [])
+
+  const handleDeleteImage = async (path:string) => {
+    setDisabled(true);
+
+    await deleteReportFile(reportId, path);
+    setImageUrl('')
+    setIsError(null)
+
+    setDisabled(false);
+  }
+
+  return (
+    <div>
+
+      <label htmlFor={id}></label>
+      <div id={id} className="flex flex-row items-center">
+        {/* Custom designed input */}
+        <div 
+        className={`w-36 relative flex items-center 
+        ${imageUrl.length > 0 ? 'rounded-t-md rounded-r-md' : 'rounded-md'}
+        ${disabled ? 'bg-MainGreen-200' : 'bg-MainGreen-300'}`}>
+          <input
+            className="opacity-0 z-20"
+            type="file" 
+            accept="image/png, image/jpeg"
+            required={required}
+            disabled={imageUrl !== '' || disabled}
+            onChange={(e) => handleChange(e)}
+            multiple={false}
+          />
+          <div className="absolute z-10 text-white ml-2 flex flex-row items-center">
+            <FontAwesomeIcon icon={faCamera} className="mr-2"/>
+            <p>
+              Select image
+            </p>
+          </div>
+        </div>
+      </div>
+      {imageUrl.length > 0 && (
+          <div className="relative w-20 h-20">
+  
+            {/* X icon, for deletion */}
+            <FontAwesomeIcon 
+              className="z-10 h-4 w-4 absolute top-0 right-0 text-red-500" 
+              icon={faX} 
+              onClick={() => handleDeleteImage(filePath)}
+            />
+            
+            {/* The image */}
+            <img 
+              className="h-full w-full z-0"
+              src={imageUrl} 
+              alt={`DamageImage`} 
+            />
+          </div>
+        )}
+    </div>
+  )
+}
 
 /* ----- Checkbox ---------------------------------------------------- */
 interface CheckboxProps {

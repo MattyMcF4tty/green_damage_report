@@ -1,7 +1,6 @@
 import { WitnessInformation } from "@/components/otherPartys/witnessList";
 import {
   collectionName,
-  getData,
   getImages,
   getReportIds,
   updateData,
@@ -163,6 +162,8 @@ export const getServerSidePropsWithRedirect = async (
     OtherParty: otherPartyImages,
   };
 
+  reportData.isExpired();
+
   if (reportData.isFinished()) {
     return {
       redirect: {
@@ -171,6 +172,7 @@ export const getServerSidePropsWithRedirect = async (
       },
     };
   }
+
 
   return {
     props: {
@@ -440,7 +442,7 @@ export const handleGeneratePdf = async (id: string) => {
     console.log(map);
 
     try {
-      data.updateFields(await getData(id));
+      data.updateFields(await getReportDoc(id, true));
     } catch (error) {
       console.error("Error getting data");
     }
@@ -614,37 +616,6 @@ export const wunderToGender = (gender: number | null) => {
   return "Other"
 }
 
-export const handleCreateNewReport = async (email: string) => {
-  const data = {
-    email: email,
-  }
-
-  const url = process.env.NEXT_PUBLIC_URL;
-  if (!url) {
-    throw new Error("NEXT_PUBLIC_URL is not defined in enviroment")
-  } 
-
-  const response = await fetch(process.env.NEXT_PUBLIC_URL + "/api/damageReport/createNew", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(data)
-  })
-
-  const responseJson = await response.json()
-  if (!response.ok) {
-      const newError = new Error(responseJson.errors[0])
-      newError.name = responseJson.status
-
-      throw newError;
-  }
-
-  const reportId: string = responseJson.data.reportId;
-
-  return reportId;
-}
-
 export const handleGetReportData = async (reportId: string) => {
   const url = process.env.NEXT_PUBLIC_URL;
   if (!url) {
@@ -715,12 +686,39 @@ export const isJSONSerializable = (data:any) => {
   }
 }
 
-export const createError = (name:string, message:string) => {
-  let newError = new Error();
-  newError.name = name;
-  newError.message = message;
+export const trimArrayToLimit = (limit: number, array: any[]) => {
+  if (array.length > limit) {
+      return array.slice(0, limit);
+  }
+  return array;
+}
 
-  return newError
+export const blobToBase64 = async (blob: Blob): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob);
+  });
+}
+
+export const base64ToBuffer = (base64: string, contentType: string = '') => {
+  const base64Regex = /^data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,(.*)$/;
+  const matches = base64.match(base64Regex);
+  if (!matches || matches.length !== 3) {
+    throw new Error('Invalid input string format');
+  }
+  contentType = matches[1];
+  base64 = matches[2];
+  return Buffer.from(base64, 'base64');
+}
+
+export const arrayBufferToBlob = (arrayBuffer: ArrayBuffer, contentType: string) => {
+  return new Blob([arrayBuffer], { type: contentType });
+}
+
+export const replaceLastSlash = (path:string, replacement:string) => {
+  return path.replace(/\/([^\/]*)$/, replacement + '$1');
 }
 
 /* ---------------- classes and types ------------------------------ */
@@ -968,6 +966,24 @@ export class reportDataType {
 
   isFinished() {
     return this.finished;
+  }
+
+  isExpired() {
+    const ExpiredTime = 72 * 60 * 60 * 1000 // 72 hours
+
+    if (this.openedDate) {
+      const openedDate = new Date(this.openedDate);
+      const currentDate = new Date();
+  
+      // If the difference between the current date and the opened date is more than 72 hours
+      if (currentDate.getTime() - openedDate.getTime() > ExpiredTime) {
+        this.finished = true;
+        this.closedDate = `${new Date}`
+        return true;
+      }
+      return false;
+    }
+    return false;
   }
 
   toPlainObject() {

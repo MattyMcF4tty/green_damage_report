@@ -8,28 +8,6 @@ const storage = getStorage(app);
 
 export const collectionName = "DamageReports"
 
-export const getData = async (id: string) => {
-  console.log("fetchind docID: " + id)
-  const docRef = doc(db, `${collectionName}/${id}`);
-  const data = new reportDataType()
-
-  try {
-    const docSnapshot = await getDoc(docRef)
-    if (docSnapshot.exists()) {
-      const fetchedData = docSnapshot.data();
-      data.updateFields(fetchedData)
-    } 
-    else {
-      throw new Error("Document does not exist");
-    }
-  } catch (error) {
-    console.error(`Something went wrong fetching data:\n${error}\n`)
-  }
-  const decryptedData = data;
-
-  return decryptedData;
-}
-
 export const createDoc = async (id: string, email: string) => {
   try {
     const data = new reportDataType();
@@ -165,27 +143,6 @@ export const getReportIds = async () => {
   return idList;
 };
 
-export const getReports = async () => {
-  const idList = await getReportIds();
-  const reportList: { id: string; data: reportDataType }[] = [];
-
-  if (idList.length > 0) {
-    try {
-      await Promise.all(
-        idList.map(async (id) => {
-          const docData = await getData(id);
-          if (docData !== undefined) {
-            reportList.push({ id: id, data: docData });
-          }
-        })
-      );
-    } catch (error) {
-      console.error(`Something went wrong fecthing reports:\n${error}\n`);
-    }
-  }
-
-  return reportList;
-};
 
 export const deleteReports = async (reportsToDelete: string[]) => {
   if (reportsToDelete.length === 0) {

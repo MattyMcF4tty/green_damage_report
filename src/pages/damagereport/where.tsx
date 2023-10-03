@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { PedestrianInformation } from "../../components/opposite_information/person_information_form";
 import {
   ImageField,
+  MultipleImageField,
+  SingleImagefield,
   TextField,
   YesNo,
 } from "../../components/custom_inputfields";
