@@ -477,11 +477,11 @@ const ExpandedReport = ({ setVisible, reports }: ExpandedReportProps) => {
                           key={index}
                           className="h-10 odd:bg-white even:bg-blue-50 "
                         >
-                          <td onClick={() => navigator.clipboard.writeText(currentWitness.name)}
+                          <td onClick={() => navigator.clipboard.writeText(currentWitness.name ? currentWitness.name : '-')}
                           className={`text-lg hover:cursor-pointer hover:bg-MainGreen-100 hover:shadow-md`}>{currentWitness.name}</td>
-                          <td onClick={() => navigator.clipboard.writeText(currentWitness.phone)}
+                          <td onClick={() => navigator.clipboard.writeText(currentWitness.phone ? currentWitness.phone : '-')}
                           className={`text-lg hover:cursor-pointer hover:bg-MainGreen-100 hover:shadow-md`}>{currentWitness.phone}</td>
-                          <td onClick={() => navigator.clipboard.writeText(currentWitness.email)}
+                          <td onClick={() => navigator.clipboard.writeText(currentWitness.email ? currentWitness.email : '-')}
                           className={`text-lg hover:cursor-pointer hover:bg-MainGreen-100 hover:shadow-md`}>{currentWitness.email}</td>
                         </tr>
                       )
