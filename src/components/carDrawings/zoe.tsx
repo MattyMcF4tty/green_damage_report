@@ -41,72 +41,147 @@ const ZoeDrawing = ({ damages, setDamages }: ZoeDrawingProps) => {
     position: string | null;
     description: string | null;
     images: string[];
-  } | null>(damages[1]);
+  } | null>(damages[1] || null);
   const [damageThree, setDamageThree] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  } | null>(damages[2]);
+  } | null>(damages[2] || null);
   const [damageFour, setDamageFour] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  } | null>(damages[3]);
+  } | null>(damages[3] || null);
   const [damageFive, setDamageFive] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  } | null>(damages[4]);
+  } | null>(damages[4] || null);
   const [damageSix, setDamageSix] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  } | null>(damages[5]);
+  } | null>(damages[5] || null);
   const [damageSeven, setDamageSeven] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  } | null>(damages[6]);
+  } | null>(damages[6] || null);
   const [damageEight, setDamageEight] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  } | null>(damages[7]);
-  const [damageNine, setDamageNine] = useState<{
-    position: string | null;
-    description: string | null;
-    images: string[];
-  } | null>(damages[8]);
+  } | null>(damages[7] || null);
+  const [damageNine, setDamageNine] =
+    useState<{
+      position: string | null;
+      description: string | null;
+      images: string[];
+    } | null>(damages[8]) || null;
   const [damageTen, setDamageTen] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  } | null>(damages[9]);
+  } | null>(damages[9] || null);
   const [damageEleven, setDamageEleven] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  } | null>(damages[10]);
+  } | null>(damages[10] || null);
   const [damageTwelve, setDamageTwelve] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  } | null>(damages[11]);
+  } | null>(damages[11] || null);
   const [damageThirteen, setDamageThirteen] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  } | null>(damages[12]);
+  } | null>(damages[12] || null);
   const [damageFourteen, setDamageFourteen] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  } | null>(damages[13]);
+  } | null>(damages[13] || null);
   const [damageFifteen, setDamageFifteen] = useState<{
     position: string | null;
     description: string | null;
     images: string[];
-  } | null>(damages[14]);
+  } | null>(damages[14] || null);
+
+  useEffect(() => {
+    const setFunctions = [
+      setDamageOne,
+      setDamageTwo,
+      setDamageThree,
+      setDamageFour,
+      setDamageFive,
+      setDamageSix,
+      setDamageSeven,
+      setDamageEight,
+      setDamageNine,
+      setDamageTen,
+      setDamageEleven,
+      setDamageTwelve,
+      setDamageThirteen,
+      setDamageFourteen,
+      setDamageFifteen,
+    ];
+    const positions = [
+      "Front left wheel",
+      "Front left door",
+      "Back left door",
+      "Back left wheel",
+      "Front bumper",
+      "Hood",
+      "Windshield",
+      "Roof",
+      "Rear window",
+      "Trunk",
+      "Rear bumper",
+      "Front right wheel",
+      "Front right door",
+      "Back right door",
+      "Back right wheel",
+    ];
+
+    setFunctions.map((setFunction) => {
+      setFunction(null);
+    });
+
+    damages.map((damage, index) => {
+      if (!damage.position) {
+        return;
+      }
+
+      const setFunctionIndex = positions.indexOf(damage.position);
+
+      if (positions[setFunctionIndex] === damage.position) {
+        setFunctions[setFunctionIndex](damage);
+      }
+    });
+
+    /*     for (let i = 0; i < 15; i++) {
+      const damage: {
+        position: string | null;
+        description: string | null;
+        images: string[];
+      } | null = damages[i];
+
+      if (!damage || !damage.position) {
+        setFunctions[i](null);
+        return;
+      }
+
+      console.log(
+        `Damage:`,
+        damage,
+        `\nindex: ${i}\n position: ${positions[i]}\n`
+      );
+
+
+    } */
+  }, [damages]);
 
   useEffect(() => {
     const newDamageArray: {
