@@ -162,6 +162,7 @@ export const getImages = async (id: string) => {
   return imageURLs;
 };
 
+
 export const getReportIds = async () => {
   const reportColRef = collection(db, `${collectionName}/`);
   const idList: string[] = [];

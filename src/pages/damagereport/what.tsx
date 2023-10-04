@@ -108,18 +108,6 @@ const What: NextPage<pageProps> = ({ data, id }) => {
         validDriversLicense: validDriversLicense,
       };
       serverData.updateFields({ driverInfo: newDriverInfo });
-    } else {
-      const newDriverInfo = {
-        firstName: renter.firstName,
-        lastName: renter.lastName,
-        address: null,
-        phoneNumber: null,
-        socialSecurityNumber: null,
-        drivingLicenseNumber: null,
-        email: null,
-        validDriversLicense: null,
-      };
-      serverData.updateFields({ driverInfo: newDriverInfo });
     }
 
     serverData.updateFields({
@@ -175,7 +163,6 @@ const What: NextPage<pageProps> = ({ data, id }) => {
       <div className="">
         <YesNo
           labelText="
-
           Was the driver the same person as the renter?"
           id="ShowDriverInfoForm"
           required={true}
