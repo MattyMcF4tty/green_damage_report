@@ -120,3 +120,4 @@ export const handleGetBase64FileFromStorage = async (fileUrl:string | null, file
 
     return responseJson.data.base64File as string;
 }
+

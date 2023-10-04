@@ -336,3 +336,19 @@ export const getFirestoreDocuments = async (path: string) => {
   return colDocs;
 }
 
+export const getFirestoreCollection = async (collectionPath: string) => {
+  
+  const fireDB = FireDatabase;
+  if (!fireDB) {
+    let newError = new Error;
+    newError.name = 'SERVER_ERROR'
+    newError.message = 'FireDatabase is not initialized'
+    throw newError;
+  }
+
+  const colRef = collection(fireDB, collectionPath)
+
+  const docList = await getDocs(colRef)
+
+  return docList;
+}

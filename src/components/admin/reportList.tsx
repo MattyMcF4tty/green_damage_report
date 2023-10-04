@@ -1,6 +1,7 @@
-import { reportDataType, reportSearch } from "@/utils/utils";
+import { dateToWunder, reportDataType, reportSearch } from "@/utils/utils";
 import { useEffect, useState } from "react";
 import Loading from "../loading";
+import { handleGetAllReports } from "@/utils/damageReportUtils.ts/apiRoutes";
 
 interface reportListProps {
   status: "all" | "finished" | "unfinished";
@@ -40,7 +41,7 @@ const ReportList = ({
   useEffect(() => {
     const fetchReportList = async () => {
       try {
-        const data = [{id:"234234", data: new reportDataType()}]
+        const data = await handleGetAllReports();
         setReportList(data);
         setFilteredReportList(data);
         setLoaded(true);
@@ -168,7 +169,7 @@ const ReportList = ({
                         {report.data.finished ? "Finished" : "Unfinished"}
                       </td>
                       <td className="w-2/12">
-                        {report.data.lastChange}
+                        {dateToWunder(new Date(report.data.lastChange))}
                       </td>
                     </tr>
                   ))
