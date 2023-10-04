@@ -29,6 +29,7 @@ import VanDrawing from "@/components/carDrawings/kangoo";
 import DamagePopUp from "@/components/popups/damagePopUp";
 import Google from "@/components/google";
 import DamageList from "@/components/carDrawings/damageList";
+import { uploadReportFile } from "@/utils/firebaseUtils/storageUtils";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -154,7 +155,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
       const mapBlob: Blob = dataURItoBlob(dataUrl);
 
       console.log("map created");
-      await handleUploadMap(mapBlob, id);
+      await uploadReportFile(id, 'Admin/map', mapBlob);
       console.log("map done");
     }
 

@@ -76,3 +76,47 @@ export const handleUploadFile = async (file: Blob, path:string, id: string) => {
 
     return true;
 }
+
+export const handleGetBase64FileFromStorage = async (fileUrl:string | null, filePath:string | null) => {
+
+    if (!filePath && !fileUrl) {
+        throw new Error("Missing storagePage or url")
+    }
+    if (filePath && fileUrl) {
+        throw new Error("Can only fetch base64 file from either url or storagePath not both")
+    }
+
+
+    const url = process.env.NEXT_PUBLIC_URL;
+    if (!url) {
+        let newError = new Error;
+        newError.name = "SERVER_ERROR";
+        newError.message = "NEXT_PUBLIC_URL is not defined in enviroment"
+        throw newError;
+    }
+
+    let data: {};
+    if (fileUrl) {
+        data = {fileUrl: fileUrl}
+    } else {
+        data = {filePath: filePath}
+    }
+
+    const response = await fetch(url + '/api/firebase/uploadFile', {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data)
+    })
+
+    const responseJson = await response.json();
+    if (!response.ok) {
+        let newError = new Error;
+        newError.name = responseJson.status;
+        newError.message = responseJson.errors[0]
+        throw newError;
+    }
+
+    return responseJson.data.base64File as string;
+}

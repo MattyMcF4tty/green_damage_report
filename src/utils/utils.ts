@@ -16,6 +16,7 @@ import { collection, doc, getDocs, query, updateDoc, where } from "firebase/fire
 import createReportPDF from "./reportPdfTemplate";
 import jsPDF from "jspdf";
 import { getReportDoc } from "./firebaseUtils/firestoreUtils";
+import { getReportFile, getReportFolder } from "./firebaseUtils/storageUtils";
 
 /* ------- utils config ----- */
 const firebaseCollectionName = collectionName;
@@ -119,10 +120,9 @@ export const getServerSidePropsWithRedirect = async (
     `${id}/GreenMobility`,
     "url"
   );
-  const otherPartyImages = await handleDownloadImages(
-    `${id}/OtherParty`,
-    "url"
-  );
+  const otherPartyImages = (await getReportFolder(id, 'OtherPartyDamages/')).map((file, index) => {
+    return file.url
+  });
   const images: Record<string, string[]> = {
     GreenMobility: GreenMobilityImages,
     OtherParty: otherPartyImages,
@@ -692,6 +692,30 @@ export const arrayBufferToBlob = (arrayBuffer: ArrayBuffer, contentType: string)
 export const replaceLastSlash = (path:string, replacement:string) => {
   return path.replace(/\/([^\/]*)$/, replacement + '$1');
 }
+
+
+export const urlToBase64 = async (url: string) => {
+  let base64: string;
+  try {
+    // Fetch the image as an ArrayBuffer
+    const response = await axios.get(url, {
+      responseType: 'arraybuffer',
+    });
+
+    // Convert the ArrayBuffer to a Base64 string
+    base64 = Buffer.from(response.data, 'binary').toString('base64');
+
+  } catch (error:any) {
+    // Log or handle any error occurred during the axios call
+    console.error("Error fetching the image: ", error.message);
+
+    // Re-throw the error after logging it (or handle it in another way if desired)
+    throw error;
+  }
+
+  return base64
+};
+
 
 /* ---------------- classes and types ------------------------------ */
 export type pageProps = {

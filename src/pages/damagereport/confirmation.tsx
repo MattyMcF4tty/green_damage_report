@@ -19,6 +19,7 @@ import {
   faCar,
   faPerson,
 } from "@fortawesome/free-solid-svg-icons";
+import { getReportFile } from "@/utils/firebaseUtils/storageUtils";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -33,12 +34,11 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
   const [map, setMap] = useState<string | null>();
   const [allowClick, setAllowClick] = useState(true);
 
-  useEffect(() => {
+/*   useEffect(() => {
     const getMap = async () => {
-      const storageRef = ref(FireStorage, `${id}/admin/map`);
       let serverMap: string | null = null;
       try {
-        serverMap = await getDownloadURL(storageRef);
+        serverMap = await getReportFile(id, 'Admin/map');
       } catch (error) {
         console.error("No map");
       }
@@ -47,7 +47,7 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
       }
     };
     getMap();
-  }, []);
+  }, []); */
 
   let [confirmVis, setConfirmVis] = useState(false);
 
