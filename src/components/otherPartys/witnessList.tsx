@@ -3,18 +3,18 @@ import { Inputfield } from "../custom_inputfields";
 import PhoneNumber from "../opposite_information/phone_form";
 
 interface WitnessListProps {
-  value: { name: string; phone: string; email: string }[];
+  value: { name: string | null; phone: string | null; email: string | null }[];
   onChange: (
-    witnesses: { name: string; phone: string; email: string }[]
+    witnesses: { name: string | null; phone: string | null; email: string | null }[]
   ) => void;
 }
 
 export class WitnessInformation {
-  name: string;
-  phone: string;
-  email: string;
+  name: string | null;
+  phone: string | null;
+  email: string | null;
 
-  constructor(name: string, phone: string, email: string) {
+  constructor(name: string | null, phone: string | null, email: string | null) {
     this.name = name;
     this.phone = phone;
     this.email = email;
@@ -99,9 +99,9 @@ export default WitnessList;
 
 /* ------------------------------------New Witness------------------------------------------------ */
 interface newWitnessPopUpProps {
-  witnesses: { name: string; phone: string; email: string }[];
+  witnesses: { name: string | null; phone: string | null; email: string | null }[];
   setWitnesses: (
-    witnesses: { name: string; phone: string; email: string }[]
+    witnesses: { name: string | null; phone: string | null; email: string | null }[]
   ) => void;
   showPopUp: (show: boolean) => void;
 }
@@ -190,10 +190,10 @@ const NewWitnessPopUp = ({
 
 /* ------------------------------------update Witness--------------------------------------------- */
 interface UpdateWitnessPopUpProps {
-  witnesses: { name: string; phone: string; email: string }[];
+  witnesses: { name: string | null; phone: string | null; email: string | null }[];
   index: number;
   setWitnesses: (
-    witnesses: { name: string; phone: string; email: string }[]
+    witnesses: { name: string | null; phone: string | null; email: string | null }[]
   ) => void;
   showPopUp: (show: boolean) => void;
 }
@@ -204,12 +204,12 @@ const UpdateWitnessPopUp = ({
   witnesses,
   index,
 }: UpdateWitnessPopUpProps) => {
-  const [witnessName, setWitnessName] = useState<string>(witnesses[index].name);
+  const [witnessName, setWitnessName] = useState<string>(witnesses[index].name || '');
   const [witnessPhone, setWitnessPhone] = useState<string>(
-    witnesses[index].phone
+    witnesses[index].phone || ''
   );
   const [witnessEmail, setWitnessEmail] = useState<string>(
-    witnesses[index].email
+    witnesses[index].email || ''
   );
 
   const allowSave =

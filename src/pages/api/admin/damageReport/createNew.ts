@@ -170,13 +170,15 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         openedDate: currentDate.toString(),
         renterInfo: {
             customerId: reservation.customerId,
-            reservationId: Number(reservationId),
+            reservationId: reservationId,
             firstName: renter.firstName,
             lastName: renter.lastName,
             birthDate: renter.birthDate,
             gender: wunderToGender(renter.gender),
-            age: renterAge,
-            insurance: null
+            age: `${renterAge}`,
+            insurance: null,
+            email: null,
+            phoneNumber: null,
         }
     });
 

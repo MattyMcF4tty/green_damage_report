@@ -1,5 +1,5 @@
 import { WitnessInformation } from "@/components/otherPartys/witnessList";
-import { createError, reportDataType } from "./utils";
+import { reportDataType } from "./utils";
 import * as CryptoJS from 'crypto-js';
 
 // ENCRYPTION
@@ -10,7 +10,10 @@ export const encryptText = (text: string, key:string) => {
 export const lowEncryptText = (text: string) => {
     const key = process.env.LOW_ENCRYPTION_KEY;
     if (!key) {
-        throw createError("SERVER_ERROR", 'LOW_ENCRYPTION_KEY is not defined in enviroment')
+        let newError = new Error;
+        newError.name = "SERVER_ERROR";
+        newError.message = 'LOW_ENCRYPTION_KEY is not defined in enviroment';
+        throw newError;
     }
 
     return encryptText(text, key);
@@ -19,7 +22,10 @@ export const lowEncryptText = (text: string) => {
 export const highEncryptText = (text: string) => {
     const key = process.env.HIGH_ENCRYPTION_KEY;
     if (!key) {
-        throw createError("SERVER_ERROR", 'HIGH_ENCRYPTION_KEY is not defined in enviroment')
+        let newError = new Error;
+        newError.name = "SERVER_ERROR";
+        newError.message = 'HIGH_ENCRYPTION_KEY is not defined in enviroment';
+        throw newError;
     }
 
     return encryptText(text, key);
@@ -179,7 +185,10 @@ export const decryptText = (text: string, key:string) => {
 export const lowDecryptText = (text: string) => {
     const key = process.env.LOW_ENCRYPTION_KEY;
     if (!key) {
-        throw createError("SERVER_ERROR", 'LOW_ENCRYPTION_KEY is not defined in enviroment')
+        let newError = new Error;
+        newError.name = "SERVER_ERROR";
+        newError.message = 'LOW_ENCRYPTION_KEY is not defined in enviroment';
+        throw newError;
     }
 
     return decryptText(text, key);
@@ -188,7 +197,10 @@ export const lowDecryptText = (text: string) => {
 export const highDecryptText = (text: string) => {
     const key = process.env.HIGH_ENCRYPTION_KEY;
     if (!key) {
-        throw createError("SERVER_ERROR", 'HIGH_ENCRYPTION_KEY is not defined in enviroment')
+        let newError = new Error;
+        newError.name = "SERVER_ERROR";
+        newError.message = 'HIGH_ENCRYPTION_KEY is not defined in enviroment';
+        throw newError;
     }
 
     return decryptText(text, key);

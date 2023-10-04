@@ -1,4 +1,3 @@
-import { getReports } from "@/firebase/clientApp";
 import { reportDataType, reportSearch } from "@/utils/utils";
 import { useEffect, useState } from "react";
 import Loading from "../loading";
@@ -41,7 +40,7 @@ const ReportList = ({
   useEffect(() => {
     const fetchReportList = async () => {
       try {
-        const data = await getReports();
+        const data = [{id:"234234", data: new reportDataType()}]
         setReportList(data);
         setFilteredReportList(data);
         setLoaded(true);
