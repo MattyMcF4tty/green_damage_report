@@ -155,7 +155,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
       const mapBlob: Blob = dataURItoBlob(dataUrl);
 
       console.log("map created");
-      await uploadReportFile(id, 'Admin/map', mapBlob);
+      await uploadReportFile(id, "Admin/map", mapBlob);
       console.log("map done");
     }
 
@@ -249,7 +249,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         />
       </div>
       {otherPartyInvolved && (
-        <div className="flex flex-col justify-left text-left w-full mb-4">
+        <div className="flex flex-col justify-left text-left w-full ">
           <div id="whatvehicle" className="flex flex-col w-full">
             <div>
               <label htmlFor="whatvehicle">Please select the object</label>
@@ -276,7 +276,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
               labelText="Please take pictures of the damage to the other partys"
               required={false}
               imageLimit={20}
-              folderPath="OtherPartyDamages/"        
+              folderPath="OtherPartyDamages/"
             />
           </div>
 
@@ -290,6 +290,18 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
               required={true}
               value={damageDescription}
               onChange={setDamageDescription}
+            />
+          </div>
+          {/* Picture of damages to green car collection */}
+          <div className="">
+            <ImageField
+              reportID={id}
+              id="LeftImage"
+              labelText="Please take pictures of the damage to the other party"
+              required={false}
+              images={otherPartyImages}
+              imageType="OtherParty"
+              multiple={true}
             />
           </div>
         </div>
@@ -313,12 +325,20 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         </div>
         {currentCar === "zoe" && (
           <div className="">
-            <ZoeDrawing reportId={id} damages={damages} setDamages={setDamages} />
+            <ZoeDrawing
+              reportId={id}
+              damages={damages}
+              setDamages={setDamages}
+            />
           </div>
         )}
         {currentCar === "van" && (
           <div>
-            <VanDrawing reportId={id} damages={damages} setDamages={setDamages} />
+            <VanDrawing
+              reportId={id}
+              damages={damages}
+              setDamages={setDamages}
+            />
           </div>
         )}
       </div>

@@ -16,7 +16,6 @@ import { useState } from "react";
 import ExpandedReport from "./expandedReport";
 import { deleteReports } from "@/firebase/clientApp";
 
-
 interface ReportControls {
   selectedReports: { id: string; data: reportDataType }[];
 }
@@ -27,12 +26,10 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
 
   const [allowPdf, setAllowPdf] = useState(true);
 
-  const handleEmail = async ( 
+  const handleEmail = async (
     selectedReports: { id: string; data: reportDataType }[]
   ) => {
-    selectedReports.map(async (report, index) => {
-
-    })
+    selectedReports.map(async (report, index) => {});
   };
 
   const handleInstallPDF = async (
@@ -61,7 +58,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
     <div className="flex flex-row w-full justify-between ml-8">
       <button
         type="button"
-        className="bg-white border-gray-300 border-[1px] rounded-xl w-32  hover:bg-MainGreen-300 hover:text-white duration-150"
+        className="bg-white border-gray-300 border-[1px] rounded-xl w-32  hover:bg-MainGreen-300 hover:text-white duration-150 md:h-[4rem]"
         onClick={() => handleDelete()}
       >
         <FontAwesomeIcon icon={faTrashCan} className="mr-2" />
@@ -73,7 +70,8 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
           if (selectedReports.length > 0) {
             handleEmail(selectedReports);
           }
-        }}>
+        }}
+      >
         <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
         WUNDER TEST
       </button>

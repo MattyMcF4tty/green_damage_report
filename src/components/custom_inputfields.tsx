@@ -83,7 +83,7 @@ export const Inputfield = ({
       patternError = "Please enter only valid characters";
       break;
     case "license":
-      pattern = "[0-9]{8,}";
+      pattern = "[0-9]{8}";
       patternError = "Please enter a valid drivers license number";
       break;
     case "ssn":

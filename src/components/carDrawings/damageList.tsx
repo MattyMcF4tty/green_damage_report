@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DamagePopUp from "../popups/damagePopUp";
 import ZoeDrawing from "./zoe";
 import { deleteReportFile, deleteStorageFile } from "@/utils/firebaseUtils/storageUtils";
@@ -25,10 +25,17 @@ const DamageList = ({ damages, setDamages, reportId }: damageListProps) => {
     setEditingIndex(index);
   };
 
-  const handleSave = (updatedDamage: (typeof damages)[0], index: number) => {
-    const newDamages = [...damages];
-    newDamages[index] = updatedDamage;
-    setDamages(newDamages);
+  const handleSave = (
+    updatedDamage: {
+      position: string | null;
+      description: string | null;
+      images: string[];
+    },
+    index: number
+  ) => {
+    const updatedDamages = [...damages];
+    updatedDamages[index] = updatedDamage;
+    setDamages(updatedDamages);
     setEditingIndex(null);
   };
 
@@ -41,7 +48,7 @@ const DamageList = ({ damages, setDamages, reportId }: damageListProps) => {
     }
     updatedDamages.splice(index, 1);
     setDamages(updatedDamages);
-    setEditingIndex(null); // Close the pop-up if it's opened.
+    setEditingIndex(null);
   };
 
   return (

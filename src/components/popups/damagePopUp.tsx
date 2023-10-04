@@ -73,11 +73,10 @@ const DamagePopUp = ({
           <h1 className="">New damage description</h1>
         </div>
 
-        <div>
+        <div className="md:w-[32rem] md:h-[8rem] md:mt-6">
           <TextField
             id="damageDescription"
-            labelText="
-          Please provide a description of the damages incurred to the parties involved"
+            labelText="Please describe the damages to this position"
             maxLength={500}
             required={true}
             value={damageDescription}

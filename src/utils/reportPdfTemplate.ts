@@ -45,7 +45,7 @@ const createReportPDF = async (
 
   // Draw a rectangle for the box with rounded corners around driver information
   doc.setFillColor("#E6EEE5");
-  doc.roundedRect(10, 115, 190, 60, 5, 5, "F");
+  doc.roundedRect(10, 115, 190, 38, 5, 5, "F");
 
   // Driver information header
   doc.setTextColor(0);
@@ -91,13 +91,12 @@ const createReportPDF = async (
       ? `${data.renterInfo.firstName} ${data.renterInfo.lastName}`
       : "-";
 
-  const maxLocationWidth = 80;
-  const addressLines = doc.splitTextToSize(
-    `Address: ${address}`,
-    maxLocationWidth
-  );
-
   doc.text(`Name: ${renterFullName}`, 15, driverInfoY);
+  if (driverRenter !== true) {
+    doc.text("Driver and renter is not the same", 15, driverInfoY - 8);
+  } else {
+    doc.text("Driver and renter is  the same", 15, driverInfoY - 8);
+  }
   /*   doc.text(`Phone number: ${data.renterInfo.phoneNumber}`, 15, driverInfoY + 8);
    */ /* doc.text(`Email: ${data.renterInfo.email}`, 15, driverInfoY + 16); */
   const addDriverInfoToPDF = (
@@ -105,51 +104,59 @@ const createReportPDF = async (
     startY: number,
     data: reportDataType
   ) => {
-    const renterInfoY = startY; // Starting Y-coordinate for Renter information
+    const lineDriverHeight = 8;
+    const staticContentHeight = 40;
+    const padding = 10;
 
+    const address = data.driverInfo.address ? data.driverInfo.address : "-";
+    const maxLocationWidth = 140;
+
+    const addressLines = doc.splitTextToSize(
+      `Address: ${address}`,
+      maxLocationWidth
+    );
+    const dynamicContentHeight = addressLines.length * lineDriverHeight;
+    const totalBoxHeight = staticContentHeight + dynamicContentHeight + padding;
+
+    const renterInfoY = startY;
     // Draw a rectangle for the box with rounded corners around Renter information
     doc.setFillColor("#E6EEE5");
-    doc.roundedRect(10, driverInfoY + 5, 190, 60, 5, 5, "F"); // You can adjust the dimensions accordingly
+    doc.roundedRect(10, driverInfoY, 190, totalBoxHeight, 5, 5, "F");
 
     // driver information header
     doc.setFont("bold");
-    doc.text("Driver information", 15, driverInfoY + 23);
+    doc.text("Driver information", 15, driverInfoY + 16);
     doc.setLineWidth(0.5);
-    doc.line(15, driverInfoY + 24, 80, driverInfoY + 24);
+    doc.line(15, driverInfoY + 18, 80, driverInfoY + 18);
 
     doc.setFont("normal");
 
-    doc.text(`Name: ${name}`, 15, driverInfoY + 36);
-    doc.text(`Phone number: ${phoneNumber}`, 15, driverInfoY + 44);
-    doc.text(`Email: ${email}`, 15, driverInfoY + 52);
-    let yOffset = driverInfoY + 60; // starting y-coordinate for the address
+    doc.text(`Name: ${name}`, 15, driverInfoY + 24);
+    doc.text(`Phone number: ${phoneNumber}`, 15, driverInfoY + 32);
+    doc.text(`Email: ${email}`, 15, driverInfoY + 40);
+    let yOffset = driverInfoY + 48; // Starting y-coordinate for the address
     for (let line of addressLines) {
       doc.text(line, 15, yOffset);
-      yOffset += 8; // adjust by the height of one line, you can change this value if needed
+      yOffset += lineDriverHeight; // Adjust by the height of one line
     }
+
     doc.text(
       `Social security number: ${socialSecurityNumber}`,
       105,
-      driverInfoY + 36
+      driverInfoY + 24
     );
     doc.text(
       `Driving License Number: ${drivingLicenseNumber}`,
       105,
-      driverInfoY + 44
+      driverInfoY + 32
     );
-    if (driverRenter === null) {
-      doc.text("Is driver and renter the same? -", 105, driverInfoY + 52);
-    } else if (driverRenter === true) {
-      doc.text("Driver and renter is the same", 105, driverInfoY + 52);
-    } else {
-      doc.text("Driver and renter is not the same", 105, driverInfoY + 52);
-    }
+
     if (validLicense === null) {
-      doc.text("Valid drivers license? -", 105, driverInfoY + 60);
+      doc.text("Valid drivers license? -", 105, driverInfoY + 40);
     } else if (validLicense === true) {
-      doc.text("Valid drivers license? Yes", 105, driverInfoY + 60);
+      doc.text("Valid drivers license? Yes", 105, driverInfoY + 40);
     } else {
-      doc.text("Valid drivers license? No", 105, driverInfoY + 60);
+      doc.text("Valid drivers license? No", 105, driverInfoY + 40);
     }
 
     return driverInfoY + 60 + 10; // Return the Y-coordinate after drawing the Renter info + some gap for the next section
@@ -221,12 +228,21 @@ const createReportPDF = async (
   );
 
   // Police journal number
+  let policeReportText = "No police report filed";
+
+  // Check if police report is filed
+  if (data.policeReportExist) {
+    // If yes, check whether a report number has been provided
+    if (data.policeReportNumber && data.policeReportNumber.trim() !== "") {
+      policeReportText = data.policeReportNumber;
+    } else {
+      policeReportText = "Police report filed, but number is unavailable";
+    }
+  }
+
+  // Then, you can use `policeReportText` to display the text in your PDF as desired
   doc.text("Police journal number:", accidentInfoLeftX, accidentInfoY + 34);
-  doc.text(
-    data.policeReportNumber || "No police report filed",
-    accidentInfoRightX,
-    accidentInfoY + 34
-  );
+  doc.text(policeReportText, accidentInfoRightX, accidentInfoY + 34);
 
   // Time of accident
   doc.text("Time of accident:", accidentInfoLeftX, accidentInfoY + 42);
@@ -1206,9 +1222,13 @@ const createReportPDF = async (
 
       // Damage information header
       doc.setFont("bold");
-      doc.text("Damage position information", 15, currentY + 10); // Use currentY
+      doc.text(
+        "Damage position for GreenMobility car information",
+        15,
+        currentY + 10
+      ); // Use currentY
       doc.setLineWidth(0.5);
-      doc.line(15, currentY + 12, 80, currentY + 12); // Use currentY
+      doc.line(15, currentY + 12, 105, currentY + 12); // Use currentY
 
       doc.setFont("normal");
 
@@ -1221,26 +1241,14 @@ const createReportPDF = async (
       for (let i = 0; i < numDamagePositionDescriptionLines; i++) {
         doc.text(
           damagePositionDescriptionLines[i],
-          15, // Starting at the left edge
-          currentY + 40 + i * damagePositionLineHeight // Use currentY
+          85, // Starting at the left edge
+          currentY + 30 + i * damagePositionLineHeight // Use currentY
         );
       }
 
       // Images
-      doc.text(
-        "Images:",
-        15,
-        currentY +
-          40 +
-          numDamagePositionDescriptionLines * damagePositionLineHeight
-      );
-      doc.text(
-        damage.images.join(", "),
-        85,
-        currentY +
-          40 +
-          numDamagePositionDescriptionLines * damagePositionLineHeight
-      );
+      doc.text("Images:", 15, currentY + 38);
+      doc.text(damage.images.join(", "), 85, currentY + 38);
 
       currentY +=
         calculateDamageSpaceRequired(damagePositionDescriptionHeight) + 5;
