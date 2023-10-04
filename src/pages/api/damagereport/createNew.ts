@@ -24,6 +24,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         ))
     }
 
+    console.log("Creating new report")
     // Check if required information is valid.
     try {
         if (!email || typeof email !== 'string') {
