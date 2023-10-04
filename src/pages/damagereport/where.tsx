@@ -243,7 +243,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         <YesNo
           required={true}
           id="collisionWithOtherParty"
-          labelText="Damage to other object?"
+          labelText="Any damage to another object"
           value={otherPartyInvolved}
           onChange={setOtherPartyInvolved}
         />
