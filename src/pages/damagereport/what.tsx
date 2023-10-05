@@ -39,7 +39,9 @@ const What: NextPage<pageProps> = ({ data, id }) => {
   const [drivingLicenseNumber, setDrivingLicenseNumber] = useState(
     serverData.driverInfo.drivingLicenseNumber
   );
-  const [validDriversLicense, setValidDriversLicense] = useState(serverData.driverInfo.validDriversLicense);
+  const [validDriversLicense, setValidDriversLicense] = useState(
+    serverData.driverInfo.validDriversLicense
+  );
   const [phoneNumber, setPhoneNumber] = useState(
     serverData.driverInfo.phoneNumber
   );
@@ -125,8 +127,8 @@ const What: NextPage<pageProps> = ({ data, id }) => {
   };
 
   useEffect(() => {
-    console.log(validDriversLicense)
-  }, [validDriversLicense])
+    console.log(validDriversLicense);
+  }, [validDriversLicense]);
 
   return (
     <form
@@ -147,7 +149,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
           labelText="
             Please enter the license plate of the GreenMobility car"
           id="greenCarNumberplateInput"
-          type="text"
+          type="numberplate"
           required={true}
           value={greenCarNumberplate}
           onChange={setgreenCarNumberplate}
