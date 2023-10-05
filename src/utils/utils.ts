@@ -116,10 +116,8 @@ export const getServerSidePropsWithRedirect = async (
 
   const reportData = await getReportDoc(id, false);
   console.log(reportData)
-  const GreenMobilityImages = await handleDownloadImages(
-    `${id}/GreenMobility`,
-    "url"
-  );
+  const GreenMobilityImages: string[]= []
+
   const otherPartyImages = (await getReportFolder(id, 'OtherPartyDamages/')).map((file, index) => {
     return file.url
   });

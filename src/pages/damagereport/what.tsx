@@ -146,7 +146,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
           labelText="
             Please enter the license plate of the GreenMobility car"
           id="greenCarNumberplateInput"
-          type="numberplate"
+          type="text"
           required={true}
           value={greenCarNumberplate}
           onChange={setgreenCarNumberplate}
