@@ -1,8 +1,4 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { apiResponse } from "./types";
-import { reportDataType } from "./schemas/damageReportSchemas";
-import { doc, updateDoc } from "firebase/firestore";
-import { FireDatabase } from "@/firebase/firebaseConfig";
+import { NextApiRequest } from "next";
 
 // TODO: Improve to be more secure, right now you can add a / to url and it will pass.
 export function checkOrigin(req: NextApiRequest, allowedOrigins: string[]): boolean {

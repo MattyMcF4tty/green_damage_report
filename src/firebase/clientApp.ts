@@ -18,7 +18,7 @@ import {
   ref,
   uploadBytes,
 } from "firebase/storage";
-import { reportDataType } from "@/utils/schemas/damageReportSchemas";
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import app from "./firebaseConfig";
 
 const db = getFirestore(app);
@@ -29,7 +29,7 @@ export const collectionName = "DamageReports";
 export const getData = async (id: string) => {
   console.log("fetchind docID: " + id);
   const docRef = doc(db, `${collectionName}/${id}`);
-  const data = new reportDataType();
+  const data = new CustomerDamageReport();
 
   try {
     const docSnapshot = await getDoc(docRef);
@@ -49,7 +49,7 @@ export const getData = async (id: string) => {
 
 export const createDoc = async (id: string, email: string) => {
   try {
-    const data = new reportDataType();
+    const data = new CustomerDamageReport();
     data.updateFields({ userEmail: email.toLowerCase() });
     console.log(
       "Report created:\n" + "id: " + id + "\n" + "Email: " + email.toLowerCase()
@@ -62,7 +62,7 @@ export const createDoc = async (id: string, email: string) => {
   }
 };
 
-export const updateData = async (id: string, data: reportDataType) => {
+export const updateData = async (id: string, data: CustomerDamageReport) => {
   const dataRef = doc(db, `${collectionName}/${id}`);
   const currentDate = new Date();
 

@@ -2,7 +2,7 @@ import { dateToWunder, reportSearch } from "@/utils/utils";
 import { useEffect, useState } from "react";
 import Loading from "../loading";
 import { handleGetAllReports } from "@/utils/damageReportUtils.ts/apiRoutes";
-import { reportDataType } from "@/utils/schemas/damageReportSchemas";
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 
 interface reportListProps {
   status: "all" | "finished" | "unfinished";
@@ -11,7 +11,7 @@ interface reportListProps {
   itemsPerPage: number;
   currentPage: number; // Add currentPage to the interface
   currentSelectedReports: (
-    selected: { id: string; data: reportDataType }[]
+    selected: { id: string; data: CustomerDamageReport }[]
   ) => void;
 }
 
@@ -23,14 +23,14 @@ const ReportList = ({
   currentSelectedReports,
 }: reportListProps) => {
   const [reportList, setReportList] = useState<
-    { id: string; data: reportDataType }[]
+    { id: string; data: CustomerDamageReport }[]
   >([]);
   const [filteredReportList, setFilteredReportList] = useState<
-    { id: string; data: reportDataType }[]
+    { id: string; data: CustomerDamageReport }[]
   >([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedReports, setSelectedReports] = useState<
-    { id: string; data: reportDataType }[]
+    { id: string; data: CustomerDamageReport }[]
   >([]);
   const [loaded, setLoaded] = useState<boolean>(false);
 

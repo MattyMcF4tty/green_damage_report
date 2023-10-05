@@ -1,15 +1,15 @@
 import { FireDatabase } from "@/firebase/firebaseConfig";
 import { decryptReport } from "@/utils/securityUtils";
-import { apiResponse } from "@/utils/types";
 import { doc, getDoc } from "firebase/firestore";
 import { NextApiRequest, NextApiResponse } from "next";
-import { reportDataType } from "@/utils/schemas/damageReportSchemas";
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
+import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
 
     // Check method
     if (req.method !== "POST") {
-        return res.status(405).json(new apiResponse(
+        return res.status(405).json(new ApiResponse(
             "METHOD_NOT_ALLOWED",
             [],
             ["Method is not allowed"],
@@ -31,7 +31,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             throw new Error("Missing id")
         }
     } catch ( error:any ) {
-        return res.status(400).json(new apiResponse(
+        return res.status(400).json(new ApiResponse(
             "BAD_REQUEST",
             [],
             [error.message],
@@ -42,7 +42,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     const damageCol = process.env.DAMAGE_REPORT_FIRESTORE_COLLECTION;
     if (!damageCol || typeof damageCol !== 'string') {
         console.error("DAMAGE_REPORT_FIRESTORE_COLLECTION is not defined in enviroment")
-        return res.status(500).json(new apiResponse(
+        return res.status(500).json(new ApiResponse(
             "SERVER_ERROR",
             [],
             ["Something went wrong"],
@@ -53,7 +53,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     const database = FireDatabase;
     if (!database) {
         console.error("FireDatabase is not initialized");
-        return res.status(500).json(new apiResponse(
+        return res.status(500).json(new ApiResponse(
             "SERVER_ERROR",
             [],
             ["Something went wrong"],
@@ -69,7 +69,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         document = await getDoc(documentRef)
     } catch ( error:any)  {
         console.error(`Error getting report with id: ${reportId}, ${error.code}`)
-        return res.status(500).json(new apiResponse(
+        return res.status(500).json(new ApiResponse(
             "SERVER_ERROR",
             [],
             ["Something went wrong"],
@@ -79,7 +79,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
     // Check if report exists
     if (!document.exists()) {
-        return res.status(404).json(new apiResponse(
+        return res.status(404).json(new ApiResponse(
             "NOT_FOUND",
             [],
             ["Report not found"],
@@ -90,7 +90,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     const documentData = document.data();
 
     if (!documentData) {
-        return res.status(404).json(new apiResponse(
+        return res.status(404).json(new ApiResponse(
             "NOT_FOUND",
             [],
             ["Report data not found"],
@@ -98,13 +98,13 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         ))
     }
 
-    const report = new reportDataType();
+    const report = new CustomerDamageReport();
     report.updateFields(documentData);
 
     const lowEncryptionKey = process.env.LOW_ENCRYPTION_KEY;
     if (!lowEncryptionKey) {
         console.error("LOW_ENCRYPTION_KEY is not defined in enviroment")
-        return res.status(500).json(new apiResponse(
+        return res.status(500).json(new ApiResponse(
             "SERVER_ERROR",
             [],
             ["Something went wrong"],
@@ -116,7 +116,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     const decryptedReport = decryptReport(report, false)
     const decryptedReportObject = decryptedReport.toPlainObject();
 
-    return res.status(200).json(new apiResponse(
+    return res.status(200).json(new ApiResponse(
         "OK",
         [],
         [],

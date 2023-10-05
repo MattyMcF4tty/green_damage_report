@@ -14,7 +14,7 @@ import {
   isJSONSerializable,
 } from "../utils";
 import { decryptReport, encryptReport } from "../securityUtils";
-import { reportDataType } from "../schemas/damageReportSchemas";
+import { CustomerDamageReport } from "../schemas/damageReportSchemas/customerReportSchema";
 
 export const updateFirestoreDoc = async (path: string, data: {}) => {
   // We check if Firestore is initialized.
@@ -73,7 +73,7 @@ export const updateFirestoreDoc = async (path: string, data: {}) => {
 
 export const updateReportDoc = async (
   reportId: string,
-  data: reportDataType
+  data: CustomerDamageReport
 ) => {
   // We get our encryption collection name from the enviroment
   const damageReportCol = process.env.DAMAGE_REPORT_FIRESTORE_COLLECTION;
@@ -86,7 +86,7 @@ export const updateReportDoc = async (
   }
 
   // Here we encrypt the data before sending it to our database
-  let encryptedData: reportDataType;
+  let encryptedData: CustomerDamageReport;
   try {
     encryptedData = encryptReport(data);
   } catch (error) {
@@ -181,7 +181,7 @@ export const getReportDoc = async (reportId: string, authorized: boolean) => {
   }
 
   // We convert it to our report format
-  let reportData = new reportDataType();
+  let reportData = new CustomerDamageReport();
   try {
     reportData.updateFields(documentData);
   } catch (error: any) {
@@ -193,7 +193,7 @@ export const getReportDoc = async (reportId: string, authorized: boolean) => {
   }
 
   // We decrypt the report
-  let decryptedData = new reportDataType();
+  let decryptedData = new CustomerDamageReport();
   try {
     decryptedData = decryptReport(reportData, authorized);
   } catch (error) {
@@ -272,7 +272,7 @@ export const createReportDoc = async (email: string) => {
     throw error;
   }
 
-  const newReportData = new reportDataType();
+  const newReportData = new CustomerDamageReport();
   newReportData.updateFields({
     openedDate: `${new Date()}`,
     lastChange: `${new Date()}`,

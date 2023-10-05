@@ -9,15 +9,14 @@ import { GetServerSidePropsContext, NextPage } from "next";
 import NextButton from "@/components/buttons/next";
 import BackButton from "@/components/buttons/back";
 import { useRouter } from "next/router";
-import { updateData } from "@/firebase/clientApp";
 import {
   getServerSidePropsWithRedirect,
   handleGetRenter,
   handleUpdateReport,
   pageProps,
 } from "@/utils/utils";
-import PhoneNumber from "@/components/opposite_information/phone_form";
-import { reportDataType } from "@/utils/schemas/damageReportSchemas";
+import PhoneNumber from "@/components/opposite_information/phoneForm";
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -27,7 +26,7 @@ export const getServerSideProps = async (
 
 const What: NextPage<pageProps> = ({ data, id }) => {
   const router = useRouter();
-  const serverData = new reportDataType();
+  const serverData = new CustomerDamageReport();
   serverData.updateFields(data);
 
   const [firstName, setFirstName] = useState(serverData.driverInfo.firstName);
@@ -149,7 +148,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
           labelText="
             Please enter the license plate of the GreenMobility car"
           id="greenCarNumberplateInput"
-          type="numberplate"
+          type="text"
           required={true}
           value={greenCarNumberplate}
           onChange={setgreenCarNumberplate}

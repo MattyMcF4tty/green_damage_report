@@ -1,6 +1,5 @@
 import { highEncryptText, lowEncryptText } from "@/utils/securityUtils";
-import { checkOrigin } from "@/utils/serverUtils";
-import { apiResponse } from "@/utils/types";
+import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 import {
   dateToWunder,
   getAge,
@@ -18,7 +17,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       return res
         .status(405)
         .json(
-          new apiResponse(
+          new ApiResponse(
             "METHOD_NOT_ALLOWED",
             [],
             ["Method is not allowed"],
@@ -55,7 +54,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     } catch (error: any) {
       return res
         .status(400)
-        .json(new apiResponse("BAD_REQUEST", [], [error.message], {}));
+        .json(new ApiResponse("BAD_REQUEST", [], [error.message], {}));
     }
 
     const accidentDate = new Date(date);
@@ -89,7 +88,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       return res
         .status(500)
         .json(
-          new apiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
+          new ApiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
         );
     }
     debug.push(`VehicleResponse returned ${vehicleResponse.status}`);
@@ -100,7 +99,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       debug.push("Car not found");
       return res
         .status(404)
-        .json(new apiResponse("NOT_FOUND", [], ["Car not found"], {}));
+        .json(new ApiResponse("NOT_FOUND", [], ["Car not found"], {}));
     }
 
     debug.push("Car found");
@@ -144,7 +143,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       return res
         .status(500)
         .json(
-          new apiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
+          new ApiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
         );
     }
     debug.push(`reservationResponse returned ${reservationResponse.status}`);
@@ -184,7 +183,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         return res
           .status(500)
           .json(
-            new apiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
+            new ApiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
           );
       }
       const activeReservationResponseData =
@@ -202,7 +201,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       return res
         .status(500)
         .json(
-          new apiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
+          new ApiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
         );
     }
     debug.push(`ReservationId: ${reservation[0].reservationId}`);
@@ -227,7 +226,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       return res
         .status(500)
         .json(
-          new apiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
+          new ApiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
         );
     }
     debug.push(`Reservation startTime: ${startTime}`);
@@ -242,7 +241,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       return res
         .status(404)
         .json(
-          new apiResponse(
+          new ApiResponse(
             "NOT_FOUND",
             [],
             ["No reservations were ongoing at that point in time"],
@@ -279,7 +278,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         return res
           .status(404)
           .json(
-            new apiResponse(
+            new ApiResponse(
               "NOT_FOUND",
               [],
               ["No customers were found with customerId"],
@@ -296,7 +295,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       return res
         .status(500)
         .json(
-          new apiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
+          new ApiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
         );
     }
     const renterData = renterResponseData.data[0];
@@ -336,12 +335,12 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     return res
       .status(200)
       .json(
-        new apiResponse("OK", ["User fetched succesfully"], [], renterInfo)
+        new ApiResponse("OK", ["User fetched succesfully"], [], renterInfo)
       );
   } catch (error: any) {
     console.error("Error at api/wunderfleet/getRenter.ts", error.message);
     return res
       .status(500)
-      .json(new apiResponse("SERVER_ERROR", [], ["Something went wrong"], {}));
+      .json(new ApiResponse("SERVER_ERROR", [], ["Something went wrong"], {}));
   }
 }

@@ -2,7 +2,6 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import axios from 'axios';
 import { getDownloadURL, ref } from "firebase/storage";
 import { FireStorage } from '@/firebase/firebaseConfig';
-import { handleGeneratePdf } from '@/utils/utils';
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
   try {

@@ -19,7 +19,7 @@ import { getReportDoc } from "./firebaseUtils/firestoreUtils";
 import { getReportFile, getReportFolder } from "./firebaseUtils/storageUtils";
 import { handleGetBase64FileFromStorage } from "./firebaseUtils/apiRoutes";
 import { handleGetReport } from "./damageReportUtils.ts/apiRoutes";
-import { reportDataType } from "./schemas/damageReportSchemas";
+import { CustomerDamageReport } from "./schemas/damageReportSchemas/customerReportSchema";
 
 /* ------- utils config ----- */
 const firebaseCollectionName = collectionName;
@@ -74,8 +74,8 @@ export const GetUserPosition = () => {
   });
 };
 
-export const encryptData = (data: reportDataType) => {
-  const encryptedData = new reportDataType();
+export const encryptData = (data: CustomerDamageReport) => {
+  const encryptedData = new CustomerDamageReport();
   encryptedData.updateFields({ ...data });
   const secretKey = process.env.DATA_ENCRYPTION_KEY || "";
 
@@ -92,8 +92,8 @@ export const encryptData = (data: reportDataType) => {
   return encryptedData;
 };
 
-export const decryptData = (data: reportDataType) => {
-  const decryptedData = new reportDataType();
+export const decryptData = (data: CustomerDamageReport) => {
+  const decryptedData = new CustomerDamageReport();
   decryptedData.updateFields({ ...data });
   const secretKey = process.env.DATA_ENCRYPTION_KEY || "";
 
@@ -153,7 +153,7 @@ export const getServerSidePropsWithRedirect = async (
 };
 
 export const reportSearch = (
-  reportList: { id: string; data: reportDataType }[],
+  reportList: { id: string; data: CustomerDamageReport }[],
   status: "all" | "finished" | "unfinished",
   filter: "id" | "driver" | "numberplate" | "date",
   search: string
@@ -420,7 +420,7 @@ export const handleGeneratePdf = async (id: string) => {
     } catch (error) {
       console.error(error);
     }
-    const data: reportDataType = new reportDataType();
+    const data: CustomerDamageReport = new CustomerDamageReport();
     console.log(map);
 
     try {
@@ -624,7 +624,7 @@ export const handleGetReportData = async (reportId: string) => {
     throw newError;
   }
 
-  const report = new reportDataType();
+  const report = new CustomerDamageReport();
   report.updateFields(responseJson.data);
 
   return report;
@@ -632,7 +632,7 @@ export const handleGetReportData = async (reportId: string) => {
 
 export const handleUpdateReport = async (
   reportId: string,
-  reportData: reportDataType
+  reportData: CustomerDamageReport
 ) => {
   const data = {
     reportId: reportId,
@@ -729,6 +729,8 @@ export const urlToBase64 = async (url: string) => {
 
   return base64;
 };
+
+
 
 /* ---------------- classes and types ------------------------------ */
 export type pageProps = {

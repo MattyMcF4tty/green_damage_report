@@ -1,16 +1,8 @@
-import { useEffect, useState } from "react";
-import BikeInfoForm, {
-  bikeInformation,
-} from "../opposite_information/bike_information_form";
-import CarInfoForm, {
-  carInformation,
-} from "../opposite_information/car_information_form";
-import OtherInfoForm, {
-  OtherInformation,
-} from "../opposite_information/other_information_form";
-import PedestrianInfoForm, {
-  PedestrianInformation,
-} from "../opposite_information/person_information_form";
+import { useState } from "react";
+import BikeInfoForm from "../opposite_information/bikerInformationForm";
+import CarInfoForm from "../opposite_information/vehicleInformationForm";
+import OtherInfoForm from "../opposite_information/otherInformationForm";
+import PedestrianInfoForm from "../opposite_information/personInformationForm";
 import { Checkbox } from "../custom_inputfields";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -20,19 +12,23 @@ import {
   faPerson,
   faX,
 } from "@fortawesome/free-solid-svg-icons";
+import { Biker } from "@/utils/schemas/accidentParticipantSchemas/bikerSchema";
+import { Vehicle } from "@/utils/schemas/accidentParticipantSchemas/vehicleSchema";
+import { IncidentObject } from "@/utils/schemas/accidentParticipantSchemas/incidentObjectSchema";
+import { Pedestrian } from "@/utils/schemas/accidentParticipantSchemas/pedestrianSchema";
 
 interface OtherPartyListProps {
-  bikeValue: bikeInformation[];
-  setBikeValue: (newBikeValue: bikeInformation[]) => void;
+  bikeValue: Biker[];
+  setBikeValue: (newBikeValue: Biker[]) => void;
 
-  vehicleValue: carInformation[];
-  setVehicleValue: (newVehicleValue: carInformation[]) => void;
+  vehicleValue: Vehicle[];
+  setVehicleValue: (newVehicleValue: Vehicle[]) => void;
 
-  pedestrianValue: PedestrianInformation[];
-  setPedestrianValue: (newPedestrianValue: PedestrianInformation[]) => void;
+  pedestrianValue: Pedestrian[];
+  setPedestrianValue: (newPedestrianValue: Pedestrian[]) => void;
 
-  otherInfoValue: OtherInformation[];
-  setOtherInfoValue: (newOtherInfoValue: OtherInformation[]) => void;
+  otherInfoValue: IncidentObject[];
+  setOtherInfoValue: (newOtherInfoValue: IncidentObject[]) => void;
 }
 
 export const OtherPartyList = ({
@@ -181,19 +177,19 @@ export const OtherPartyList = ({
       {showPopUp && (
         <NewObjectPopUp
           setVisibility={setShowPopUp}
-          vehicleValue={new carInformation("", "", "", "", "", "", "")}
+          vehicleValue={new Vehicle("", "", "", "", "", "", "")}
           setVehicleValue={(newVehicleValue) =>
             setVehicleValue([...vehicleValue, newVehicleValue])
           }
-          bikeValue={new bikeInformation("", "", "", null, "")}
+          bikeValue={new Biker("", "", "", null, "")}
           setBikeValue={(newBikeValue) =>
             setBikeValue([...bikeValue, newBikeValue])
           }
-          pedestrianValue={new PedestrianInformation("", "", "", "")}
+          pedestrianValue={new Pedestrian("", "", "", "")}
           setPedestrianValue={(newPedestrianValue) =>
             setPedestrianValue([...pedestrianValue, newPedestrianValue])
           }
-          otherValue={new OtherInformation("", "")}
+          otherValue={new IncidentObject("", "")}
           setOtherValue={(newOtherValue) =>
             setOtherInfoValue([...otherInfoValue, newOtherValue])
           }
@@ -241,17 +237,17 @@ export const OtherPartyList = ({
 interface NewObjectPopUpProps {
   setVisibility: (visibility: boolean) => void;
 
-  bikeValue: bikeInformation;
-  setBikeValue: (newBikeValue: bikeInformation) => void;
+  bikeValue: Biker;
+  setBikeValue: (newBikeValue: Biker) => void;
 
-  vehicleValue: carInformation;
-  setVehicleValue: (newVehicleValue: carInformation) => void;
+  vehicleValue: Vehicle;
+  setVehicleValue: (newVehicleValue: Vehicle) => void;
 
-  pedestrianValue: PedestrianInformation;
-  setPedestrianValue: (newPedestrianValue: PedestrianInformation) => void;
+  pedestrianValue: Pedestrian;
+  setPedestrianValue: (newPedestrianValue: Pedestrian) => void;
 
-  otherValue: OtherInformation;
-  setOtherValue: (newOtherValue: OtherInformation) => void;
+  otherValue: IncidentObject;
+  setOtherValue: (newOtherValue: IncidentObject) => void;
 }
 
 const NewObjectPopUp = ({
@@ -270,19 +266,19 @@ const NewObjectPopUp = ({
   const [isPedestrian, setIsPedestrian] = useState<boolean>(false);
   const [isOther, setIsOther] = useState<boolean>(false);
 
-  const [currentBikeValue, setCurrentBikeValue] = useState<bikeInformation>(
-    bikeValue || new bikeInformation("", "", "", null, "")
+  const [currentBikeValue, setCurrentBikeValue] = useState<Biker>(
+    bikeValue || new Biker("", "", "", null, "")
   );
   const [currentVehicleValue, setCurrentVehicleValue] =
-    useState<carInformation>(
-      vehicleValue || new carInformation("", "", "", "", "", "", "")
+    useState<Vehicle>(
+      vehicleValue || new Vehicle("", "", "", "", "", "", "")
     );
   const [currentPedestrianValue, setCurrentPedestranValue] =
-    useState<PedestrianInformation>(
-      pedestrianValue || new PedestrianInformation("", "", "", "")
+    useState<Pedestrian>(
+      pedestrianValue || new Pedestrian("", "", "", "")
     );
-  const [currentOtherValue, setCurrentOtherValue] = useState<OtherInformation>(
-    otherValue || new OtherInformation("", "")
+  const [currentOtherValue, setCurrentOtherValue] = useState<IncidentObject>(
+    otherValue || new IncidentObject("", "")
   );
 
   const handleSave = () => {
@@ -418,8 +414,8 @@ const NewObjectPopUp = ({
 /* --------------------- UpdateBike -------------------------- */
 interface UpdateBikeProps {
   index: number;
-  setBikeValue: (updatedBikeValue: bikeInformation[]) => void;
-  bikeValue: bikeInformation[];
+  setBikeValue: (updatedBikeValue: Biker[]) => void;
+  bikeValue: Biker[];
   setVisibility: (visibility: boolean) => void;
 }
 
@@ -429,7 +425,7 @@ const UpdateBike = ({
   bikeValue,
   setVisibility,
 }: UpdateBikeProps) => {
-  const [currentBikeInfo, setCurrentBikeInfo] = useState<bikeInformation>(
+  const [currentBikeInfo, setCurrentBikeInfo] = useState<Biker>(
     bikeValue[index]
   );
 
@@ -486,8 +482,8 @@ const UpdateBike = ({
 /* --------------------- UpdateVehicle -------------------------- */
 interface UpdateVehicleProps {
   index: number;
-  setVehicleValue: (updatedVehicleValue: carInformation[]) => void;
-  vehicleValue: carInformation[];
+  setVehicleValue: (updatedVehicleValue: Vehicle[]) => void;
+  vehicleValue: Vehicle[];
   setVisibility: (visibility: boolean) => void;
 }
 
@@ -497,7 +493,7 @@ const UpdateVehicle = ({
   vehicleValue,
   setVisibility,
 }: UpdateVehicleProps) => {
-  const [currentVehicleInfo, setCurrentVehicleInfo] = useState<carInformation>(
+  const [currentVehicleInfo, setCurrentVehicleInfo] = useState<Vehicle>(
     vehicleValue[index]
   );
 
@@ -551,8 +547,8 @@ const UpdateVehicle = ({
 /* --------------------- UpdatePedestrian -------------------------- */
 interface UpdatePedestrianProps {
   index: number;
-  setPedestrianValue: (updatedPedestrianValue: PedestrianInformation[]) => void;
-  pedestrianValue: PedestrianInformation[];
+  setPedestrianValue: (updatedPedestrianValue: Pedestrian[]) => void;
+  pedestrianValue: Pedestrian[];
   setVisibility: (visibility: boolean) => void;
 }
 
@@ -563,7 +559,7 @@ const UpdatePedestrian = ({
   setVisibility,
 }: UpdatePedestrianProps) => {
   const [currentPedestrianInfo, setCurrentPedestrianInfo] =
-    useState<PedestrianInformation>(pedestrianValue[index]);
+    useState<Pedestrian>(pedestrianValue[index]);
 
   const handlePedestrianUpdate = () => {
     const updatedPedestrianValue = pedestrianValue;
@@ -614,8 +610,8 @@ const UpdatePedestrian = ({
 /* --------------------- UpdateOther -------------------------- */
 interface UpdateOtherProps {
   index: number;
-  setOtherValue: (updatedOtherValue: OtherInformation[]) => void;
-  otherValue: OtherInformation[];
+  setOtherValue: (updatedOtherValue: IncidentObject[]) => void;
+  otherValue: IncidentObject[];
   setVisibility: (visibility: boolean) => void;
 }
 
@@ -625,7 +621,7 @@ const UpdateOther = ({
   otherValue,
   setVisibility,
 }: UpdateOtherProps) => {
-  const [currentOtherInfo, setCurrentOtherInfo] = useState<OtherInformation>(
+  const [currentOtherInfo, setCurrentOtherInfo] = useState<IncidentObject>(
     otherValue[index]
   );
 

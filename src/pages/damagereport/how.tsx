@@ -14,7 +14,7 @@ import {
   pageProps,
 } from "@/utils/utils";
 import WitnessList from "@/components/otherPartys/witnessList";
-import { reportDataType } from "@/utils/schemas/damageReportSchemas";
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -24,7 +24,7 @@ export const getServerSideProps = async (
 
 const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
   const router = useRouter();
-  const serverData = new reportDataType();
+  const serverData = new CustomerDamageReport();
   serverData.updateFields(data);
   const [allowClick, setAllowClick] = useState(true);
 

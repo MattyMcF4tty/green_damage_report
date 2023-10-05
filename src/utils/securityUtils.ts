@@ -1,5 +1,5 @@
 import * as CryptoJS from 'crypto-js';
-import { reportDataType } from "./schemas/damageReportSchemas";
+import { CustomerDamageReport } from "./schemas/damageReportSchemas/customerReportSchema";
 
 // ENCRYPTION
 export const encryptText = (text: string, key:string) => {
@@ -33,8 +33,8 @@ export const highEncryptText = (text: string) => {
     return encryptText(text, key);
 }
 
-export const encryptReport = (reportData: reportDataType) => {
-    const encryptedReport = new reportDataType();
+export const encryptReport = (reportData: CustomerDamageReport) => {
+    const encryptedReport = new CustomerDamageReport();
     encryptedReport.updateFields(reportData.toPlainObject());
 
     // Renter is already encrypted by the highKey therefore no need here.
@@ -208,8 +208,8 @@ export const highDecryptText = (text: string) => {
     return decryptText(text, key);
 }
 
-export const decryptReport = (reportData: reportDataType, authorized: boolean) => {
-    const decryptedReport = new reportDataType();
+export const decryptReport = (reportData: CustomerDamageReport, authorized: boolean) => {
+    const decryptedReport = new CustomerDamageReport();
     decryptedReport.updateFields(reportData.toPlainObject());
 
     if (authorized) {

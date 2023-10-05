@@ -1,4 +1,4 @@
-import { reportDataType } from "@/utils/schemas/damageReportSchemas";
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
@@ -7,13 +7,13 @@ import ImageCarousel from "./imageCarousel";
 
 interface ExpandedReportProps {
   setVisible: (visibility: boolean) => void;
-  reports: { id: string; data: reportDataType }[];
+  reports: { id: string; data: CustomerDamageReport }[];
 }
 
 const ExpandedReport = ({ setVisible, reports }: ExpandedReportProps) => {
   const [currentReport, setCurrentReport] = useState<{
     id: string;
-    data: reportDataType;
+    data: CustomerDamageReport;
   }>(reports[0]);
   const [currentImages, setCurrentImages] = useState<Record<string, string[]>>(
     {}

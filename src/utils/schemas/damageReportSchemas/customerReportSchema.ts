@@ -1,4 +1,12 @@
-export class reportDataType {
+import { BikerSchema } from "../accidentParticipantSchemas/bikerSchema";
+import { DriverSchema } from "../accidentParticipantSchemas/driverSchema";
+import { IncidentObjectSchema } from "../accidentParticipantSchemas/incidentObjectSchema";
+import { PedestrianSchema } from "../accidentParticipantSchemas/pedestrianSchema";
+import { RenterSchema } from "../accidentParticipantSchemas/renterSchema";
+import { VehicleSchema } from "../accidentParticipantSchemas/vehicleSchema";
+import { WitnessSchema } from "../accidentParticipantSchemas/witnessSchema";
+
+export class CustomerDamageReport {
     userEmail: string | null;
     userPhoneNumber: string | null;
     finished: boolean;
@@ -7,29 +15,9 @@ export class reportDataType {
     openedDate: string | null;
     closedDate: string | null;
   
-    driverInfo: {
-      firstName: string | null;
-      lastName: string | null;
-      address: string | null;
-      socialSecurityNumber: string | null;
-      drivingLicenseNumber: string | null;
-      phoneNumber: string | null;
-      email: string | null;
-      validDriversLicense: null | boolean;
-    };
+    driverInfo: DriverSchema;
   
-    renterInfo: {
-      customerId: string | null;
-      reservationId: string | null;
-      firstName: string | null;
-      lastName: string | null;
-      email: string | null;
-      phoneNumber: string | null;
-      birthDate: string | null;
-      gender: string | null;
-      age: string | null;
-      insurance: boolean | null;
-    };
+    renterInfo: RenterSchema
   
     accidentLocation: { lat: number | null; lng: number | null };
     accidentAddress: string;
@@ -43,38 +31,12 @@ export class reportDataType {
     damageDescription: string | null;
     policeReportNumber: string | null;
   
-    bikerInfo: {
-      name: string;
-      phone: string;
-      email: string;
-      ebike: boolean | null;
-      personDamage: string;
-    }[];
-    vehicleInfo: {
-      name: string;
-      phone: string;
-      email: string;
-      driversLicenseNumber: string;
-      insurance: string;
-      numberplate: string;
-      model: string;
-    }[];
-    pedestrianInfo: {
-      name: string;
-      phone: string;
-      email: string;
-      personDamage: string;
-    }[];
-    otherObjectInfo: {
-      description: string;
-      information: string;
-    }[];
+    bikerInfo: BikerSchema[];
+    vehicleInfo: VehicleSchema[];
+    pedestrianInfo: PedestrianSchema[];
+    otherObjectInfo: IncidentObjectSchema[];
   
-    witnesses: {
-      name: string | null;
-      phone: string | null;
-      email: string | null;
-    }[];
+    witnesses: WitnessSchema[];
   
     damages: {
       position: string | null;
@@ -149,7 +111,7 @@ export class reportDataType {
       this.singleVehicleAccident = null;
     }
   
-    updateFields(fields: Partial<reportDataType>) {
+    updateFields(fields: Partial<CustomerDamageReport>) {
       Object.assign(this, fields);
     }
   

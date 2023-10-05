@@ -1,52 +1,21 @@
 import React, { useState, useEffect } from "react";
-import PhoneNumber from "./phone_form";
+import PhoneNumber from "./phoneForm";
 import { Inputfield, TextField } from "../custom_inputfields";
-
-export class PedestrianInformation {
-  name: string;
-  phone: string;
-  email: string;
-  personDamage: string;
-
-  constructor(
-    name: string,
-    phone: string,
-    email: string,
-    personDamage: string
-  ) {
-    this.name = name;
-    this.phone = phone;
-    this.email = email;
-    this.personDamage = personDamage;
-  }
-
-  updateFields(fields: Partial<PedestrianInformation>) {
-    Object.assign(this, fields);
-  }
-
-  toPlainObject() {
-    return {
-      name: this.name,
-      phone: this.phone,
-      email: this.email,
-      personDamage: this.personDamage,
-    };
-  }
-}
+import { Pedestrian } from "@/utils/schemas/accidentParticipantSchemas/pedestrianSchema";
 
 interface PedestrianProps {
-  value: PedestrianInformation;
-  onChange: (pedestrianInfo: PedestrianInformation) => void;
+  value: Pedestrian;
+  onChange: (pedestrianInfo: Pedestrian) => void;
 }
 
 const PedestrianInfoForm = ({ value, onChange }: PedestrianProps) => {
-  const [name, setName] = useState<string>(value.name);
-  const [phoneNumber, setPhoneNumber] = useState<string>(value.phone);
-  const [email, setEmail] = useState<string>(value.email);
-  const [personDamage, setPersonDamage] = useState<string>(value.personDamage);
+  const [name, setName] = useState<string | null>(value.name);
+  const [phoneNumber, setPhoneNumber] = useState<string | null>(value.phone);
+  const [email, setEmail] = useState<string | null>(value.email);
+  const [personDamage, setPersonDamage] = useState<string | null>(value.personDamage);
 
   useEffect(() => {
-    const newPedestrianInfo: PedestrianInformation = new PedestrianInformation(
+    const newPedestrianInfo: Pedestrian = new Pedestrian(
       name,
       phoneNumber,
       email,

@@ -1,13 +1,9 @@
-import React, { use, useEffect, useState } from "react";
-import { PedestrianInformation } from "../../components/opposite_information/person_information_form";
+import React, { useState } from "react";
 import {
   MultipleImageField,
   TextField,
   YesNo,
 } from "../../components/custom_inputfields";
-import { carInformation } from "../../components/opposite_information/car_information_form";
-import { bikeInformation } from "../../components/opposite_information/bike_information_form";
-import { OtherInformation } from "../../components/opposite_information/other_information_form";
 import BackButton from "@/components/buttons/back";
 import NextButton from "@/components/buttons/next";
 import { GetServerSidePropsContext, NextPage } from "next";
@@ -24,7 +20,11 @@ import VanDrawing from "@/components/carDrawings/kangoo";
 import Google from "@/components/google";
 import DamageList from "@/components/carDrawings/damageList";
 import { uploadReportFile } from "@/utils/firebaseUtils/storageUtils";
-import { reportDataType } from "@/utils/schemas/damageReportSchemas";
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
+import { Vehicle } from "@/utils/schemas/accidentParticipantSchemas/vehicleSchema";
+import { Biker } from "@/utils/schemas/accidentParticipantSchemas/bikerSchema";
+import { Pedestrian } from "@/utils/schemas/accidentParticipantSchemas/pedestrianSchema";
+import { IncidentObject } from "@/utils/schemas/accidentParticipantSchemas/incidentObjectSchema";
 
 
 export const getServerSideProps = async (
@@ -35,7 +35,7 @@ export const getServerSideProps = async (
 
 const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
   const router = useRouter();
-  const serverData = new reportDataType();
+  const serverData = new CustomerDamageReport();
   const mapsId = "GoogleMap";
   serverData.updateFields(data);
   const [allowClick, setAllowClick] = useState(true);
@@ -74,7 +74,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
   const [carInfo, setCarInfo] = useState(
     serverData.vehicleInfo.map(
       (info) =>
-        new carInformation(
+        new Vehicle(
           info.name,
           info.phone,
           info.email,
@@ -88,7 +88,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
   const [bikeInfo, setBikeInfo] = useState(
     serverData.bikerInfo.map(
       (info) =>
-        new bikeInformation(
+        new Biker(
           info.name,
           info.phone,
           info.email,
@@ -99,13 +99,13 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
   );
   const [otherInfo, setOtherInfo] = useState(
     serverData.otherObjectInfo.map(
-      (info) => new OtherInformation(info.description, info.information)
+      (info) => new IncidentObject(info.description, info.information)
     )
   );
   const [pedestrianInfo, setPedestrianInfo] = useState(
     serverData.pedestrianInfo.map(
       (info) =>
-        new PedestrianInformation(
+        new Pedestrian(
           info.name,
           info.phone,
           info.email,

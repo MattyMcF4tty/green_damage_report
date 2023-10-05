@@ -8,7 +8,7 @@ import {
   handleUpdateReport,
   pageProps,
 } from "@/utils/utils";
-import { reportDataType } from "@/utils/schemas/damageReportSchemas";
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBicycle,
@@ -25,7 +25,7 @@ export const getServerSideProps = async (
 
 const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
   const Router = useRouter();
-  const serverData = new reportDataType();
+  const serverData = new CustomerDamageReport();
   serverData.updateFields(data);
   const [allowClick, setAllowClick] = useState(true);
 

@@ -11,10 +11,10 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ExpandedReport from "./expandedReport";
 import { deleteReports } from "@/firebase/clientApp";
-import { reportDataType } from "@/utils/schemas/damageReportSchemas";
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 
 interface ReportControls {
-  selectedReports: { id: string; data: reportDataType }[];
+  selectedReports: { id: string; data: CustomerDamageReport }[];
 }
 
 const ReportControls = ({ selectedReports }: ReportControls) => {
@@ -24,13 +24,13 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
   const [allowPdf, setAllowPdf] = useState(true);
 
   const handleEmail = async (
-    selectedReports: { id: string; data: reportDataType }[]
+    selectedReports: { id: string; data: CustomerDamageReport }[]
   ) => {
     selectedReports.map(async (report, index) => {});
   };
 
   const handleInstallPDF = async (
-    selectedReports: { id: string; data: reportDataType }[]
+    selectedReports: { id: string; data: CustomerDamageReport }[]
   ) => {
     setAllowPdf(false);
     selectedReports.map(async (report) => {

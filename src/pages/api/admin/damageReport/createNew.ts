@@ -1,11 +1,11 @@
 import admin from "@/firebase/firebaseAdminConfig";
 import { FireDatabase } from "@/firebase/firebaseConfig";
 import { getCustomerFromCustomerId, getReservationFromReservationId } from "@/utils/serverUtils";
-import { apiResponse } from "@/utils/types";
+import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 import { generateId, getAge, wunderToDate, wunderToGender } from "@/utils/utils";
 import { doc, setDoc } from "firebase/firestore";
 import { NextApiRequest, NextApiResponse } from "next";
-import { reportDataType } from "@/utils/schemas/damageReportSchemas";
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 
 export default async function (req:NextApiRequest, res:NextApiResponse) {
     const method = req.method;
@@ -14,7 +14,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
 
     // Check request
     if (method !== "POST") {
-        return res.status(405).json(new apiResponse(
+        return res.status(405).json(new ApiResponse(
             "METHOD_NOT_ALLOWED",
             [],
             ["Method is not allowed"],
@@ -34,7 +34,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
             throw new Error("Missing reservation id")
         }
     } catch ( error:any ) {
-        return res.status(400).json(new apiResponse(
+        return res.status(400).json(new ApiResponse(
             "BAD_REQUEST",
             [],
             [error.message],
@@ -45,7 +45,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
 
     // Verify that user has permission
     if (!authorization || typeof authorization !== 'string') {
-        return res.status(401).json(new apiResponse(
+        return res.status(401).json(new ApiResponse(
             "UNAUTHORIZED",
             [],
             ["Invalid authentication"],
@@ -60,7 +60,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
     } catch (error: any) {
         if (error.code === 'auth/id-token-expired') {
             // Handle token expired error
-            return res.status(401).json(new apiResponse(
+            return res.status(401).json(new ApiResponse(
                 "TOKEN_EXPIRED",
                 [],
                 ["Token has expired"],
@@ -68,7 +68,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
             ));
         } else if (error.code === 'auth/id-token-revoked') {
             // Handle token revoked error
-            return res.status(401).json(new apiResponse(
+            return res.status(401).json(new ApiResponse(
                 "TOKEN_REVOKED",
                 [],
                 ["Token has been revoked"],
@@ -76,7 +76,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
             ));
         } else if (error.code === 'auth/argument-error') {
             // Handle invalid argument error
-            return res.status(400).json(new apiResponse(
+            return res.status(400).json(new ApiResponse(
                 "BAD_REQUEST",
                 [],
                 ["Invalid argument supplied"],
@@ -84,7 +84,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
             ));
         } else {
             console.log("Error verifying users authentication", error);
-            return res.status(500).json(new apiResponse(
+            return res.status(500).json(new ApiResponse(
                 "SERVER_ERROR",
                 [],
                 ["Something went wrong"],
@@ -97,7 +97,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
     const firebaseDatabase = FireDatabase;
     if (!damageReportColName || typeof damageReportColName !== 'string') {
         console.error("FIRESTORE_DAMAGEREPORT_COLLECTION is not defined in enviroment")
-        return res.status(500).json(new apiResponse(
+        return res.status(500).json(new ApiResponse(
             "SERVER_ERROR",
             [],
             ["Something went wrong"],
@@ -106,7 +106,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
     }
     if (!firebaseDatabase) {
         console.error("FireDatabase is not initialized")
-        return res.status(500).json(new apiResponse(
+        return res.status(500).json(new ApiResponse(
             "SERVER_ERROR",
             [],
             ["Something went wrong"],
@@ -119,7 +119,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         reservation = await getReservationFromReservationId(reservationId);
     } catch ( error:any ) {
         console.error(error)
-        return res.status(500).json(new apiResponse(
+        return res.status(500).json(new ApiResponse(
             "SERVER_ERROR",
             [],
             ["Something went wrong"],
@@ -127,7 +127,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         ))
     }
     if (!reservation) {
-        return res.status(404).json(new apiResponse(
+        return res.status(404).json(new ApiResponse(
             "NOT_FOUND",
             [],
             ["Reservation not found"],
@@ -140,7 +140,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         renter = await getCustomerFromCustomerId(reservation.customerId)
     } catch ( error:any ) {
         console.error(error)
-        return res.status(500).json(new apiResponse(
+        return res.status(500).json(new ApiResponse(
             "SERVER_ERROR",
             [],
             ["Something went wrong"],
@@ -148,7 +148,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         ))
     }
     if (!renter) {
-        return res.status(404).json(new apiResponse(
+        return res.status(404).json(new ApiResponse(
             "NOT_FOUND",
             [],
             ["Customer not found"],
@@ -163,7 +163,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
        renterAge = getAge(renterBirthDate)
     }
 
-    const newDamageReport = new reportDataType();
+    const newDamageReport = new CustomerDamageReport();
     const currentDate = new Date();
     newDamageReport.updateFields({
         userEmail: email, 
@@ -188,7 +188,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         reportId = await generateId();
     } catch ( error:any ) {
         console.error("Something went wrong generating report for report", error.message)
-        return res.status(500).json(new apiResponse(
+        return res.status(500).json(new ApiResponse(
             "SERVER_ERROR",
             [],
             ["Something went wrong"],
@@ -207,7 +207,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
             "Error:", 
             error.message
         )
-        return res.status(500).json(new apiResponse(
+        return res.status(500).json(new ApiResponse(
             "SERVER_ERROR",
             [],
             ["Something went wrong"],
@@ -215,7 +215,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         ))
     }
 
-    return res.status(201).json(new apiResponse(
+    return res.status(201).json(new ApiResponse(
         "CREATED",
         ["Damage report has succesfully been created"],
         [],

@@ -1,4 +1,3 @@
-import { apiResponse } from "../types";
 import { blobToBase64 } from "../utils";
 
 export const handleCreateNewReport = async (email: string) => {

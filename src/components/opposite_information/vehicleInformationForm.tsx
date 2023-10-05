@@ -1,70 +1,27 @@
 import React, { useState, useEffect } from "react";
 import "react-phone-number-input/style.css";
-import PhoneNumber from "./phone_form";
+import PhoneNumber from "./phoneForm";
 import { Inputfield } from "../custom_inputfields";
-
-export class carInformation {
-  name: string;
-  phone: string;
-  email: string;
-  driversLicenseNumber: string;
-  insurance: string;
-  numberplate: string;
-  model: string;
-
-  constructor(
-    name: string,
-    phone: string,
-    email: string,
-    driversLicenseNumber: string,
-    insurance: string,
-    numberplate: string,
-    model: string
-  ) {
-    this.name = name;
-    this.phone = phone;
-    this.email = email;
-    this.driversLicenseNumber = driversLicenseNumber;
-    this.insurance = insurance;
-    this.numberplate = numberplate;
-    this.model = model;
-  }
-
-  updateFields(fields: Partial<carInformation>) {
-    Object.assign(this, fields);
-  }
-
-  toPlainObject() {
-    return {
-      name: this.name,
-      phone: this.phone,
-      email: this.email,
-      driversLicenseNumber: this.driversLicenseNumber,
-      insurance: this.insurance,
-      numberplate: this.numberplate,
-      model: this.model,
-    };
-  }
-}
+import { Vehicle } from "@/utils/schemas/accidentParticipantSchemas/vehicleSchema";
 
 interface carInfoFormProps {
-  value: carInformation;
-  onChange: (carInfo: carInformation) => void;
+  value: Vehicle;
+  onChange: (carInfo: Vehicle) => void;
 }
 
 const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
-  const [numberplate, setNumberplate] = useState<string>(value.numberplate);
-  const [model, setModel] = useState<string>(value.model);
-  const [name, setName] = useState<string>(value.name);
-  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState<string>(
+  const [numberplate, setNumberplate] = useState<string | null>(value.numberplate);
+  const [model, setModel] = useState<string | null>(value.model);
+  const [name, setName] = useState<string | null>(value.name);
+  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState<string | null>(
     value.driversLicenseNumber
   );
-  const [phoneNumber, setPhoneNumber] = useState<string>(value.phone);
-  const [email, setEmail] = useState<string>(value.email);
-  const [insurance, setInsurance] = useState<string>(value.insurance);
+  const [phoneNumber, setPhoneNumber] = useState<string | null>(value.phone);
+  const [email, setEmail] = useState<string | null>(value.email);
+  const [insurance, setInsurance] = useState<string | null>(value.insurance);
 
   useEffect(() => {
-    const newCarInfo: carInformation = new carInformation(
+    const newCarInfo: Vehicle = new Vehicle(
       name,
       phoneNumber,
       email,
