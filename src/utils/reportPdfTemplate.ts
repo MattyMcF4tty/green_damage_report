@@ -3,6 +3,7 @@ import { reportDataType } from "@/utils/utils";
 import axios from "axios";
 import sharp from "sharp";
 import EXIF from "exif-js";
+import { handleGetBase64FileFromStorage } from "./firebaseUtils/apiRoutes";
 
 const addImageToPDF = (pdfDoc: jsPDF) => {
   const imageWidth = 80;
@@ -19,7 +20,7 @@ const addImageToPDF = (pdfDoc: jsPDF) => {
 const createReportPDF = async (
   data: reportDataType,
   images: Record<string, string[]>,
-  map: string[]
+  map: string
 ) => {
   const doc = new jsPDF();
 
@@ -1087,45 +1088,18 @@ const createReportPDF = async (
   const headerHeight = 20;
   currentY = 10;
 
-  if (images["GreenMobility"]) {
-    addImageSectionHeader("GreenMobility Damage Images");
-
-    if (Array.isArray(images["GreenMobility"])) {
-      for (const imageBase64 of images["GreenMobility"]) {
-        const correctedImageBase64 = await getCorrectlyOrientedImage(
-          imageBase64
-        );
-
-        currentY = await addImageWithSpacingCheck(
-          correctedImageBase64,
-          "JPEG",
-          15,
-          currentY,
-          100,
-          100
-        );
-      }
-    } else {
-      doc.text("No GreenMobility images available.", 15, currentY);
-      currentY += headerHeight;
-    }
-  }
-
-  doc.addPage();
-  currentY = 10;
-
   // For OtherParty images
   if (images["OtherParty"]) {
     addImageSectionHeader("OtherParty Damage Images");
 
     if (Array.isArray(images["OtherParty"])) {
       for (const imageBase64 of images["OtherParty"]) {
-        const correctedImageBase64 = await getCorrectlyOrientedImage(
+        /*         const correctedImageBase64 = await getCorrectlyOrientedImage(
           imageBase64
-        );
+        ); */
 
         currentY = await addImageWithSpacingCheck(
-          correctedImageBase64,
+          imageBase64,
           "JPEG",
           15,
           currentY,
@@ -1140,23 +1114,21 @@ const createReportPDF = async (
   currentY = 10;
 
   if (map) {
-    map.map((currentMap, index) => {
-      addImageSectionHeader("Map Images");
+    addImageSectionHeader("Map Images");
 
-      doc.addImage(
-        currentMap,
-        "png",
-        15,
-        currentY,
-        100, // FIX
-        100 // FIX
-      );
-      currentY += 105; // FIX;
-      doc.text(`lat: ${data.accidentLocation.lat || "-"}`, 15, currentY);
-      currentY += 4;
-      doc.text(`lng: ${data.accidentLocation.lng || "-"}`, 15, currentY);
-      currentY += 4; // Adjust as needed.
-    });
+    doc.addImage(
+      map,
+      "png",
+      15,
+      currentY,
+      100, // FIX
+      100 // FIX
+    );
+    currentY += 105; // FIX;
+    doc.text(`lat: ${data.accidentLocation.lat || "-"}`, 15, currentY);
+    currentY += 4;
+    doc.text(`lng: ${data.accidentLocation.lng || "-"}`, 15, currentY);
+    currentY += 4; // Adjust as needed.
   } else {
     addImageSectionHeader("Map Images");
     doc.text("No map images available.", 15, currentY);
@@ -1176,8 +1148,8 @@ const createReportPDF = async (
   ): number {
     return 70 + damageDescriptionHeight; // Include headers, footers, and some buffer
   }
-  data.damages &&
-    data.damages.forEach((damage, index) => {
+  if (data.damages) {
+    for (const damage of data.damages) {
       const damagePositionDescriptionLines = doc.splitTextToSize(
         damage.description || "No damage description has been provided",
         damagePositionDescriptionMaxWidth
@@ -1240,11 +1212,23 @@ const createReportPDF = async (
 
       // Images
       doc.text("Images:", 15, currentY + 38);
-      doc.text(damage.images.join(", "), 85, currentY + 38);
 
-      currentY +=
-        calculateDamageSpaceRequired(damagePositionDescriptionHeight) + 5;
-    });
+      const imageUrl = damage.images[0];
+      const imageBase64 = await handleGetBase64FileFromStorage(imageUrl);
+      currentY += 40; // Update as per actual space needed
+      const imageHeight = 55; // Example height
+
+      doc.addImage(
+        imageBase64,
+        "png",
+        15,
+        currentY,
+        55, // FIX
+        imageHeight
+      );
+      currentY += imageHeight + 20; // Add some padding
+    }
+  }
   const pdfBlob = doc.output("blob");
   return pdfBlob;
 };

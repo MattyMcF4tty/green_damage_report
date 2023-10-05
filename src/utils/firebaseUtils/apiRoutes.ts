@@ -111,7 +111,7 @@ export const handleGetBase64FileFromStorage = async (
     data = { filePath: filePath };
   }
 
-  const response = await fetch(url + "/api/firebase/uploadFile", {
+  const response = await fetch(url + "/api/firebase/downloadFileBase64", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

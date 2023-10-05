@@ -148,7 +148,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
         type="text"
         value={insurance}
         onChange={setInsurance}
-        placeHolder="Your insurance..."
+        placeHolder="Insurance company"
       />
     </div>
   );

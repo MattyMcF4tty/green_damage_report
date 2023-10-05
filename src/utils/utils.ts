@@ -401,23 +401,30 @@ export const handleGeneratePdf = async (id: string) => {
       OtherParty: [],
     };
 
-    let map: string[] = []; // Assuming handleDownloadImages returns an array of strings for maps
+    let map: string = ""; // Assuming handleDownloadImages returns an array of strings for maps
 
     try {
+      const otherPartyImageData = await getReportFolder(
+        id,
+        "/OtherPartyDamages/"
+      );
+      const otherPartyBase64 = await Promise.all(
+        otherPartyImageData.map(async (imageData) => {
+          const image = await handleGetBase64FileFromStorage(imageData.url);
+          return image;
+        })
+      );
+
+      console.log(otherPartyBase64);
+
       Images = {
-        GreenMobility: await handleDownloadImages(
-          `${id}/GreenMobility`,
-          "base64"
-        ),
-        OtherParty: await Promise.all(
-          (
-            await getReportFolder(id, "OtherParty/")
-          ).map((file) => handleGetBase64FileFromStorage(file.url))
-        ),
+        GreenMobility: [],
+        OtherParty: otherPartyBase64,
       };
-      map = await handleDownloadImages(`${id}/admin`, "base64");
+      const mapUrl = await getReportFile(id, "/Admin/map");
+      map = await handleGetBase64FileFromStorage(mapUrl);
     } catch (error) {
-      console.error("Error getting images");
+      console.error(error);
     }
     const data: reportDataType = new reportDataType();
     console.log(map);

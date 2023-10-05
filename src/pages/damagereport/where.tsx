@@ -268,20 +268,8 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
             </div>
           </div>
 
-          {/* Picture of damages to green car collection */}
-          <div className="mb-4">
-            <MultipleImageField
-              reportId={id}
-              id="FrontImage"
-              labelText="Please take pictures of the damage to the other partys"
-              required={false}
-              imageLimit={20}
-              folderPath="OtherPartyDamages/"
-            />
-          </div>
-
           {/* Damage description collection */}
-          <div className="">
+          <div className="mt-4">
             <TextField
               id="damageDescription"
               labelText="
@@ -292,23 +280,24 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
               onChange={setDamageDescription}
             />
           </div>
+
           {/* Picture of damages to green car collection */}
-          <div className="">
-            <ImageField
-              reportID={id}
-              id="LeftImage"
-              labelText="Please take pictures of the damage to the other party"
+          <div className="mb-6 mt-4">
+            <MultipleImageField
+              reportId={id}
+              id="FrontImage"
+              labelText="Please take pictures of the damage to the other partys"
               required={false}
-              images={otherPartyImages}
-              imageType="OtherParty"
-              multiple={true}
+              imageLimit={20}
+              folderPath="OtherPartyDamages/"
             />
           </div>
         </div>
       )}
 
       <div className="">
-        What type of car is damaged?
+        Please chose the type of the GreenMobility vehicle and indicate the
+        position of the damages that occurred
         <div className="">
           <select
             className="h-8 border border-MainGreen-300 bg-MainGreen-200 rounded-md shadow-md outline-none"
