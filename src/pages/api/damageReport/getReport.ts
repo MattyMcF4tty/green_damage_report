@@ -19,10 +19,10 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     }
 
     const { reportId } = req.body;
-    const { authorization } = req.headers;
+    const { Authorization } = req.headers;
     let isAdmin = false;
 
-    if (authorization) {
+    if (Authorization) {
         isAdmin = true;
     }
 
