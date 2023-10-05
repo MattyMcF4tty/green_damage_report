@@ -1094,12 +1094,12 @@ const createReportPDF = async (
 
     if (Array.isArray(images["OtherParty"])) {
       for (const imageBase64 of images["OtherParty"]) {
-        /*         const correctedImageBase64 = await getCorrectlyOrientedImage(
+        const correctedImageBase64 = await getCorrectlyOrientedImage(
           imageBase64
-        ); */
+        );
 
         currentY = await addImageWithSpacingCheck(
-          imageBase64,
+          correctedImageBase64,
           "JPEG",
           15,
           currentY,
