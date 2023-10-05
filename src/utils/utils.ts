@@ -717,6 +717,7 @@ export const replaceLastSlash = (path: string, replacement: string) => {
 
 export const urlToBase64 = async (url: string) => {
   let base64: string;
+  let mimeType: string;
   try {
     // Fetch the image as an ArrayBuffer
     const response = await axios.get(url, {
@@ -725,6 +726,9 @@ export const urlToBase64 = async (url: string) => {
 
     // Convert the ArrayBuffer to a Base64 string
     base64 = Buffer.from(response.data, "binary").toString("base64");
+
+    // Get the MIME type
+    mimeType = response.headers["content-type"];
   } catch (error: any) {
     // Log or handle any error occurred during the axios call
     console.error("Error fetching the image: ", error.message);
@@ -733,7 +737,8 @@ export const urlToBase64 = async (url: string) => {
     throw error;
   }
 
-  return base64;
+  // Return the Base64 encoded string with the MIME type
+  return `data:${mimeType};base64,${base64}`;
 };
 
 /* ---------------- classes and types ------------------------------ */
