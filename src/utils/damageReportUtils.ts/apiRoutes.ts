@@ -40,3 +40,27 @@ export const handleGetAllReports = async () => {
 
     return reportList;
 }
+
+export const handleGetReport = async(reportId:string) => {
+
+    const data = {
+        reportId: reportId
+    }
+
+    const url = process.env.NEXT_PUBLIC_URL;
+    if (!url) {
+        let newError = new Error;
+        newError.name = "SERVER_ERROR";
+        newError.message = "NEXT_PUBLIC_URL is not defined in enviroment"
+        throw newError;
+    }
+
+    const response = await fetch(url + '/api/damageReport/getReport', {
+        method: 'POST',
+        headers: {
+        "Content-Type": "application/json",
+        'Authorization': 'Hejas'
+        },
+        body: JSON.stringify(data)
+    })
+}

@@ -410,7 +410,7 @@ export const handleGeneratePdf = async (id: string) => {
     console.log(map);
 
     try {
-      data.updateFields(await getReportDoc(id, true));
+      data.updateFields(await getReportDoc(id, false));
     } catch (error) {
       console.error("Error getting data");
     }

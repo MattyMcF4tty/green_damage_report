@@ -1,12 +1,6 @@
-import admin from "@/firebase/firebaseAdminConfig";
-import { FireDatabase } from "@/firebase/firebaseConfig";
 import { createReportDoc } from "@/utils/firebaseUtils/firestoreUtils";
-import { lowEncryptText } from "@/utils/securityUtils";
-import { getCustomerFromCustomerId, getReservationFromReservationId } from "@/utils/serverUtils";
 import { apiResponse } from "@/utils/types";
-import { generateId, getAge, reportDataType, wunderToDate, wunderToGender } from "@/utils/utils";
-import { auth } from "firebase-admin";
-import { collection, doc, getDoc, setDoc } from "firebase/firestore";
+
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function (req:NextApiRequest, res:NextApiResponse) {

@@ -1,5 +1,4 @@
 import { Inputfield } from "@/components/custom_inputfields";
-import { createDoc } from "@/firebase/clientApp";
 import { generateId, getReportsByEmail } from "@/utils/utils";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
