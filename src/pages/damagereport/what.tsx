@@ -74,7 +74,6 @@ const What: NextPage<pageProps> = ({ data, id }) => {
 
     const combinedDateTime = `${accidentDate}T${accidentTime}`;
     const date = new Date(combinedDateTime);
-    console.log(date)
 
     let renter;
     try {

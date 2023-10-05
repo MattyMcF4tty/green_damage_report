@@ -12,11 +12,20 @@ import Cookies from "js-cookie";
 import app, { FireDatabase, FireStorage } from "@/firebase/firebaseConfig";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import { useRouter } from "next/router";
-import { collection, doc, getDocs, query, updateDoc, where } from "firebase/firestore";
+import {
+  collection,
+  doc,
+  getDocs,
+  query,
+  updateDoc,
+  where,
+} from "firebase/firestore";
 import createReportPDF from "./reportPdfTemplate";
 import jsPDF from "jspdf";
 import { getReportDoc } from "./firebaseUtils/firestoreUtils";
 import { getReportFile, getReportFolder } from "./firebaseUtils/storageUtils";
+import { handleGetBase64FileFromStorage } from "./firebaseUtils/apiRoutes";
+import { handleGetReport } from "./damageReportUtils.ts/apiRoutes";
 
 /* ------- utils config ----- */
 const firebaseCollectionName = collectionName;
@@ -25,19 +34,20 @@ export const generateId = async () => {
   let dataList: string[];
   try {
     dataList = await getReportIds();
-  } catch ( error: any ) {
+  } catch (error: any) {
     throw new Error(error.message);
   }
 
   let id: string | null = null;
 
-  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
   /* Generates random id from chars and checks if this id is not already taken */
   while (!id) {
-    const newId =Array.from(crypto.getRandomValues(new Uint16Array(16)))
-    .map((randomValue) => chars[randomValue % chars.length])
-    .join("");
+    const newId = Array.from(crypto.getRandomValues(new Uint16Array(16)))
+      .map((randomValue) => chars[randomValue % chars.length])
+      .join("");
 
     const existingId = dataList.find((docId: string) => docId === newId);
 
@@ -115,11 +125,13 @@ export const getServerSidePropsWithRedirect = async (
   const id = context.query.id as string;
 
   const reportData = await getReportDoc(id, false);
-  console.log(reportData)
-  const GreenMobilityImages: string[]= []
+  console.log(reportData);
+  const GreenMobilityImages: string[] = [];
 
-  const otherPartyImages = (await getReportFolder(id, 'OtherPartyDamages/')).map((file, index) => {
-    return file.url
+  const otherPartyImages = (
+    await getReportFolder(id, "OtherPartyDamages/")
+  ).map((file, index) => {
+    return file.url;
   });
   const images: Record<string, string[]> = {
     GreenMobility: GreenMobilityImages,
@@ -136,7 +148,6 @@ export const getServerSidePropsWithRedirect = async (
       },
     };
   }
-
 
   return {
     props: {
@@ -222,10 +233,10 @@ export const handleSendEmail = async (
 
   const url = process.env.NEXT_PUBLIC_URL;
   if (!url) {
-    throw new Error("NEXT_PUBLIC_URL is not defined")
+    throw new Error("NEXT_PUBLIC_URL is not defined");
   }
 
-  const response = await fetch(url + '/api/sendEmail', {
+  const response = await fetch(url + "/api/sendEmail", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -233,12 +244,12 @@ export const handleSendEmail = async (
     body: JSON.stringify(data),
   });
 
-  const responseData = await response.json()
+  const responseData = await response.json();
   if (response.ok) {
     console.log(responseData.messages);
     return true;
   } else {
-    console.error(responseData.errors)
+    console.error(responseData.errors);
     return false;
   }
 };
@@ -398,7 +409,11 @@ export const handleGeneratePdf = async (id: string) => {
           `${id}/GreenMobility`,
           "base64"
         ),
-        OtherParty: await handleDownloadImages(`${id}/OtherParty`, "base64"),
+        OtherParty: await Promise.all(
+          (
+            await getReportFolder(id, "OtherParty/")
+          ).map((file) => handleGetBase64FileFromStorage(file.url))
+        ),
       };
       map = await handleDownloadImages(`${id}/admin`, "base64");
     } catch (error) {
@@ -408,7 +423,7 @@ export const handleGeneratePdf = async (id: string) => {
     console.log(map);
 
     try {
-      data.updateFields(await getReportDoc(id, false));
+      data.updateFields(await handleGetReport(id));
     } catch (error) {
       console.error("Error getting data");
     }
@@ -511,7 +526,7 @@ export const handleGetRenter = async (numberplate: string, date: Date) => {
     lastName: string | null;
     birthDate: string | null;
     email: string | null;
-    phoneNumber: string |null;
+    phoneNumber: string | null;
     gender: string | null;
     age: string | null;
     insurance: boolean | null;
@@ -567,44 +582,41 @@ export const wunderToDate = (wunderTime: string | null) => {
   }
 
   return parsed;
-}
-
+};
 
 export const wunderToGender = (gender: number | null) => {
-
   if (!gender) {
-    return "Unknown"
-  } 
+    return "Unknown";
+  }
 
   switch (gender) {
     case 1:
-      return "Male"
+      return "Male";
     case 2:
-      return "Female"
+      return "Female";
   }
 
-  return "Other"
-}
+  return "Other";
+};
 
 export const handleGetReportData = async (reportId: string) => {
   const url = process.env.NEXT_PUBLIC_URL;
   if (!url) {
-    throw new Error("NEXT_PUBLIC_URL not defined")
+    throw new Error("NEXT_PUBLIC_URL not defined");
   }
 
-  const data = {reportId: reportId}
+  const data = { reportId: reportId };
 
   const response = await fetch(url + "/api/damageReport/getReport", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(data)
-  })
-
+    body: JSON.stringify(data),
+  });
 
   const responseJson = await response.json();
-  console.log(responseJson)
+  console.log(responseJson);
   if (!response.ok) {
     const newError = new Error(responseJson.errors[0]);
     newError.name = responseJson.status;
@@ -612,30 +624,32 @@ export const handleGetReportData = async (reportId: string) => {
   }
 
   const report = new reportDataType();
-  report.updateFields(responseJson.data)
+  report.updateFields(responseJson.data);
 
   return report;
-}
+};
 
-export const handleUpdateReport = async (reportId:string, reportData:reportDataType) => {
-
+export const handleUpdateReport = async (
+  reportId: string,
+  reportData: reportDataType
+) => {
   const data = {
     reportId: reportId,
     reportData: reportData.toPlainObject(),
-  }
+  };
 
   const url = process.env.NEXT_PUBLIC_URL;
-  if (!url || typeof url !== 'string') {
-    throw new Error("NEXT_PUBLIC_URL is not defined in enviroment")
+  if (!url || typeof url !== "string") {
+    throw new Error("NEXT_PUBLIC_URL is not defined in enviroment");
   }
 
-  const response = await fetch(url + '/api/damageReport/updateReport', {
+  const response = await fetch(url + "/api/damageReport/updateReport", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(data)
-  })
+    body: JSON.stringify(data),
+  });
 
   const responseJson = await response.json();
   if (!response.ok) {
@@ -645,23 +659,23 @@ export const handleUpdateReport = async (reportId:string, reportData:reportDataT
   }
 
   return;
-}
+};
 
-export const isJSONSerializable = (data:any) => {
+export const isJSONSerializable = (data: any) => {
   try {
     JSON.stringify(data);
     return true;
   } catch (error) {
     return false;
   }
-}
+};
 
 export const trimArrayToLimit = (limit: number, array: any[]) => {
   if (array.length > limit) {
-      return array.slice(0, limit);
+    return array.slice(0, limit);
   }
   return array;
-}
+};
 
 export const blobToBase64 = async (blob: Blob): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -670,40 +684,41 @@ export const blobToBase64 = async (blob: Blob): Promise<string> => {
     reader.onerror = reject;
     reader.readAsDataURL(blob);
   });
-}
+};
 
-export const base64ToBuffer = (base64: string, contentType: string = '') => {
+export const base64ToBuffer = (base64: string, contentType: string = "") => {
   const base64Regex = /^data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,(.*)$/;
   const matches = base64.match(base64Regex);
   if (!matches || matches.length !== 3) {
-    throw new Error('Invalid input string format');
+    throw new Error("Invalid input string format");
   }
   contentType = matches[1];
   base64 = matches[2];
-  return Buffer.from(base64, 'base64');
-}
+  return Buffer.from(base64, "base64");
+};
 
-export const arrayBufferToBlob = (arrayBuffer: ArrayBuffer, contentType: string) => {
+export const arrayBufferToBlob = (
+  arrayBuffer: ArrayBuffer,
+  contentType: string
+) => {
   return new Blob([arrayBuffer], { type: contentType });
-}
+};
 
-export const replaceLastSlash = (path:string, replacement:string) => {
-  return path.replace(/\/([^\/]*)$/, replacement + '$1');
-}
-
+export const replaceLastSlash = (path: string, replacement: string) => {
+  return path.replace(/\/([^\/]*)$/, replacement + "$1");
+};
 
 export const urlToBase64 = async (url: string) => {
   let base64: string;
   try {
     // Fetch the image as an ArrayBuffer
     const response = await axios.get(url, {
-      responseType: 'arraybuffer',
+      responseType: "arraybuffer",
     });
 
     // Convert the ArrayBuffer to a Base64 string
-    base64 = Buffer.from(response.data, 'binary').toString('base64');
-
-  } catch (error:any) {
+    base64 = Buffer.from(response.data, "binary").toString("base64");
+  } catch (error: any) {
     // Log or handle any error occurred during the axios call
     console.error("Error fetching the image: ", error.message);
 
@@ -711,9 +726,8 @@ export const urlToBase64 = async (url: string) => {
     throw error;
   }
 
-  return base64
+  return base64;
 };
-
 
 /* ---------------- classes and types ------------------------------ */
 export type pageProps = {
@@ -820,7 +834,6 @@ export class reportDataType {
   openedDate: string | null;
   closedDate: string | null;
 
-
   driverInfo: {
     firstName: string | null;
     lastName: string | null;
@@ -885,9 +898,9 @@ export class reportDataType {
   }[];
 
   witnesses: {
-    name: string | null,
-    phone: string | null,
-    email: string | null,
+    name: string | null;
+    phone: string | null;
+    email: string | null;
   }[];
 
   damages: {
@@ -972,16 +985,16 @@ export class reportDataType {
   }
 
   isExpired() {
-    const ExpiredTime = 72 * 60 * 60 * 1000 // 72 hours
+    const ExpiredTime = 72 * 60 * 60 * 1000; // 72 hours
 
     if (this.openedDate) {
       const openedDate = new Date(this.openedDate);
       const currentDate = new Date();
-  
+
       // If the difference between the current date and the opened date is more than 72 hours
       if (currentDate.getTime() - openedDate.getTime() > ExpiredTime) {
         this.finished = true;
-        this.closedDate = `${new Date}`
+        this.closedDate = `${new Date()}`;
         return true;
       }
       return false;
