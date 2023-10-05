@@ -62,12 +62,13 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     debug.push(`Accident date [Date]: ${accidentDate}`);
     debug.push(`Accident date [Wunder]: ${dateToWunder(accidentDate)}`);
 
+    console.log(debug)
     // Get information about vehicle
-    const vehicleResponse = await fetch(wunderUrl + "/api/v2/vehicles/search", {
+    const vehicleResponse = await fetch(wunderUrl + '/api/v2/vehicles/search', {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
+        'Authorization': `${accessToken}`,
       },
       body: JSON.stringify({
         licencePlate: {
@@ -113,7 +114,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${accessToken}`,
+          'Authorization': `${accessToken}`,
         },
         body: JSON.stringify({
           $and: [
@@ -164,7 +165,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
+            'Authorization': `${accessToken}`,
           },
           body: JSON.stringify({
             carId: carId,
@@ -264,7 +265,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${accessToken}`,
+        'Authorization': `${accessToken}`,
       },
       body: JSON.stringify({
         customerId: {

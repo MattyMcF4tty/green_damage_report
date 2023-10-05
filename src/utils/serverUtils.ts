@@ -49,7 +49,7 @@ export const getReservationFromReservationId = async (reservationId:string) => {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "authorization": wunderAuth
+            "Authorization": wunderAuth
         },
     }) 
 
@@ -77,7 +77,7 @@ export const getCustomerFromCustomerId = async (customerId: string) => {
         method: "GET",
         headers: {
             "Content-Type": "application/json",
-            "authorization": wunderAuth
+            "Authorization": wunderAuth
         },
     }) 
 
@@ -105,7 +105,7 @@ export const getVehicleByNumberplate = async (numberplate:string) => {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
-            "authorization": wunderAuth
+            "Authorization": wunderAuth
         },
         body: JSON.stringify({
             "licencePlate": numberplate
