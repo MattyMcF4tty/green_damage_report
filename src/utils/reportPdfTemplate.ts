@@ -101,8 +101,8 @@ const createReportPDF = async (
   } else {
     doc.text("Driver and renter is  the same", 15, driverInfoY - 8);
   }
-  doc.text(`Email: ${renterMail}`, 120, driverInfoY - 8);
-  doc.text(`Birthday: ${renterBirthday}`, 120, driverInfoY);
+  doc.text(`Email: ${renterMail}`, 105, driverInfoY - 8);
+  doc.text(`Birthday: ${renterBirthday}`, 105, driverInfoY);
 
   /*   doc.text(`Phone number: ${data.renterInfo.phoneNumber}`, 15, driverInfoY + 8);
    */ /* doc.text(`Email: ${data.renterInfo.email}`, 15, driverInfoY + 16); */
@@ -284,7 +284,7 @@ const createReportPDF = async (
   const damageDescriptionMaxWidth = 90; // Adjust as needed
   const damageDescriptionMaxLines = 15; // Adjust as needed
   const damageDescriptionLines = doc.splitTextToSize(
-    data.damageDescription || "No damage description has been provided",
+    data.damageDescription || "",
     damageDescriptionMaxWidth
   );
   const numDamageDescriptionLines = Math.min(
@@ -302,7 +302,7 @@ const createReportPDF = async (
     10,
     damageInfoBoxTopY,
     190,
-    damageInfoBoxHeight,
+    45,
     5, // Corner radius
     5, // Corner radius
     "F" // "F" fills the rectangle
@@ -324,21 +324,6 @@ const createReportPDF = async (
   // Speed
   doc.text("Speed:", accidentInfoLeftX, 45); // Adjust Y-coordinate as needed
   doc.text(`${data.speed || "-"} km/h`, accidentInfoRightX, 45); // Adjust Y-coordinate as needed
-
-  // Damage description
-  const damageDescriptionTopY = 32; // Adjust Y-coordinate as needed
-  doc.text(
-    "Damage description:",
-    accidentInfoLeftX,
-    damageDescriptionTopY + 21
-  );
-  for (let i = 0; i < numDamageDescriptionLines; i++) {
-    doc.text(
-      damageDescriptionLines[i],
-      accidentInfoLeftX + 85,
-      damageDescriptionTopY + 21 + i * damageLineHeight
-    );
-  }
 
   //Others involved
 

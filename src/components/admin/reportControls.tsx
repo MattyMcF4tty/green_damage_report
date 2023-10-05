@@ -65,7 +65,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
         {" Delete"}
       </button>
       <button
-        className="bg-white text-black w-32 rounded-xl border-[1px]  border-gray-300 hover:bg-MainGreen-300 hover:text-white duration-150"
+        className="bg-white text-black w-32 rounded-xl border-[1px]  border-gray-300 hover:bg-MainGreen-300 hover:text-white duration-150 md:h-[4rem]"
         onClick={() => {
           if (selectedReports.length > 0) {
             handleEmail(selectedReports);
@@ -82,7 +82,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
             handleInstallPDF(selectedReports);
           }
         }}
-        className="bg-white text-black px-4 py-2 rounded-xl border-[1px]  border-gray-300 hover:bg-MainGreen-300 hover:text-white duration-150"
+        className="bg-white text-black px-4 py-2 rounded-xl border-[1px]  border-gray-300 hover:bg-MainGreen-300 hover:text-white duration-150 md:h-[4rem] md:w-[9rem]"
       >
         <FontAwesomeIcon icon={faCloudArrowDown} className="mr-2" />
         Download PDF
@@ -90,7 +90,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
 
       <button
         type="button"
-        className="bg-white border-gray-300 border-[1px] rounded-xl w-32 hover:bg-MainGreen-300 hover:text-white duration-150"
+        className="bg-white border-gray-300 border-[1px] rounded-xl w-32 hover:bg-MainGreen-300 hover:text-white duration-150 md:h-[4rem] md:w-[7rem]"
         onClick={() => {
           if (selectedReports.length > 0) {
             setShowExpandedReports(true);

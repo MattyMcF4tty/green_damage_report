@@ -25,6 +25,7 @@ import jsPDF from "jspdf";
 import { getReportDoc } from "./firebaseUtils/firestoreUtils";
 import { getReportFile, getReportFolder } from "./firebaseUtils/storageUtils";
 import { handleGetBase64FileFromStorage } from "./firebaseUtils/apiRoutes";
+import { handleGetReport } from "./damageReportUtils.ts/apiRoutes";
 
 /* ------- utils config ----- */
 const firebaseCollectionName = collectionName;
@@ -424,7 +425,7 @@ export const handleGeneratePdf = async (id: string) => {
     console.log(map);
 
     try {
-      data.updateFields(await getReportDoc(id, false));
+      data.updateFields(await handleGetReport(id));
     } catch (error) {
       console.error("Error getting data");
     }
