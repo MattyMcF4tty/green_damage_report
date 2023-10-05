@@ -63,4 +63,18 @@ export const handleGetReport = async(reportId:string) => {
         },
         body: JSON.stringify(data)
     })
+
+    const responseJson = await response.json();
+    if (!response.ok) {
+        let newError = new Error;
+        newError.name = responseJson.status;
+        newError.message = responseJson.errors[0];
+        throw newError;
+    }
+
+    const reportData = new reportDataType();
+    reportData.updateFields(responseJson.data)
+
+
+    return reportData;
 }
