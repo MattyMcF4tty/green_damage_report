@@ -15,9 +15,9 @@ import {
   handleGetRenter,
   handleUpdateReport,
   pageProps,
-  reportDataType,
 } from "@/utils/utils";
 import PhoneNumber from "@/components/opposite_information/phone_form";
+import { reportDataType } from "@/utils/schemas/damageReportSchemas";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext

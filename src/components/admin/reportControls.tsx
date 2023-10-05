@@ -1,8 +1,4 @@
 import {
-  handleDownloadPdf,
-  reportDataType,
-  handleSendEmail,
-  handleGetRenter,
   handleGeneratePdf,
 } from "@/utils/utils";
 import {
@@ -15,6 +11,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ExpandedReport from "./expandedReport";
 import { deleteReports } from "@/firebase/clientApp";
+import { reportDataType } from "@/utils/schemas/damageReportSchemas";
 
 interface ReportControls {
   selectedReports: { id: string; data: reportDataType }[];

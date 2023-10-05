@@ -1,7 +1,8 @@
-import { dateToWunder, reportDataType, reportSearch } from "@/utils/utils";
+import { dateToWunder, reportSearch } from "@/utils/utils";
 import { useEffect, useState } from "react";
 import Loading from "../loading";
 import { handleGetAllReports } from "@/utils/damageReportUtils.ts/apiRoutes";
+import { reportDataType } from "@/utils/schemas/damageReportSchemas";
 
 interface reportListProps {
   status: "all" | "finished" | "unfinished";

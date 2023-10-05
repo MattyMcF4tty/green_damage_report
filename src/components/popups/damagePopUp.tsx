@@ -1,10 +1,5 @@
-import { useEffect, useState } from "react";
-import { ImageField, SingleImagefield, TextField } from "../custom_inputfields";
-import { handleDownloadImages } from "@/utils/utils";
-import { updateImages } from "@/firebase/clientApp";
-import { url } from "inspector";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { FireStorage } from "@/firebase/firebaseConfig";
+import { useState } from "react";
+import { SingleImagefield, TextField } from "../custom_inputfields";
 
 interface DamagePopUpProps {
   reportId: string;

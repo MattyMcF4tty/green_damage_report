@@ -1,8 +1,6 @@
 import { getFirestoreCollection } from "@/utils/firebaseUtils/firestoreUtils";
 import { apiResponse } from "@/utils/types";
-import { reportDataType } from "@/utils/utils";
-import { collection, getDocs } from "firebase/firestore";
-import { ListResult, listAll } from "firebase/storage";
+import { reportDataType } from "@/utils/schemas/damageReportSchemas";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function (req:NextApiRequest, res:NextApiResponse) {

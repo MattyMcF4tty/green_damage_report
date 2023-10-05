@@ -1,17 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
 import BackButton from "@/components/buttons/back";
-import { updateData } from "@/firebase/clientApp";
 import {
   getServerSidePropsWithRedirect,
   handleSendEmail,
   handleUpdateReport,
   pageProps,
-  reportDataType,
 } from "@/utils/utils";
-import { getDownloadURL, ref } from "firebase/storage";
-import { FireStorage } from "@/firebase/firebaseConfig";
+import { reportDataType } from "@/utils/schemas/damageReportSchemas";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBicycle,
@@ -19,7 +16,6 @@ import {
   faCar,
   faPerson,
 } from "@fortawesome/free-solid-svg-icons";
-import { getReportFile } from "@/utils/firebaseUtils/storageUtils";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -31,23 +27,7 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
   const Router = useRouter();
   const serverData = new reportDataType();
   serverData.updateFields(data);
-  const [map, setMap] = useState<string | null>();
   const [allowClick, setAllowClick] = useState(true);
-
-/*   useEffect(() => {
-    const getMap = async () => {
-      let serverMap: string | null = null;
-      try {
-        serverMap = await getReportFile(id, 'Admin/map');
-      } catch (error) {
-        console.error("No map");
-      }
-      if (serverMap) {
-        setMap(serverMap);
-      }
-    };
-    getMap();
-  }, []); */
 
   let [confirmVis, setConfirmVis] = useState(false);
 

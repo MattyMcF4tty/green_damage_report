@@ -5,10 +5,8 @@ import {
   getDoc,
   getDocs,
   getFirestore,
-  query,
   setDoc,
   updateDoc,
-  where,
 } from "firebase/firestore";
 import {
   ListResult,
@@ -20,7 +18,7 @@ import {
   ref,
   uploadBytes,
 } from "firebase/storage";
-import { decryptData, encryptData, reportDataType } from "@/utils/utils";
+import { reportDataType } from "@/utils/schemas/damageReportSchemas";
 import app from "./firebaseConfig";
 
 const db = getFirestore(app);

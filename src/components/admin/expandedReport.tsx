@@ -1,9 +1,8 @@
-import { reportDataType } from "@/utils/utils";
+import { reportDataType } from "@/utils/schemas/damageReportSchemas";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
 import { getImages } from "@/firebase/clientApp";
-import Loading from "../loading";
 import ImageCarousel from "./imageCarousel";
 
 interface ExpandedReportProps {

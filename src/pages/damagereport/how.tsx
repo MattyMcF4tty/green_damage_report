@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   TextField,
   Inputfield,
-  ImageField,
   YesNo,
 } from "@/components/custom_inputfields";
 import NextButton from "@/components/buttons/next";
@@ -13,10 +12,9 @@ import {
   getServerSidePropsWithRedirect,
   handleUpdateReport,
   pageProps,
-  reportDataType,
 } from "@/utils/utils";
-import { updateData } from "@/firebase/clientApp";
 import WitnessList from "@/components/otherPartys/witnessList";
+import { reportDataType } from "@/utils/schemas/damageReportSchemas";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext

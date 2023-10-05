@@ -1,9 +1,7 @@
 import jsPDF from "jspdf";
-import { reportDataType } from "@/utils/utils";
-import axios from "axios";
-import sharp from "sharp";
 import EXIF from "exif-js";
 import { handleGetBase64FileFromStorage } from "./firebaseUtils/apiRoutes";
+import { reportDataType } from "./schemas/damageReportSchemas";
 
 const addImageToPDF = (pdfDoc: jsPDF) => {
   const imageWidth = 80;

@@ -1,9 +1,7 @@
 import { Inputfield } from "@/components/custom_inputfields";
-import { generateId, getReportsByEmail } from "@/utils/utils";
+import { getReportsByEmail } from "@/utils/utils";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRightLong } from "@fortawesome/free-solid-svg-icons";
 import EmailPopUp from "@/components/popups/emailPopUp";
 import { handleCreateNewReport } from "@/utils/firebaseUtils/apiRoutes";
 

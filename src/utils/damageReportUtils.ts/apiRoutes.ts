@@ -1,5 +1,5 @@
 import { DocumentData, QueryDocumentSnapshot, QuerySnapshot } from "firebase/firestore";
-import { reportDataType } from "../utils";
+import { reportDataType } from "../schemas/damageReportSchemas";
 
 export const handleGetAllReports = async () => {
 
@@ -27,12 +27,12 @@ export const handleGetAllReports = async () => {
 
     const responseData = responseJson.data;
 
-    const reportList = responseData.reports.map((reportsData:any) => {
+    const reportList = responseData.reports.map((report:any) => {
         const reportData = new reportDataType();
-        reportData.updateFields(reportsData.data)
+        reportData.updateFields(report.data)
 
         return {
-            id: reportsData.id as string,
+            id: report.id as string,
             data: reportData
         }
     })
@@ -77,4 +77,8 @@ export const handleGetReport = async(reportId:string) => {
 
 
     return reportData;
+}
+
+export const handleDeleteReport = async (id:string) => {
+
 }

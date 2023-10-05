@@ -1,9 +1,7 @@
-import { FireDatabase } from "@/firebase/firebaseConfig";
 import { updateReportDoc } from "@/utils/firebaseUtils/firestoreUtils";
 import { apiResponse } from "@/utils/types";
-import { encryptData, reportDataType } from "@/utils/utils";
-import { doc, updateDoc } from "firebase/firestore";
 import { NextApiRequest, NextApiResponse } from "next";
+import { reportDataType } from "@/utils/schemas/damageReportSchemas";
 
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {

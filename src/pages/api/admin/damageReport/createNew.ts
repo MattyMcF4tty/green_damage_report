@@ -2,9 +2,10 @@ import admin from "@/firebase/firebaseAdminConfig";
 import { FireDatabase } from "@/firebase/firebaseConfig";
 import { getCustomerFromCustomerId, getReservationFromReservationId } from "@/utils/serverUtils";
 import { apiResponse } from "@/utils/types";
-import { generateId, getAge, reportDataType, wunderToDate, wunderToGender } from "@/utils/utils";
+import { generateId, getAge, wunderToDate, wunderToGender } from "@/utils/utils";
 import { doc, setDoc } from "firebase/firestore";
 import { NextApiRequest, NextApiResponse } from "next";
+import { reportDataType } from "@/utils/schemas/damageReportSchemas";
 
 export default async function (req:NextApiRequest, res:NextApiResponse) {
     const method = req.method;

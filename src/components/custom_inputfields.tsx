@@ -483,80 +483,7 @@ export const TextField = ({
   );
 };
 
-/* ----- ImageField ---------------------------------------------------- */
-interface ImageFieldProps {
-  reportID: string;
-  id: string;
-  required: boolean;
-  labelText: string;
-  images: string[] | null;
-  imageType: "GreenMobility" | "OtherParty" | "Damage";
-  multiple: boolean;
-}
-
-export const ImageField = ({
-  reportID,
-  images,
-  required,
-  id,
-  labelText,
-  imageType,
-  multiple,
-}: ImageFieldProps) => {
-  const [isRequired, setIsRequired] = useState<boolean>(required);
-  const [isError, setIsError] = useState<boolean>(false);
-  const [imagesUploaded, setImagesUploaded] = useState(required);
-
-  useEffect(() => {
-    if (images === null) setIsRequired(images === null);
-  }, [images]);
-
-  const handleChange = async (newImages: FileList | null) => {
-    setImagesUploaded(true);
-    await updateImages(reportID, newImages, imageType);
-    setImagesUploaded(false);
-  };
-
-  return (
-    <div className="flex flex-col mb-4">
-      <label className="" htmlFor={id}>
-        {labelText}
-      </label>
-      <input
-        type="text"
-        required={imagesUploaded}
-        className="w-0 h-0 opacity-0"
-      />
-      <input
-        className="cursor-pointer"
-        id={id}
-        type="file"
-        accept="image/png, image/jpeg"
-        required={isRequired}
-        onChange={(e) => {
-          handleChange(e.target.files);
-          setIsError(false);
-        }}
-        onInvalid={() => setIsError(true)}
-        multiple={multiple}
-      />
-      <div className="flex flex-wrap gap-[2px] mt-1">
-        {images &&
-          images.map((image, index) => (
-            <img key={index} src={image} alt={image} className="w-20" />
-          ))}
-      </div>
-      {isError && (
-        <p className="text-sm text-red-500">
-          Please choose one or more pictures
-        </p>
-      )}
-    </div>
-  );
-};
-
 // ----------------------- MULTIPLE IMAGES FIELD --------------------------------------------------
-
 interface multipleImageFieldProps {
   id: string;
   reportId: string;
@@ -580,7 +507,7 @@ export const MultipleImageField = ({id, reportId, imageLimit, labelText, require
 
     // Check if files is empty
     if (!e.target.files) {
-      setDisabled(true);
+      setDisabled(false);
       return;
     }
 
@@ -746,7 +673,7 @@ export const SingleImagefield = ({id, reportId, labelText, required, filePath, s
 
     // Check if files is empty
     if (!e.target.files) {
-      setDisabled(true);
+      setDisabled(false);
       return;
     }
 

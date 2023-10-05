@@ -1,10 +1,9 @@
 import { FireDatabase } from "@/firebase/firebaseConfig";
 import { decryptReport } from "@/utils/securityUtils";
 import { apiResponse } from "@/utils/types";
-import { decryptData, reportDataType } from "@/utils/utils";
 import { doc, getDoc } from "firebase/firestore";
 import { NextApiRequest, NextApiResponse } from "next";
-
+import { reportDataType } from "@/utils/schemas/damageReportSchemas";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
 

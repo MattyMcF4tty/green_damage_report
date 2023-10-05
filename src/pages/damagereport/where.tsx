@@ -1,9 +1,7 @@
 import React, { use, useEffect, useState } from "react";
 import { PedestrianInformation } from "../../components/opposite_information/person_information_form";
 import {
-  ImageField,
   MultipleImageField,
-  SingleImagefield,
   TextField,
   YesNo,
 } from "../../components/custom_inputfields";
@@ -12,24 +10,22 @@ import { bikeInformation } from "../../components/opposite_information/bike_info
 import { OtherInformation } from "../../components/opposite_information/other_information_form";
 import BackButton from "@/components/buttons/back";
 import NextButton from "@/components/buttons/next";
-import { handleUploadMap, updateData } from "@/firebase/clientApp";
 import { GetServerSidePropsContext, NextPage } from "next";
 import {
   getServerSidePropsWithRedirect,
   handleUpdateReport,
   pageProps,
-  reportDataType,
 } from "@/utils/utils";
 import { OtherPartyList } from "@/components/otherPartys/otherPartyList";
 import { useRouter } from "next/router";
 import html2canvas from "html2canvas";
 import ZoeDrawing from "@/components/carDrawings/zoe";
-import KangooDrawing from "@/components/carDrawings/kangoo";
 import VanDrawing from "@/components/carDrawings/kangoo";
-import DamagePopUp from "@/components/popups/damagePopUp";
 import Google from "@/components/google";
 import DamageList from "@/components/carDrawings/damageList";
 import { uploadReportFile } from "@/utils/firebaseUtils/storageUtils";
+import { reportDataType } from "@/utils/schemas/damageReportSchemas";
+
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext

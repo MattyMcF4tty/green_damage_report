@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { GetServerSidePropsContext, NextPage } from "next";
-import { handleVerifyUser, reportDataType } from "@/utils/utils";
+import { handleVerifyUser } from "@/utils/utils";
 import ReportList from "@/components/admin/reportList";
 import ReportControls from "@/components/admin/reportControls";
+import { reportDataType } from "@/utils/schemas/damageReportSchemas";
 
 export const getServerSideProps = async (context: GetServerSidePropsContext) => {
   const token = context.req.cookies["AuthToken"]

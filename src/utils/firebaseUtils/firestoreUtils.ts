@@ -10,13 +10,11 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import {
-  decryptData,
   generateId,
   isJSONSerializable,
-  reportDataType,
 } from "../utils";
 import { decryptReport, encryptReport } from "../securityUtils";
-import { listAll } from "firebase/storage";
+import { reportDataType } from "../schemas/damageReportSchemas";
 
 export const updateFirestoreDoc = async (path: string, data: {}) => {
   // We check if Firestore is initialized.

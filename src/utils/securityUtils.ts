@@ -1,6 +1,5 @@
-import { WitnessInformation } from "@/components/otherPartys/witnessList";
-import { reportDataType } from "./utils";
 import * as CryptoJS from 'crypto-js';
+import { reportDataType } from "./schemas/damageReportSchemas";
 
 // ENCRYPTION
 export const encryptText = (text: string, key:string) => {
