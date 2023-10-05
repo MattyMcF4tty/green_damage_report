@@ -11,7 +11,7 @@ export const handleCreateNewReport = async (email: string) => {
       throw new Error("NEXT_PUBLIC_URL is not defined in enviroment")
     } 
   
-    const response = await fetch(process.env.NEXT_PUBLIC_URL + "/api/damageReport/createNew", {
+    const response = await fetch(process.env.NEXT_PUBLIC_URL + "/api/damageReport/createReport", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
