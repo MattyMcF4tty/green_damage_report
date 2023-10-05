@@ -5,20 +5,22 @@ import ReportList from "@/components/admin/reportList";
 import ReportControls from "@/components/admin/reportControls";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 
-export const getServerSideProps = async (context: GetServerSidePropsContext) => {
-  const token = context.req.cookies["AuthToken"]
+export const getServerSideProps = async (
+  context: GetServerSidePropsContext
+) => {
+  const token = context.req.cookies["AuthToken"];
   const userVerified = await handleVerifyUser(token);
 
   if (!userVerified) {
     return {
       redirect: {
-        destination: '/auth/signIn',
+        destination: "/auth/signIn",
         permanent: false,
       },
     };
   }
 
-  return {props: {}}
+  return { props: {} };
 };
 
 const adminPage: NextPage = () => {

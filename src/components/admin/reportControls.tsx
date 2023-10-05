@@ -12,6 +12,7 @@ import { useState } from "react";
 import ExpandedReport from "./expandedReport";
 import { deleteReports } from "@/firebase/clientApp";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
+import SendMailPopUp from "../popups/sendMailPopUp";
 
 interface ReportControls {
   selectedReports: { id: string; data: CustomerDamageReport }[];
@@ -22,7 +23,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
     useState<boolean>(false);
 
   const [allowPdf, setAllowPdf] = useState(true);
-
+  const [sendMail, setSendMail] = useState(false);
   const handleEmail = async (
     selectedReports: { id: string; data: CustomerDamageReport }[]
   ) => {
@@ -65,12 +66,12 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
         className="bg-white text-black w-32 rounded-xl border-[1px]  border-gray-300 hover:bg-MainGreen-300 hover:text-white duration-150 md:h-[4rem]"
         onClick={() => {
           if (selectedReports.length > 0) {
-            handleEmail(selectedReports);
+            setSendMail(true);
           }
         }}
       >
         <FontAwesomeIcon icon={faEnvelope} className="mr-2" />
-        WUNDER TEST
+        Send mail
       </button>
       <button
         disabled={!allowPdf}
@@ -79,7 +80,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
             handleInstallPDF(selectedReports);
           }
         }}
-        className="bg-white text-black px-4 py-2 rounded-xl border-[1px]  border-gray-300 hover:bg-MainGreen-300 hover:text-white duration-150 md:h-[4rem] md:w-[9rem]"
+        className="bg-white text-black px-4 py-2 rounded-xl border-[1px]  border-gray-300 hover:bg-MainGreen-300 hover:text-white duration-150 md:h-[4rem] md:w-[11rem]"
       >
         <FontAwesomeIcon icon={faCloudArrowDown} className="mr-2" />
         Download PDF
@@ -102,6 +103,13 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
         <ExpandedReport
           setVisible={setShowExpandedReports}
           reports={selectedReports}
+        />
+      )}
+
+      {sendMail && (
+        <SendMailPopUp
+          setVisibility={setSendMail}
+          damageReport={selectedReports[0].data}
         />
       )}
     </div>

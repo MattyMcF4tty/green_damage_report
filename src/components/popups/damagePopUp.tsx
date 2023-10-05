@@ -56,7 +56,7 @@ const DamagePopUp = ({
 
   return (
     <div className="fixed flex justify-center items-center z-50 inset-0 bg-black bg-opacity-75 overflow-y-auto">
-      <div className="absolute flex flex-col justify-center bg-white p-4 rounded-lg">
+      <div className="absolute flex flex-col justify-center md:w-[32rem] bg-white p-4 rounded-lg">
         <div className="flex flex-row border-b-[1px] border-gray-300 mb-4 justify-center">
           <button
             onClick={() => handleClosePopUp()}
@@ -68,33 +68,31 @@ const DamagePopUp = ({
           <h1 className="">New damage description</h1>
         </div>
 
-        <div className="md:w-[32rem] md:h-[8rem] md:mt-6">
-          <TextField
-            id="damageDescription"
-            labelText="Please describe the damages to this position"
-            maxLength={500}
-            required={true}
-            value={damageDescription}
-            onChange={setDamageDescription}
-          />
-        </div>
-          <div>
-            <SingleImagefield 
+        <TextField
+          id="damageDescription"
+          labelText="Please describe the damages to this position"
+          maxLength={500}
+          required={true}
+          value={damageDescription}
+          onChange={setDamageDescription}
+        />
+        <div>
+          <SingleImagefield
             reportId={reportId}
             id={"DamageImage"}
             labelText="Please take picture of damage"
             required={false}
             filePath={`GreenDamage/${position}`}
             setImage={(image) => {
-              setImages([image])
+              setImages([image]);
             }}
-            />
-          </div>
+          />
+        </div>
         <button
           type="button"
           disabled={!allowSave}
           onClick={() => handleNewDamageList()}
-          className="bg-MainGreen-300 text-white mt-4 p-2 disabled:bg-MainGreen-200"
+          className="bg-MainGreen-300 text-white mt-4 rounded-md p-2 disabled:bg-MainGreen-200"
         >
           Save
         </button>
