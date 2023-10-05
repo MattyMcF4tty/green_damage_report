@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DamagePopUp from "../popups/damagePopUp";
-import ZoeDrawing from "./zoe";
-import { deleteReportFile, deleteStorageFile } from "@/utils/firebaseUtils/storageUtils";
+import { deleteReportFile } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
+
 interface damageListProps {
   reportId: string;
   damages: {

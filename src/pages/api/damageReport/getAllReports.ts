@@ -1,4 +1,4 @@
-import { getFirestoreCollection } from "@/utils/firebaseUtils/firestoreUtils";
+import { getFirestoreCollection } from "@/utils/logic/firebaseLogic/firestore";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { NextApiRequest, NextApiResponse } from "next";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";

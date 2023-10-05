@@ -3,7 +3,7 @@ import { getReportsByEmail } from "@/utils/utils";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import EmailPopUp from "@/components/popups/emailPopUp";
-import { handleCreateNewReport } from "@/utils/firebaseUtils/apiRoutes";
+import { handleCreateNewReport } from "@/utils/logic/firebaseLogic/apiRoutes";
 
 const IndexPage = () => {
   const router = useRouter();

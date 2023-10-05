@@ -1,4 +1,4 @@
-import { CustomerDamageReport } from "../schemas/damageReportSchemas/customerReportSchema";
+import { CustomerDamageReport } from "../../schemas/damageReportSchemas/customerReportSchema";
 
 export const handleGetAllReports = async () => {
 

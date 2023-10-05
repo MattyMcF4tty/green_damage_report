@@ -1,4 +1,4 @@
-import { createReportDoc } from "@/utils/firebaseUtils/firestoreUtils";
+import { createDamageReport } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -34,7 +34,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
 
     let reportId: string;
     try {
-        reportId = await createReportDoc(email);
+        reportId = await createDamageReport(email);
     } catch (error:any) {
         return res.status(500).json(new ApiResponse(
             error.name,

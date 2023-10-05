@@ -1,8 +1,7 @@
 import { WitnessInformation } from "@/components/otherPartys/witnessList";
 import {
   collectionName,
-  getReportIds,
-  } from "@/firebase/clientApp";
+} from "@/firebase/clientApp";
 import CryptoJS from "crypto-js";
 import { GetServerSidePropsContext } from "next";
 import axios from "axios";
@@ -15,29 +14,20 @@ import {
   where,
 } from "firebase/firestore";
 import createReportPDF from "./reportPdfTemplate";
-import { getReportDoc } from "./firebaseUtils/firestoreUtils";
-import { getReportFile, getReportFolder } from "./firebaseUtils/storageUtils";
-import { handleGetBase64FileFromStorage } from "./firebaseUtils/apiRoutes";
-import { handleGetReport } from "./damageReportUtils.ts/apiRoutes";
+import { handleGetBase64FileFromStorage } from "./logic/firebaseLogic/apiRoutes";
 import { CustomerDamageReport } from "./schemas/damageReportSchemas/customerReportSchema";
+import { getDamageReport, getDamageReportIds, getReportFile, getReportFolder } from "./logic/damageReportLogic.ts/damageReportHandling";
 
 /* ------- utils config ----- */
 const firebaseCollectionName = collectionName;
 
 export const generateId = async () => {
-  let dataList: string[];
-  try {
-    dataList = await getReportIds();
-  } catch (error: any) {
-    throw new Error(error.message);
-  }
+  const dataList = await getDamageReportIds();
 
-  let id: string | null = null;
-
-  const chars =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
   /* Generates random id from chars and checks if this id is not already taken */
+  let id: string | null = null;
   while (!id) {
     const newId = Array.from(crypto.getRandomValues(new Uint16Array(16)))
       .map((randomValue) => chars[randomValue % chars.length])
@@ -118,7 +108,7 @@ export const getServerSidePropsWithRedirect = async (
 ) => {
   const id = context.query.id as string;
 
-  const reportData = await getReportDoc(id, false);
+  const reportData = await getDamageReport(id, false);
   console.log(reportData);
   const GreenMobilityImages: string[] = [];
 
@@ -424,7 +414,7 @@ export const handleGeneratePdf = async (id: string) => {
     console.log(map);
 
     try {
-      data.updateFields(await handleGetReport(id));
+      data.updateFields(await handleGetReportData(id));
     } catch (error) {
       console.error("Error getting data");
     }

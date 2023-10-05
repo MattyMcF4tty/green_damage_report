@@ -1,4 +1,4 @@
-import { blobToBase64 } from "../utils";
+import { blobToBase64 } from "../../utils";
 
 export const handleCreateNewReport = async (email: string) => {
   const data = {

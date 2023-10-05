@@ -1,7 +1,7 @@
-import { updateReportDoc } from "@/utils/firebaseUtils/firestoreUtils";
 import { NextApiRequest, NextApiResponse } from "next";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
+import { updateReportDoc } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
 

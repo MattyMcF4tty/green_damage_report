@@ -1,5 +1,5 @@
 import { createDoc } from "@/firebase/clientApp";
-import { handleCreateNewReport } from "@/utils/firebaseUtils/apiRoutes";
+import { handleCreateNewReport } from "@/utils/logic/firebaseLogic/apiRoutes";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 

@@ -1,7 +1,7 @@
 import { dateToWunder, reportSearch } from "@/utils/utils";
 import { useEffect, useState } from "react";
 import Loading from "../loading";
-import { handleGetAllReports } from "@/utils/damageReportUtils.ts/apiRoutes";
+import { handleGetAllReports } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 
 interface reportListProps {

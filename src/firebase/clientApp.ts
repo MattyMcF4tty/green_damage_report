@@ -161,29 +161,6 @@ export const getImages = async (id: string) => {
 };
 
 
-export const getReportIds = async () => {
-  const reportColRef = collection(db, `${collectionName}/`);
-  const idList: string[] = [];
-
-  try {
-    const querySnapshot = await getDocs(reportColRef);
-
-    if (querySnapshot.docs.length > 0) {
-      for (const doc of querySnapshot.docs) {
-        const id = doc.id;
-        idList.push(id);
-      }
-    } else {
-      throw Error(`No documents exist in path ${reportColRef.path}`);
-    }
-  } catch (error) {
-    console.error(`Something went wrong fetching document ids:\n${error}\n`);
-  }
-
-  return idList;
-};
-
-
 export const deleteReports = async (reportsToDelete: string[]) => {
   if (reportsToDelete.length === 0) {
     throw Error("No reports to delete");

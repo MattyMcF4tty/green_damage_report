@@ -19,12 +19,12 @@ import ZoeDrawing from "@/components/carDrawings/zoe";
 import VanDrawing from "@/components/carDrawings/kangoo";
 import Google from "@/components/google";
 import DamageList from "@/components/carDrawings/damageList";
-import { uploadReportFile } from "@/utils/firebaseUtils/storageUtils";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { Vehicle } from "@/utils/schemas/accidentParticipantSchemas/vehicleSchema";
 import { Biker } from "@/utils/schemas/accidentParticipantSchemas/bikerSchema";
 import { Pedestrian } from "@/utils/schemas/accidentParticipantSchemas/pedestrianSchema";
 import { IncidentObject } from "@/utils/schemas/accidentParticipantSchemas/incidentObjectSchema";
+import { uploadReportFile } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
 
 
 export const getServerSideProps = async (

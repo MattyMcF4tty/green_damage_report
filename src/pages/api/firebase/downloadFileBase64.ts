@@ -1,4 +1,4 @@
-import { getStorageDownloadUrl } from "@/utils/firebaseUtils/storageUtils";
+import { getStorageDownloadUrl } from "@/utils/logic/firebaseLogic/storage";
 import { urlToBase64 } from "@/utils/utils";
 import { NextApiRequest, NextApiResponse } from "next";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
