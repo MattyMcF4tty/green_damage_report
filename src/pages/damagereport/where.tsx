@@ -296,7 +296,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
       )}
 
       <div className="">
-        Please chose the type of the GreenMobility vehicle and indicate the
+        Please choose the type of the GreenMobility vehicle and indicate the
         position of the damages that occurred
         <div className="">
           <select
