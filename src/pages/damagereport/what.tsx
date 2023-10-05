@@ -39,9 +39,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
   const [drivingLicenseNumber, setDrivingLicenseNumber] = useState(
     serverData.driverInfo.drivingLicenseNumber
   );
-  const [validDriversLicense, setValidDriversLicense] = useState<
-    null | boolean
-  >(null);
+  const [validDriversLicense, setValidDriversLicense] = useState(serverData.driverInfo.validDriversLicense);
   const [phoneNumber, setPhoneNumber] = useState(
     serverData.driverInfo.phoneNumber
   );
@@ -125,6 +123,10 @@ const What: NextPage<pageProps> = ({ data, id }) => {
 
     router.push(`how?id=${id}`);
   };
+
+  useEffect(() => {
+    console.log(validDriversLicense)
+  }, [validDriversLicense])
 
   return (
     <form

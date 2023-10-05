@@ -4,9 +4,10 @@ import * as CryptoJS from 'crypto-js';
 
 // ENCRYPTION
 export const encryptText = (text: string, key:string) => {
+    const encryptedText = CryptoJS.AES.encrypt(text , key)
+    console.log(encryptedText)
 
-    console.log(CryptoJS.AES.encrypt(JSON.stringify({text}), key).toString())
-    return CryptoJS.AES.encrypt(JSON.stringify({text}), key).toString()
+    return encryptedText.toString();
 }
 
 export const lowEncryptText = (text: string) => {
