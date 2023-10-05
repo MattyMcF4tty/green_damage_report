@@ -91,12 +91,19 @@ const createReportPDF = async (
       ? `${data.renterInfo.firstName} ${data.renterInfo.lastName}`
       : "-";
 
+  const renterMail = data.renterInfo.email ? `${data.renterInfo.email}` : "-";
+  const renterBirthday = data.renterInfo.birthDate
+    ? `${data.renterInfo.birthDate}`
+    : "-";
   doc.text(`Name: ${renterFullName}`, 15, driverInfoY);
   if (driverRenter !== true) {
     doc.text("Driver and renter is not the same", 15, driverInfoY - 8);
   } else {
     doc.text("Driver and renter is  the same", 15, driverInfoY - 8);
   }
+  doc.text(`Email: ${renterMail}`, 120, driverInfoY - 8);
+  doc.text(`Birthday: ${renterBirthday}`, 120, driverInfoY);
+
   /*   doc.text(`Phone number: ${data.renterInfo.phoneNumber}`, 15, driverInfoY + 8);
    */ /* doc.text(`Email: ${data.renterInfo.email}`, 15, driverInfoY + 16); */
   const addDriverInfoToPDF = (
@@ -229,7 +236,7 @@ const createReportPDF = async (
 
   // Police journal number
   let policeReportText = "No police report filed";
-
+  console.log("IUH  IUHIUHIUHIUHIUHIUHIUHIUHIUHIUHIUHIUHIUHUI", data);
   // Check if police report is filed
   if (data.policeReportExist) {
     // If yes, check whether a report number has been provided
