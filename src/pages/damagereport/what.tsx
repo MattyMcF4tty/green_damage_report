@@ -63,7 +63,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
   useEffect(() => {
     setInvalidNumberplate(false);
   }, [greenCarNumberplate]);
-
+  console.log("gugug", serverData.userEmail);
   useEffect(() => {
     setInvalidTime(false);
   }, [greenCarNumberplate, accidentTime, accidentDate]);

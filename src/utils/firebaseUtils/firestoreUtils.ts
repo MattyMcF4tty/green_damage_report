@@ -184,6 +184,7 @@ export const getReportDoc = async (reportId: string, authorized: boolean) => {
 
   // We convert it to our report format
   let reportData = new reportDataType();
+
   try {
     reportData.updateFields(documentData);
   } catch (error: any) {

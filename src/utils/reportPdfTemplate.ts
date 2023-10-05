@@ -1171,23 +1171,22 @@ const createReportPDF = async (
       }
       // Calculate the height of the green box based on the description length
       const damagePositionInfoBoxHeight = damagePositionDescriptionHeight + 50; // Additional space for other data
-
       // Green box for the damage entry
       doc.setFillColor("#E6EEE5");
       doc.roundedRect(
         10,
-        currentY, // Use currentY instead of the fixed value
+        currentY - damagePositionDescriptionHeight, // Adjusted to start above
         190,
-        damagePositionInfoBoxHeight,
+        damagePositionInfoBoxHeight + 55,
         5, // Corner radius
         5, // Corner radius
         "F"
       );
-
+      const position = damage.position;
       // Damage information header
       doc.setFont("bold");
       doc.text(
-        "Damage position for GreenMobility car information",
+        `Damage to ${position?.toLowerCase()} of GreenMobility car`,
         15,
         currentY + 10
       ); // Use currentY
@@ -1196,30 +1195,27 @@ const createReportPDF = async (
 
       doc.setFont("normal");
 
-      // Position
-      doc.text("Position:", 15, currentY + 22); // Use currentY
-      doc.text(damage.position || "-", 85, currentY + 22); // Use currentY
-
       // Damage description
-      doc.text("Damage description:", 15, currentY + 30); // Use currentY
+      doc.text("Damage description:", 15, currentY + 22); // Use currentY
       for (let i = 0; i < numDamagePositionDescriptionLines; i++) {
         doc.text(
           damagePositionDescriptionLines[i],
           85, // Starting at the left edge
-          currentY + 30 + i * damagePositionLineHeight // Use currentY
+          currentY + 22 + i * damagePositionLineHeight // Use currentY
         );
       }
 
       // Images
-      doc.text("Images:", 15, currentY + 38);
+      doc.text("Images:", 15, currentY + 30);
 
       const imageUrl = damage.images[0];
       const imageBase64 = await handleGetBase64FileFromStorage(imageUrl);
       currentY += 40; // Update as per actual space needed
       const imageHeight = 55; // Example height
 
+      const correctedImageBase64 = await getCorrectlyOrientedImage(imageBase64);
       doc.addImage(
-        imageBase64,
+        correctedImageBase64,
         "png",
         15,
         currentY,
