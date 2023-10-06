@@ -4,6 +4,10 @@ import { getEnvVariable } from '../logic/misc';
 
 // ENCRYPTION
 export const encryptText = (text: string) => {
+  if (text.length <= 0) {
+    return text;  
+  }
+
   const key = getEnvVariable('ENCRYPTION_KEY')
   const encryptedText = CryptoJS.AES.encrypt(text, key);
 
@@ -13,6 +17,10 @@ export const encryptText = (text: string) => {
 
 // DECRYPTION
 export const decryptText = (text: string) => {
+  if (text.length <= 0) {
+    return text;  
+  }
+
   const key = getEnvVariable('ENCRYPTION_KEY')
   const decryptedText = CryptoJS.AES.decrypt(text, key);
 

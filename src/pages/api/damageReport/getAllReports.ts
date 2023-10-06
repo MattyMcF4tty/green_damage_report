@@ -15,7 +15,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         ))
     }
 
-    const reportCol = process.env.DAMAGE_REPORT_FIRESTORE_COLLECTION;
+    const reportCol = process.env.NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION;
     if (!reportCol) {
         console.error('DAMAGE_REPORT_FIRESTORE_COLLECTION is not defined in enviroment')
         return res.status(500).json(new ApiResponse(

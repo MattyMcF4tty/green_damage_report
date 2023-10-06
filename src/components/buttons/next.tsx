@@ -3,20 +3,22 @@ import { faArrowRightLong, faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { useState, useEffect } from "react";
 
 interface NextButtonProps {
-  allowClick: boolean;
+  disabled: boolean;
 }
 
-const NextButton = ({ allowClick }: NextButtonProps) => {
-  const [loading, setLoading] = useState(!allowClick);
+const NextButton = ({ disabled }: NextButtonProps) => {
+  const [loading, setLoading] = useState(disabled);
 
   useEffect(() => {
-    setLoading(!allowClick);
-  }, [allowClick]);
+    setLoading(disabled);
+  }, [disabled]);
+
+
   return (
     <button
-      disabled={!allowClick}
+      disabled={disabled}
       type="submit"
-      className="text-white w-full bg-MainGreen-300 h-full rounded-full flex justify-center items-center"
+      className="text-white w-full bg-MainGreen-300 disabled:bg-MainGreen-200 h-full rounded-full flex justify-center items-center"
     >
       {!loading ? (
         <FontAwesomeIcon icon={faArrowRightLong} className="w-full text-xl" />

@@ -35,7 +35,6 @@ const WherePage: NextPage<PageProps> = ({ data, images, id }) => {
   const serverData = new CustomerDamageReport();
   const mapsId = "GoogleMap";
   serverData.updateFields(data);
-  const [allowClick, setAllowClick] = useState(true);
   const [currentCar, setCurrentCar] = useState<"zoe" | "van">(
     serverData.greenCarType || "zoe"
   );
@@ -54,6 +53,8 @@ const WherePage: NextPage<PageProps> = ({ data, images, id }) => {
   const [isSingleVehicleChecked, setIsSingleVehicleChecked] = useState<
     boolean | null
   >(serverData.singleVehicleAccident);
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [allowClick, setAllowClick] = useState(true && !uploadingImages);
 
   // DATA
 
@@ -284,6 +285,7 @@ const WherePage: NextPage<PageProps> = ({ data, images, id }) => {
               required={false}
               imageLimit={20}
               folderPath="OtherPartyDamages/"
+              setIsLoading={setUploadingImages}
             />
           </div>
         </div>
@@ -336,7 +338,7 @@ const WherePage: NextPage<PageProps> = ({ data, images, id }) => {
         </div>
 
         <div className="flex flex-row w-16 justify-end h-14 mr-10 lg:w-16">
-          <NextButton allowClick={allowClick} />
+          <NextButton disabled={!allowClick} />
         </div>
       </div>
     </form>

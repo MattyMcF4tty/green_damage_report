@@ -485,14 +485,21 @@ interface multipleImageFieldProps {
   labelText: string;
   required: boolean;
   folderPath: string;
+  setImages?: (images: string[]) => void;
+  setIsLoading?: (isloading: boolean) => void;
 }
 
-export const MultipleImageField = ({id, reportId, imageLimit, labelText, required, folderPath}: multipleImageFieldProps) => {
+export const MultipleImageField = ({id, reportId, imageLimit, labelText, required, folderPath, setImages, setIsLoading}: multipleImageFieldProps) => {
   const [isRequired, setIsRequired] = useState(required);
   const [imageURLs, setImageURLs] = useState<{url:string, path:string}[]>([])
   const [disabled, setDisabled] = useState(false);
-  const [isError, setIsError] = useState<string | null>()
+  const [isError, setIsError] = useState<string | null>();
 
+  useEffect(() => {
+    if (setIsLoading) {
+      setIsLoading(disabled)
+    };
+  }, [disabled])
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsError(null)
@@ -545,8 +552,11 @@ export const MultipleImageField = ({id, reportId, imageLimit, labelText, require
     if (imageURLs.length >= imageLimit) {
       setIsError('Image limit reached')
       setDisabled(true);
+    } else if (setImages) {
+      setImages(imageURLs.map((image) => {
+        return image.url
+      }))
     }
-    console.log(imageURLs)
   }, [imageURLs])
 
   async function getImg() {
@@ -653,12 +663,19 @@ interface singleImagefield {
   required: boolean;
   filePath: string;
   setImage?: (image: string) => void;
+  setIsLoading?: (isLoading: boolean) => void;
 }
 
-export const SingleImagefield = ({id, reportId, labelText, required, filePath, setImage}: singleImagefield) => {
+export const SingleImagefield = ({id, reportId, labelText, required, filePath, setImage, setIsLoading}: singleImagefield) => {
   const [disabled, setDisabled] = useState(false);
-  const [imageUrl, setImageUrl] = useState('')
-  const [isError, setIsError] = useState<null | string>(null)
+  const [imageUrl, setImageUrl] = useState('');
+  const [isError, setIsError] = useState<null | string>(null);
+
+  useEffect(() => {
+    if (setIsLoading) {
+      setIsLoading(disabled)
+    };
+  }, [disabled])
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsError(null)

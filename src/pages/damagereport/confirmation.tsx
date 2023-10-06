@@ -445,24 +445,9 @@ const confirmationPage: NextPage<PageProps> = ({ data, images, id }) => {
         )}
       </div>
 
-      {/* Images of damages to GreenMobility car*/}
-      <p className="font-bold text-MainGreen-300 mb-2">
-        Pictures of the damages to the GreenMobility car
-      </p>
-      <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
-        {images &&
-        images["GreenMobility"] &&
-        images["GreenMobility"].length > 0 ? (
-          images["GreenMobility"].map((image) => (
-            <img key={image} src={image} alt={image} className="w-1/2" />
-          ))
-        ) : (
-          <p>No images</p>
-        )}
-      </div>
       {/* Images of damages to otherparty car*/}
       <p className="font-bold text-MainGreen-300 mb-2">
-        Pictures of the damages to the other Party involved
+        Pictures of the damages to the other Partys involved
       </p>
       <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
         {images && images["OtherParty"] && images["OtherParty"].length > 0 ? (
@@ -506,10 +491,12 @@ const confirmationPage: NextPage<PageProps> = ({ data, images, id }) => {
                 <p className="break-words">Description: {damage.description}</p>
                 <div className="">
                   <p>Images:</p>
-                  {damage.images[0].length > 0 && (
-                    <img className="h-14 w-14"
-                    src={damage.images[0]} alt="Damage" />
-                  )}
+                  <div className="flex flex-wrap">
+                    {damage.images.length > 0 && damage.images.map((image, index) => (
+                      <img className="h-14 w-14 m-1" key={index}
+                      src={image} alt="Damage" />
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
