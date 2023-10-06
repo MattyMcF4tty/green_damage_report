@@ -41,7 +41,11 @@ const SendMailPopUp = ({ setVisibility, damageReport }: SendMailPopUpProps) => {
       setCurrentMail(driverMail);
     }
   }, []);
-
+  const handleClosePopUp = () => {
+    setTextArea("");
+    setSubject("");
+    setVisibility(false);
+  };
   const allowSend = !textArea || !subject;
   useEffect(() => {
     console.log(allowSend);
@@ -51,6 +55,13 @@ const SendMailPopUp = ({ setVisibility, damageReport }: SendMailPopUpProps) => {
     <div className="fixed flex justify-center items-center z-20 inset-0 bg-black bg-opacity-75 overflow-auto overflow-x-auto">
       <div className="absolute flex flex-col justify-center md:w-[32rem] bg-white p-4 rounded-lg">
         <p className="text-2xl flex flex-col items-center justify-center border-b-[1px] border-MainGreen-300 mb-8">
+          <button
+            onClick={() => handleClosePopUp()}
+            type="button"
+            className=" absolute ml-4 pr-4 left-0"
+          >
+            X
+          </button>
           <FontAwesomeIcon
             icon={faEnvelope}
             className="ml-2 text-MainGreen-300"
@@ -61,7 +72,7 @@ const SendMailPopUp = ({ setVisibility, damageReport }: SendMailPopUpProps) => {
         <div className="mb-10">
           <p>To:</p>
           <select
-            className="h-8 border border-MainGreen-200 bg-MainGreen-100 rounded-md shadow-md outline-none "
+            className="h-8 border w-1/2 border-MainGreen-200 bg-MainGreen-100 rounded-md shadow-md outline-none "
             id="FilterOptions"
             value={currentMail}
             onChange={(e) => setCurrentMail(e.target.value)}
