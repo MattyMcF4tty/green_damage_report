@@ -98,8 +98,6 @@ const Google = ({
   }, [map, autocomplete, marker]);
   const handleMapLoad = useCallback(
     (mapInstance: google.maps.Map) => {
-      console.log("handleMapLoad called");
-
       setMap(mapInstance);
       geocoderRef.current = new google.maps.Geocoder();
 
@@ -116,8 +114,6 @@ const Google = ({
           markerRef.current,
           "dragend",
           function () {
-            console.log("Marker dragged");
-
             const newPosition = markerRef.current?.getPosition();
             if (newPosition) {
               mapInstance.panTo(newPosition);
@@ -133,7 +129,6 @@ const Google = ({
                 geocoderRef.current.geocode(
                   { location: newPosition },
                   function (results, status) {
-                    console.log("Geocoding status:", status);
                     if (
                       status === google.maps.GeocoderStatus.OK &&
                       results &&
