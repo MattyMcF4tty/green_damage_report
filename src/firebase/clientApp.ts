@@ -5,10 +5,8 @@ import {
   getDoc,
   getDocs,
   getFirestore,
-  query,
   setDoc,
   updateDoc,
-  where,
 } from "firebase/firestore";
 import {
   ListResult,
@@ -20,7 +18,7 @@ import {
   ref,
   uploadBytes,
 } from "firebase/storage";
-import { decryptData, encryptData, reportDataType } from "@/utils/utils";
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import app from "./firebaseConfig";
 
 const db = getFirestore(app);
@@ -31,7 +29,7 @@ export const collectionName = "DamageReports";
 export const getData = async (id: string) => {
   console.log("fetchind docID: " + id);
   const docRef = doc(db, `${collectionName}/${id}`);
-  const data = new reportDataType();
+  const data = new CustomerDamageReport();
 
   try {
     const docSnapshot = await getDoc(docRef);
@@ -51,7 +49,7 @@ export const getData = async (id: string) => {
 
 export const createDoc = async (id: string, email: string) => {
   try {
-    const data = new reportDataType();
+    const data = new CustomerDamageReport();
     data.updateFields({ userEmail: email.toLowerCase() });
     console.log(
       "Report created:\n" + "id: " + id + "\n" + "Email: " + email.toLowerCase()
@@ -64,7 +62,7 @@ export const createDoc = async (id: string, email: string) => {
   }
 };
 
-export const updateData = async (id: string, data: reportDataType) => {
+export const updateData = async (id: string, data: CustomerDamageReport) => {
   const dataRef = doc(db, `${collectionName}/${id}`);
   const currentDate = new Date();
 
@@ -160,29 +158,6 @@ export const getImages = async (id: string) => {
     console.error(`Something went wrong fetching images:\n${error}\n`);
   }
   return imageURLs;
-};
-
-
-export const getReportIds = async () => {
-  const reportColRef = collection(db, `${collectionName}/`);
-  const idList: string[] = [];
-
-  try {
-    const querySnapshot = await getDocs(reportColRef);
-
-    if (querySnapshot.docs.length > 0) {
-      for (const doc of querySnapshot.docs) {
-        const id = doc.id;
-        idList.push(id);
-      }
-    } else {
-      throw Error(`No documents exist in path ${reportColRef.path}`);
-    }
-  } catch (error) {
-    console.error(`Something went wrong fetching document ids:\n${error}\n`);
-  }
-
-  return idList;
 };
 
 

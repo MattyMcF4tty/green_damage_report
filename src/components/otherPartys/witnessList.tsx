@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Inputfield } from "../custom_inputfields";
-import PhoneNumber from "../opposite_information/phone_form";
+import PhoneNumber from "../opposite_information/phoneForm";
 
 interface WitnessListProps {
   value: { name: string | null; phone: string | null; email: string | null }[];

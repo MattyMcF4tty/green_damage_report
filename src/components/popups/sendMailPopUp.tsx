@@ -1,35 +1,25 @@
 import { createDoc } from "@/firebase/clientApp";
-import { handleCreateNewReport } from "@/utils/firebaseUtils/apiRoutes";
-import { handleSendEmail, reportDataType } from "@/utils/utils";
-import { useRouter } from "next/router";
-import { use, useEffect, useRef, useState } from "react";
+import { requestDamageReportCreation } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import { handleSendEmail } from "@/utils/logic/misc";
+import { useEffect, useState } from "react";
 import { TextField } from "../custom_inputfields";
-import { text } from "stream/consumers";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faMailForward } from "@fortawesome/free-solid-svg-icons";
 import sendEmail from "@/pages/api/sendEmail";
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 
 interface SendMailPopUpProps {
   setVisibility: (visible: boolean) => void;
-  damageReport: reportDataType;
+  damageReport: CustomerDamageReport;
 }
 const SendMailPopUp = ({ setVisibility, damageReport }: SendMailPopUpProps) => {
   const userEmail = damageReport.userEmail;
   const driverMail = damageReport.driverInfo.email;
   const renterMail = damageReport.renterInfo.email;
 
-  console.log(
-    "Driver:",
-    driverMail,
-    "\nReporter:",
-    userEmail,
-    "\nRenter",
-    renterMail
-  );
-
   const [subject, setSubject] = useState<string | null>(null);
   const [textArea, setTextArea] = useState<string | null>(null);
-  const [currentMail, setCurrentMail] = useState<string>("No emails");
+  const [currentMail, setCurrentMail] = useState<string>("-");
 
   useEffect(() => {
     // Initialize currentMail based on the selected report's recipient

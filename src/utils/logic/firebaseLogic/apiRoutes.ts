@@ -1,39 +1,6 @@
-import { apiResponse } from "../types";
-import { blobToBase64 } from "../utils";
+import Cookies from "js-cookie";
+import { blobToBase64 } from "../misc";
 
-export const handleCreateNewReport = async (email: string) => {
-  const data = {
-    email: email,
-  };
-
-  const url = process.env.NEXT_PUBLIC_URL;
-  if (!url) {
-    throw new Error("NEXT_PUBLIC_URL is not defined in enviroment");
-  }
-
-  const response = await fetch(
-    process.env.NEXT_PUBLIC_URL + "/api/damageReport/createReport",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    }
-  );
-
-  const responseJson = await response.json();
-  if (!response.ok) {
-    const newError = new Error(responseJson.errors[0]);
-    newError.name = responseJson.status;
-
-    throw newError;
-  }
-
-  const reportId: string = responseJson.data.reportId;
-
-  return reportId;
-};
 
 export const handleUploadFile = async (
   file: Blob,
@@ -128,4 +95,95 @@ export const handleGetBase64FileFromStorage = async (
   }
 
   return responseJson.data.base64File as string;
+};
+
+
+export const handleSignUp = async (email: string, password: string) => {
+  const data = {
+    email: email,
+    password: password,
+  };
+
+  const response = await fetch(
+    process.env.NEXT_PUBLIC_URL + "/api/auth/signUp",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  const responseData = await response.json();
+  if (response.ok) {
+    console.log(responseData.messages);
+    Cookies.set("AuthToken", responseData.data.userToken, {
+      expires: 365 * 100,
+      secure: true,
+    });
+    return true;
+  } else {
+    return false;
+  }
+};
+
+export const handleVerifyUser = async (userToken: string | undefined) => {
+  const response = await fetch(
+    process.env.NEXT_PUBLIC_URL + "/api/auth/verifyAdmin",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ userToken: userToken }),
+    }
+  );
+
+  const responseData = await response.json();
+  if (response.ok) {
+    console.log(responseData.messages);
+    return true;
+  } else {
+    console.error(responseData.errors);
+    return false;
+  }
+};
+
+export const handleSignIn = async (email: string, password: string) => {
+  try {
+    const data = {
+      email: email,
+      password: password,
+    };
+
+    const response = await fetch(
+      process.env.NEXT_PUBLIC_URL + "/api/auth/signIn",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+    );
+
+    const responseData = await response.json();
+    if (response.ok) {
+      console.log(responseData.messages);
+      Cookies.set("AuthToken", responseData.data.userToken, {
+        expires: 365 * 100,
+      });
+      return true;
+    } else {
+      throw new Error(responseData.messages);
+    }
+  } catch (error: any) {
+    console.error("Something went wrong signing in:\n", error.message);
+    return false;
+  }
+};
+
+export const handleSignOut = () => {
+  Cookies.remove("AuthToken");
 };

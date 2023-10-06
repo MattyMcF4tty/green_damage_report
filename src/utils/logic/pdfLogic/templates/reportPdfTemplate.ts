@@ -1,9 +1,7 @@
 import jsPDF from "jspdf";
-import { reportDataType } from "@/utils/utils";
-import axios from "axios";
-import sharp from "sharp";
 import EXIF from "exif-js";
-import { handleGetBase64FileFromStorage } from "./firebaseUtils/apiRoutes";
+import { handleGetBase64FileFromStorage } from "../../firebaseLogic/apiRoutes";
+import { CustomerDamageReport } from "../../../schemas/damageReportSchemas/customerReportSchema";
 
 const addImageToPDF = (pdfDoc: jsPDF) => {
   const imageWidth = 80;
@@ -18,7 +16,7 @@ const addImageToPDF = (pdfDoc: jsPDF) => {
 };
 
 const createReportPDF = async (
-  data: reportDataType,
+  data: CustomerDamageReport,
   images: Record<string, string[]>,
   map: string
 ) => {
@@ -110,7 +108,7 @@ const createReportPDF = async (
   const addDriverInfoToPDF = (
     doc: jsPDF,
     startY: number,
-    data: reportDataType
+    data: CustomerDamageReport
   ) => {
     const lineDriverHeight = 8;
     const staticContentHeight = 40;

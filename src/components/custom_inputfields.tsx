@@ -1,18 +1,12 @@
 /* import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";*/
-import { updateImages } from "@/firebase/clientApp";
 import React, { useEffect, useState, useRef } from "react";
-import { GoogleMap, LoadScript } from "@react-google-maps/api";
 import usePlacesService from "react-google-autocomplete/lib/usePlacesAutocompleteService";
-import {
-  formatJournalNumber,
-  formatNumberplate,
-  formatSSN,
-} from "@/utils/formatUtils";
-import { trimArrayToLimit } from "@/utils/utils";
-import { deleteReportFile, deleteStorageFile, getReportFile, getReportFolder, getStorageFolderDownloadUrls, uploadReportFile } from "@/utils/firebaseUtils/storageUtils";
-import { handleUploadFile } from "@/utils/firebaseUtils/apiRoutes";
+import { trimArrayToLimit } from "@/utils/logic/misc";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera, faX } from "@fortawesome/free-solid-svg-icons";
+import { deleteReportFile, getReportFile, getReportFolder, uploadReportFile } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
+import { deleteStorageFile } from "@/utils/logic/firebaseLogic/storage";
+import { formatJournalNumber, formatNumberplate, formatSSN } from "@/utils/logic/formattingLogic/formatters";
 
 /* import usePlacesAutocomplete, {
   getGeocode,
@@ -483,80 +477,7 @@ export const TextField = ({
   );
 };
 
-/* ----- ImageField ---------------------------------------------------- */
-interface ImageFieldProps {
-  reportID: string;
-  id: string;
-  required: boolean;
-  labelText: string;
-  images: string[] | null;
-  imageType: "GreenMobility" | "OtherParty" | "Damage";
-  multiple: boolean;
-}
-
-export const ImageField = ({
-  reportID,
-  images,
-  required,
-  id,
-  labelText,
-  imageType,
-  multiple,
-}: ImageFieldProps) => {
-  const [isRequired, setIsRequired] = useState<boolean>(required);
-  const [isError, setIsError] = useState<boolean>(false);
-  const [imagesUploaded, setImagesUploaded] = useState(required);
-
-  useEffect(() => {
-    if (images === null) setIsRequired(images === null);
-  }, [images]);
-
-  const handleChange = async (newImages: FileList | null) => {
-    setImagesUploaded(true);
-    await updateImages(reportID, newImages, imageType);
-    setImagesUploaded(false);
-  };
-
-  return (
-    <div className="flex flex-col mb-4">
-      <label className="" htmlFor={id}>
-        {labelText}
-      </label>
-      <input
-        type="text"
-        required={imagesUploaded}
-        className="w-0 h-0 opacity-0"
-      />
-      <input
-        className="cursor-pointer"
-        id={id}
-        type="file"
-        accept="image/png, image/jpeg"
-        required={isRequired}
-        onChange={(e) => {
-          handleChange(e.target.files);
-          setIsError(false);
-        }}
-        onInvalid={() => setIsError(true)}
-        multiple={multiple}
-      />
-      <div className="flex flex-wrap gap-[2px] mt-1">
-        {images &&
-          images.map((image, index) => (
-            <img key={index} src={image} alt={image} className="w-20" />
-          ))}
-      </div>
-      {isError && (
-        <p className="text-sm text-red-500">
-          Please choose one or more pictures
-        </p>
-      )}
-    </div>
-  );
-};
-
 // ----------------------- MULTIPLE IMAGES FIELD --------------------------------------------------
-
 interface multipleImageFieldProps {
   id: string;
   reportId: string;
@@ -564,14 +485,21 @@ interface multipleImageFieldProps {
   labelText: string;
   required: boolean;
   folderPath: string;
+  setImages?: (images: string[]) => void;
+  setIsLoading?: (isloading: boolean) => void;
 }
 
-export const MultipleImageField = ({id, reportId, imageLimit, labelText, required, folderPath}: multipleImageFieldProps) => {
+export const MultipleImageField = ({id, reportId, imageLimit, labelText, required, folderPath, setImages, setIsLoading}: multipleImageFieldProps) => {
   const [isRequired, setIsRequired] = useState(required);
   const [imageURLs, setImageURLs] = useState<{url:string, path:string}[]>([])
   const [disabled, setDisabled] = useState(false);
-  const [isError, setIsError] = useState<string | null>()
+  const [isError, setIsError] = useState<string | null>();
 
+  useEffect(() => {
+    if (setIsLoading) {
+      setIsLoading(disabled)
+    };
+  }, [disabled])
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsError(null)
@@ -580,7 +508,7 @@ export const MultipleImageField = ({id, reportId, imageLimit, labelText, require
 
     // Check if files is empty
     if (!e.target.files) {
-      setDisabled(true);
+      setDisabled(false);
       return;
     }
 
@@ -624,8 +552,11 @@ export const MultipleImageField = ({id, reportId, imageLimit, labelText, require
     if (imageURLs.length >= imageLimit) {
       setIsError('Image limit reached')
       setDisabled(true);
+    } else if (setImages) {
+      setImages(imageURLs.map((image) => {
+        return image.url
+      }))
     }
-    console.log(imageURLs)
   }, [imageURLs])
 
   async function getImg() {
@@ -732,12 +663,19 @@ interface singleImagefield {
   required: boolean;
   filePath: string;
   setImage?: (image: string) => void;
+  setIsLoading?: (isLoading: boolean) => void;
 }
 
-export const SingleImagefield = ({id, reportId, labelText, required, filePath, setImage}: singleImagefield) => {
+export const SingleImagefield = ({id, reportId, labelText, required, filePath, setImage, setIsLoading}: singleImagefield) => {
   const [disabled, setDisabled] = useState(false);
-  const [imageUrl, setImageUrl] = useState('')
-  const [isError, setIsError] = useState<null | string>(null)
+  const [imageUrl, setImageUrl] = useState('');
+  const [isError, setIsError] = useState<null | string>(null);
+
+  useEffect(() => {
+    if (setIsLoading) {
+      setIsLoading(disabled)
+    };
+  }, [disabled])
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsError(null)
@@ -746,7 +684,7 @@ export const SingleImagefield = ({id, reportId, labelText, required, filePath, s
 
     // Check if files is empty
     if (!e.target.files) {
-      setDisabled(true);
+      setDisabled(false);
       return;
     }
 

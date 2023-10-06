@@ -1,15 +1,13 @@
-import { getFirestoreCollection } from "@/utils/firebaseUtils/firestoreUtils";
-import { apiResponse } from "@/utils/types";
-import { reportDataType } from "@/utils/utils";
-import { collection, getDocs } from "firebase/firestore";
-import { ListResult, listAll } from "firebase/storage";
+import { getFirestoreCollection } from "@/utils/logic/firebaseLogic/firestore";
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { NextApiRequest, NextApiResponse } from "next";
+import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 
 export default async function (req:NextApiRequest, res:NextApiResponse) {
 
     //TODO: Make verify admin
     if (req.method !== "GET") {
-        return res.status(405).json(new apiResponse(
+        return res.status(405).json(new ApiResponse(
             "METHOD_NOT_ALLOWED",
             [],
             ["Method is not allowed"],
@@ -17,10 +15,10 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         ))
     }
 
-    const reportCol = process.env.DAMAGE_REPORT_FIRESTORE_COLLECTION;
+    const reportCol = process.env.NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION;
     if (!reportCol) {
         console.error('DAMAGE_REPORT_FIRESTORE_COLLECTION is not defined in enviroment')
-        return res.status(500).json(new apiResponse(
+        return res.status(500).json(new ApiResponse(
             'SERVER_ERROR',
             [],
             ['Something went wrong'],
@@ -33,7 +31,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         reportList = await getFirestoreCollection(reportCol)
     } catch (error:any) {
         console.error(error)
-        return res.status(500).json(new apiResponse(
+        return res.status(500).json(new ApiResponse(
             'SERVER_ERROR',
             [],
             ['Something went wrong'],
@@ -42,7 +40,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
     }
 
     if (reportList.empty) {
-        return res.status(404).json(new apiResponse(
+        return res.status(404).json(new ApiResponse(
             'NOT_FOUND',
             [],
             ['No documents found'],
@@ -52,7 +50,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
 
     const reports = reportList.docs.map((doc) => {
         const docData = doc.data();
-        const reportData = new reportDataType();
+        const reportData = new CustomerDamageReport();
         reportData.updateFields(docData);
 
         return {
@@ -60,7 +58,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
             data: reportData.toPlainObject()
         }
     })
-    return res.status(200).json(new apiResponse(
+    return res.status(200).json(new ApiResponse(
         'OK',
         ['Fetching all report ids finished succesfully'],
         [],

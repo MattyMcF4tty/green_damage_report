@@ -1,10 +1,5 @@
-import { useEffect, useState } from "react";
-import { ImageField, SingleImagefield, TextField } from "../custom_inputfields";
-import { handleDownloadImages } from "@/utils/utils";
-import { updateImages } from "@/firebase/clientApp";
-import { url } from "inspector";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
-import { FireStorage } from "@/firebase/firebaseConfig";
+import { useState } from "react";
+import { MultipleImageField, SingleImagefield, TextField } from "../custom_inputfields";
 
 interface DamagePopUpProps {
   reportId: string;
@@ -36,8 +31,8 @@ const DamagePopUp = ({
     damage && damage.images ? damage.images : []
   );
   const [currentImage, setCurrentImage] = useState<string>();
-
-  const allowSave = damageDescription !== "";
+  const [isLoading, setIsLoading] = useState(false);
+  const allowSave = damageDescription !== '' && !isLoading;
 
   const handleClosePopUp = () => {
     setDamageDescription("");
@@ -82,15 +77,15 @@ const DamagePopUp = ({
           onChange={setDamageDescription}
         />
         <div>
-          <SingleImagefield
+          <MultipleImageField
             reportId={reportId}
             id={"DamageImage"}
             labelText="Please take picture of damage"
             required={false}
-            filePath={`GreenDamage/${position}`}
-            setImage={(image) => {
-              setImages([image]);
-            }}
+            folderPath={`GreenDamage/${position}/`}
+            imageLimit={5}
+            setImages={setImages}
+            setIsLoading={setIsLoading}
           />
         </div>
         <button

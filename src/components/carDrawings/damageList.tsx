@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import DamagePopUp from "../popups/damagePopUp";
-import ZoeDrawing from "./zoe";
-import { deleteReportFile, deleteStorageFile } from "@/utils/firebaseUtils/storageUtils";
+import { deleteReportFile } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
+
 interface damageListProps {
   reportId: string;
   damages: {
@@ -71,10 +71,12 @@ const DamageList = ({ damages, setDamages, reportId }: damageListProps) => {
             <p className="break-words">Description: {damage.description}</p>
             <div className="mb-4">
               <p>Images:</p>
-              {damage.images[0].length > 0 && (
-                <img className="h-14 w-14"
-                src={damage.images[0]} alt="Damage" />
-              )}
+                <div className="flex flex-wrap">
+                  {damage.images.length > 0 && damage.images.map((image, index) => (
+                    <img className="h-14 w-14 m-1" key={index}
+                    src={image} alt="Damage" />
+                  ))}
+              </div>
             </div>
 
             <button

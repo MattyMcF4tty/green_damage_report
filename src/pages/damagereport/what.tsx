@@ -9,15 +9,13 @@ import { GetServerSidePropsContext, NextPage } from "next";
 import NextButton from "@/components/buttons/next";
 import BackButton from "@/components/buttons/back";
 import { useRouter } from "next/router";
-import { updateData } from "@/firebase/clientApp";
-import {
-  getServerSidePropsWithRedirect,
-  handleGetRenter,
-  handleUpdateReport,
-  pageProps,
-  reportDataType,
-} from "@/utils/utils";
-import PhoneNumber from "@/components/opposite_information/phone_form";
+import PhoneNumber from "@/components/opposite_information/phoneForm";
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
+import { getServerSidePropsWithRedirect } from "@/utils/logic/misc";
+import { PageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
+import { handleGetRenter } from "@/utils/logic/wunderfleetLogic/apiRoutes";
+import { updateDamageReport } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
+import { serverUpdateReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -25,9 +23,9 @@ export const getServerSideProps = async (
   return await getServerSidePropsWithRedirect(context);
 };
 
-const What: NextPage<pageProps> = ({ data, id }) => {
+const What: NextPage<PageProps> = ({ data, id }) => {
   const router = useRouter();
-  const serverData = new reportDataType();
+  const serverData = new CustomerDamageReport();
   serverData.updateFields(data);
 
   const [firstName, setFirstName] = useState(serverData.driverInfo.firstName);
@@ -63,7 +61,6 @@ const What: NextPage<pageProps> = ({ data, id }) => {
   useEffect(() => {
     setInvalidNumberplate(false);
   }, [greenCarNumberplate]);
-  console.log("gugug", serverData.userEmail);
   useEffect(() => {
     setInvalidTime(false);
   }, [greenCarNumberplate, accidentTime, accidentDate]);
@@ -117,7 +114,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
     });
 
     try {
-      await handleUpdateReport(id, serverData);
+      await serverUpdateReport(id, serverData);
     } catch (error) {
       setAllowClick(true);
       return;
@@ -125,10 +122,6 @@ const What: NextPage<pageProps> = ({ data, id }) => {
 
     router.push(`how?id=${id}`);
   };
-
-  useEffect(() => {
-    console.log(validDriversLicense);
-  }, [validDriversLicense]);
 
   return (
     <form
@@ -149,7 +142,7 @@ const What: NextPage<pageProps> = ({ data, id }) => {
           labelText="
             Please enter the license plate of the GreenMobility car"
           id="greenCarNumberplateInput"
-          type="numberplate"
+          type="text"
           required={true}
           value={greenCarNumberplate}
           onChange={setgreenCarNumberplate}

@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import { GetServerSidePropsContext, NextPage } from "next";
-import { handleVerifyUser, reportDataType } from "@/utils/utils";
 import ReportList from "@/components/admin/reportList";
 import ReportControls from "@/components/admin/reportControls";
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
+import { handleVerifyUser } from "@/utils/logic/firebaseLogic/apiRoutes";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -31,7 +32,7 @@ const adminPage: NextPage = () => {
   >("id");
   const [currentSearch, setCurrentSearch] = useState<string>("");
   const [selectedReports, setSelectedReports] = useState<
-    { id: string; data: reportDataType }[]
+    { id: string; data: CustomerDamageReport }[]
   >([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [showExpandedReports, setShowExpandedReports] =
@@ -44,7 +45,7 @@ const adminPage: NextPage = () => {
   let totalPages: number = 0;
   let currentReports: {
     id: string;
-    data: reportDataType;
+    data: CustomerDamageReport;
   }[] = [];
 
   // Function to handle changing the page

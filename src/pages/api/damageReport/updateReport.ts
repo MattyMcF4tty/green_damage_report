@@ -1,16 +1,13 @@
-import { FireDatabase } from "@/firebase/firebaseConfig";
-import { updateReportDoc } from "@/utils/firebaseUtils/firestoreUtils";
-import { apiResponse } from "@/utils/types";
-import { encryptData, reportDataType } from "@/utils/utils";
-import { doc, updateDoc } from "firebase/firestore";
 import { NextApiRequest, NextApiResponse } from "next";
-
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
+import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
+import { updateDamageReport } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
 
     // Check method
     if (req.method !== "POST") {
-        return res.status(405).json(new apiResponse(
+        return res.status(405).json(new ApiResponse(
             "METHOD_NOT_ALLOWED",
             [],
             ["Method is not allowed"],
@@ -20,7 +17,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
     // Check for user errors
     const { reportData, reportId } = req.body;
-    let report = new reportDataType();
+    let report = new CustomerDamageReport();
     try {
         if (!reportData) {
             throw new Error("reportData is null")
@@ -32,11 +29,11 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         try {
             report.updateFields(reportData);
         } catch (error:any) {
-            throw new Error("reportData does not math reportDataType")
+            throw new Error("reportData does not match CustomerDamageReport")
         }
 
     } catch (error:any) {
-        return res.status(400).json(new apiResponse(
+        return res.status(400).json(new ApiResponse(
             "BAD_REQUEST",
             [],
             [error.message],
@@ -44,9 +41,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         ))
     }
 
-    await updateReportDoc(reportId, report)
+    await updateDamageReport(reportId, report)
 
-    return res.status(200).json(new apiResponse(
+    return res.status(200).json(new ApiResponse(
         "OK",
         [],
         ["Report updated succesfully"],

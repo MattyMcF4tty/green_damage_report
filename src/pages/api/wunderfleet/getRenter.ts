@@ -1,12 +1,8 @@
-import { highEncryptText, lowEncryptText } from "@/utils/securityUtils";
-import { checkOrigin } from "@/utils/serverUtils";
-import { apiResponse } from "@/utils/types";
-import {
-  dateToWunder,
-  getAge,
-  isDateInRange,
-  wunderToDate,
-} from "@/utils/utils";
+import { getAge, isDateInRange } from "@/utils/logic/misc";
+import { dateToWunder, wunderToDate } from "@/utils/logic/wunderfleetLogic/wunderUtils";
+import { Renter } from "@/utils/schemas/accidentParticipantSchemas/renterSchema";
+import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
+import { encryptObject } from "@/utils/security/crypto";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
@@ -18,7 +14,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       return res
         .status(405)
         .json(
-          new apiResponse(
+          new ApiResponse(
             "METHOD_NOT_ALLOWED",
             [],
             ["Method is not allowed"],
@@ -55,14 +51,13 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     } catch (error: any) {
       return res
         .status(400)
-        .json(new apiResponse("BAD_REQUEST", [], [error.message], {}));
+        .json(new ApiResponse("BAD_REQUEST", [], [error.message], {}));
     }
 
     const accidentDate = new Date(date);
     debug.push(`Accident date [Date]: ${accidentDate}`);
     debug.push(`Accident date [Wunder]: ${dateToWunder(accidentDate)}`);
 
-    console.log(debug)
     // Get information about vehicle
     const vehicleResponse = await fetch(wunderUrl + '/api/v2/vehicles/search', {
       method: "POST",
@@ -89,7 +84,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       return res
         .status(500)
         .json(
-          new apiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
+          new ApiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
         );
     }
     debug.push(`VehicleResponse returned ${vehicleResponse.status}`);
@@ -100,7 +95,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       debug.push("Car not found");
       return res
         .status(404)
-        .json(new apiResponse("NOT_FOUND", [], ["Car not found"], {}));
+        .json(new ApiResponse("NOT_FOUND", [], ["Car not found"], {}));
     }
 
     debug.push("Car found");
@@ -144,7 +139,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       return res
         .status(500)
         .json(
-          new apiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
+          new ApiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
         );
     }
     debug.push(`reservationResponse returned ${reservationResponse.status}`);
@@ -184,7 +179,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         return res
           .status(500)
           .json(
-            new apiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
+            new ApiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
           );
       }
       const activeReservationResponseData =
@@ -202,7 +197,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       return res
         .status(500)
         .json(
-          new apiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
+          new ApiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
         );
     }
     debug.push(`ReservationId: ${reservation[0].reservationId}`);
@@ -227,7 +222,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       return res
         .status(500)
         .json(
-          new apiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
+          new ApiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
         );
     }
     debug.push(`Reservation startTime: ${startTime}`);
@@ -242,7 +237,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       return res
         .status(404)
         .json(
-          new apiResponse(
+          new ApiResponse(
             "NOT_FOUND",
             [],
             ["No reservations were ongoing at that point in time"],
@@ -279,7 +274,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         return res
           .status(404)
           .json(
-            new apiResponse(
+            new ApiResponse(
               "NOT_FOUND",
               [],
               ["No customers were found with customerId"],
@@ -296,7 +291,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       return res
         .status(500)
         .json(
-          new apiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
+          new ApiResponse("SERVER_ERROR", [], ["Something went wrong"], {})
         );
     }
     const renterData = renterResponseData.data[0];
@@ -318,30 +313,30 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       renterGender === "Female";
     }
 
+    const renterInfo = new Renter(
+      `${customerId}`,
+      `${reservationId}`,
+      `${renterData.firstName}`,
+      `${renterData.lastName}`,
+      `${renterData.email}`,
+      `${renterData.mobilePhone}`,
+      `${renterData.birthDate}`,
+      `${renterGender}`,
+      `${renterAge}`,
+      null
+    )
     // Collecting renter data in object
-    const renterInfo = {
-      customerId: highEncryptText(`${customerId}`),
-      reservationId: highEncryptText(`${reservationId}`),
-      firstName: lowEncryptText(`${renterData.firstName}`),
-      lastName: lowEncryptText(`${renterData.lastName}`),
-      birthDate: highEncryptText(`${renterData.birthDate}`),
-      email: highEncryptText(`${renterData.email}`),
-      phoneNumber: highEncryptText(`${renterData.mobilePhone}`),
-      gender: highEncryptText(renterGender),
-      age: highEncryptText(`${renterAge}`),
-      insurance: null,
-    };
-    console.log(renterInfo);
+    const encryptedRenter = encryptObject(renterInfo.toPlainObject())
 
     return res
       .status(200)
       .json(
-        new apiResponse("OK", ["User fetched succesfully"], [], renterInfo)
+        new ApiResponse("OK", ["Renter fetched succesfully"], [], encryptedRenter)
       );
   } catch (error: any) {
     console.error("Error at api/wunderfleet/getRenter.ts", error.message);
     return res
       .status(500)
-      .json(new apiResponse("SERVER_ERROR", [], ["Something went wrong"], {}));
+      .json(new ApiResponse("SERVER_ERROR", [], ["Something went wrong"], {}));
   }
 }

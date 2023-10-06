@@ -1,5 +1,5 @@
 import { FireAuth } from "@/firebase/firebaseConfig";
-import { apiResponse } from "@/utils/types";
+import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 import { UserCredential, signInWithEmailAndPassword } from "firebase/auth";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -8,7 +8,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
     try {
         // Check if method is correct
         if (req.method !== "POST") {
-            return res.status(405).json(new apiResponse(
+            return res.status(405).json(new ApiResponse(
                 "METHOD_NOT_ALLOWED",
                 [],
                 ["Method is not allowed"],
@@ -19,7 +19,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         const auth = FireAuth;
         if (!auth) {
             console.error("Firebasebase Authentication not defined")
-            return res.status(500).json(new apiResponse(
+            return res.status(500).json(new ApiResponse(
                 "SERVER_ERROR",
                 [],
                 ["Something went wrong"],
@@ -37,7 +37,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 throw new Error("Incorrect password format")
             }
         } catch (error:any) {
-            return res.status(400).json(new apiResponse(
+            return res.status(400).json(new ApiResponse(
                 "BAD_REQUEST",
                 [],
                 [error.message],
@@ -50,7 +50,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             userCred = await signInWithEmailAndPassword(auth, email, password)
         } catch (error:any) {
             if (error.code === 'auth/invalid-email' || error.code === 'auth/wrong-password') {
-                return res.status(401).json(new apiResponse(
+                return res.status(401).json(new ApiResponse(
                     "UNAUTHORIZED",
                     [],
                     ["Wrong email or password"],
@@ -58,7 +58,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 ))
             } else {
                 console.error("Something went wrong signing in user", error.code, error.message)
-                return res.status(500).json(new apiResponse(
+                return res.status(500).json(new ApiResponse(
                     "SERVER_ERROR",
                     [],
                     ["Something went wrong"],
@@ -72,7 +72,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             userToken = await userCred.user?.getIdToken();
         } catch ( error:any ) {
             console.error("Something went wrong getting user id token", error.code)
-            return res.status(500).json(new apiResponse(
+            return res.status(500).json(new ApiResponse(
                 "SERVER_ERROR",
                 [],
                 ["Something went wrong"],
@@ -81,7 +81,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         }
         
 
-        res.status(200).json(new apiResponse(
+        res.status(200).json(new ApiResponse(
             "OK",
             ["User succesfully signed in"],
             [],
@@ -89,7 +89,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         ))
     } catch (error:any) {
         console.error("Something went wrong signing in user", error.message)
-        return res.status(500).json(new apiResponse(
+        return res.status(500).json(new ApiResponse(
             "SERVER_ERROR",
             [],
             ["Something went wrong"],

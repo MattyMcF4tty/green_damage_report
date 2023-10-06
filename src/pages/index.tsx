@@ -1,11 +1,9 @@
 import { Inputfield } from "@/components/custom_inputfields";
-import { generateId, getReportsByEmail } from "@/utils/utils";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowRightLong } from "@fortawesome/free-solid-svg-icons";
 import EmailPopUp from "@/components/popups/emailPopUp";
-import { handleCreateNewReport } from "@/utils/firebaseUtils/apiRoutes";
+import { requestDamageReportCreation } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import { queryDamageReports } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
 
 const IndexPage = () => {
   const router = useRouter();
@@ -18,16 +16,10 @@ const IndexPage = () => {
     e.preventDefault();
 
     // Check for ongoing reports with that email.
-    let ongoingReports: string[] = [];
-    try {
-      ongoingReports = await getReportsByEmail(email);
-    } catch (error:any) {
-      console.error(error)
-      return;
-    }
+    const ongoingReports = await queryDamageReports('userEmail', email);
 
-    if (ongoingReports.length !== 0) {
-      setOngoingReports(ongoingReports);
+    if (Object.keys(ongoingReports).length !== 0) {
+      setOngoingReports(Object.keys(ongoingReports));
       setShowPopUp(true);
       return;
     }
@@ -35,7 +27,7 @@ const IndexPage = () => {
     // Create a new report
     let reportId: string;
     try {
-      reportId = await handleCreateNewReport(email);
+      reportId = await requestDamageReportCreation(email);
     } catch ( error:any ) {
       console.error(error)
       setIsError(error.message)

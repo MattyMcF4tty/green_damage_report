@@ -1,57 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { YesNo, Inputfield, TextField } from "../custom_inputfields";
-import PhoneNumber from "./phone_form";
-
-export class bikeInformation {
-  name: string;
-  phone: string;
-  email: string;
-  ebike: boolean | null;
-  personDamage: string;
-
-  constructor(
-    name: string,
-    phone: string,
-    email: string,
-    ebike: boolean | null,
-    personDamage: string
-  ) {
-    this.name = name;
-    this.phone = phone;
-    this.email = email;
-    this.ebike = ebike;
-    this.personDamage = personDamage;
-  }
-
-  updateFields(fields: Partial<bikeInformation>) {
-    Object.assign(this, fields);
-  }
-
-  toPlainObject() {
-    return {
-      name: this.name,
-      phone: this.phone,
-      email: this.email,
-      ebike: this.ebike,
-      personDamage: this.personDamage,
-    };
-  }
-}
+import PhoneNumber from "./phoneForm";
+import { Biker } from "@/utils/schemas/accidentParticipantSchemas/bikerSchema";
 
 interface bikeInfoFormProps {
-  value: bikeInformation;
-  onChange: (bikeInfo: bikeInformation) => void;
+  value: Biker;
+  onChange: (bikeInfo: Biker) => void;
 }
 
 const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
-  const [name, setName] = useState<string>(value.name);
-  const [phoneNumber, setPhoneNumber] = useState<string>(value.phone);
-  const [email, setEmail] = useState<string>(value.email);
-  const [personDamage, setPersonDamage] = useState<string>(value.personDamage);
+  const [name, setName] = useState<string | null>(value.name);
+  const [phoneNumber, setPhoneNumber] = useState<string | null>(value.phone);
+  const [email, setEmail] = useState<string | null>(value.email);
+  const [personDamage, setPersonDamage] = useState<string | null>(value.personDamage);
   const [ebike, setEbike] = useState<boolean | null>(value.ebike);
 
   useEffect(() => {
-    const newBikeInfo = new bikeInformation(
+    const newBikeInfo = new Biker(
       name,
       phoneNumber,
       email,

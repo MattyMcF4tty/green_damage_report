@@ -1,17 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
 import BackButton from "@/components/buttons/back";
-import { updateData } from "@/firebase/clientApp";
-import {
-  getServerSidePropsWithRedirect,
-  handleSendEmail,
-  handleUpdateReport,
-  pageProps,
-  reportDataType,
-} from "@/utils/utils";
-import { getDownloadURL, ref } from "firebase/storage";
-import { FireStorage } from "@/firebase/firebaseConfig";
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBicycle,
@@ -19,7 +10,10 @@ import {
   faCar,
   faPerson,
 } from "@fortawesome/free-solid-svg-icons";
-import { getReportFile } from "@/utils/firebaseUtils/storageUtils";
+import { getServerSidePropsWithRedirect, handleSendEmail } from "@/utils/logic/misc";
+import { updateDamageReport } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
+import { PageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
+import { serverUpdateReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -27,27 +21,12 @@ export const getServerSideProps = async (
   return await getServerSidePropsWithRedirect(context);
 };
 
-const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
-  const Router = useRouter();
-  const serverData = new reportDataType();
-  serverData.updateFields(data);
-  const [map, setMap] = useState<string | null>();
-  const [allowClick, setAllowClick] = useState(true);
 
-/*   useEffect(() => {
-    const getMap = async () => {
-      let serverMap: string | null = null;
-      try {
-        serverMap = await getReportFile(id, 'Admin/map');
-      } catch (error) {
-        console.error("No map");
-      }
-      if (serverMap) {
-        setMap(serverMap);
-      }
-    };
-    getMap();
-  }, []); */
+const confirmationPage: NextPage<PageProps> = ({ data, images, id }) => {
+  const Router = useRouter();
+  const serverData = new CustomerDamageReport();
+  serverData.updateFields(data);
+  const [allowClick, setAllowClick] = useState(true);
 
   let [confirmVis, setConfirmVis] = useState(false);
 
@@ -55,7 +34,7 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
     setAllowClick(false);
     serverData.updateFields({ finished: true });
     try {
-      await handleUpdateReport(id, serverData);
+      await serverUpdateReport(id, serverData);
     } catch (error) {
       setAllowClick(true);
       return;
@@ -466,24 +445,9 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
         )}
       </div>
 
-      {/* Images of damages to GreenMobility car*/}
-      <p className="font-bold text-MainGreen-300 mb-2">
-        Pictures of the damages to the GreenMobility car
-      </p>
-      <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
-        {images &&
-        images["GreenMobility"] &&
-        images["GreenMobility"].length > 0 ? (
-          images["GreenMobility"].map((image) => (
-            <img key={image} src={image} alt={image} className="w-1/2" />
-          ))
-        ) : (
-          <p>No images</p>
-        )}
-      </div>
       {/* Images of damages to otherparty car*/}
       <p className="font-bold text-MainGreen-300 mb-2">
-        Pictures of the damages to the other Party involved
+        Pictures of the damages to the other Partys involved
       </p>
       <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
         {images && images["OtherParty"] && images["OtherParty"].length > 0 ? (
@@ -527,10 +491,12 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
                 <p className="break-words">Description: {damage.description}</p>
                 <div className="">
                   <p>Images:</p>
-                  {damage.images[0].length > 0 && (
-                    <img className="h-14 w-14"
-                    src={damage.images[0]} alt="Damage" />
-                  )}
+                  <div className="flex flex-wrap">
+                    {damage.images.length > 0 && damage.images.map((image, index) => (
+                      <img className="h-14 w-14 m-1" key={index}
+                      src={image} alt="Damage" />
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}

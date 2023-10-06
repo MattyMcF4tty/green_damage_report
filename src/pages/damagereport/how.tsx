@@ -1,22 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   TextField,
   Inputfield,
-  ImageField,
   YesNo,
 } from "@/components/custom_inputfields";
 import NextButton from "@/components/buttons/next";
 import BackButton from "@/components/buttons/back";
 import { useRouter } from "next/router";
 import { GetServerSidePropsContext, NextPage } from "next";
-import {
-  getServerSidePropsWithRedirect,
-  handleUpdateReport,
-  pageProps,
-  reportDataType,
-} from "@/utils/utils";
-import { updateData } from "@/firebase/clientApp";
 import WitnessList from "@/components/otherPartys/witnessList";
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
+import { getServerSidePropsWithRedirect } from "@/utils/logic/misc";
+import { updateDamageReport } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
+import { PageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
+import { serverUpdateReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -24,9 +21,9 @@ export const getServerSideProps = async (
   return await getServerSidePropsWithRedirect(context);
 };
 
-const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
+const HowPage: NextPage<PageProps> = ({ data, images, id }) => {
   const router = useRouter();
-  const serverData = new reportDataType();
+  const serverData = new CustomerDamageReport();
   serverData.updateFields(data);
   const [allowClick, setAllowClick] = useState(true);
 
@@ -77,7 +74,7 @@ const HowPage: NextPage<pageProps> = ({ data, images, id }) => {
     });
 
     try {
-      await handleUpdateReport(id, serverData);
+      await serverUpdateReport(id, serverData);
     } catch (error) {
       setAllowClick(true);
       return;

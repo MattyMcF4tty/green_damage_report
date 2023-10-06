@@ -1,16 +1,15 @@
 import { FireStorage } from "@/firebase/firebaseConfig";
-import { checkOrigin } from "@/utils/serverUtils";
-import { apiResponse } from "@/utils/types";
 import axios from "axios";
 import { ListResult, getDownloadURL, listAll, ref } from "firebase/storage";
 import { NextApiRequest, NextApiResponse } from "next";
+import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 
 export default async (req: NextApiRequest, res: NextApiResponse) => {
     try {
 
         // Check if method is correct
         if (req.method !== "POST") {
-            return res.status(405).json(new apiResponse(
+            return res.status(405).json(new ApiResponse(
                 "METHOD_NOT_ALLOWED",
                 [],
                 ["Method is not allowed"],
@@ -28,7 +27,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                 throw new Error("Incorrect type")
             }
         } catch (error: any) {
-            return res.status(400).json(new apiResponse(
+            return res.status(400).json(new ApiResponse(
                 "BAD_REQUEST",
                 [],
                 [error.message],
@@ -38,7 +37,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
 
         if (!FireStorage) {
             console.error("FireStorage is not defined")
-            return res.status(500).json(new apiResponse(
+            return res.status(500).json(new ApiResponse(
                 "SERVER_ERROR",
                 [],
                 ["Something went wrong"],
@@ -52,7 +51,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             imageNameList = await listAll(storageRef);
         } catch (error: any) {
             console.error(`Could not listAll from ${storageRef}`, error.message)
-            return res.status(500).json(new apiResponse(
+            return res.status(500).json(new ApiResponse(
                 "SERVER_ERROR",
                 [],
                 ["Something went wrong"],
@@ -71,7 +70,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             );
         } catch (error:any) {
             console.error(`Something went wrong fetching image urls from ${storageRef}`, error.message)
-            return res.status(500).json(new apiResponse(
+            return res.status(500).json(new ApiResponse(
                 "SERVER_ERROR",
                 [],
                 ["Something went wrong"],
@@ -99,7 +98,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
                     ))
                 } catch (error: any) {
                     console.error("Something went wrong converting image urls to base64", error.message)
-                    return res.status(500).json(new apiResponse(
+                    return res.status(500).json(new ApiResponse(
                         "SERVER_ERROR",
                         [],
                         ["Something went wrong"],
@@ -112,7 +111,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
             }
         }
 
-        res.status(200).json(new apiResponse(
+        res.status(200).json(new ApiResponse(
             "OK",
             ["Downloading images finished succesfully"],
             [],
@@ -120,7 +119,7 @@ export default async (req: NextApiRequest, res: NextApiResponse) => {
         ))
     } catch (error:any) {
         console.error("Something went wrong trying to run downloadImages", error.message)
-        return res.status(500).json(new apiResponse(
+        return res.status(500).json(new ApiResponse(
             "SERVER_ERROR",
             [],
             ["Something went wrong"],

@@ -1,35 +1,28 @@
-import React, { use, useEffect, useState } from "react";
-import { PedestrianInformation } from "../../components/opposite_information/person_information_form";
+import React, { useState } from "react";
 import {
-  ImageField,
   MultipleImageField,
-  SingleImagefield,
   TextField,
   YesNo,
 } from "../../components/custom_inputfields";
-import { carInformation } from "../../components/opposite_information/car_information_form";
-import { bikeInformation } from "../../components/opposite_information/bike_information_form";
-import { OtherInformation } from "../../components/opposite_information/other_information_form";
 import BackButton from "@/components/buttons/back";
 import NextButton from "@/components/buttons/next";
-import { handleUploadMap, updateData } from "@/firebase/clientApp";
 import { GetServerSidePropsContext, NextPage } from "next";
-import {
-  getServerSidePropsWithRedirect,
-  handleUpdateReport,
-  pageProps,
-  reportDataType,
-} from "@/utils/utils";
 import { OtherPartyList } from "@/components/otherPartys/otherPartyList";
 import { useRouter } from "next/router";
 import html2canvas from "html2canvas";
 import ZoeDrawing from "@/components/carDrawings/zoe";
-import KangooDrawing from "@/components/carDrawings/kangoo";
 import VanDrawing from "@/components/carDrawings/kangoo";
-import DamagePopUp from "@/components/popups/damagePopUp";
 import Google from "@/components/google";
 import DamageList from "@/components/carDrawings/damageList";
-import { uploadReportFile } from "@/utils/firebaseUtils/storageUtils";
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
+import { Vehicle } from "@/utils/schemas/accidentParticipantSchemas/vehicleSchema";
+import { Biker } from "@/utils/schemas/accidentParticipantSchemas/bikerSchema";
+import { Pedestrian } from "@/utils/schemas/accidentParticipantSchemas/pedestrianSchema";
+import { IncidentObject } from "@/utils/schemas/accidentParticipantSchemas/incidentObjectSchema";
+import { updateDamageReport, uploadReportFile } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
+import { getEnvVariable, getServerSidePropsWithRedirect } from "@/utils/logic/misc";
+import { PageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
+import { serverUpdateReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -37,12 +30,11 @@ export const getServerSideProps = async (
   return await getServerSidePropsWithRedirect(context);
 };
 
-const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
+const WherePage: NextPage<PageProps> = ({ data, images, id }) => {
   const router = useRouter();
-  const serverData = new reportDataType();
+  const serverData = new CustomerDamageReport();
   const mapsId = "MyGoogleMap";
   serverData.updateFields(data);
-  const [allowClick, setAllowClick] = useState(true);
   const [currentCar, setCurrentCar] = useState<"zoe" | "van">(
     serverData.greenCarType || "zoe"
   );
@@ -61,6 +53,8 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
   const [isSingleVehicleChecked, setIsSingleVehicleChecked] = useState<
     boolean | null
   >(serverData.singleVehicleAccident);
+  const [uploadingImages, setUploadingImages] = useState(false);
+  const [allowClick, setAllowClick] = useState(true && !uploadingImages);
 
   // DATA
 
@@ -78,7 +72,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
   const [carInfo, setCarInfo] = useState(
     serverData.vehicleInfo.map(
       (info) =>
-        new carInformation(
+        new Vehicle(
           info.name,
           info.phone,
           info.email,
@@ -92,7 +86,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
   const [bikeInfo, setBikeInfo] = useState(
     serverData.bikerInfo.map(
       (info) =>
-        new bikeInformation(
+        new Biker(
           info.name,
           info.phone,
           info.email,
@@ -103,13 +97,13 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
   );
   const [otherInfo, setOtherInfo] = useState(
     serverData.otherObjectInfo.map(
-      (info) => new OtherInformation(info.description, info.information)
+      (info) => new IncidentObject(info.description, info.information)
     )
   );
   const [pedestrianInfo, setPedestrianInfo] = useState(
     serverData.pedestrianInfo.map(
       (info) =>
-        new PedestrianInformation(
+        new Pedestrian(
           info.name,
           info.phone,
           info.email,
@@ -124,6 +118,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
   const [accidentAddress, setAccidentAddress] = useState(
     serverData.accidentAddress
   );
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -202,7 +197,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
     });
 
     try {
-      await handleUpdateReport(id, serverData);
+      await serverUpdateReport(id, serverData);
     } catch (error) {
       setAllowClick(true);
       return;
@@ -290,6 +285,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
               required={false}
               imageLimit={20}
               folderPath="OtherPartyDamages/"
+              setIsLoading={setUploadingImages}
             />
           </div>
         </div>
@@ -342,7 +338,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
         </div>
 
         <div className="flex flex-row w-16 justify-end h-14 mr-10 lg:w-16">
-          <NextButton allowClick={allowClick} />
+          <NextButton disabled={!allowClick} />
         </div>
       </div>
     </form>

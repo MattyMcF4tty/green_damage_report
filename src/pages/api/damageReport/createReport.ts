@@ -1,6 +1,5 @@
-import { createReportDoc } from "@/utils/firebaseUtils/firestoreUtils";
-import { apiResponse } from "@/utils/types";
-
+import { createDamageReport } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
+import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function (req:NextApiRequest, res:NextApiResponse) {
@@ -10,7 +9,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
 
     // Check request
     if (method !== "POST") {
-        return res.status(405).json(new apiResponse(
+        return res.status(405).json(new ApiResponse(
             "METHOD_NOT_ALLOWED",
             [],
             ["Method is not allowed"],
@@ -18,14 +17,13 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         ))
     }
 
-    console.log("Creating new report")
     // Check if required information is valid.
     try {
         if (!email || typeof email !== 'string') {
             throw new Error("Missing email")
         }
     } catch ( error:any ) {
-        return res.status(400).json(new apiResponse(
+        return res.status(400).json(new ApiResponse(
             "BAD_REQUEST",
             [],
             [error.message],
@@ -35,9 +33,9 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
 
     let reportId: string;
     try {
-        reportId = await createReportDoc(email);
+        reportId = await createDamageReport(email);
     } catch (error:any) {
-        return res.status(500).json(new apiResponse(
+        return res.status(500).json(new ApiResponse(
             error.name,
             [],
             [error.message],
@@ -45,7 +43,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         ))
     }
 
-    return res.status(201).json(new apiResponse(
+    return res.status(201).json(new ApiResponse(
         "CREATED",
         ["Damage report has succesfully been created"],
         [],
