@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   useJsApiLoader,
   GoogleMap,
@@ -40,6 +40,8 @@ const Google = ({
     lat: 55.676098,
     lng: 12.568337,
   });
+  const markerRef = useRef<google.maps.Marker | null>(null);
+  const geocoderRef = useRef<google.maps.Geocoder | null>(null);
 
   const [autocompleteValue, setAutocompleteValue] =
     useState<string>(accidentAddress);
@@ -94,48 +96,71 @@ const Google = ({
       });
     }
   }, [map, autocomplete, marker]);
+  const handleMapLoad = useCallback(
+    (mapInstance: google.maps.Map) => {
+      console.log("handleMapLoad called");
 
-  const handleMapLoad = (mapInstance: google.maps.Map) => {
-    setMap(mapInstance);
-    setGeocoder(new google.maps.Geocoder());
+      setMap(mapInstance);
+      geocoderRef.current = new google.maps.Geocoder();
 
-    const initialMarker = new google.maps.Marker({
-      position: Center,
-      map: mapInstance,
-      draggable: true,
-    });
-
-    google.maps.event.addListener(initialMarker, "dragend", function () {
-      const newPosition = initialMarker.getPosition();
-      mapInstance.panTo(newPosition!);
-
-      if (newPosition) {
-        const verifiedPos = {
-          lat: newPosition.lat() ? newPosition.lat() : accidentLocation.lat,
-          lng: newPosition.lng() ? newPosition.lng() : accidentLocation.lng,
-        };
-        setAccidentLocation(verifiedPos);
-      }
-
-      // Reverse geocode the new position to get the address
-      if (geocoder) {
-        geocoder.geocode({ location: newPosition }, function (results, status) {
-          if (status === "OK" && results && results.length > 0) {
-            setAutocompleteValue(results[0].formatted_address);
-          } else if (results && results.length === 0) {
-            console.error("No results found");
-          } else {
-            console.error("Geocoder failed due to: " + status);
-          }
+      // Only create a new marker if one doesn't already exist
+      if (!markerRef.current) {
+        markerRef.current = new google.maps.Marker({
+          position: Center,
+          map: mapInstance,
+          draggable: true,
         });
+
+        // Add listeners here...
+        google.maps.event.addListener(
+          markerRef.current,
+          "dragend",
+          function () {
+            console.log("Marker dragged");
+
+            const newPosition = markerRef.current?.getPosition();
+            if (newPosition) {
+              mapInstance.panTo(newPosition);
+
+              const verifiedPos = {
+                lat: newPosition.lat(),
+                lng: newPosition.lng(),
+              };
+              setAccidentLocation(verifiedPos);
+
+              // Reverse geocode the new position to get the address
+              if (geocoderRef.current) {
+                geocoderRef.current.geocode(
+                  { location: newPosition },
+                  function (results, status) {
+                    console.log("Geocoding status:", status);
+                    if (
+                      status === google.maps.GeocoderStatus.OK &&
+                      results &&
+                      results.length > 0
+                    ) {
+                      setAutocompleteValue(results[0].formatted_address);
+                    } else {
+                      console.error(
+                        "No results found or Geocoder failed due to:",
+                        status
+                      );
+                    }
+                  }
+                );
+              }
+            }
+          }
+        );
+      } else {
+        // Re-use the existing marker
+        markerRef.current.setMap(mapInstance);
+        markerRef.current.setPosition(Center);
       }
-    });
-
-    setMarker(initialMarker);
-  };
-
+    },
+    [Center, setAccidentLocation, setAutocompleteValue]
+  );
   const handleCurrentLocation = () => {
-    // Check if geolocation is supported by the browser
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -145,18 +170,18 @@ const Google = ({
           };
 
           // Update map center and marker with user's location
-          // In handleCurrentLocation
           if (map) {
             map.panTo(pos);
             setMapCenter(pos);
           }
 
-          if (marker) {
-            marker.setPosition(pos);
+          if (markerRef.current) {
+            markerRef.current.setPosition(pos);
           }
+
           setTimeout(() => {
-            if (geocoder) {
-              geocoder.geocode(
+            if (geocoderRef.current) {
+              geocoderRef.current.geocode(
                 { location: pos },
                 (
                   results: google.maps.GeocoderResult[] | null,
@@ -174,15 +199,15 @@ const Google = ({
                 }
               );
             }
-          }, 500);
+          }, 200);
         },
         (error) => {
           console.warn(`ERROR(${error.code}): ${error.message}`);
         },
         {
-          enableHighAccuracy: true, // Get the best possible results
-          timeout: 5000, // Maximum time to wait for a position, in ms
-          maximumAge: 0, // Accept the last-known cached position up to a specified age in ms.
+          enableHighAccuracy: true,
+          timeout: 5000,
+          maximumAge: 0,
         }
       );
     } else {
@@ -212,6 +237,7 @@ const Google = ({
           {/* Container with spacing */}
           <Autocomplete onLoad={setAutocomplete}>
             <input
+              required={true}
               type="text"
               placeholder="Enter the location of the incident"
               className={`w-full h-10 text-lg p-1 rounded-none border-[1px]  focus:border-[3px] border-MainGreen-200 outline-none ${autocompleteBgColor}`} // Apply the dynamic background color
