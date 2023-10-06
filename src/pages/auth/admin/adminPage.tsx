@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { GetServerSidePropsContext, NextPage } from "next";
-import { handleVerifyUser } from "@/utils/utils";
 import ReportList from "@/components/admin/reportList";
 import ReportControls from "@/components/admin/reportControls";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
+import { handleVerifyUser } from "@/utils/logic/firebaseLogic/apiRoutes";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext

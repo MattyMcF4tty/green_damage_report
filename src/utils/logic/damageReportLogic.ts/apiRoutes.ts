@@ -1,6 +1,6 @@
 import { CustomerDamageReport } from "../../schemas/damageReportSchemas/customerReportSchema";
 
-export const handleGetAllReports = async () => {
+export const fetchAllDamageReports = async () => {
 
     const url = process.env.NEXT_PUBLIC_URL;
     if (!url) {
@@ -40,7 +40,7 @@ export const handleGetAllReports = async () => {
     return reportList;
 }
 
-export const handleGetReport = async(reportId:string) => {
+export const fetchDamageReport = async(reportId:string) => {
 
     const data = {
         reportId: reportId
@@ -78,6 +78,65 @@ export const handleGetReport = async(reportId:string) => {
     return reportData;
 }
 
-export const handleDeleteReport = async (id:string) => {
+export const requestDamageReportCreation = async (email: string) => {
+    const data = {
+      email: email,
+    };
+  
+    const url = process.env.NEXT_PUBLIC_URL;
+    if (!url) {
+      throw new Error("NEXT_PUBLIC_URL is not defined in enviroment");
+    }
+  
+    const response = await fetch(
+      process.env.NEXT_PUBLIC_URL + "/api/damageReport/createReport",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      }
+    );
+  
+    const responseJson = await response.json();
+    if (!response.ok) {
+      const newError = new Error(responseJson.errors[0]);
+      newError.name = responseJson.status;
+  
+      throw newError;
+    }
+  
+    const reportId: string = responseJson.data.reportId;
+  
+    return reportId;
+};
+  
 
+export const serverUpdateReport = async (reportId:string, reportData:CustomerDamageReport,) => {
+  const data = {
+    reportData: reportData.toPlainObject(), 
+    reportId: reportId
+  }
+
+  const response = await fetch(
+    process.env.NEXT_PUBLIC_URL + "/api/damageReport/updateReport",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    }
+  );
+
+  const responseJson = await response.json();
+  if (!response.ok) {
+    const newError = new Error(responseJson.errors[0]);
+    newError.name = responseJson.status;
+
+    throw newError;
+  }
+
+  return true;
 }

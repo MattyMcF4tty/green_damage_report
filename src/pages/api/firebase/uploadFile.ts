@@ -1,7 +1,7 @@
-import { arrayBufferToBlob, base64ToBuffer } from "@/utils/utils";
 import { NextApiRequest, NextApiResponse } from "next";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 import { uploadReportFile } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
+import { arrayBufferToBlob, base64ToBuffer } from "@/utils/logic/misc";
 
 
 export default async function (req:NextApiRequest, res:NextApiResponse) {

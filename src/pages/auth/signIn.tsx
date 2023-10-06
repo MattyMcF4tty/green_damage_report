@@ -1,5 +1,5 @@
 import { Inputfield } from "@/components/custom_inputfields";
-import { handleSignIn } from "@/utils/utils";
+import { handleSignIn } from "@/utils/logic/firebaseLogic/apiRoutes";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";

@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
-import { updateReportDoc } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
+import { updateDamageReport } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
 
@@ -29,7 +29,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         try {
             report.updateFields(reportData);
         } catch (error:any) {
-            throw new Error("reportData does not math CustomerDamageReport")
+            throw new Error("reportData does not match CustomerDamageReport")
         }
 
     } catch (error:any) {
@@ -41,7 +41,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         ))
     }
 
-    await updateReportDoc(reportId, report)
+    await updateDamageReport(reportId, report)
 
     return res.status(200).json(new ApiResponse(
         "OK",

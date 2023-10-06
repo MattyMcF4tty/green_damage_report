@@ -1,16 +1,12 @@
 /* import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";*/
 import React, { useEffect, useState, useRef } from "react";
 import usePlacesService from "react-google-autocomplete/lib/usePlacesAutocompleteService";
-import {
-  formatJournalNumber,
-  formatNumberplate,
-  formatSSN,
-} from "@/utils/formatUtils";
-import { trimArrayToLimit } from "@/utils/utils";
+import { trimArrayToLimit } from "@/utils/logic/misc";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera, faX } from "@fortawesome/free-solid-svg-icons";
 import { deleteReportFile, getReportFile, getReportFolder, uploadReportFile } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
 import { deleteStorageFile } from "@/utils/logic/firebaseLogic/storage";
+import { formatJournalNumber, formatNumberplate, formatSSN } from "@/utils/logic/formattingLogic/formatters";
 
 /* import usePlacesAutocomplete, {
   getGeocode,

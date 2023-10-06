@@ -1,5 +1,5 @@
 import { createDoc } from "@/firebase/clientApp";
-import { handleCreateNewReport } from "@/utils/logic/firebaseLogic/apiRoutes";
+import { requestDamageReportCreation } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 
@@ -18,7 +18,7 @@ const EmailPopUp = ({ reportIDs, setVisibility, email }: EmailPopUpProps) => {
 
     let reportId: string;
     try {
-      reportId = await handleCreateNewReport(email);
+      reportId = await requestDamageReportCreation(email);
     } catch (error: any) {
       console.error(error);
       setEnableButtons(true);

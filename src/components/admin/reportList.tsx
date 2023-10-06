@@ -1,8 +1,9 @@
-import { dateToWunder, reportSearch } from "@/utils/utils";
 import { useEffect, useState } from "react";
 import Loading from "../loading";
-import { handleGetAllReports } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
+import { fetchAllDamageReports } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import { reportSearch } from "@/utils/logic/misc";
+import { dateToWunder } from "@/utils/logic/wunderfleetLogic/wunderUtils";
 
 interface reportListProps {
   status: "all" | "finished" | "unfinished";
@@ -42,7 +43,7 @@ const ReportList = ({
   useEffect(() => {
     const fetchReportList = async () => {
       try {
-        const data = await handleGetAllReports();
+        const data = await fetchAllDamageReports();
         setReportList(data);
         setFilteredReportList(data);
         setLoaded(true);

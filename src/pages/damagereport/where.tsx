@@ -7,11 +7,6 @@ import {
 import BackButton from "@/components/buttons/back";
 import NextButton from "@/components/buttons/next";
 import { GetServerSidePropsContext, NextPage } from "next";
-import {
-  getServerSidePropsWithRedirect,
-  handleUpdateReport,
-  pageProps,
-} from "@/utils/utils";
 import { OtherPartyList } from "@/components/otherPartys/otherPartyList";
 import { useRouter } from "next/router";
 import html2canvas from "html2canvas";
@@ -24,8 +19,10 @@ import { Vehicle } from "@/utils/schemas/accidentParticipantSchemas/vehicleSchem
 import { Biker } from "@/utils/schemas/accidentParticipantSchemas/bikerSchema";
 import { Pedestrian } from "@/utils/schemas/accidentParticipantSchemas/pedestrianSchema";
 import { IncidentObject } from "@/utils/schemas/accidentParticipantSchemas/incidentObjectSchema";
-import { uploadReportFile } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
-
+import { updateDamageReport, uploadReportFile } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
+import { getEnvVariable, getServerSidePropsWithRedirect } from "@/utils/logic/misc";
+import { PageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
+import { serverUpdateReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -33,7 +30,7 @@ export const getServerSideProps = async (
   return await getServerSidePropsWithRedirect(context);
 };
 
-const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
+const WherePage: NextPage<PageProps> = ({ data, images, id }) => {
   const router = useRouter();
   const serverData = new CustomerDamageReport();
   const mapsId = "GoogleMap";
@@ -121,6 +118,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
     serverData.accidentAddress
   );
 
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setAllowClick(false);
@@ -198,7 +196,7 @@ const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
     });
 
     try {
-      await handleUpdateReport(id, serverData);
+      await serverUpdateReport(id, serverData);
     } catch (error) {
       setAllowClick(true);
       return;

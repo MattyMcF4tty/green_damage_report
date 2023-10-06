@@ -1,11 +1,8 @@
-import { highEncryptText, lowEncryptText } from "@/utils/securityUtils";
+import { getAge, isDateInRange } from "@/utils/logic/misc";
+import { dateToWunder, wunderToDate } from "@/utils/logic/wunderfleetLogic/wunderUtils";
+import { Renter } from "@/utils/schemas/accidentParticipantSchemas/renterSchema";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
-import {
-  dateToWunder,
-  getAge,
-  isDateInRange,
-  wunderToDate,
-} from "@/utils/utils";
+import { encryptObject } from "@/utils/security/crypto";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
@@ -61,7 +58,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     debug.push(`Accident date [Date]: ${accidentDate}`);
     debug.push(`Accident date [Wunder]: ${dateToWunder(accidentDate)}`);
 
-    console.log(debug)
     // Get information about vehicle
     const vehicleResponse = await fetch(wunderUrl + '/api/v2/vehicles/search', {
       method: "POST",
@@ -317,25 +313,25 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       renterGender === "Female";
     }
 
+    const renterInfo = new Renter(
+      `${customerId}`,
+      `${reservationId}`,
+      `${renterData.firstName}`,
+      `${renterData.lastName}`,
+      `${renterData.email}`,
+      `${renterData.mobilePhone}`,
+      `${renterData.birthDate}`,
+      `${renterGender}`,
+      `${renterAge}`,
+      null
+    )
     // Collecting renter data in object
-    const renterInfo = {
-      customerId: highEncryptText(`${customerId}`),
-      reservationId: highEncryptText(`${reservationId}`),
-      firstName: lowEncryptText(`${renterData.firstName}`),
-      lastName: lowEncryptText(`${renterData.lastName}`),
-      birthDate: highEncryptText(`${renterData.birthDate}`),
-      email: highEncryptText(`${renterData.email}`),
-      phoneNumber: highEncryptText(`${renterData.mobilePhone}`),
-      gender: highEncryptText(renterGender),
-      age: highEncryptText(`${renterAge}`),
-      insurance: null,
-    };
-    console.log(renterInfo);
+    const encryptedRenter = encryptObject(renterInfo.toPlainObject())
 
     return res
       .status(200)
       .json(
-        new ApiResponse("OK", ["User fetched succesfully"], [], renterInfo)
+        new ApiResponse("OK", ["Renter fetched succesfully"], [], encryptedRenter)
       );
   } catch (error: any) {
     console.error("Error at api/wunderfleet/getRenter.ts", error.message);

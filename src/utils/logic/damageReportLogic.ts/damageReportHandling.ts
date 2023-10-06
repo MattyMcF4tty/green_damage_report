@@ -1,12 +1,9 @@
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
-import { generateId } from "@/utils/utils";
-import { createFirestoreDoc, getFirestoreCollection, getFirestoreDoc, updateFirestoreDoc } from "../firebaseLogic/firestore";
+import { createFirestoreDoc, getFirestoreCollection, getFirestoreDoc, queryFirestoreCollection, updateFirestoreDoc } from "../firebaseLogic/firestore";
 import AppError from "@/utils/schemas/miscSchemas/errorSchema";
-import { collection, getDocs } from "firebase/firestore";
-import { FireDatabase } from "@/firebase/firebaseConfig";
-import { getEnvVariable } from "../misc";
-import { decryptReport, encryptReport } from "@/utils/securityUtils";
+import { generateId, getEnvVariable } from "../misc";
 import { deleteStorageFile, getStorageDownloadUrl, getStorageFolderDownloadUrls, uploadFileToStorage } from "../firebaseLogic/storage";
+import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
 
 export const createDamageReport = async (email: string) => {
     const reportId = await generateId()
@@ -18,9 +15,9 @@ export const createDamageReport = async (email: string) => {
       userEmail: email,
     });
   
-    const damageReportCol = process.env.DAMAGE_REPORT_FIRESTORE_COLLECTION;
+    const damageReportCol = process.env.NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION;
     if (!damageReportCol) {
-      throw new AppError('INTERNAL_ERROR', 'DAMAGE_REPORT_FIRESTORE_COLLECTION is not defined in enviroment');
+      throw new AppError('INTERNAL_ERROR', 'NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION is not defined in enviroment');
     }
   
     await createFirestoreDoc(
@@ -32,7 +29,10 @@ export const createDamageReport = async (email: string) => {
 };
 
 export const getDamageReportIds = async () => {
-  const collectionName = getEnvVariable('DAMAGE_REPORT_FIRESTORE_COLLECTION');
+  const collectionName = process.env.NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION;
+  if (!collectionName) {
+    throw new AppError('INTERNAL_ERROR', `NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION is not defined in environment.`);
+  }
   const idList: string[] = [];
 
   const querySnapshot = await getFirestoreCollection(collectionName);
@@ -49,22 +49,13 @@ export const getDamageReportIds = async () => {
 
 export const getDamageReport = async (reportId: string, authorized: boolean) => {
   // We get our encryption collection name from the enviroment
-  const damageReportCol = process.env.DAMAGE_REPORT_FIRESTORE_COLLECTION;
+  const damageReportCol = process.env.NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION;
   if (!damageReportCol) {
-    let newError = new Error();
-    newError.name = "SERVER_ERROR";
-    newError.message =
-      "DAMAGE_REPORT_FIRESTORE_COLLECTION is not defined in enviroment";
-    throw newError;
+    throw new AppError('INTERNAL_ERROR', `NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION is not defined in environment.`);
   }
 
   // we get the data from firebase
-  let documentData;
-  try {
-    documentData = await getFirestoreDoc(`${damageReportCol}/${reportId}`);
-  } catch (error: any) {
-    throw error;
-  }
+  const documentData = await getFirestoreDoc(`${damageReportCol}/${reportId}`);
 
   // We convert it to our report format
   let reportData = new CustomerDamageReport();
@@ -79,26 +70,29 @@ export const getDamageReport = async (reportId: string, authorized: boolean) => 
   }
 
   // We decrypt the report
-  let decryptedData = new CustomerDamageReport();
-  try {
-    decryptedData = decryptReport(reportData, authorized);
-  } catch (error) {
-    throw error;
-  }
+  let decryptedReport = new CustomerDamageReport();
+  decryptedReport.updateFields(reportData.decrypt());
 
-  return decryptedData;
+
+  return decryptedReport;
 };
 
 
 export const deleteReportFile = async (id:string, path:string) => {
-  const reportStorageName = getEnvVariable('NEXT_PUBLIC_DAMAGE_REPORT_STORAGE_FOLDER');
+  const reportStorageName = process.env.NEXT_PUBLIC_DAMAGE_REPORT_STORAGE_FOLDER;
+  if (!reportStorageName) {
+    throw new AppError('INTERNAL_ERROR', `NEXT_PUBLIC_DAMAGE_REPORT_STORAGE_FOLDER is not defined in environment.`);
+  }
 
   await deleteStorageFile(`${reportStorageName}/${id}/${path}`)
 }
 
 
 export const uploadReportFile = async (id:string, path:string, file:Blob) => {
-  const reportStorageName = getEnvVariable('NEXT_PUBLIC_DAMAGE_REPORT_STORAGE_FOLDER');
+  const reportStorageName = process.env.NEXT_PUBLIC_DAMAGE_REPORT_STORAGE_FOLDER;
+  if (!reportStorageName) {
+    throw new AppError('INTERNAL_ERROR', `NEjjjXT_PUBLIC_DAMAGE_REPORT_STORAGE_FOLDER is not defined in environment.`);
+  }
 
   await uploadFileToStorage(`${reportStorageName}/${id}/${path}`, file)
 
@@ -107,32 +101,34 @@ export const uploadReportFile = async (id:string, path:string, file:Blob) => {
 
 
 export const getReportFolder = async (id:string, folderName:string) => {
-    
-  const reportStorageName = getEnvVariable('NEXT_PUBLIC_DAMAGE_REPORT_STORAGE_FOLDER');
-
+  const reportStorageName = process.env.NEXT_PUBLIC_DAMAGE_REPORT_STORAGE_FOLDER;
+  if (!reportStorageName) {
+    throw new AppError('INTERNAL_ERROR', `NEXT_PUBLIC_DAMAGE_REPORT_STORAGE_FOLDER is not defined in environment.`);
+  }
+  
   const files = await getStorageFolderDownloadUrls(`${reportStorageName}/${id}/${folderName}`)
 
   return files;
 }
 
 
-export const updateReportDoc = async (
+export const updateDamageReport = async (
   reportId: string,
-  data: CustomerDamageReport
+  damageReport: CustomerDamageReport
 ) => {
   // We get our encryption collection name from the enviroment
-  const damageReportCol = getEnvVariable('DAMAGE_REPORT_FIRESTORE_COLLECTION');
+  const damageReportCol = process.env.NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION;
+  if (!damageReportCol) {
+    throw new AppError('INTERNAL_ERROR', `NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION is not defined in environment.`);
+  }
 
-  // Here we encrypt the data before sending it to our database
-  const encryptedData = encryptReport(data);
-
-  // We update when the document was last changed.
-  encryptedData.updateFields({ lastChange: `${new Date()}` });
+  // Here we encrypt the data before sending it to our database;
+  const encryptedData = damageReport.encrypt();
 
   // We upload the data to the given document
   await updateFirestoreDoc(
     `${damageReportCol}/${reportId}`,
-    encryptedData.toPlainObject()
+    encryptedData
   );
 
     return true;
@@ -142,8 +138,11 @@ export const updateReportDoc = async (
 export const getReportFile = async (id:string, filePath:string) => {
   let file: string;
 
-  const reportStorageName = getEnvVariable('NEXT_PUBLIC_DAMAGE_REPORT_STORAGE_FOLDER');
-
+  const reportStorageName = process.env.NEXT_PUBLIC_DAMAGE_REPORT_STORAGE_FOLDER;
+  if (!reportStorageName) {
+    throw new AppError('INTERNAL_ERROR', `NEXT_PUBLIC_DAMAGE_REPORT_STORAGE_FOLDER is not defined in environment.`);
+  }
+  
   try {
       file = await getStorageDownloadUrl(`${reportStorageName}/${id}/${filePath}`)
   } catch (error:any) {
@@ -151,4 +150,30 @@ export const getReportFile = async (id:string, filePath:string) => {
   }
 
   return file;
+}
+
+
+export const queryDamageReports = async (key: keyof CustomerDamageReport, value: string) => {
+
+  const url = process.env.NEXT_PUBLIC_URL;
+  if (!url) {
+    throw new AppError('INTERNAL_ERROR', `NEXT_PUBLIC_URL is not defined in environment.`);
+  }
+  const collectionName = process.env.NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION;
+  if (!collectionName) {
+    throw new AppError('INTERNAL_ERROR', `NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION is not defined in environment.`);
+  }
+
+  const result = await queryFirestoreCollection(collectionName, key, value);
+  const damageReports: Record<string, CustomerDamageReport> = result.reduce((acc: Record<string, CustomerDamageReport>, doc) => {
+    const damageReport = new CustomerDamageReport();
+    damageReport.updateFields(doc.data());
+
+    // Using doc.id as the key and the damageReport instance as the value
+    acc[doc.id] = damageReport;
+
+    return acc;
+  }, {});
+
+  return damageReports;
 }

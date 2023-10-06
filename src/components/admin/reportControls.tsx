@@ -1,7 +1,4 @@
 import {
-  handleGeneratePdf,
-} from "@/utils/utils";
-import {
   faCloudArrowDown,
   faEnvelope,
   faEye,
@@ -12,6 +9,7 @@ import { useState } from "react";
 import ExpandedReport from "./expandedReport";
 import { deleteReports } from "@/firebase/clientApp";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
+import { handleGeneratePdf } from "@/utils/logic/pdfLogic/pdfLogic";
 import SendMailPopUp from "../popups/sendMailPopUp";
 
 interface ReportControls {

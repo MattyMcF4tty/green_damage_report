@@ -2,12 +2,6 @@ import React, { useState } from "react";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
 import BackButton from "@/components/buttons/back";
-import {
-  getServerSidePropsWithRedirect,
-  handleSendEmail,
-  handleUpdateReport,
-  pageProps,
-} from "@/utils/utils";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -16,6 +10,10 @@ import {
   faCar,
   faPerson,
 } from "@fortawesome/free-solid-svg-icons";
+import { getServerSidePropsWithRedirect, handleSendEmail } from "@/utils/logic/misc";
+import { updateDamageReport } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
+import { PageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
+import { serverUpdateReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -23,7 +21,8 @@ export const getServerSideProps = async (
   return await getServerSidePropsWithRedirect(context);
 };
 
-const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
+
+const confirmationPage: NextPage<PageProps> = ({ data, images, id }) => {
   const Router = useRouter();
   const serverData = new CustomerDamageReport();
   serverData.updateFields(data);
@@ -35,7 +34,7 @@ const confirmationPage: NextPage<pageProps> = ({ data, images, id }) => {
     setAllowClick(false);
     serverData.updateFields({ finished: true });
     try {
-      await handleUpdateReport(id, serverData);
+      await serverUpdateReport(id, serverData);
     } catch (error) {
       setAllowClick(true);
       return;

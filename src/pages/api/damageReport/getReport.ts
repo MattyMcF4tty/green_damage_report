@@ -1,9 +1,10 @@
 import { FireDatabase } from "@/firebase/firebaseConfig";
-import { decryptReport } from "@/utils/securityUtils";
 import { doc, getDoc } from "firebase/firestore";
 import { NextApiRequest, NextApiResponse } from "next";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
+import { getDamageReport } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
+import { getEnvVariable } from "@/utils/logic/misc";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
 
@@ -39,35 +40,16 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         ))
     }
 
-    const damageCol = process.env.DAMAGE_REPORT_FIRESTORE_COLLECTION;
-    if (!damageCol || typeof damageCol !== 'string') {
-        console.error("DAMAGE_REPORT_FIRESTORE_COLLECTION is not defined in enviroment")
-        return res.status(500).json(new ApiResponse(
-            "SERVER_ERROR",
-            [],
-            ["Something went wrong"],
-            {}
-        ))
-    }
+    const damageCol = getEnvVariable('NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION');
+  
 
-    const database = FireDatabase;
-    if (!database) {
-        console.error("FireDatabase is not initialized");
-        return res.status(500).json(new ApiResponse(
-            "SERVER_ERROR",
-            [],
-            ["Something went wrong"],
-            {}
-        ))
-    }
-
-    const documentRef = doc(database, `${damageCol}/${reportId}`);
+    const documentRef = doc(FireDatabase, `${damageCol}/${reportId}`);
 
     // Get report
-    let document;
+    let damageReport;
     try {
-        document = await getDoc(documentRef)
-    } catch ( error:any)  {
+        damageReport = await getDamageReport(reportId, false)
+    } catch (error:any)  {
         console.error(`Error getting report with id: ${reportId}, ${error.code}`)
         return res.status(500).json(new ApiResponse(
             "SERVER_ERROR",
@@ -77,49 +59,14 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         ))
     }
 
-    // Check if report exists
-    if (!document.exists()) {
-        return res.status(404).json(new ApiResponse(
-            "NOT_FOUND",
-            [],
-            ["Report not found"],
-            {}
-        ))
-    }
-
-    const documentData = document.data();
-
-    if (!documentData) {
-        return res.status(404).json(new ApiResponse(
-            "NOT_FOUND",
-            [],
-            ["Report data not found"],
-            {}
-        ))
-    }
-
-    const report = new CustomerDamageReport();
-    report.updateFields(documentData);
-
-    const lowEncryptionKey = process.env.LOW_ENCRYPTION_KEY;
-    if (!lowEncryptionKey) {
-        console.error("LOW_ENCRYPTION_KEY is not defined in enviroment")
-        return res.status(500).json(new ApiResponse(
-            "SERVER_ERROR",
-            [],
-            ["Something went wrong"],
-            {}
-        ))
-    }
 
     // Decrypt here
-    const decryptedReport = decryptReport(report, false)
-    const decryptedReportObject = decryptedReport.toPlainObject();
+    const decryptedReport = damageReport;
 
     return res.status(200).json(new ApiResponse(
         "OK",
         [],
         [],
-        decryptedReportObject
+        decryptedReport
     ))
 }

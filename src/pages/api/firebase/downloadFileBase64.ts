@@ -1,7 +1,7 @@
 import { getStorageDownloadUrl } from "@/utils/logic/firebaseLogic/storage";
-import { urlToBase64 } from "@/utils/utils";
 import { NextApiRequest, NextApiResponse } from "next";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
+import { urlToBase64 } from "@/utils/logic/misc";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
 

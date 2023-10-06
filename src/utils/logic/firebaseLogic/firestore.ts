@@ -1,21 +1,7 @@
 import { FireDatabase } from "@/firebase/firebaseConfig";
-import {
-  DocumentData,
-  QuerySnapshot,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  setDoc,
-  updateDoc,
-} from "firebase/firestore";
-import {
-  generateId,
-  isJSONSerializable,
-} from "../../utils";
-import { decryptReport, encryptReport } from "../../securityUtils";
-import { CustomerDamageReport } from "../../schemas/damageReportSchemas/customerReportSchema";
 import AppError from "@/utils/schemas/miscSchemas/errorSchema";
+import { isJSONSerializable } from "../wunderfleetLogic/wunderUtils";
+import { DocumentData, QuerySnapshot, collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
 
 export const updateFirestoreDoc = async (path: string, data: {}) => {
 
@@ -186,3 +172,18 @@ export const handleFirestoreErrors = (error: any): Error => {
   return newError;
 };
 
+
+export const queryFirestoreCollection = async (collectionName: string, key: string, value: string) => {
+  try {    
+    // Create a query against the specified collection where the key matches the value
+    const q = query(collection(FireDatabase, collectionName), where(key, "==", value));
+
+    const querySnapshot = await getDocs(q); // Execute the query
+    
+
+    return querySnapshot.docs; // Return results as an array of objects
+  } catch (error) {
+    console.error("Error querying Firestore: ", error); // Log error
+    throw error; // Rethrow to be handled by calling function
+  }
+};

@@ -1,4 +1,4 @@
-import { handleSignOut } from "@/utils/utils";
+import { handleSignOut } from "@/utils/logic/firebaseLogic/apiRoutes";
 import { faArrowRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRouter } from "next/router";

@@ -1,10 +1,6 @@
-import { createDoc } from "@/firebase/clientApp";
-import { handleCreateNewReport } from "@/utils/logic/firebaseLogic/apiRoutes";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
-import { useRouter } from "next/router";
-import { use, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { TextField } from "../custom_inputfields";
-import { text } from "stream/consumers";
 
 interface SendMailPopUpProps {
   setVisibility: (visible: boolean) => void;

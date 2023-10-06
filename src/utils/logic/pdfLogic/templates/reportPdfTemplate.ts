@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import EXIF from "exif-js";
-import { handleGetBase64FileFromStorage } from "./logic/firebaseLogic/apiRoutes";
-import { CustomerDamageReport } from "./schemas/damageReportSchemas/customerReportSchema";
+import { handleGetBase64FileFromStorage } from "../../firebaseLogic/apiRoutes";
+import { CustomerDamageReport } from "../../../schemas/damageReportSchemas/customerReportSchema";
 
 const addImageToPDF = (pdfDoc: jsPDF) => {
   const imageWidth = 80;

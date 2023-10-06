@@ -1,8 +1,6 @@
 import { FireStorage } from "@/firebase/firebaseConfig"
 import { deleteObject, getDownloadURL, listAll, ref, uploadBytes } from "firebase/storage"
-import { replaceLastSlash } from "../../utils";
 import AppError from "@/utils/schemas/miscSchemas/errorSchema";
-import { getEnvVariable } from "../misc";
 
 export const getStorageDownloadUrl = async (path:string) => {
     const fileRef = ref(FireStorage, path);
@@ -149,8 +147,6 @@ export const deleteStorageFile = async (path:string) => {
             default:
                 newError.message = 'File deletion failed.';
         }
-
-        // Optionally: Send error to an error reporting service
 
         throw new AppError(newError.name, newError.message);
     }
