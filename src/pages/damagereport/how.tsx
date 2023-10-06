@@ -172,7 +172,7 @@ const HowPage: NextPage<PageProps> = ({ data, images, id }) => {
         </div>
 
         <div className="flex flex-row w-16 justify-end h-14 mr-10">
-          <NextButton allowClick={allowClick}/>
+          <NextButton disabled={!allowClick}/>
         </div>
       </div>
     </form>

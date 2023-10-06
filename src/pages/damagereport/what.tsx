@@ -260,7 +260,7 @@ const What: NextPage<PageProps> = ({ data, id }) => {
         </div>
 
         <div className="flex flex-row h-14 mt-4 w-16 justify-end mr-10">
-          <NextButton allowClick={allowClick} />
+          <NextButton disabled={!allowClick} />
         </div>
       </div>
     </form>
