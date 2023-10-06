@@ -40,7 +40,7 @@ export const getServerSideProps = async (
 const WherePage: NextPage<pageProps> = ({ data, images, id }) => {
   const router = useRouter();
   const serverData = new reportDataType();
-  const mapsId = "GoogleMap";
+  const mapsId = "MyGoogleMap";
   serverData.updateFields(data);
   const [allowClick, setAllowClick] = useState(true);
   const [currentCar, setCurrentCar] = useState<"zoe" | "van">(

@@ -226,7 +226,7 @@ const Google = ({
         <div>
           <div className="mb-4 ">
             <GoogleMap
-              id={id}
+              id={"MyGoogleMap"}
               onLoad={handleMapLoad}
               center={mapCenter}
               zoom={Zoom}
