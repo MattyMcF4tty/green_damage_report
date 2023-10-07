@@ -8,7 +8,10 @@ export const encryptText = (text: string) => {
     return text;  
   }
 
-  const key = getEnvVariable('ENCRYPTION_KEY')
+  const key = process.env.ENCRYPTION_KEY;
+  if (!key) {
+    throw new Error('ENCRYPTION_KEY is not defined in enviroment')
+  }
   const encryptedText = CryptoJS.AES.encrypt(text, key);
 
   return encryptedText.toString();
@@ -21,8 +24,11 @@ export const decryptText = (text: string) => {
     return text;  
   }
 
-  const key = getEnvVariable('ENCRYPTION_KEY')
-  const decryptedText = CryptoJS.AES.decrypt(text, key);
+
+    if (!key) {
+    throw new Error('ENCRYPTION_KEY is not defined in enviroment')
+  }
+const decryptedText = CryptoJS.AES.decrypt(text, key);
 
   return decryptedText.toString(CryptoJS.enc.Utf8);
 };
