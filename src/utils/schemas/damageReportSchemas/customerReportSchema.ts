@@ -1,4 +1,4 @@
-import { decryptObject, encryptObject } from "@/utils/security/crypto";
+import { decryptArray, decryptObject, decryptText, encryptArray, encryptObject, encryptText } from "@/utils/security/crypto";
 import { BikerSchema } from "../accidentParticipantSchemas/bikerSchema";
 import { DriverSchema } from "../accidentParticipantSchemas/driverSchema";
 import { IncidentObjectSchema } from "../accidentParticipantSchemas/incidentObjectSchema";
@@ -192,6 +192,8 @@ export class CustomerDamageReport implements CustomerDamageReportSchema {
     }
     return false;
   }
+
+
   
   toPlainObject() {
     return {
@@ -252,14 +254,73 @@ export class CustomerDamageReport implements CustomerDamageReportSchema {
     };
   }
 
-  encrypt() {
-    const encryptedObject = encryptObject(this.toPlainObject());
-    return encryptedObject as CustomerDamageReportSchema;
-  }
+  crypto(type: 'decrypt' | 'encrypt') {
+    console.log(this.witnesses)
 
-  decrypt() {
-    const decryptedObject = decryptObject(this.toPlainObject()); 
-    return decryptedObject as CustomerDamageReportSchema;
+    const cryptoText = (text: string | null) => {
+      if (!text) {
+        return text
+      }
+
+      return type === 'encrypt' ? encryptText(text) : decryptText(text);
+    }
+
+    return {
+      userEmail: this.userEmail,
+      userPhoneNumber: cryptoText(this.userPhoneNumber),
+      finished: this.finished,
+      openedDate: this.openedDate,
+      closedDate: this.closedDate,
+      lastChange: this.lastChange,
+      reportId: this.reportId,
+      driverInfo: {
+        firstName: cryptoText(this.driverInfo.firstName),
+        lastName: cryptoText(this.driverInfo.lastName),
+        address: cryptoText(this.driverInfo.address),
+        socialSecurityNumber: cryptoText(this.driverInfo.socialSecurityNumber),
+        drivingLicenseNumber: cryptoText(this.driverInfo.drivingLicenseNumber),
+        phoneNumber: cryptoText(this.driverInfo.phoneNumber),
+        email: cryptoText(this.driverInfo.email),
+        validDriversLicense: this.driverInfo.validDriversLicense,
+      },
+      renterInfo: {
+        customerId: this.renterInfo.customerId,
+        reservationId: this.renterInfo.reservationId,
+        firstName: cryptoText(this.renterInfo.firstName),
+        lastName: cryptoText(this.renterInfo.lastName),
+        email: cryptoText(this.renterInfo.email),
+        phoneNumber: cryptoText(this.renterInfo.phoneNumber),
+        birthDate: cryptoText(this.renterInfo.birthDate),
+        gender: cryptoText(this.renterInfo.gender),
+        age: cryptoText(this.renterInfo.age),
+        insurance: this.renterInfo.insurance,
+      },
+      accidentLocation: {
+        lat: this.accidentLocation.lat,
+        lng: this.accidentLocation.lng,
+      },
+      accidentAddress: this.accidentAddress,
+      time: this.time,
+      date: this.date,
+      accidentDescription: cryptoText(this.accidentDescription),
+      greenCarNumberPlate: this.greenCarNumberPlate,
+      greenCarType: this.greenCarType,
+      speed: this.speed,
+      damageDescription: cryptoText(this.damageDescription),
+      policeReportNumber: cryptoText(this.policeReportNumber),
+      bikerInfo: this.bikerInfo,
+      vehicleInfo: this.vehicleInfo,
+      pedestrianInfo: this.pedestrianInfo,
+      otherObjectInfo: this.otherObjectInfo,
+      witnesses: this.witnesses,
+      damages: this.damages,
+      driverRenter: this.driverRenter,
+      policePresent: this.policePresent,
+      policeReportExist: this.policeReportExist,
+      witnessesPresent: this.witnessesPresent,
+      otherPartyInvolved: this.otherPartyInvolved,
+      singleVehicleAccident: this.singleVehicleAccident,
+    };
   }
 }
   

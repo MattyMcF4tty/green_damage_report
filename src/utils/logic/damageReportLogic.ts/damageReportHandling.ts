@@ -19,10 +19,12 @@ export const createDamageReport = async (email: string) => {
     if (!damageReportCol) {
       throw new AppError('INTERNAL_ERROR', 'NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION is not defined in enviroment');
     }
+
+    console.log('asfesfefef', newReportData)
   
     await createFirestoreDoc(
     `${damageReportCol}/${reportId}`,
-    newReportData.toPlainObject()
+    newReportData.crypto('encrypt')
     );
   
     return reportId;
@@ -71,7 +73,7 @@ export const getDamageReport = async (reportId: string, authorized: boolean) => 
 
   // We decrypt the report
   let decryptedReport = new CustomerDamageReport();
-  decryptedReport.updateFields(reportData.decrypt());
+  decryptedReport.updateFields(reportData.crypto('decrypt'));
 
 
   return decryptedReport;
@@ -123,7 +125,7 @@ export const updateDamageReport = async (
   }
 
   // Here we encrypt the data before sending it to our database;
-  const encryptedData = damageReport.encrypt();
+  const encryptedData = damageReport.crypto('encrypt');
 
   // We upload the data to the given document
   await updateFirestoreDoc(

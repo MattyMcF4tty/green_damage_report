@@ -89,7 +89,7 @@ export const requestDamageReportCreation = async (email: string) => {
     }
   
     const response = await fetch(
-      process.env.NEXT_PUBLIC_URL + "/api/damageReport/createReport",
+      url + "/api/damageReport/createReport",
       {
         method: "POST",
         headers: {

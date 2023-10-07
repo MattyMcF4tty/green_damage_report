@@ -95,6 +95,7 @@ export const getFirestoreDoc = async (path: string) => {
 
 export const createFirestoreDoc = async (path: string, data: {}) => {
 
+  console.log(data)
   // Verify data is Json serializable.
   if (!isJSONSerializable(data)) {
     throw new AppError('INVALID_FORMAT', 'Object is not JSON serializable.');

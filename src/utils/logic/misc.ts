@@ -65,7 +65,6 @@ export const generateId = async () => {
     const id = context.query.id as string;
   
     const reportData = await getDamageReport(id, false);
-    console.log(reportData);
     const GreenMobilityImages: string[] = [];
   
     const otherPartyImages = (

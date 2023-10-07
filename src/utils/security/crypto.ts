@@ -28,6 +28,7 @@ export const decryptText = (text: string) => {
 };
 
 
+// ENCRYPT DECRYPT ARRAY -----------------------------------------------------------------------------
 export const encryptArray = (array: string[]) => {
   const encryptedArray = array.map((item) => {
     return encryptText(item);
@@ -35,6 +36,7 @@ export const encryptArray = (array: string[]) => {
 
   return encryptedArray;
 }
+
 
 export const decryptArray = (array: string[]) => {
   const decryptedText = array.map((item) => {
@@ -44,7 +46,7 @@ export const decryptArray = (array: string[]) => {
   return decryptedText;
 }
 
-
+// ENCRYPT DECRYPT OBJECT -----------------------------------------------------------------------------
 export const encryptObject = (obj: object): object => {
   const encryptedObj: Record<string, any> = { ...obj }; 
 
@@ -61,7 +63,6 @@ export const encryptObject = (obj: object): object => {
 
   return encryptedObj;
 };
-
 
 
 export const decryptObject = (obj: Record<string, any>): object => {
