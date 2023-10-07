@@ -25,6 +25,7 @@ export const decryptText = (text: string) => {
   }
 
 
+  const key = process.env.ENCRYPTION_KEY;
     if (!key) {
     throw new Error('ENCRYPTION_KEY is not defined in enviroment')
   }
