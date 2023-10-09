@@ -1,3 +1,5 @@
+import { cryptoText } from "@/utils/security/crypto";
+
 export interface IncidentObjectSchema {
     description: string | null;
     information: string | null;
@@ -23,6 +25,13 @@ export class IncidentObject implements IncidentObjectSchema {
         return {
             description: this.description,
             information: this.information,
+        };
+    }
+
+    crypto(type: 'encrypt' | 'decrypt') {
+        return {
+            description: cryptoText(type, this.description),
+            information: cryptoText(type, this.information),
         };
     }
 }

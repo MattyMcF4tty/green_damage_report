@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { YesNo, Inputfield, TextField } from "../custom_inputfields";
 import PhoneNumber from "./phoneForm";
-import { Biker } from "@/utils/schemas/accidentParticipantSchemas/bikerSchema";
+import { Biker } from "@/utils/schemas/incidentDetailSchemas/bikerSchema";
 
 interface bikeInfoFormProps {
   value: Biker;

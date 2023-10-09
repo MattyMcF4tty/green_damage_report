@@ -1,3 +1,5 @@
+import { cryptoText } from "@/utils/security/crypto";
+
 export interface BikerSchema {
     name: string | null;
     phone: string | null;
@@ -39,5 +41,15 @@ export class Biker {
             ebike: this.ebike,
             personDamage: this.personDamage,
         };
+    }
+    
+    crypto(type: 'encrypt' | 'decrypt') {
+        return {
+            name: cryptoText(type, this.name),
+            phone: cryptoText(type, this.phone),
+            email: cryptoText(type, this.email),
+            ebike: this.ebike,
+            personDamage: cryptoText(type, this.personDamage),
+        }
     }
 }

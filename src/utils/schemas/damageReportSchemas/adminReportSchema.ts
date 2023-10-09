@@ -1,5 +1,5 @@
 import { decryptText, encryptText } from "@/utils/security/crypto";
-import { Renter, RenterSchema } from "../accidentParticipantSchemas/renterSchema";
+import { Renter, RenterSchema } from "../incidentDetailSchemas/renterSchema";
 import { CustomerDamageReport } from "./customerReportSchema";
 
 export class AdminDamageReport extends CustomerDamageReport {

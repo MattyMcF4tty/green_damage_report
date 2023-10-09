@@ -88,3 +88,17 @@ export const decryptObject = (obj: Record<string, any>): object => {
 
   return decryptedObj;
 };
+
+
+export const cryptoText = (type: 'encrypt' | 'decrypt', text: string | null) => {
+  if (!text) {
+    return text
+  }
+
+  return type === 'encrypt' ? encryptText(text) : decryptText(text);
+}
+
+
+export const cryptoTextArray = (type: 'encrypt' | 'decrypt', array:string[]) => {
+  return type === 'encrypt' ? encryptArray(array) : decryptArray(array)
+}

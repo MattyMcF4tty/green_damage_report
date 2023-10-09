@@ -12,10 +12,10 @@ import {
   faPerson,
   faX,
 } from "@fortawesome/free-solid-svg-icons";
-import { Biker } from "@/utils/schemas/accidentParticipantSchemas/bikerSchema";
-import { Vehicle } from "@/utils/schemas/accidentParticipantSchemas/vehicleSchema";
-import { IncidentObject } from "@/utils/schemas/accidentParticipantSchemas/incidentObjectSchema";
-import { Pedestrian } from "@/utils/schemas/accidentParticipantSchemas/pedestrianSchema";
+import { Biker } from "@/utils/schemas/incidentDetailSchemas/bikerSchema";
+import { Vehicle } from "@/utils/schemas/incidentDetailSchemas/vehicleSchema";
+import { IncidentObject } from "@/utils/schemas/incidentDetailSchemas/incidentObjectSchema";
+import { Pedestrian } from "@/utils/schemas/incidentDetailSchemas/pedestrianSchema";
 
 interface OtherPartyListProps {
   bikeValue: Biker[];

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { TextField } from "../custom_inputfields";
-import { IncidentObject } from "@/utils/schemas/accidentParticipantSchemas/incidentObjectSchema";
+import { IncidentObject } from "@/utils/schemas/incidentDetailSchemas/incidentObjectSchema";
 
 
 interface OtherProps {

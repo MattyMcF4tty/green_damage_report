@@ -136,12 +136,12 @@ export const reportSearch = (
           break;
 
         case "customerId":
-          updatedFilteredList = updatedFilteredList.filter((report) =>{
+          updatedFilteredList = updatedFilteredList.filter((report) => {
             const customerId = report.data.renterInfo.customerId;
             if (customerId)
             customerId.toLowerCase().includes(search.toLowerCase())
           });
-          break;
+        break;
 
         case "numberplate":
           updatedFilteredList = updatedFilteredList.filter((report) => {

@@ -2,7 +2,7 @@ import { updateDamageReport, updatePartialDamageReport } from "@/utils/logic/dam
 import { updateFirestoreDoc } from "@/utils/logic/firebaseLogic/firestore";
 import { getAge, isDateInRange } from "@/utils/logic/misc";
 import { dateToWunder, wunderToDate } from "@/utils/logic/wunderfleetLogic/wunderUtils";
-import { Renter } from "@/utils/schemas/accidentParticipantSchemas/renterSchema";
+import { Renter } from "@/utils/schemas/incidentDetailSchemas/renterSchema";
 import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 import AppError from "@/utils/schemas/miscSchemas/errorSchema";

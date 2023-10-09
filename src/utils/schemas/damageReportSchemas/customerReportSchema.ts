@@ -1,10 +1,11 @@
-import { decryptArray, decryptObject, decryptText, encryptArray, encryptObject, encryptText } from "@/utils/security/crypto";
-import { BikerSchema } from "../accidentParticipantSchemas/bikerSchema";
-import { DriverSchema } from "../accidentParticipantSchemas/driverSchema";
-import { IncidentObjectSchema } from "../accidentParticipantSchemas/incidentObjectSchema";
-import { PedestrianSchema } from "../accidentParticipantSchemas/pedestrianSchema";
-import { VehicleSchema } from "../accidentParticipantSchemas/vehicleSchema";
-import { WitnessSchema } from "../accidentParticipantSchemas/witnessSchema";
+import { cryptoText, decryptArray, decryptObject, decryptText, encryptArray, encryptObject, encryptText } from "@/utils/security/crypto";
+import { Biker, BikerSchema } from "../incidentDetailSchemas/bikerSchema";
+import { DriverSchema } from "../incidentDetailSchemas/driverSchema";
+import { IncidentObject, IncidentObjectSchema } from "../incidentDetailSchemas/incidentObjectSchema";
+import { Pedestrian, PedestrianSchema } from "../incidentDetailSchemas/pedestrianSchema";
+import { Vehicle, VehicleSchema } from "../incidentDetailSchemas/vehicleSchema";
+import { Witness, WitnessSchema } from "../incidentDetailSchemas/witnessSchema";
+import { Damage, DamageSchema } from "../incidentDetailSchemas/damageSchema";
 
 export interface CustomerDamageReportSchema {
   userEmail: string | null;
@@ -88,11 +89,7 @@ export class CustomerDamageReport implements CustomerDamageReportSchema {
 
   witnesses: WitnessSchema[];
 
-  damages: {
-    position: string | null;
-    description: string | null;
-    images: string[];
-  }[];
+  damages: DamageSchema[];
 
   /* SITE LOGIC */
   /* What */
@@ -227,30 +224,22 @@ export class CustomerDamageReport implements CustomerDamageReportSchema {
 
   crypto(type: 'decrypt' | 'encrypt') {
 
-    const cryptoText = (text: string | null) => {
-      if (!text) {
-        return text
-      }
-
-      return type === 'encrypt' ? encryptText(text) : decryptText(text);
-    }
-
     return {
       userEmail: this.userEmail,
-      userPhoneNumber: cryptoText(this.userPhoneNumber),
+      userPhoneNumber: cryptoText(type, this.userPhoneNumber),
       finished: this.finished,
       openedDate: this.openedDate,
       closedDate: this.closedDate,
       lastChange: this.lastChange,
       reportId: this.reportId,
       driverInfo: {
-        firstName: cryptoText(this.driverInfo.firstName),
-        lastName: cryptoText(this.driverInfo.lastName),
-        address: cryptoText(this.driverInfo.address),
-        socialSecurityNumber: cryptoText(this.driverInfo.socialSecurityNumber),
-        drivingLicenseNumber: cryptoText(this.driverInfo.drivingLicenseNumber),
-        phoneNumber: cryptoText(this.driverInfo.phoneNumber),
-        email: cryptoText(this.driverInfo.email),
+        firstName: cryptoText(type, this.driverInfo.firstName),
+        lastName: cryptoText(type, this.driverInfo.lastName),
+        address: cryptoText(type, this.driverInfo.address),
+        socialSecurityNumber: cryptoText(type, this.driverInfo.socialSecurityNumber),
+        drivingLicenseNumber: cryptoText(type, this.driverInfo.drivingLicenseNumber),
+        phoneNumber: cryptoText(type, this.driverInfo.phoneNumber),
+        email: cryptoText(type, this.driverInfo.email),
         validDriversLicense: this.driverInfo.validDriversLicense,
       },
       accidentLocation: {
@@ -260,18 +249,30 @@ export class CustomerDamageReport implements CustomerDamageReportSchema {
       accidentAddress: this.accidentAddress,
       time: this.time,
       date: this.date,
-      accidentDescription: cryptoText(this.accidentDescription),
+      accidentDescription: cryptoText(type, this.accidentDescription),
       greenCarNumberPlate: this.greenCarNumberPlate,
       greenCarType: this.greenCarType,
       speed: this.speed,
-      damageDescription: cryptoText(this.damageDescription),
-      policeReportNumber: cryptoText(this.policeReportNumber),
-      bikerInfo: this.bikerInfo,
-      vehicleInfo: this.vehicleInfo,
-      pedestrianInfo: this.pedestrianInfo,
-      otherObjectInfo: this.otherObjectInfo,
-      witnesses: this.witnesses,
-      damages: this.damages,
+      damageDescription: cryptoText(type, this.damageDescription),
+      policeReportNumber: cryptoText(type, this.policeReportNumber),
+      bikerInfo: this.bikerInfo.map((bike) => {
+        return new Biker(bike.name, bike.phone, bike.email, bike.ebike, bike.personDamage).crypto(type)
+      }),
+      vehicleInfo: this.vehicleInfo.map((vehicle) => {
+        return new Vehicle(vehicle.name, vehicle.phone, vehicle.email, vehicle.driversLicenseNumber, vehicle.insurance, vehicle.numberplate, vehicle.model).crypto(type)
+      }),
+      pedestrianInfo: this.pedestrianInfo.map((pedestrian) => {
+        return new Pedestrian(pedestrian.name, pedestrian.phone, pedestrian.email, pedestrian.personDamage).crypto(type)
+      }),
+      otherObjectInfo: this.otherObjectInfo.map((otherObject) => {
+        return new IncidentObject(otherObject.description, otherObject.information).crypto(type)
+      }),
+      witnesses: this.witnesses.map((witness) => {
+        return new Witness(witness.name, witness.phone, witness.email).crypto(type)
+      }),
+      damages: this.damages.map((damage) => {
+        return new Damage(damage.position, damage.description, damage.images).crypto(type)
+      }),
       driverRenter: this.driverRenter,
       policePresent: this.policePresent,
       policeReportExist: this.policeReportExist,
