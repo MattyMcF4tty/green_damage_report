@@ -109,17 +109,19 @@ export const updateDamageReport = async (
 export const updatePartialDamageReport = async (
   reportId: string,
   damageReportData: Partial<AdminDamageReport>
-) => {
+) => {  
   // We get our encryption collection name from the enviroment
   const damageReportCol = process.env.NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION;
   if (!damageReportCol) {
     throw new AppError('INTERNAL_ERROR', `NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION is not defined in environment.`);
   }
 
+  const reportData: Partial<AdminDamageReport> = {...damageReportData, lastChange: `${new Date()}`}
+
   // We upload the data to the given document
   await updateFirestoreDoc(
     `${damageReportCol}/${reportId}`,
-    damageReportData
+    reportData
   );
 
     return true;
@@ -206,6 +208,7 @@ export const getDamageReport = async (reportId: string) => {
 
   // we get the data from firebase
   const documentData = await getFirestoreDoc(`${damageReportCol}/${reportId}`);
+  console.log(`Fetched report: ${reportId}'s data from server:`, documentData.data(), '\n')
 
   // We convert it to our report format
   let reportData = documentData.data();

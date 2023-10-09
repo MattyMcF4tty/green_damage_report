@@ -1,4 +1,5 @@
 export const handleGetRenter = async (reportId:string, numberplate: string, date: Date) => {
+
     const data = {
       numberplate: numberplate.toUpperCase(),
       date: date,
