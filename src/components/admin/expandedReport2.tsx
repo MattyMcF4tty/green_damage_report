@@ -1,4 +1,4 @@
-import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
+/* import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
@@ -80,7 +80,7 @@ const ExpandedReport2 = ({ setVisible, reports }: ExpandedReport2Props) => {
             Police Info
           </h1>
         </div>
-        {/*Report info*/}
+        {/*Report info
 
         <div className="flex flex-row justify-between ">
           <div className="p-4 bg-white shadow-lg w-1/4 ">
@@ -101,7 +101,7 @@ const ExpandedReport2 = ({ setVisible, reports }: ExpandedReport2Props) => {
               {`${currentReport.data.lastChange}`}
             </span>
           </div>
-          {/* Driver info */}
+          {/* Driver info 
 
           <div className="ml-12 w-1/2 flex flex-row">
             <div className="p-4 bg-white shadow-lg">
@@ -258,7 +258,7 @@ const ExpandedReport2 = ({ setVisible, reports }: ExpandedReport2Props) => {
               </div>
             </div>
           </div>
-          {/* Police info */}
+          {/* Police info 
 
           <div className="ml-12 w-1/4">
             <div className="p-4 bg-white shadow-lg min-h-[20rem]">
@@ -328,7 +328,7 @@ const ExpandedReport2 = ({ setVisible, reports }: ExpandedReport2Props) => {
             </div>
           </div>
         </div>
-        {/* Section 2*/}
+        {/* Section 2
 
         <div>
           <div className=" h-[25rem] mt-4 w-1/3">
@@ -446,7 +446,7 @@ const ExpandedReport2 = ({ setVisible, reports }: ExpandedReport2Props) => {
             </div>
           </div>
 
-          {/* Displays current reports witness list  */}
+          {/* Displays current reports witness list 
           <h1 className="text-xs">Witnesses</h1>
           <div className=" bg-white shadow-md overflow-y-auto no-scrollbar h-full">
             {currentReport.data.witnesses.length > 0 ? (
@@ -516,3 +516,4 @@ const ExpandedReport2 = ({ setVisible, reports }: ExpandedReport2Props) => {
   );
 };
 export default ExpandedReport2;
+ */
