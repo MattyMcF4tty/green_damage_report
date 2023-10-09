@@ -1,3 +1,6 @@
+import AppError from "@/utils/schemas/miscSchemas/errorSchema";
+import { getEnvVariable } from "../misc";
+
 export const dateToWunder = (date: Date) => {
     const yyyy = date.getUTCFullYear();
     const MM = String(date.getUTCMonth() + 1).padStart(2, "0");
@@ -44,14 +47,8 @@ export const dateToWunder = (date: Date) => {
   };
   
 export const getReservationFromReservationId = async (reservationId:string) => {
-    const wunderURL = process.env.WUNDER_DOMAIN;
-    if (!wunderURL) {
-        throw new Error("WUNDER_DOMAIN is not defined")
-    }
-    const wunderAuth = process.env.WUNDER_ACCESS_TOKEN;
-    if (!wunderAuth) {
-        throw new Error("WUNDER_ACCESS_TOKEN is not defined")
-    }
+    const wunderURL = getEnvVariable('WUNDER_DOMAIN');
+    const wunderAuth = getEnvVariable('WUNDER_ACCESS_TOKEN');
 
     const response = await fetch(wunderURL + `/reservations/${reservationId}`, {
         method: "GET",
@@ -68,18 +65,12 @@ export const getReservationFromReservationId = async (reservationId:string) => {
         throw wunderError;
     }
 
-    return responseJson.data;
+    return responseJson.data ? responseJson.data[0] : null;
 }
 
 export const getCustomerFromCustomerId = async (customerId: string) => {
-    const wunderURL = process.env.WUNDER_DOMAIN;
-    if (!wunderURL) {
-        throw new Error("WUNDER_DOMAIN is not defined")
-    }
-    const wunderAuth = process.env.WUNDER_ACCESS_TOKEN;
-    if (!wunderAuth) {
-        throw new Error("WUNDER_ACCESS_TOKEN is not defined")
-    }
+    const wunderURL = getEnvVariable('WUNDER_DOMAIN');
+    const wunderAuth = getEnvVariable('WUNDER_ACCESS_TOKEN');
 
     const response = await fetch(wunderURL + `/customers/${customerId}`, {
         method: "GET",
@@ -96,18 +87,12 @@ export const getCustomerFromCustomerId = async (customerId: string) => {
         throw wunderError;
     }
 
-    return responseJson.data;
+    return responseJson.data ? responseJson.data[0] : null;
 }
 
 export const getVehicleByNumberplate = async (numberplate:string) => {
-    const wunderURL = process.env.WUNDER_DOMAIN;
-    if (!wunderURL) {
-        throw new Error("WUNDER_DOMAIN is not defined")
-    }
-    const wunderAuth = process.env.WUNDER_ACCESS_TOKEN;
-    if (!wunderAuth) {
-        throw new Error("WUNDER_ACCESS_TOKEN is not defined")
-    }
+    const wunderURL = getEnvVariable('WUNDER_DOMAIN');
+    const wunderAuth = getEnvVariable('WUNDER_ACCESS_TOKEN');
 
     const response = await fetch(wunderURL + `/vehicles/search`, {
         method: "POST",
@@ -116,29 +101,24 @@ export const getVehicleByNumberplate = async (numberplate:string) => {
             "Authorization": wunderAuth
         },
         body: JSON.stringify({
-            "licencePlate": numberplate
+            "licencePlate": {
+                "$eq": numberplate
+            }
         })
     }) 
+    console.log(response)
 
     const responseJson = await response.json();
     if (!response.ok) {
-        const wunderError = new Error(responseJson.errors[0]);
-        wunderError.name = responseJson.status;
-        throw wunderError;
+        throw new AppError(responseJson.status, responseJson.errors[0]);
     }
 
-    return responseJson.data;
+    return responseJson.data ? responseJson.data[0] : null;
 }
 
 export const getVehicleByVehicleId = async (vehicleId:string) => {
-    const wunderURL = process.env.WUNDER_DOMAIN;
-    if (!wunderURL) {
-        throw new Error("WUNDER_DOMAIN is not defined")
-    }
-    const wunderAuth = process.env.WUNDER_ACCESS_TOKEN;
-    if (!wunderAuth) {
-        throw new Error("WUNDER_ACCESS_TOKEN is not defined")
-    }
+    const wunderURL = getEnvVariable('WUNDER_DOMAIN');
+    const wunderAuth = getEnvVariable('WUNDER_ACCESS_TOKEN');
 
     const response = await fetch(wunderURL + `/vehicles/${vehicleId}`, {
         method: "GET",
@@ -150,19 +130,17 @@ export const getVehicleByVehicleId = async (vehicleId:string) => {
 
     const responseJson = await response.json();
     if (!response.ok) {
-        const wunderError = new Error(responseJson.errors[0]);
-        wunderError.name = responseJson.status;
-        throw wunderError;
+        throw new AppError(responseJson.status, responseJson.errors[0]);
     }
 
-    return responseJson.data;
+    return responseJson.data ? responseJson.data[0] : null;
 }
 
-export const isJSONSerializable = (data: any) => {
-    try {
-      JSON.stringify(data);
-      return true;
-    } catch (error) {
-      return false;
-    }
-  };
+
+
+
+export const getWunderVehicle = async () => {
+    const wunderUrl = getEnvVariable('WUNDER_DOMAIN');
+
+/*     const response = fecth (wunderUrl + '/')
+ */}

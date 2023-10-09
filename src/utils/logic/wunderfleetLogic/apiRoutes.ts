@@ -1,7 +1,8 @@
-export const handleGetRenter = async (numberplate: string, date: Date) => {
+export const handleGetRenter = async (reportId:string, numberplate: string, date: Date) => {
     const data = {
       numberplate: numberplate.toUpperCase(),
       date: date,
+      reportId: reportId
     };
   
     const response = await fetch(
@@ -21,16 +22,5 @@ export const handleGetRenter = async (numberplate: string, date: Date) => {
       throw new Error(responseData.errors[0]);
     }
   
-    return responseData.data as {
-      customerId: string | null;
-      reservationId: string | null;
-      firstName: string | null;
-      lastName: string | null;
-      birthDate: string | null;
-      email: string | null;
-      phoneNumber: string | null;
-      gender: string | null;
-      age: string | null;
-      insurance: boolean | null;
-    };
+    return true;
   };

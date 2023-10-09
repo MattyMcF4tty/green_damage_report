@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
-import { updateDamageReport } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
+import { updatePartialDamageReport } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
+import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
 
@@ -17,7 +17,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
     // Check for user errors
     const { reportData, reportId } = req.body;
-    let report = new CustomerDamageReport();
+    let report = new AdminDamageReport();
     try {
         if (!reportData) {
             throw new Error("reportData is null")
@@ -41,7 +41,8 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         ))
     }
 
-    await updateDamageReport(reportId, report)
+    const encryptedReport = report.crypto('encrypt')
+    await updatePartialDamageReport(reportId, encryptedReport)
 
     return res.status(200).json(new ApiResponse(
         "OK",

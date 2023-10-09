@@ -1,26 +1,26 @@
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { createFirestoreDoc, getFirestoreCollection, getFirestoreDoc, queryFirestoreCollection, updateFirestoreDoc } from "../firebaseLogic/firestore";
 import AppError from "@/utils/schemas/miscSchemas/errorSchema";
-import { generateId, getEnvVariable } from "../misc";
+import { generateId } from "../misc";
 import { deleteStorageFile, getStorageDownloadUrl, getStorageFolderDownloadUrls, uploadFileToStorage } from "../firebaseLogic/storage";
-import { DocumentData, QueryDocumentSnapshot } from "firebase/firestore";
+import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
 
 export const createDamageReport = async (email: string) => {
     const reportId = await generateId()
   
-    const newReportData = new CustomerDamageReport();
+    const newReportData = new AdminDamageReport();
+
     newReportData.updateFields({
       openedDate: `${new Date()}`,
       lastChange: `${new Date()}`,
       userEmail: email,
     });
+
   
     const damageReportCol = process.env.NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION;
     if (!damageReportCol) {
       throw new AppError('INTERNAL_ERROR', 'NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION is not defined in enviroment');
     }
-
-    console.log('asfesfefef', newReportData)
   
     await createFirestoreDoc(
     `${damageReportCol}/${reportId}`,
@@ -47,36 +47,6 @@ export const getDamageReportIds = async () => {
   }
 
   return idList;
-};
-
-export const getDamageReport = async (reportId: string, authorized: boolean) => {
-  // We get our encryption collection name from the enviroment
-  const damageReportCol = process.env.NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION;
-  if (!damageReportCol) {
-    throw new AppError('INTERNAL_ERROR', `NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION is not defined in environment.`);
-  }
-
-  // we get the data from firebase
-  const documentData = await getFirestoreDoc(`${damageReportCol}/${reportId}`);
-
-  // We convert it to our report format
-  let reportData = new CustomerDamageReport();
-  try {
-    reportData.updateFields(documentData.data());
-  } catch (error: any) {
-    let newError = new Error();
-    newError.name = "WRONG_FORMAT";
-    newError.message =
-      "The document data does not match the required format for a report";
-    throw newError;
-  }
-
-  // We decrypt the report
-  let decryptedReport = new CustomerDamageReport();
-  decryptedReport.updateFields(reportData.crypto('decrypt'));
-
-
-  return decryptedReport;
 };
 
 
@@ -136,6 +106,25 @@ export const updateDamageReport = async (
     return true;
 };
 
+export const updatePartialDamageReport = async (
+  reportId: string,
+  damageReportData: Partial<AdminDamageReport>
+) => {
+  // We get our encryption collection name from the enviroment
+  const damageReportCol = process.env.NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION;
+  if (!damageReportCol) {
+    throw new AppError('INTERNAL_ERROR', `NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION is not defined in environment.`);
+  }
+
+  // We upload the data to the given document
+  await updateFirestoreDoc(
+    `${damageReportCol}/${reportId}`,
+    damageReportData
+  );
+
+    return true;
+};
+
 
 export const getReportFile = async (id:string, filePath:string) => {
   let file: string;
@@ -179,3 +168,48 @@ export const queryDamageReports = async (key: keyof CustomerDamageReport, value:
 
   return damageReports;
 }
+
+export const getCustomerDamageReport = async (reportId:string) => {
+  const reportData = await getDamageReport(reportId);
+
+  const damageReport = new CustomerDamageReport();
+  damageReport.updateFields(reportData);
+
+  // We decrypt the damage report.
+  const decryptedDamageReport = new CustomerDamageReport();
+  decryptedDamageReport.updateFields(damageReport.crypto('decrypt'))
+
+  return decryptedDamageReport;
+}
+
+
+export const getAdminDamageReport = async (reportId:string) => {
+  const reportData = await getDamageReport(reportId);
+
+  const damageReport = new AdminDamageReport();
+  damageReport.updateFields(reportData);
+
+  // We decrypt the damage report.
+  const decryptedDamageReport = new AdminDamageReport();
+  damageReport.updateFields(damageReport.crypto('decrypt'))
+
+  return decryptedDamageReport;
+}
+
+
+export const getDamageReport = async (reportId: string) => {
+  // We get our encryption collection name from the enviroment
+  const damageReportCol = process.env.NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION;
+  if (!damageReportCol) {
+    throw new AppError('INTERNAL_ERROR', `NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION is not defined in environment.`);
+  }
+
+  // we get the data from firebase
+  const documentData = await getFirestoreDoc(`${damageReportCol}/${reportId}`);
+
+  // We convert it to our report format
+  let reportData = documentData.data();
+
+
+  return reportData;
+};

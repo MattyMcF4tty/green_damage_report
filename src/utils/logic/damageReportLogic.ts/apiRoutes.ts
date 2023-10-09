@@ -1,4 +1,7 @@
+import AppError from "@/utils/schemas/miscSchemas/errorSchema";
 import { CustomerDamageReport } from "../../schemas/damageReportSchemas/customerReportSchema";
+import { getAuthToken } from "@/utils/security/misc";
+import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
 
 export const fetchAllDamageReports = async () => {
 
@@ -139,4 +142,35 @@ export const serverUpdateReport = async (reportId:string, reportData:CustomerDam
   }
 
   return true;
+}
+
+
+export const getAdminDamageReport = async (reportId: string) => {
+  const url = process.env.NEXT_PUBLIC_URL;
+  if (!url) {
+    console.error('NEXT_PUBLIC_URL is not defined in enviroment')
+    throw new AppError('INTERNAL_ERROR', 'Something went wrong.')
+  }
+  const authorization = getAuthToken();
+  if (!authorization) {
+    throw new AppError('UNAUTHORIZED', 'No auth token available.')
+  }
+
+  const response = await fetch(`${url}/api/damageReport/admin?reportId=${reportId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': authorization
+    }
+  })
+
+  const responseJson = await response.json();
+  if (!response.ok) {
+    throw new AppError(responseJson.status, responseJson.errors[0]);
+  };
+
+  const adminDamageReport = new AdminDamageReport();
+  adminDamageReport.updateFields(responseJson.data)
+
+  return adminDamageReport;
 }

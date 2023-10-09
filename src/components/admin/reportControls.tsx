@@ -8,12 +8,12 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
 import ExpandedReport from "./expandedReport";
 import { deleteReports } from "@/firebase/clientApp";
-import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { handleGeneratePdf } from "@/utils/logic/pdfLogic/pdfLogic";
 import SendMailPopUp from "../popups/sendMailPopUp";
+import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
 
 interface ReportControls {
-  selectedReports: { id: string; data: CustomerDamageReport }[];
+  selectedReports: { id: string; data: AdminDamageReport }[];
 }
 
 const ReportControls = ({ selectedReports }: ReportControls) => {
@@ -23,13 +23,13 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
   const [allowPdf, setAllowPdf] = useState(true);
   const [sendMail, setSendMail] = useState(false);
   const handleEmail = async (
-    selectedReports: { id: string; data: CustomerDamageReport }[]
+    selectedReports: { id: string; data: AdminDamageReport }[]
   ) => {
     selectedReports.map(async (report, index) => {});
   };
 
   const handleInstallPDF = async (
-    selectedReports: { id: string; data: CustomerDamageReport }[]
+    selectedReports: { id: string; data: AdminDamageReport }[]
   ) => {
     setAllowPdf(false);
     selectedReports.map(async (report) => {

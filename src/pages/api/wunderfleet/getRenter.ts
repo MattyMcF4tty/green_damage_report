@@ -1,7 +1,11 @@
+import { updateDamageReport, updatePartialDamageReport } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
+import { updateFirestoreDoc } from "@/utils/logic/firebaseLogic/firestore";
 import { getAge, isDateInRange } from "@/utils/logic/misc";
 import { dateToWunder, wunderToDate } from "@/utils/logic/wunderfleetLogic/wunderUtils";
 import { Renter } from "@/utils/schemas/accidentParticipantSchemas/renterSchema";
+import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
+import AppError from "@/utils/schemas/miscSchemas/errorSchema";
 import { encryptObject } from "@/utils/security/crypto";
 import { NextApiRequest, NextApiResponse } from "next";
 
@@ -26,7 +30,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
     const wunderUrl = process.env.WUNDER_DOMAIN;
     const accessToken = process.env.WUNDER_ACCESS_TOKEN;
-    const { numberplate, date } = req.body;
+    const { numberplate, date, reportId } = req.body;
 
     try {
       if (!wunderUrl || typeof wunderUrl !== "string") {
@@ -42,6 +46,11 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       if (!numberplate || typeof numberplate !== "string") {
         throw new Error("Incorrect numberplate format");
       }
+
+      if (!numberplate || typeof numberplate !== "string") {
+        throw new Error("Incorrect numberplate format");
+      }
+      
       debug.push("Numberplate verified");
 
       if (!date || typeof date !== "string") {
@@ -249,11 +258,9 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
     // Get reservationId from reservation
     const reservationId = reservation[0].reservationId;
-    console.log("resvervation:", reservationId);
 
     // Get customerId from reservation
     const customerId = reservation[0].customerId;
-    console.log("customer:", customerId);
 
     // Get customer information by customerId
     const renterResponse = await fetch(wunderUrl + "/api/v2/customers/search", {
@@ -325,13 +332,24 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       `${renterAge}`,
       null
     )
+
     // Collecting renter data in object
-    const encryptedRenter = encryptObject(renterInfo.toPlainObject())
+    try {
+      await updatePartialDamageReport(reportId, {renterInfo: renterInfo.toPlainObject()})
+    } catch (error:any) {
+      console.error(error);
+      return res.status(500).json(new ApiResponse(
+        'INTERNAL_ERROR',
+        [],
+        ['Something went wrong.'],
+        {}
+      ))
+    }
 
     return res
       .status(200)
       .json(
-        new ApiResponse("OK", ["Renter fetched succesfully"], [], encryptedRenter)
+        new ApiResponse("OK", ["Renter fetched succesfully"], [], {})
       );
   } catch (error: any) {
     console.error("Error at api/wunderfleet/getRenter.ts", error.message);

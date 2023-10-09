@@ -7,10 +7,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEnvelope, faMailForward } from "@fortawesome/free-solid-svg-icons";
 import sendEmail from "@/pages/api/sendEmail";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
+import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
 
 interface SendMailPopUpProps {
   setVisibility: (visible: boolean) => void;
-  damageReport: CustomerDamageReport;
+  damageReport: AdminDamageReport;
 }
 const SendMailPopUp = ({ setVisibility, damageReport }: SendMailPopUpProps) => {
   const userEmail = damageReport.userEmail;

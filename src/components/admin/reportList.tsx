@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import Loading from "../loading";
-import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { fetchAllDamageReports } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 import { reportSearch } from "@/utils/logic/misc";
 import { dateToWunder } from "@/utils/logic/wunderfleetLogic/wunderUtils";
+import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
 
 interface reportListProps {
   status: "all" | "finished" | "unfinished";
@@ -12,7 +12,7 @@ interface reportListProps {
   itemsPerPage: number;
   currentPage: number; // Add currentPage to the interface
   currentSelectedReports: (
-    selected: { id: string; data: CustomerDamageReport }[]
+    selected: { id: string; data: AdminDamageReport }[]
   ) => void;
 }
 
@@ -24,14 +24,14 @@ const ReportList = ({
   currentSelectedReports,
 }: reportListProps) => {
   const [reportList, setReportList] = useState<
-    { id: string; data: CustomerDamageReport }[]
+    { id: string; data: AdminDamageReport }[]
   >([]);
   const [filteredReportList, setFilteredReportList] = useState<
-    { id: string; data: CustomerDamageReport }[]
+    { id: string; data: AdminDamageReport }[]
   >([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedReports, setSelectedReports] = useState<
-    { id: string; data: CustomerDamageReport }[]
+    { id: string; data: AdminDamageReport }[]
   >([]);
   const [loaded, setLoaded] = useState<boolean>(false);
 

@@ -1,7 +1,7 @@
 import { FireDatabase } from "@/firebase/firebaseConfig";
 import AppError from "@/utils/schemas/miscSchemas/errorSchema";
-import { isJSONSerializable } from "../wunderfleetLogic/wunderUtils";
 import { DocumentData, QuerySnapshot, collection, doc, getDoc, getDocs, query, setDoc, updateDoc, where } from "firebase/firestore";
+import { isJSONSerializable } from "../misc";
 
 export const updateFirestoreDoc = async (path: string, data: {}) => {
 

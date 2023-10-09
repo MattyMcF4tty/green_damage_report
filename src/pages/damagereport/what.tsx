@@ -14,7 +14,6 @@ import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/custom
 import { getServerSidePropsWithRedirect } from "@/utils/logic/misc";
 import { PageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
 import { handleGetRenter } from "@/utils/logic/wunderfleetLogic/apiRoutes";
-import { updateDamageReport } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
 import { serverUpdateReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 
 export const getServerSideProps = async (
@@ -72,9 +71,8 @@ const What: NextPage<PageProps> = ({ data, id }) => {
     const combinedDateTime = `${accidentDate}T${accidentTime}`;
     const date = new Date(combinedDateTime);
 
-    let renter;
     try {
-      renter = await handleGetRenter(greenCarNumberplate as string, date);
+      await handleGetRenter(id, greenCarNumberplate as string, date);
     } catch (error: any) {
       if (error.message === "Car not found") {
         setInvalidNumberplate(true);
@@ -89,7 +87,6 @@ const What: NextPage<PageProps> = ({ data, id }) => {
       setAllowClick(true);
       return;
     }
-    serverData.updateFields({ renterInfo: renter });
 
     /* TODO: Make function that gets information about current driver from green server */
     if (showDriverInfoForm !== true) {
