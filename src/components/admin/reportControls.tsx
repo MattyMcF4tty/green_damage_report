@@ -11,6 +11,7 @@ import { deleteReports } from "@/firebase/clientApp";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { handleGeneratePdf } from "@/utils/logic/pdfLogic/pdfLogic";
 import SendMailPopUp from "../popups/sendMailPopUp";
+import ExpandedReport2 from "./expandedReport2";
 
 interface ReportControls {
   selectedReports: { id: string; data: CustomerDamageReport }[];
@@ -98,7 +99,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
       </button>
 
       {showExpandedReports && (
-        <ExpandedReport
+        <ExpandedReport2
           setVisible={setShowExpandedReports}
           reports={selectedReports}
         />

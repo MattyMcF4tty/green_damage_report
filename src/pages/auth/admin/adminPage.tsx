@@ -5,7 +5,7 @@ import ReportControls from "@/components/admin/reportControls";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { handleVerifyUser } from "@/utils/logic/firebaseLogic/apiRoutes";
 
-export const getServerSideProps = async (
+/* export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   const token = context.req.cookies["AuthToken"];
@@ -21,7 +21,7 @@ export const getServerSideProps = async (
   }
 
   return { props: {} };
-};
+}; */
 
 const adminPage: NextPage = () => {
   const [currentStatus, setCurrentStatus] = useState<

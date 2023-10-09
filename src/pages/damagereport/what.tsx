@@ -227,7 +227,7 @@ const What: NextPage<PageProps> = ({ data, id }) => {
               labelText="Please enter the email of the driver"
               id="EmailInput"
               required={true}
-              type="email"
+              type="emailPattern"
               value={email}
               onChange={setEmail}
               placeHolder="Greenmobility@example.com"
