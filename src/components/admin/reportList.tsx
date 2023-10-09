@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import Loading from "../loading";
 import { fetchAllDamageReports } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
-import { reportSearch } from "@/utils/logic/misc";
+import { dateToString, reportSearch } from "@/utils/logic/misc";
 import { dateToWunder } from "@/utils/logic/wunderfleetLogic/wunderUtils";
 import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
 
 interface reportListProps {
   status: "all" | "finished" | "unfinished";
-  filter: "id" | "driver" | "numberplate" | "date";
+  filter: "id" | "customerId" | "numberplate" | "date";
   search: string;
   itemsPerPage: number;
   currentPage: number; // Add currentPage to the interface
@@ -101,7 +101,7 @@ const ReportList = ({
                 />
               </th>
               <th className="w-2/12 font-normal">ID</th>
-              <th className="w-2/12 font-normal">Name</th>
+              <th className="w-2/12 font-normal">CustomerID</th>
               <th className="w-2/12 font-normal">Numberplate</th>
               <th className="w-1/12 font-normal">Status</th>
               <th className="w-2/12 font-normal">Updated</th>
@@ -158,9 +158,9 @@ const ReportList = ({
                       </td>
                       <td className="w-2/12">{report.id}</td>
                       <td className="w-2/12">
-                        {report.data.driverInfo.firstName && report.data.driverInfo.lastName
-                          ? `${report.data.driverInfo.firstName} ${report.data.driverInfo.lastName}`
-                          : "-"}
+                        {report.data.renterInfo.customerId ? 
+                          `${report.data.renterInfo.customerId}`
+                         : '-'}
                       </td>
                       <td  className="w-2/12">
                         {report.data.greenCarNumberPlate
@@ -171,7 +171,7 @@ const ReportList = ({
                         {report.data.finished ? "Finished" : "Unfinished"}
                       </td>
                       <td className="w-2/12">
-                        {dateToWunder(new Date(report.data.lastChange))}
+                        {dateToString(new Date(report.data.lastChange))}
                       </td>
                     </tr>
                   ))

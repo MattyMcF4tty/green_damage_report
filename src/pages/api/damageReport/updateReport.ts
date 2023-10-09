@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 import { updatePartialDamageReport } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
 import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
 
@@ -17,7 +18,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
     // Check for user errors
     const { reportData, reportId } = req.body;
-    let report = new AdminDamageReport();
+    let report = new CustomerDamageReport()
     try {
         if (!reportData) {
             throw new Error("reportData is null")

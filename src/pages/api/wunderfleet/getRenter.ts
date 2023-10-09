@@ -6,7 +6,7 @@ import { Renter } from "@/utils/schemas/accidentParticipantSchemas/renterSchema"
 import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 import AppError from "@/utils/schemas/miscSchemas/errorSchema";
-import { encryptObject } from "@/utils/security/crypto";
+import { encryptObject, encryptText } from "@/utils/security/crypto";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
@@ -321,15 +321,15 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     }
 
     const renterInfo = new Renter(
-      `${customerId}`,
-      `${reservationId}`,
-      `${renterData.firstName}`,
-      `${renterData.lastName}`,
-      `${renterData.email}`,
-      `${renterData.mobilePhone}`,
-      `${renterData.birthDate}`,
-      `${renterGender}`,
-      `${renterAge}`,
+      customerId ? `${customerId}` : null,
+      reservationId ? `${reservationId}` : null,
+      renterData.firstName ? encryptText(`${renterData.firstName}`) : null,
+      renterData.lastName ? encryptText(`${renterData.lastName}`) : null,
+      renterData.email ? encryptText(`${renterData.email}`) : null,
+      renterData.mobilePhone ? encryptText(`${renterData.mobilePhone}`) : null,
+      renterData.birthDate ? encryptText(`${renterData.birthDate}`) : null,
+      renterGender,
+      renterAge ? encryptText(`${renterAge}`) : null,
       null
     )
 

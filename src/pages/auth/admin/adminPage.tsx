@@ -28,7 +28,7 @@ const adminPage: NextPage = () => {
     "all" | "finished" | "unfinished"
   >("all");
   const [currentFilter, setCurrentFilter] = useState<
-    "id" | "driver" | "numberplate" | "date"
+    "id" | "customerId" | "numberplate" | "date"
   >("id");
   const [currentSearch, setCurrentSearch] = useState<string>("");
   const [selectedReports, setSelectedReports] = useState<
@@ -103,14 +103,14 @@ const adminPage: NextPage = () => {
             value={currentFilter}
             onChange={(e) =>
               setCurrentFilter(
-                e.target.value as "id" | "driver" | "numberplate" | "date"
+                e.target.value as "id" | "customerId" | "numberplate" | "date"
               )
             }
           >
-            <option value="id">Id</option>
-            <option value="driver">Driver</option>
+            <option value="id">Report ID</option>
+            <option value="CustomerId">Customer ID</option>
             <option value="numberplate">Numberplate</option>
-            <option value="date">Date</option>
+            <option value="date">Updated</option>
           </select>
           {currentFilter === "date" ? (
             <input

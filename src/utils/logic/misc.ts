@@ -109,7 +109,7 @@ export const generateId = async () => {
 export const reportSearch = (
     reportList: { id: string; data: AdminDamageReport }[],
     status: "all" | "finished" | "unfinished",
-    filter: "id" | "driver" | "numberplate" | "date",
+    filter: "id" | "customerId" | "numberplate" | "date",
     search: string
   ) => {
     let updatedFilteredList = [...reportList];
@@ -134,31 +134,21 @@ export const reportSearch = (
             report.id.includes(search)
           );
           break;
-        case "driver":
-          updatedFilteredList = updatedFilteredList.filter((report) => {
-            if (
-              report.data.driverInfo.firstName &&
-              report.data.driverInfo.lastName
-            ) {
-              `${report.data.driverInfo.firstName.toLowerCase()} ${report.data.driverInfo.lastName.toLowerCase()}`.includes(
-                search.toLowerCase()
-              );
-            }
+
+        case "customerId":
+          updatedFilteredList = updatedFilteredList.filter((report) =>{
+            const customerId = report.data.renterInfo.customerId;
+            if (customerId)
+            customerId.toLowerCase().includes(search.toLowerCase())
           });
           break;
+
         case "numberplate":
           updatedFilteredList = updatedFilteredList.filter((report) => {
             if (report.data.greenCarNumberPlate) {
               report.data.greenCarNumberPlate
                 .toLowerCase()
                 .includes(search.toLowerCase());
-            }
-          });
-          break;
-        case "date":
-          updatedFilteredList = updatedFilteredList.filter((report) => {
-            if (report.data.date) {
-              report.data.date.toLowerCase().includes(search.toLowerCase());
             }
           });
           break;
@@ -308,3 +298,8 @@ export const reportSearch = (
     // Return the Base64 encoded string with the MIME type
     return `data:${mimeType};base64,${base64}`;
   };
+
+
+  export const dateToString = (date:Date) => {
+    return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()} ${date.getDay()}-${date.getMonth()}-${date.getFullYear()}`
+  }
