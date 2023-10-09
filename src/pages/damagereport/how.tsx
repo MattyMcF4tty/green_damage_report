@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   TextField,
   Inputfield,
@@ -43,7 +43,6 @@ const HowPage: NextPage<PageProps> = ({ data, images, id }) => {
     serverData.witnessesPresent
   );
   const [witnesses, setWitnesses] = useState(serverData.witnesses);
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

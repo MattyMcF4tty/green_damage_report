@@ -3,7 +3,6 @@ import { BikerSchema } from "../accidentParticipantSchemas/bikerSchema";
 import { DriverSchema } from "../accidentParticipantSchemas/driverSchema";
 import { IncidentObjectSchema } from "../accidentParticipantSchemas/incidentObjectSchema";
 import { PedestrianSchema } from "../accidentParticipantSchemas/pedestrianSchema";
-import { RenterSchema } from "../accidentParticipantSchemas/renterSchema";
 import { VehicleSchema } from "../accidentParticipantSchemas/vehicleSchema";
 import { WitnessSchema } from "../accidentParticipantSchemas/witnessSchema";
 
@@ -18,8 +17,6 @@ export interface CustomerDamageReportSchema {
   closedDate: string | null;
 
   driverInfo: DriverSchema;
-
-  renterInfo: RenterSchema
 
   accidentLocation: { lat: number | null; lng: number | null };
   accidentAddress: string;
@@ -71,8 +68,6 @@ export class CustomerDamageReport implements CustomerDamageReportSchema {
   closedDate: string | null;
 
   driverInfo: DriverSchema;
-
-  renterInfo: RenterSchema
 
   accidentLocation: { lat: number | null; lng: number | null };
   accidentAddress: string;
@@ -130,18 +125,6 @@ export class CustomerDamageReport implements CustomerDamageReportSchema {
       phoneNumber: null,
       email: null,
       validDriversLicense: null,
-    };
-    this.renterInfo = {
-      customerId: null,
-      reservationId: null,
-      firstName: null,
-      lastName: null,
-      email: null,
-      phoneNumber: null,
-      birthDate: null,
-      gender: null,
-      age: null,
-      insurance: null,
     };
     this.accidentLocation = { lat: null, lng: null };
     this.accidentAddress = "";
@@ -214,18 +197,6 @@ export class CustomerDamageReport implements CustomerDamageReportSchema {
         email: this.driverInfo.email,
         validDriversLicense: this.driverInfo.validDriversLicense,
       },
-      renterInfo: {
-        customerId: this.renterInfo.customerId,
-        reservationId: this.renterInfo.reservationId,
-        firstName: this.renterInfo.firstName,
-        lastName: this.renterInfo.lastName,
-        email: this.renterInfo.email,
-        phoneNumber: this.renterInfo.phoneNumber,
-        birthDate: this.renterInfo.birthDate,
-        gender: this.renterInfo.gender,
-        age: this.renterInfo.age,
-        insurance: this.renterInfo.insurance,
-      },
       accidentLocation: {
         lat: this.accidentLocation.lat,
         lng: this.accidentLocation.lng,
@@ -255,7 +226,6 @@ export class CustomerDamageReport implements CustomerDamageReportSchema {
   }
 
   crypto(type: 'decrypt' | 'encrypt') {
-    console.log(this.witnesses)
 
     const cryptoText = (text: string | null) => {
       if (!text) {
@@ -282,18 +252,6 @@ export class CustomerDamageReport implements CustomerDamageReportSchema {
         phoneNumber: cryptoText(this.driverInfo.phoneNumber),
         email: cryptoText(this.driverInfo.email),
         validDriversLicense: this.driverInfo.validDriversLicense,
-      },
-      renterInfo: {
-        customerId: this.renterInfo.customerId,
-        reservationId: this.renterInfo.reservationId,
-        firstName: cryptoText(this.renterInfo.firstName),
-        lastName: cryptoText(this.renterInfo.lastName),
-        email: cryptoText(this.renterInfo.email),
-        phoneNumber: cryptoText(this.renterInfo.phoneNumber),
-        birthDate: cryptoText(this.renterInfo.birthDate),
-        gender: cryptoText(this.renterInfo.gender),
-        age: cryptoText(this.renterInfo.age),
-        insurance: this.renterInfo.insurance,
       },
       accidentLocation: {
         lat: this.accidentLocation.lat,

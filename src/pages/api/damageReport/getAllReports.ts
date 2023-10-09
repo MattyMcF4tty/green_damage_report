@@ -2,6 +2,7 @@ import { getFirestoreCollection } from "@/utils/logic/firebaseLogic/firestore";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { NextApiRequest, NextApiResponse } from "next";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
+import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
 
 export default async function (req:NextApiRequest, res:NextApiResponse) {
 
@@ -50,14 +51,15 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
 
     const reports = reportList.docs.map((doc) => {
         const docData = doc.data();
-        const reportData = new CustomerDamageReport();
+        const reportData = new AdminDamageReport();
         reportData.updateFields(docData);
 
         return {
             id: doc.id as string,
-            data: reportData.toPlainObject()
+            data: reportData.crypto('decrypt')
         }
     })
+
     return res.status(200).json(new ApiResponse(
         'OK',
         ['Fetching all report ids finished succesfully'],

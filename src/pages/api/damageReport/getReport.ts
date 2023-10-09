@@ -3,8 +3,8 @@ import { doc, getDoc } from "firebase/firestore";
 import { NextApiRequest, NextApiResponse } from "next";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
-import { getDamageReport } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
 import { getEnvVariable } from "@/utils/logic/misc";
+import { getCustomerDamageReport } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
 
@@ -19,13 +19,6 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
     }
 
     const { reportId } = req.body;
-    const { Authorization } = req.headers;
-    let isAdmin = false;
-
-    if (Authorization) {
-        isAdmin = true;
-    }
-
 
     try {
         if (!reportId || typeof reportId !== 'string') {
@@ -39,17 +32,21 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
             {}
         ))
     }
-
-    const damageCol = getEnvVariable('NEXT_PUBLIC_DAMAGE_REPORT_FIRESTORE_COLLECTION');
   
-
-    const documentRef = doc(FireDatabase, `${damageCol}/${reportId}`);
-
     // Get report
     let damageReport;
     try {
-        damageReport = await getDamageReport(reportId, false)
+        damageReport = await getCustomerDamageReport(reportId)
     } catch (error:any)  {
+        if (error.name === 'NOT_FOUND') {
+            return res.status(204).json(new ApiResponse(
+                'OK',
+                ['Report not found'],
+                [],
+                {}
+            ))
+        }
+
         console.error(`Error getting report with id: ${reportId}, ${error.code}`)
         return res.status(500).json(new ApiResponse(
             "SERVER_ERROR",
@@ -59,14 +56,10 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
         ))
     }
 
-
-    // Decrypt here
-    const decryptedReport = damageReport;
-
     return res.status(200).json(new ApiResponse(
         "OK",
         [],
         [],
-        decryptedReport
+        damageReport.crypto('decrypt')
     ))
 }

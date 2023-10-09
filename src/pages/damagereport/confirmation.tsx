@@ -89,8 +89,8 @@ const confirmationPage: NextPage<PageProps> = ({ data, images, id }) => {
           <div className="row-start-1 col-span-2 justify-center">
             <p className="text-xs italic">Name:</p>
             <p>
-              {data.renterInfo.firstName ? data.renterInfo.firstName : "-"}{" "}
-              {data.renterInfo.lastName ? data.renterInfo.lastName : ""}
+              {data.driverInfo.firstName ? data.driverInfo.firstName : "-"}{" "}
+              {data.driverInfo.lastName ? data.driverInfo.lastName : ""}
             </p>
           </div>
         </div>

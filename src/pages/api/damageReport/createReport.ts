@@ -5,7 +5,6 @@ import { NextApiRequest, NextApiResponse } from "next";
 export default async function (req:NextApiRequest, res:NextApiResponse) {
     const method = req.method;
     const { email } = req.body;
-    const { authorization } = req.headers;
 
     // Check request
     if (method !== "POST") {

@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import EXIF from "exif-js";
 import { handleGetBase64FileFromStorage } from "../../firebaseLogic/apiRoutes";
-import { CustomerDamageReport } from "../../../schemas/damageReportSchemas/customerReportSchema";
+import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
 
 const addImageToPDF = (pdfDoc: jsPDF) => {
   const imageWidth = 80;
@@ -16,7 +16,7 @@ const addImageToPDF = (pdfDoc: jsPDF) => {
 };
 
 const createReportPDF = async (
-  data: CustomerDamageReport,
+  data: AdminDamageReport,
   images: Record<string, string[]>,
   map: string
 ) => {
@@ -108,7 +108,7 @@ const createReportPDF = async (
   const addDriverInfoToPDF = (
     doc: jsPDF,
     startY: number,
-    data: CustomerDamageReport
+    data: AdminDamageReport
   ) => {
     const lineDriverHeight = 8;
     const staticContentHeight = 40;

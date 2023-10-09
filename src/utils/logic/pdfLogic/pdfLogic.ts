@@ -1,9 +1,10 @@
 import { downloadToPc } from "../misc";
-import { getReportFile, getReportFolder } from "../damageReportLogic.ts/damageReportHandling";
+import { getAdminDamageReport, getReportFile, getReportFolder } from "../damageReportLogic.ts/damageReportHandling";
 import { handleGetBase64FileFromStorage } from "../firebaseLogic/apiRoutes";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import createReportPDF from "./templates/reportPdfTemplate";
 import { fetchDamageReport } from "../damageReportLogic.ts/apiRoutes";
+import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
 
 export const handleGeneratePdf = async (id: string) => {
     let Images: Record<string, string[]> = {
@@ -37,8 +38,8 @@ export const handleGeneratePdf = async (id: string) => {
       console.error(error);
     }
     
-  const data: CustomerDamageReport = new CustomerDamageReport();
-  data.updateFields(await fetchDamageReport(id));
+  const data = new AdminDamageReport();
+  data.updateFields(await getAdminDamageReport(id));
 
   const pdfBlob = await createReportPDF(data, Images, map);
 

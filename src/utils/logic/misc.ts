@@ -1,8 +1,9 @@
 import { GetServerSidePropsContext } from "next";
 import AppError from "../schemas/miscSchemas/errorSchema";
-import { getDamageReport, getDamageReportIds, getReportFolder } from "./damageReportLogic.ts/damageReportHandling";
+import { getCustomerDamageReport, getDamageReportIds, getReportFolder } from "./damageReportLogic.ts/damageReportHandling";
 import { CustomerDamageReport } from "../schemas/damageReportSchemas/customerReportSchema";
 import axios from "axios";
+import { AdminDamageReport } from "../schemas/damageReportSchemas/adminReportSchema";
 
 //TODO: Does not work on client side for some reason;s
 export const getEnvVariable = (key: string): string => {
@@ -58,13 +59,21 @@ export const generateId = async () => {
     });
   };
 
+  export const isJSONSerializable = (data: any) => {
+    try {
+      JSON.stringify(data);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  };
 
   export const getServerSidePropsWithRedirect = async (
     context: GetServerSidePropsContext
   ) => {
     const id = context.query.id as string;
   
-    const reportData = await getDamageReport(id, false);
+    const damageReport = await getCustomerDamageReport(id);
     const GreenMobilityImages: string[] = [];
   
     const otherPartyImages = (
@@ -77,9 +86,9 @@ export const generateId = async () => {
       OtherParty: otherPartyImages,
     };
   
-    reportData.isExpired();
+    damageReport.isExpired();
   
-    if (reportData.isFinished()) {
+    if (damageReport.isFinished()) {
       return {
         redirect: {
           destination: "/damagereport/reportfinished",
@@ -87,10 +96,10 @@ export const generateId = async () => {
         },
       };
     }
-  
+
     return {
       props: {
-        data: reportData.toPlainObject(),
+        data: damageReport.toPlainObject(),
         images: images || null,
         id: id,
       },
@@ -98,7 +107,7 @@ export const generateId = async () => {
   };
 
 export const reportSearch = (
-    reportList: { id: string; data: CustomerDamageReport }[],
+    reportList: { id: string; data: AdminDamageReport }[],
     status: "all" | "finished" | "unfinished",
     filter: "id" | "driver" | "numberplate" | "date",
     search: string
