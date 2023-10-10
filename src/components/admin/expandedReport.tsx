@@ -1,4 +1,4 @@
-import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
+/* import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
@@ -72,9 +72,9 @@ const ExpandedReport = ({ setVisible, reports }: ExpandedReportProps) => {
         )}
       </div>
 
-      {/* Current report data */}
+      {/* Current report data 
       <div className="grid grid-cols-4 gap-x-8 gap-y-4 w-full px-10 py-6 bg-gray-100">
-        {/* Displays current reports info */}
+        {/* Displays current reports info 
         <div className="row-start-1 row-span-1 col-span-1">
           <h1 className="text-xs ">Report Info</h1>
           <div className="p-4 bg-white grid grid-cols-1 grid-rows-3 gap-4 shadow-md">
@@ -136,7 +136,7 @@ const ExpandedReport = ({ setVisible, reports }: ExpandedReportProps) => {
           </div>
         </div>
 
-        {/* Displays current reports driver info */}
+        {/* Displays current reports driver info 
         <div className="row-start-1 col-start-2 row-span-1 col-span-2">
           <h1 className="text-xs">Driver Info</h1>
           <div className="p-4 bg-white grid grid-cols-2 grid-rows-3 gap-4 shadow-md">
@@ -293,7 +293,7 @@ const ExpandedReport = ({ setVisible, reports }: ExpandedReportProps) => {
           </div>
         </div>
 
-        {/* Displays current reports police info */}
+        {/* Displays current reports police info 
         <div className="row-start-1 col-start-4 row-span-1">
           <h1 className="text-xs">Police Info</h1>
           <div className="p-4 bg-white grid grid-cols-1 grid-rows-4 gap-4 shadow-md">
@@ -363,7 +363,7 @@ const ExpandedReport = ({ setVisible, reports }: ExpandedReportProps) => {
           </div>
         </div>
 
-        {/* Displays current reports accident info  */}
+        {/* Displays current reports accident info 
         <div className="row-start-2 col-start-1 col-span-2 row-span-1 h-[25rem]">
           <h1 className="text-xs">Accident Info</h1>
           <div className="p-4 bg-white grid grid-cols-2 grid-rows-5 gap-4 shadow-md h-full">
@@ -455,7 +455,7 @@ const ExpandedReport = ({ setVisible, reports }: ExpandedReportProps) => {
           </div>
         </div>
 
-        {/* Displays current reports witness list  */}
+        {/* Displays current reports witness list  
         <div className="row-start-2 col-start-3 col-span-2 row-span-1 max-h-[25rem]">
           <h1 className="text-xs">Witnesses</h1>
           <div className=" bg-white grid grid-cols-1 gap-1 shadow-md overflow-y-auto no-scrollbar h-full">
@@ -494,7 +494,7 @@ const ExpandedReport = ({ setVisible, reports }: ExpandedReportProps) => {
           </div>
         </div>
 
-        {/* Displays current report pictures of green car */}
+        {/* Displays current report pictures of green car 
         <div className="row-start-3 col-start-1 row-span-1">
           <h1 className="text-xs mt-4">Pictures of green car</h1>
           <div className="p-4 bg-white shadow-md w-full">
@@ -511,7 +511,7 @@ const ExpandedReport = ({ setVisible, reports }: ExpandedReportProps) => {
           </div>
         </div>
 
-        {/* Displays current report pictures of other partys */}
+        {/* Displays current report pictures of other partys
         <div className="row-start-3 col-start-2 row-span-1">
           <h1 className="text-xs mt-4">Pictures of other partys</h1>
           <div className="p-4 bg-white shadow-md w-full">
@@ -533,3 +533,4 @@ const ExpandedReport = ({ setVisible, reports }: ExpandedReportProps) => {
 };
 
 export default ExpandedReport;
+ */

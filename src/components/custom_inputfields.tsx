@@ -4,9 +4,18 @@ import usePlacesService from "react-google-autocomplete/lib/usePlacesAutocomplet
 import { trimArrayToLimit } from "@/utils/logic/misc";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera, faX } from "@fortawesome/free-solid-svg-icons";
-import { deleteReportFile, getReportFile, getReportFolder, uploadReportFile } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
+import {
+  deleteReportFile,
+  getReportFile,
+  getReportFolder,
+  uploadReportFile,
+} from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
 import { deleteStorageFile } from "@/utils/logic/firebaseLogic/storage";
-import { formatJournalNumber, formatNumberplate, formatSSN } from "@/utils/logic/formattingLogic/formatters";
+import {
+  formatJournalNumber,
+  formatNumberplate,
+  formatSSN,
+} from "@/utils/logic/formattingLogic/formatters";
 
 /* import usePlacesAutocomplete, {
   getGeocode,
@@ -21,7 +30,7 @@ interface InputfieldProps {
   type:
     | "number"
     | "text"
-    | "email"
+    | "emailPattern"
     | "tel"
     | "numberplate"
     | "license"
@@ -57,9 +66,8 @@ export const Inputfield = ({
       pattern = "[0-9]+"; /* Only allow digits */
       patternError = "Please enter digits only";
       break;
-    case "email":
-      pattern =
-        "^[a-åA-Å0-9.]{1,100}@[a-åA-Å0-9]{2,20}\\.[a-åA-Å]{1,3}$"; /* Email pattern */
+    case "emailPattern":
+      pattern = "^[a-åA-Å0-9._%+-]+@[a-åA-Å0-9.-]+.[a-zA-Z]{2,5}$";
       patternError = "Please enter a valid Email";
       break;
     case "tel":
@@ -69,7 +77,7 @@ export const Inputfield = ({
       break;
     case "numberplate":
       pattern =
-        "([a-zA-Z]{2}\\s?\\d{2}\\s?\\d{3})|([a-zA-Z]{2}\\d{2}\\d{3})"; /* Updated Numberplate format */
+        "([a-zA-ZæøåÆØÅ]{2}\\s?\\d{2}\\s?\\d{3})|([a-zA-Z]{2}\\d{2}\\d{3})"; /* Updated Numberplate format */
       patternError = "Please enter a valid numberplate";
       break;
     case "text":
@@ -489,20 +497,31 @@ interface multipleImageFieldProps {
   setIsLoading?: (isloading: boolean) => void;
 }
 
-export const MultipleImageField = ({id, reportId, imageLimit, labelText, required, folderPath, setImages, setIsLoading}: multipleImageFieldProps) => {
+export const MultipleImageField = ({
+  id,
+  reportId,
+  imageLimit,
+  labelText,
+  required,
+  folderPath,
+  setImages,
+  setIsLoading,
+}: multipleImageFieldProps) => {
   const [isRequired, setIsRequired] = useState(required);
-  const [imageURLs, setImageURLs] = useState<{url:string, path:string}[]>([])
+  const [imageURLs, setImageURLs] = useState<{ url: string; path: string }[]>(
+    []
+  );
   const [disabled, setDisabled] = useState(false);
   const [isError, setIsError] = useState<string | null>();
 
   useEffect(() => {
     if (setIsLoading) {
-      setIsLoading(disabled)
-    };
-  }, [disabled])
+      setIsLoading(disabled);
+    }
+  }, [disabled]);
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsError(null)
+    setIsError(null);
     // Disable inputfield while handling the new images
     setDisabled(true);
 
@@ -515,92 +534,105 @@ export const MultipleImageField = ({id, reportId, imageLimit, labelText, require
     // Make filelist to an array
     let newImages = Array.from(e.target.files);
 
-
     if (imageURLs.length + newImages.length > imageLimit) {
       // Calculate the remaining space and remove exceeding images
       const remainingSpace = imageLimit - imageURLs.length;
       newImages = trimArrayToLimit(remainingSpace, newImages);
 
       // Set error so user understands why not all their images where uploaded.
-      setIsError("Image limit exceeded")
+      setIsError("Image limit exceeded");
     }
 
     if (newImages.length > 0) {
-      await Promise.all(newImages.map(image => {
-        let imageBlob = new Blob([image], { type:image.type });
-        return uploadReportFile(reportId, folderPath + image.name + `${imageURLs.length}`, imageBlob);
-      }));      
+      await Promise.all(
+        newImages.map((image) => {
+          let imageBlob = new Blob([image], { type: image.type });
+          return uploadReportFile(
+            reportId,
+            folderPath + image.name + `${imageURLs.length}`,
+            imageBlob
+          );
+        })
+      );
     }
 
-    let imagesInStorage:{url: string, path:string}[];
+    let imagesInStorage: { url: string; path: string }[];
     try {
-      imagesInStorage = await getReportFolder(reportId, folderPath)
-    } catch (error:any) {
-      setIsError(error.message)
+      imagesInStorage = await getReportFolder(reportId, folderPath);
+    } catch (error: any) {
+      setIsError(error.message);
       setDisabled(false);
       return;
     }
 
-    setImageURLs(imagesInStorage)
+    setImageURLs(imagesInStorage);
 
     setDisabled(false);
-  }
-
+  };
 
   // Disable button if imagelimit is reached or exceeded
   useEffect(() => {
     if (imageURLs.length >= imageLimit) {
-      setIsError('Image limit reached')
+      setIsError("Image limit reached");
       setDisabled(true);
     } else if (setImages) {
-      setImages(imageURLs.map((image) => {
-        return image.url
-      }))
+      setImages(
+        imageURLs.map((image) => {
+          return image.url;
+        })
+      );
     }
-  }, [imageURLs])
+  }, [imageURLs]);
 
   async function getImg() {
     setDisabled(true);
-    let imagesInStorage:{url: string, path:string}[];
+    let imagesInStorage: { url: string; path: string }[];
     try {
-      imagesInStorage = await getReportFolder(reportId, folderPath)
-    } catch (error:any) {
-      setIsError(error.message)
+      imagesInStorage = await getReportFolder(reportId, folderPath);
+    } catch (error: any) {
+      setIsError(error.message);
       setDisabled(false);
       return;
     }
 
-    setImageURLs(imagesInStorage)
+    setImageURLs(imagesInStorage);
     setDisabled(false);
   }
 
   useEffect(() => {
-    getImg()
-  }, [])
+    getImg();
+  }, []);
 
-  const handleDeleteImage = async (path:string, index:number) => {
+  const handleDeleteImage = async (path: string, index: number) => {
     setDisabled(true);
 
     await deleteStorageFile(path);
-    getImg()
-    setIsError(null)
+    getImg();
+    setIsError(null);
 
     setDisabled(false);
-  }
+  };
 
   return (
     <div className="w-full h-full flex flex-col">
       <label htmlFor={id}>{labelText}</label>
       <div id={id} className="flex flex-col">
-      <div className="flex flex-row items-center">
+        <div className="flex flex-row items-center">
           {/* Custom designed input */}
-          <div 
-          className={`w-36 relative flex items-center 
-          ${imageURLs.length >= 3 ? 'rounded-t-md' : imageURLs.length > 0 ? 'rounded-t-md rounded-r-md' : 'rounded-md'}
-          ${disabled ? 'bg-MainGreen-200' : 'bg-MainGreen-300'}`}>
+          <div
+            className={`w-36 relative flex items-center 
+          ${
+            imageURLs.length >= 3
+              ? "rounded-t-md"
+              : imageURLs.length > 0
+              ? "rounded-t-md rounded-r-md"
+              : "rounded-md"
+          }
+          ${disabled ? "bg-MainGreen-200" : "bg-MainGreen-300"}`}
+          >
             <input
               className="opacity-0 z-20"
-              type="file" 
+              type="file"
               accept="image/png, image/jpeg"
               required={isRequired}
               disabled={imageURLs.length >= imageLimit || disabled}
@@ -608,52 +640,53 @@ export const MultipleImageField = ({id, reportId, imageLimit, labelText, require
               multiple={true}
             />
             <div className="absolute z-10 text-white ml-2 flex flex-row items-center">
-              <FontAwesomeIcon icon={faCamera} className="mr-2"/>
-              <p>
-                Select images 
-              </p>
+              <FontAwesomeIcon icon={faCamera} className="mr-2" />
+              <p>Select images</p>
             </div>
-
           </div>
           {/* Display how many files can be uploaded */}
-          <p className="ml-2 italic">{`${imageLimit-imageURLs.length}`} left</p>
-      </div>
+          <p className="ml-2 italic">
+            {`${imageLimit - imageURLs.length}`} left
+          </p>
+        </div>
 
         {/* Map over the images and display them */}
         <div className="flex flex-col">
-
           {/* Make a new line every five images */}
-          {Array.from({ length: Math.ceil(imageURLs.length / 5) }).map((_, rowIndex) => (
-            <div key={rowIndex} className="flex flex-row">
-              {imageURLs.slice(rowIndex * 5, rowIndex * 5 + 5).map((imageURL, index) => (
-                <div key={index} className="relative w-14 h-14">
-                  
-                  {/* X icon, for deletion */}
-                  <FontAwesomeIcon 
-                    className="z-10 h-4 w-4 absolute top-0 right-0 text-red-500" 
-                    icon={faX} 
-                    onClick={() => handleDeleteImage(imageURL.path, index + rowIndex * 5)}
-                  />
-                  
-                  {/* The image */}
-                  <img 
-                    className="h-full w-full z-0"
-                    src={imageURL.url} 
-                    alt={`DamageImage${index}`} 
-                  />
-                </div>
-              ))}
-            </div>
-          ))}
+          {Array.from({ length: Math.ceil(imageURLs.length / 5) }).map(
+            (_, rowIndex) => (
+              <div key={rowIndex} className="flex flex-row">
+                {imageURLs
+                  .slice(rowIndex * 5, rowIndex * 5 + 5)
+                  .map((imageURL, index) => (
+                    <div key={index} className="relative w-14 h-14">
+                      {/* X icon, for deletion */}
+                      <FontAwesomeIcon
+                        className="z-10 h-4 w-4 absolute top-0 right-0 text-red-500"
+                        icon={faX}
+                        onClick={() =>
+                          handleDeleteImage(imageURL.path, index + rowIndex * 5)
+                        }
+                      />
+
+                      {/* The image */}
+                      <img
+                        className="h-full w-full z-0"
+                        src={imageURL.url}
+                        alt={`DamageImage${index}`}
+                      />
+                    </div>
+                  ))}
+              </div>
+            )
+          )}
         </div>
 
-        {isError && (
-          <p className="text-sm text-red-500">{isError}</p>
-        )}
+        {isError && <p className="text-sm text-red-500">{isError}</p>}
       </div>
     </div>
-  )
-}
+  );
+};
 
 // -------------------------------- SINGLE IMAGE FIELD ----------------------------------
 interface singleImagefield {
@@ -666,19 +699,27 @@ interface singleImagefield {
   setIsLoading?: (isLoading: boolean) => void;
 }
 
-export const SingleImagefield = ({id, reportId, labelText, required, filePath, setImage, setIsLoading}: singleImagefield) => {
+export const SingleImagefield = ({
+  id,
+  reportId,
+  labelText,
+  required,
+  filePath,
+  setImage,
+  setIsLoading,
+}: singleImagefield) => {
   const [disabled, setDisabled] = useState(false);
-  const [imageUrl, setImageUrl] = useState('');
+  const [imageUrl, setImageUrl] = useState("");
   const [isError, setIsError] = useState<null | string>(null);
 
   useEffect(() => {
     if (setIsLoading) {
-      setIsLoading(disabled)
-    };
-  }, [disabled])
+      setIsLoading(disabled);
+    }
+  }, [disabled]);
 
   const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsError(null)
+    setIsError(null);
     // Disable inputfield while handling the new images
     setDisabled(true);
 
@@ -691,127 +732,123 @@ export const SingleImagefield = ({id, reportId, labelText, required, filePath, s
     // Make filelist to an array
     let newImages = Array.from(e.target.files);
 
-
     if (imageUrl.length + newImages.length > 1) {
       // Calculate the remaining space and remove exceeding images
       const remainingSpace = 1 - imageUrl.length;
       newImages = trimArrayToLimit(remainingSpace, newImages);
 
       // Set error so user understands why not all their images where uploaded.
-      setIsError("Image limit exceeded")
+      setIsError("Image limit exceeded");
     }
 
     if (newImages.length > 0) {
-      await Promise.all(newImages.map(image => {
-        let imageBlob = new Blob([image], { type:image.type });
-        return uploadReportFile(reportId, filePath, imageBlob);
-      }));      
+      await Promise.all(
+        newImages.map((image) => {
+          let imageBlob = new Blob([image], { type: image.type });
+          return uploadReportFile(reportId, filePath, imageBlob);
+        })
+      );
     }
 
-    let imageInStorage:string;
+    let imageInStorage: string;
     try {
-      imageInStorage = await getReportFile(reportId, filePath)
-    } catch (error:any) {
-      setIsError(error.message)
+      imageInStorage = await getReportFile(reportId, filePath);
+    } catch (error: any) {
+      setIsError(error.message);
       setDisabled(false);
       return;
     }
 
-    setImageUrl(imageInStorage)
+    setImageUrl(imageInStorage);
 
     setDisabled(false);
-  }
+  };
 
   useEffect(() => {
-    console.log(imageUrl)
+    console.log(imageUrl);
     if (setImage) {
-      setImage(imageUrl)
+      setImage(imageUrl);
     }
-  }, [imageUrl])
+  }, [imageUrl]);
 
   async function getImg() {
     setDisabled(true);
-    let imageInStorage:string;
+    let imageInStorage: string;
     try {
-      imageInStorage = await getReportFile(reportId, filePath)
-    } catch (error:any) {
+      imageInStorage = await getReportFile(reportId, filePath);
+    } catch (error: any) {
       setDisabled(false);
       return;
     }
 
-    setImageUrl(imageInStorage)
+    setImageUrl(imageInStorage);
     setDisabled(false);
   }
 
   useEffect(() => {
     try {
-      getImg()
+      getImg();
     } catch (error) {
-      return
+      return;
     }
-  }, [])
+  }, []);
 
-  const handleDeleteImage = async (path:string) => {
+  const handleDeleteImage = async (path: string) => {
     setDisabled(true);
 
     await deleteReportFile(reportId, path);
-    setImageUrl('')
-    setIsError(null)
+    setImageUrl("");
+    setIsError(null);
 
     setDisabled(false);
-  }
+  };
 
   return (
     <div>
-
       <label htmlFor={id}></label>
       <div id={id} className="flex flex-row items-center">
         {/* Custom designed input */}
-        <div 
-        className={`w-36 relative flex items-center 
-        ${imageUrl.length > 0 ? 'rounded-t-md rounded-r-md' : 'rounded-md'}
-        ${disabled ? 'bg-MainGreen-200' : 'bg-MainGreen-300'}`}>
+        <div
+          className={`w-36 relative flex items-center 
+        ${imageUrl.length > 0 ? "rounded-t-md rounded-r-md" : "rounded-md"}
+        ${disabled ? "bg-MainGreen-200" : "bg-MainGreen-300"}`}
+        >
           <input
             className="opacity-0 z-20"
-            type="file" 
+            type="file"
             accept="image/png, image/jpeg"
             required={required}
-            disabled={imageUrl !== '' || disabled}
+            disabled={imageUrl !== "" || disabled}
             onChange={(e) => handleChange(e)}
             multiple={false}
           />
           <div className="absolute z-10 text-white ml-2 flex flex-row items-center">
-            <FontAwesomeIcon icon={faCamera} className="mr-2"/>
-            <p>
-              Select image
-            </p>
+            <FontAwesomeIcon icon={faCamera} className="mr-2" />
+            <p>Select image</p>
           </div>
         </div>
       </div>
       {imageUrl.length > 0 && (
-          <div className="relative w-20 h-20">
-  
-            {/* X icon, for deletion */}
-            <FontAwesomeIcon 
-              className="z-10 h-4 w-4 absolute top-0 right-0 text-red-500" 
-              icon={faX} 
-              onClick={() => handleDeleteImage(filePath)}
-            />
-            
-            {/* The image */}
-            <img 
-              className="h-full w-full z-0"
-              src={imageUrl} 
-              alt={`DamageImage`} 
-            />
-          </div>
-        )}
-        {isError && (
-          <p className="text-sm text-red-500">{isError}</p>
-        )}
+        <div className="relative w-20 h-20">
+          {/* X icon, for deletion */}
+          <FontAwesomeIcon
+            className="z-10 h-4 w-4 absolute top-0 right-0 text-red-500"
+            icon={faX}
+            onClick={() => handleDeleteImage(filePath)}
+          />
+
+          {/* The image */}
+          <img
+            className="h-full w-full z-0"
+            src={imageUrl}
+            alt={`DamageImage`}
+          />
+        </div>
+      )}
+      {isError && <p className="text-sm text-red-500">{isError}</p>}
     </div>
-  )
-}
+  );
+};
 
 /* ----- Checkbox ---------------------------------------------------- */
 interface CheckboxProps {

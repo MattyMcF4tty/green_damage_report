@@ -10,13 +10,13 @@ const IndexPage = () => {
   const [email, setEmail] = useState("");
   const [showPopUp, setShowPopUp] = useState(false);
   const [ongoingReports, setOngoingReports] = useState<string[]>([]);
-  const [isError, setIsError] = useState<string | null>(null)
+  const [isError, setIsError] = useState<string | null>(null);
 
   const handleStart = async (e: React.FormEvent) => {
     e.preventDefault();
 
     // Check for ongoing reports with that email.
-    const ongoingReports = await queryDamageReports('userEmail', email);
+    const ongoingReports = await queryDamageReports("userEmail", email);
 
     if (Object.keys(ongoingReports).length !== 0) {
       setOngoingReports(Object.keys(ongoingReports));
@@ -28,14 +28,14 @@ const IndexPage = () => {
     let reportId: string;
     try {
       reportId = await requestDamageReportCreation(email);
-    } catch ( error:any ) {
-      console.error(error)
-      setIsError(error.message)
+    } catch (error: any) {
+      console.error(error);
+      setIsError(error.message);
       return;
     }
 
     //Push to start of damage report
-    router.push(`/damagereport/what?id=${reportId}`)
+    router.push(`/damagereport/what?id=${reportId}`);
   };
 
   return (
@@ -67,15 +67,13 @@ const IndexPage = () => {
             required={true}
             onChange={setEmail}
             value={email}
-            type="email"
+            type="emailPattern"
             placeHolder="greenmobility@example.com"
           />
         </div>
       </div>
 
-      {isError && (
-        <p className="text-sm text-red-500">{isError}</p>
-      )}
+      {isError && <p className="text-sm text-red-500">{isError}</p>}
       <button
         type="submit"
         className="absolute bottom-4 w-32 h-14 text-lg font-semibold rounded-full bg-MainGreen-300 text-white
@@ -83,7 +81,6 @@ const IndexPage = () => {
       >
         Start
       </button>
-
 
       {showPopUp && (
         <EmailPopUp

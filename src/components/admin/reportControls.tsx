@@ -6,11 +6,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import ExpandedReport from "./expandedReport";
 import { deleteReports } from "@/firebase/clientApp";
 import { handleGeneratePdf } from "@/utils/logic/pdfLogic/pdfLogic";
 import SendMailPopUp from "../popups/sendMailPopUp";
 import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
+import ExpandedReport3 from "./expandedReport3";
 
 interface ReportControls {
   selectedReports: { id: string; data: AdminDamageReport }[];
@@ -51,17 +51,17 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
   };
 
   return (
-    <div className="flex flex-row w-full justify-between ml-8">
+    <div className="flex flex-row md:w-[45rem] w-full justify-between ml-8">
       <button
         type="button"
-        className="bg-white border-gray-300 border-[1px] rounded-xl w-32  hover:bg-MainGreen-300 hover:text-white duration-150 md:h-[4rem]"
+        className="bg-white border-gray-300 border-[1px] rounded-xl w-32  hover:bg-MainGreen-300 hover:text-white duration-150 md:h-[3rem]"
         onClick={() => handleDelete()}
       >
         <FontAwesomeIcon icon={faTrashCan} className="mr-2" />
         {" Delete"}
       </button>
       <button
-        className="bg-white text-black w-32 rounded-xl border-[1px]  border-gray-300 hover:bg-MainGreen-300 hover:text-white duration-150 md:h-[4rem]"
+        className="bg-white text-black w-32 rounded-xl border-[1px]  border-gray-300 hover:bg-MainGreen-300 hover:text-white duration-150 md:h-[3rem]"
         onClick={() => {
           if (selectedReports.length > 0) {
             setSendMail(true);
@@ -78,7 +78,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
             handleInstallPDF(selectedReports);
           }
         }}
-        className="bg-white text-black px-4 py-2 rounded-xl border-[1px]  border-gray-300 hover:bg-MainGreen-300 hover:text-white duration-150 md:h-[4rem] md:w-[11rem]"
+        className="bg-white text-black px-4 py-2 rounded-xl border-[1px]  border-gray-300 hover:bg-MainGreen-300 hover:text-white duration-150 md:h-[3rem] md:w-[11rem]"
       >
         <FontAwesomeIcon icon={faCloudArrowDown} className="mr-2" />
         Download PDF
@@ -86,7 +86,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
 
       <button
         type="button"
-        className="bg-white border-gray-300 border-[1px] rounded-xl w-32 hover:bg-MainGreen-300 hover:text-white duration-150 md:h-[4rem] md:w-[7rem]"
+        className="bg-white border-gray-300 border-[1px] rounded-xl w-32 hover:bg-MainGreen-300 hover:text-white duration-150 md:h-[3rem] md:w-[7rem]"
         onClick={() => {
           if (selectedReports.length > 0) {
             setShowExpandedReports(true);
@@ -98,7 +98,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
       </button>
 
       {showExpandedReports && (
-        <ExpandedReport
+        <ExpandedReport3
           setVisible={setShowExpandedReports}
           reports={selectedReports}
         />
