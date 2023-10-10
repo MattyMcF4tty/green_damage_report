@@ -1,7 +1,23 @@
-FROM node:13-slim
+# Use the official Node.js image.
+FROM node:14
 
-WORKDIR /app
+# Set the working directory.
+WORKDIR /usr/src/app
 
-ADD . /app
+# Copy the dependencies file.
+COPY package*.json ./
 
-CMD npm run build
+# Install dependencies.
+RUN npm install
+
+# Copy the content of the local src directory to the working directory.
+COPY . .
+
+# Build the app.
+RUN npm run build
+
+# Expose the app on port 3000.
+EXPOSE 3000
+
+# Command to run the app.
+CMD [ "npm", "start" ]
