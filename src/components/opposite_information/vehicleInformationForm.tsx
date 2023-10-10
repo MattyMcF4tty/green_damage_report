@@ -10,12 +10,14 @@ interface carInfoFormProps {
 }
 
 const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
-  const [numberplate, setNumberplate] = useState<string | null>(value.numberplate);
+  const [numberplate, setNumberplate] = useState<string | null>(
+    value.numberplate
+  );
   const [model, setModel] = useState<string | null>(value.model);
   const [name, setName] = useState<string | null>(value.name);
-  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState<string | null>(
-    value.driversLicenseNumber
-  );
+  const [drivingLicenseNumber, setDrivingLicenseNumber] = useState<
+    string | null
+  >(value.driversLicenseNumber);
   const [phoneNumber, setPhoneNumber] = useState<string | null>(value.phone);
   const [email, setEmail] = useState<string | null>(value.email);
   const [insurance, setInsurance] = useState<string | null>(value.insurance);
@@ -84,7 +86,7 @@ const CarInfoForm = ({ value, onChange }: carInfoFormProps) => {
         labelText="Please enter the email address of the party involved"
         id="EmailInput"
         required={false}
-        type="email"
+        type="emailPattern"
         value={email}
         onChange={setEmail}
         placeHolder="Greenmobility@example.com"
