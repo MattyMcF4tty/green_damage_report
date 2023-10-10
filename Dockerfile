@@ -8,6 +8,7 @@ WORKDIR /usr/src/app
 COPY package*.json ./
 
 # Install dependencies.
+RUN npm install -g npm@7  # Ensure npm 7 or later is used
 RUN npm install
 
 # Copy the content of the local src directory to the working directory.
