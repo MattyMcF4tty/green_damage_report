@@ -12,7 +12,9 @@ const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
   const [name, setName] = useState<string | null>(value.name);
   const [phoneNumber, setPhoneNumber] = useState<string | null>(value.phone);
   const [email, setEmail] = useState<string | null>(value.email);
-  const [personDamage, setPersonDamage] = useState<string | null>(value.personDamage);
+  const [personDamage, setPersonDamage] = useState<string | null>(
+    value.personDamage
+  );
   const [ebike, setEbike] = useState<boolean | null>(value.ebike);
 
   useEffect(() => {
@@ -57,7 +59,7 @@ const BikeInfoForm = ({ value, onChange }: bikeInfoFormProps) => {
           labelText="Please enter the email address of the party involved"
           id="EmailInput"
           required={false}
-          type="email"
+          type="emailPattern"
           value={email}
           onChange={setEmail}
           placeHolder="Greenmobility@example.com"

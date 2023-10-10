@@ -12,7 +12,9 @@ const PedestrianInfoForm = ({ value, onChange }: PedestrianProps) => {
   const [name, setName] = useState<string | null>(value.name);
   const [phoneNumber, setPhoneNumber] = useState<string | null>(value.phone);
   const [email, setEmail] = useState<string | null>(value.email);
-  const [personDamage, setPersonDamage] = useState<string | null>(value.personDamage);
+  const [personDamage, setPersonDamage] = useState<string | null>(
+    value.personDamage
+  );
 
   useEffect(() => {
     const newPedestrianInfo: Pedestrian = new Pedestrian(
@@ -45,7 +47,7 @@ const PedestrianInfoForm = ({ value, onChange }: PedestrianProps) => {
         id="EmailPedestrian"
         labelText="Please enter the email adress of the party involved"
         required={false}
-        type="email"
+        type="emailPattern"
         value={email}
         onChange={setEmail}
         placeHolder="Greenmobility@example.com"

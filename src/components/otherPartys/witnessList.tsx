@@ -5,7 +5,11 @@ import PhoneNumber from "../opposite_information/phoneForm";
 interface WitnessListProps {
   value: { name: string | null; phone: string | null; email: string | null }[];
   onChange: (
-    witnesses: { name: string | null; phone: string | null; email: string | null }[]
+    witnesses: {
+      name: string | null;
+      phone: string | null;
+      email: string | null;
+    }[]
   ) => void;
 }
 
@@ -99,9 +103,17 @@ export default WitnessList;
 
 /* ------------------------------------New Witness------------------------------------------------ */
 interface newWitnessPopUpProps {
-  witnesses: { name: string | null; phone: string | null; email: string | null }[];
+  witnesses: {
+    name: string | null;
+    phone: string | null;
+    email: string | null;
+  }[];
   setWitnesses: (
-    witnesses: { name: string | null; phone: string | null; email: string | null }[]
+    witnesses: {
+      name: string | null;
+      phone: string | null;
+      email: string | null;
+    }[]
   ) => void;
   showPopUp: (show: boolean) => void;
 }
@@ -170,7 +182,7 @@ const NewWitnessPopUp = ({
             id="witnessEmail"
             labelText="Please enter the Email of the witness"
             required={true}
-            type="email"
+            type="emailPattern"
             value={witnessEmail}
             onChange={setWitnessEmail}
           />
@@ -190,10 +202,18 @@ const NewWitnessPopUp = ({
 
 /* ------------------------------------update Witness--------------------------------------------- */
 interface UpdateWitnessPopUpProps {
-  witnesses: { name: string | null; phone: string | null; email: string | null }[];
+  witnesses: {
+    name: string | null;
+    phone: string | null;
+    email: string | null;
+  }[];
   index: number;
   setWitnesses: (
-    witnesses: { name: string | null; phone: string | null; email: string | null }[]
+    witnesses: {
+      name: string | null;
+      phone: string | null;
+      email: string | null;
+    }[]
   ) => void;
   showPopUp: (show: boolean) => void;
 }
@@ -204,12 +224,14 @@ const UpdateWitnessPopUp = ({
   witnesses,
   index,
 }: UpdateWitnessPopUpProps) => {
-  const [witnessName, setWitnessName] = useState<string>(witnesses[index].name || '');
+  const [witnessName, setWitnessName] = useState<string>(
+    witnesses[index].name || ""
+  );
   const [witnessPhone, setWitnessPhone] = useState<string>(
-    witnesses[index].phone || ''
+    witnesses[index].phone || ""
   );
   const [witnessEmail, setWitnessEmail] = useState<string>(
-    witnesses[index].email || ''
+    witnesses[index].email || ""
   );
 
   const allowSave =
@@ -269,7 +291,7 @@ const UpdateWitnessPopUp = ({
             id="witnessEmail"
             labelText="Email"
             required={true}
-            type="email"
+            type="emailPattern"
             value={witnessEmail}
             onChange={setWitnessEmail}
           />
