@@ -12,8 +12,6 @@ export interface CustomerDamageReportSchema {
   userPhoneNumber: string | null;
   finished: boolean;
   lastChange: string;
-  reportId: string | null;
-
   openedDate: string | null;
   closedDate: string | null;
 
@@ -63,7 +61,6 @@ export class CustomerDamageReport implements CustomerDamageReportSchema {
   userPhoneNumber: string | null;
   finished: boolean;
   lastChange: string;
-  reportId: string | null;
 
   openedDate: string | null;
   closedDate: string | null;
@@ -108,7 +105,6 @@ export class CustomerDamageReport implements CustomerDamageReportSchema {
     this.userEmail = null;
     this.userPhoneNumber = null;
     this.finished = false;
-    this.reportId = null;
 
     this.openedDate = null;
     this.closedDate = null;
@@ -175,7 +171,7 @@ export class CustomerDamageReport implements CustomerDamageReportSchema {
 
 
   
-  toPlainObject() {
+  toPlainObject(): CustomerDamageReportSchema {
     return {
       userEmail: this.userEmail,
       userPhoneNumber: this.userPhoneNumber,
@@ -183,7 +179,6 @@ export class CustomerDamageReport implements CustomerDamageReportSchema {
       openedDate: this.openedDate,
       closedDate: this.closedDate,
       lastChange: this.lastChange,
-      reportId: this.reportId,
       driverInfo: {
         firstName: this.driverInfo.firstName,
         lastName: this.driverInfo.lastName,
@@ -231,7 +226,6 @@ export class CustomerDamageReport implements CustomerDamageReportSchema {
       openedDate: this.openedDate,
       closedDate: this.closedDate,
       lastChange: this.lastChange,
-      reportId: this.reportId,
       driverInfo: {
         firstName: cryptoText(type, this.driverInfo.firstName),
         lastName: cryptoText(type, this.driverInfo.lastName),

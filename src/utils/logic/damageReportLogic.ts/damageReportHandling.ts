@@ -6,14 +6,19 @@ import { deleteStorageFile, getStorageDownloadUrl, getStorageFolderDownloadUrls,
 import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
 
 export const createDamageReport = async (email: string) => {
-    const reportId = await generateId()
-  
+    const reportReferenceId = await generateId();
+
+    // We have two Id's, the id for the url such that the user cant se the number of reports.
+    // We also have an id to see what number of reports we are on.
+    const reportId = await getNewReportId();
+
     const newReportData = new AdminDamageReport();
 
     newReportData.updateFields({
       openedDate: `${new Date()}`,
       lastChange: `${new Date()}`,
       userEmail: email,
+      reportId: reportId,
     });
 
   
@@ -23,11 +28,11 @@ export const createDamageReport = async (email: string) => {
     }
   
     await createFirestoreDoc(
-    `${damageReportCol}/${reportId}`,
+    `${damageReportCol}/${reportReferenceId}`,
     newReportData.crypto('encrypt')
     );
   
-    return reportId;
+    return reportReferenceId;
 };
 
 export const getDamageReportIds = async () => {
@@ -216,3 +221,19 @@ export const getDamageReport = async (reportId: string) => {
 
   return reportData;
 };
+
+
+export const getNewReportId = async () => {
+  const appDataCol = process.env.NEXT_PUBLIC_APP_DATA_COL;
+  console.log(appDataCol)
+  if (!appDataCol) {
+    throw new AppError('INTERNAL_ERROR', 'NEXT_PUBLIC_APP_DATA_COL is not defined in enviroment.')
+  }
+
+  const sharedReportData = (await getFirestoreDoc(`${appDataCol}/ReportData`)).data();
+  const reportId = sharedReportData.reportIdCounter + 1 as number;
+
+  await updateFirestoreDoc(`${appDataCol}/ReportData`, {reportIdCounter: reportId});
+
+  return reportId;
+}

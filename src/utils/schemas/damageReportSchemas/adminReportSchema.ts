@@ -1,10 +1,14 @@
-import { decryptText, encryptText } from "@/utils/security/crypto";
-import { Renter, RenterSchema } from "../incidentDetailSchemas/renterSchema";
+import { cryptoText, decryptText, encryptText } from "@/utils/security/crypto";
+import { RenterSchema } from "../incidentDetailSchemas/renterSchema";
 import { CustomerDamageReport } from "./customerReportSchema";
+import { EventLog, EventLogSchema } from "../miscSchemas/eventLogSchema";
 
 export class AdminDamageReport extends CustomerDamageReport {
 
-    renterInfo: RenterSchema
+    renterInfo: RenterSchema;
+    eventLogs: EventLogSchema[];
+    reportId: number | null;
+
 
     constructor() {
         super();
@@ -20,8 +24,14 @@ export class AdminDamageReport extends CustomerDamageReport {
             age: null,
             insurance: null
         }
+        this.eventLogs = [];
+        this.reportId = null;
     }
     
+    updateFields(fields: Partial<AdminDamageReport>): void {
+        Object.assign(this, fields);
+    }
+
     toPlainObject() {
         // Getting plain object from parent class
         const parentData = super.toPlainObject();
@@ -29,7 +39,9 @@ export class AdminDamageReport extends CustomerDamageReport {
         // Adding additional property
         return {
             ...parentData,
-            renterInfo: this.renterInfo
+            renterInfo: this.renterInfo,
+            eventLogs: this.eventLogs,
+            reportId: this.reportId,
         };
     }
 
@@ -37,28 +49,28 @@ export class AdminDamageReport extends CustomerDamageReport {
         //Encrypt / decrypt other data
         const parentData = super.crypto(type)
 
-        const cryptoText = (text: string | null) => {
-            if (!text) {
-              return text
-            }
-      
-            return type === 'encrypt' ? encryptText(text) : decryptText(text);
-        }
-
         return {
             ...parentData,
             renterInfo: {
                 customerId: this.renterInfo.customerId,
                 reservationId: this.renterInfo.reservationId,
-                firstName: cryptoText(this.renterInfo.firstName),
-                lastName: cryptoText(this.renterInfo.lastName),
-                email: cryptoText(this.renterInfo.email),
-                phoneNumber: cryptoText(this.renterInfo.phoneNumber),
-                birthDate: cryptoText(this.renterInfo.birthDate),
-                gender: cryptoText(this.renterInfo.gender),
-                age: cryptoText(this.renterInfo.age),
+                firstName: cryptoText(type, this.renterInfo.firstName),
+                lastName: cryptoText(type, this.renterInfo.lastName),
+                email: cryptoText(type, this.renterInfo.email),
+                phoneNumber: cryptoText(type, this.renterInfo.phoneNumber),
+                birthDate: cryptoText(type, this.renterInfo.birthDate),
+                gender: cryptoText(type, this.renterInfo.gender),
+                age: cryptoText(type, this.renterInfo.age),
                 insurance: this.renterInfo.insurance
-            }
+            },
+            eventLogs: this.eventLogs.map((event) => {
+                return new EventLog(event.user, event.date, event.action, event.description).crypto(type)
+            }),
+            reportId: this.reportId,
         }
+    }
+
+    addEvent(event: EventLog) {
+        this.eventLogs.push(event.toPlainObject());
     }
 }
