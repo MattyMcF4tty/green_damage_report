@@ -328,7 +328,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       renterData.email ? encryptText(`${renterData.email}`) : null,
       renterData.mobilePhone ? encryptText(`${renterData.mobilePhone}`) : null,
       renterData.birthDate ? encryptText(`${renterData.birthDate}`) : null,
-      renterGender,
+      encryptText(renterGender),
       renterAge ? encryptText(`${renterAge}`) : null,
       null
     )

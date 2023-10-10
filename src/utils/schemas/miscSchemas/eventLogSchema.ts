@@ -38,23 +38,3 @@ export class EventLog implements EventLogSchema {
         }
     }
 }
-
-export class EventLogs {
-    logs: EventLog[];
-
-    constructor(logs: EventLog[]) {
-        this.logs = logs;
-    };
-
-    addLog(log: EventLog) {
-        this.logs.push(log);
-    }
-
-    toPlainObject(): EventLogSchema[] {
-        return this.logs.map(log => log.toPlainObject());
-    }
-
-    crypto(type: 'encrypt' | 'decrypt'):EventLogSchema[] {
-        return this.logs.map(log => log.crypto(type))
-    }
-}

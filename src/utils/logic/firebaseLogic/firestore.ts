@@ -188,3 +188,4 @@ export const queryFirestoreCollection = async (collectionName: string, key: stri
     throw error; // Rethrow to be handled by calling function
   }
 };
+
