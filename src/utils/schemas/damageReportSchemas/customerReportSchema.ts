@@ -171,7 +171,7 @@ export class CustomerDamageReport implements CustomerDamageReportSchema {
 
 
   
-  toPlainObject(): CustomerDamageReportSchema {
+  toPlainObject() {
     return {
       userEmail: this.userEmail,
       userPhoneNumber: this.userPhoneNumber,
