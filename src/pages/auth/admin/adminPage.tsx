@@ -2,16 +2,15 @@ import React, { useState } from "react";
 import { GetServerSidePropsContext, NextPage } from "next";
 import ReportList from "@/components/admin/reportList";
 import ReportControls from "@/components/admin/reportControls";
-import { handleVerifyUser } from "@/utils/logic/firebaseLogic/apiRoutes";
 import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
+import { requestUserVerification } from "@/utils/logic/firebaseLogic/authenticationLogic/apiRoutes";
 
-/* export const getServerSideProps = async (
+export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  const token = context.req.cookies["AuthToken"];
-  const userVerified = await handleVerifyUser(token);
-
-  if (!userVerified) {
+  try {
+    await requestUserVerification()
+  } catch (error:any) {
     return {
       redirect: {
         destination: "/auth/signIn",
@@ -21,7 +20,7 @@ import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminRepo
   }
 
   return { props: {} };
-}; */
+};
 
 const adminPage: NextPage = () => {
   const [currentStatus, setCurrentStatus] = useState<

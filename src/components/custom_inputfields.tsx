@@ -1,21 +1,18 @@
 /* import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";*/
 import React, { useEffect, useState, useRef } from "react";
 import usePlacesService from "react-google-autocomplete/lib/usePlacesAutocompleteService";
-import { trimArrayToLimit } from "@/utils/logic/misc";
+import { convertFileToBase64, normalizeFilePath, normalizeFolderPath, trimArrayToLimit } from "@/utils/logic/misc";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera, faX } from "@fortawesome/free-solid-svg-icons";
-import {
-  deleteReportFile,
-  getReportFile,
-  getReportFolder,
-  uploadReportFile,
-} from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
-import { deleteStorageFile } from "@/utils/logic/firebaseLogic/storage";
 import {
   formatJournalNumber,
   formatNumberplate,
   formatSSN,
 } from "@/utils/logic/formattingLogic/formatters";
+import { fetcDamageReportFolderFilesUrl, requestDamageReportFileDeletion, uploadFileToDamageReport, uploadFolderToDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import { ValidMimeTypes } from "@/utils/schemas/types";
+import { position } from "html2canvas/dist/types/css/property-descriptors/position";
+import { getDamageReportFileDownloadUrl, getDamageReportFolderDownloadUrls } from "@/utils/logic/damageReportLogic.ts/logic";
 
 /* import usePlacesAutocomplete, {
   getGeocode,
@@ -487,18 +484,18 @@ export const TextField = ({
 
 // ----------------------- MULTIPLE IMAGES FIELD --------------------------------------------------
 interface multipleImageFieldProps {
-  id: string;
+  componentId: string;
   reportId: string;
   imageLimit: number;
   labelText: string;
   required: boolean;
   folderPath: string;
-  setImages?: (images: string[]) => void;
+  setImages?: (imageData: {fileName: string;downloadUrl: string;}[]) => void;
   setIsLoading?: (isloading: boolean) => void;
 }
 
 export const MultipleImageField = ({
-  id,
+  componentId,
   reportId,
   imageLimit,
   labelText,
@@ -508,123 +505,88 @@ export const MultipleImageField = ({
   setIsLoading,
 }: multipleImageFieldProps) => {
   const [isRequired, setIsRequired] = useState(required);
-  const [imageURLs, setImageURLs] = useState<{ url: string; path: string }[]>(
-    []
-  );
+  const [imageData, setImageData] = useState<{fileName: string;downloadUrl: string;}[]>([]);
   const [disabled, setDisabled] = useState(false);
   const [isError, setIsError] = useState<string | null>();
+  const normalizedFolderPath = normalizeFolderPath(folderPath);
+  const folderName = normalizedFolderPath.split('/').slice(-2)[0];
 
-  useEffect(() => {
-    if (setIsLoading) {
-      setIsLoading(disabled);
-    }
-  }, [disabled]);
-
-  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsError(null);
-    // Disable inputfield while handling the new images
+  const getImages = async () => {
     setDisabled(true);
-
-    // Check if files is empty
-    if (!e.target.files) {
-      setDisabled(false);
-      return;
-    }
-
-    // Make filelist to an array
-    let newImages = Array.from(e.target.files);
-
-    if (imageURLs.length + newImages.length > imageLimit) {
-      // Calculate the remaining space and remove exceeding images
-      const remainingSpace = imageLimit - imageURLs.length;
-      newImages = trimArrayToLimit(remainingSpace, newImages);
-
-      // Set error so user understands why not all their images where uploaded.
-      setIsError("Image limit exceeded");
-    }
-
-    if (newImages.length > 0) {
-      await Promise.all(
-        newImages.map((image) => {
-          let imageBlob = new Blob([image], { type: image.type });
-          return uploadReportFile(
-            reportId,
-            folderPath + image.name + `${imageURLs.length}`,
-            imageBlob
-          );
-        })
-      );
-    }
-
-    let imagesInStorage: { url: string; path: string }[];
-    try {
-      imagesInStorage = await getReportFolder(reportId, folderPath);
-    } catch (error: any) {
-      setIsError(error.message);
-      setDisabled(false);
-      return;
-    }
-
-    setImageURLs(imagesInStorage);
-
-    setDisabled(false);
-  };
-
-  // Disable button if imagelimit is reached or exceeded
-  useEffect(() => {
-    if (imageURLs.length >= imageLimit) {
-      setIsError("Image limit reached");
-      setDisabled(true);
-    } else if (setImages) {
-      setImages(
-        imageURLs.map((image) => {
-          return image.url;
-        })
-      );
-    }
-  }, [imageURLs]);
-
-  async function getImg() {
-    setDisabled(true);
-    let imagesInStorage: { url: string; path: string }[];
-    try {
-      imagesInStorage = await getReportFolder(reportId, folderPath);
-    } catch (error: any) {
-      setIsError(error.message);
-      setDisabled(false);
-      return;
-    }
-
-    setImageURLs(imagesInStorage);
+    const fileData = await getDamageReportFolderDownloadUrls(reportId, normalizedFolderPath)
+    setImageData(fileData)
     setDisabled(false);
   }
 
   useEffect(() => {
-    getImg();
-  }, []);
+    getImages()
+  }, [])
 
-  const handleDeleteImage = async (path: string, index: number) => {
-    setDisabled(true);
-
-    await deleteStorageFile(path);
-    getImg();
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setIsError(null);
+    setDisabled(true);
+    const files = e.target.files;
+    if (!files || files.length === 0) {
+      setDisabled(false);
+      return;
+    }
+  
+    // Calculate how many new images can be uploaded
+    const availableSlots = imageLimit - imageData.length;
+    const imagesToProcess = Math.min(files.length, availableSlots);
+  
+    if (imagesToProcess < files.length) {
+      setIsError(`You have exceeded the limit.`);
+    }
+  
+    const fileData: {name:string, mimeType:ValidMimeTypes, fileBase64:string}[] = [];
+    for (let index = 0; index < imagesToProcess; index++) {
+      const file = files.item(index);
+      if (!file) {
+        continue;
+      }
+  
+      const base64 = await convertFileToBase64(file);
+      const thisFileData = {
+        name: `${folderName}${index}`,
+        mimeType: file.type as ValidMimeTypes,
+        fileBase64: base64
+      }
+      fileData.push(thisFileData);
+    }
+  
+    await uploadFolderToDamageReport(reportId, normalizedFolderPath, fileData)
+  
+    await getImages()
+  };  
 
-    setDisabled(false);
-  };
+  const deleteImage = async (fileName:string) => {
+    setDisabled(true);
+    await requestDamageReportFileDeletion(reportId, `${normalizedFolderPath}${fileName}`);
+    await getImages();
+  }  
+
+  useEffect(() => {
+    if (setImages) {
+      setImages(imageData)
+    }
+  }, [imageData])
 
   return (
     <div className="w-full h-full flex flex-col">
-      <label htmlFor={id}>{labelText}</label>
-      <div id={id} className="flex flex-col">
+      <label htmlFor={componentId}>
+        {labelText}
+      </label>
+
+      <div id={componentId} className="flex flex-col">
         <div className="flex flex-row items-center">
           {/* Custom designed input */}
           <div
             className={`w-36 relative flex items-center 
           ${
-            imageURLs.length >= 3
+            imageData.length >= 3
               ? "rounded-t-md"
-              : imageURLs.length > 0
+              : imageData.length > 0
               ? "rounded-t-md rounded-r-md"
               : "rounded-md"
           }
@@ -635,8 +597,8 @@ export const MultipleImageField = ({
               type="file"
               accept="image/png, image/jpeg"
               required={isRequired}
-              disabled={imageURLs.length >= imageLimit || disabled}
-              onChange={(e) => handleChange(e)}
+              disabled={imageData.length >= imageLimit || disabled}
+              onChange={(e) => handleUpload(e)}
               multiple={true}
             />
             <div className="absolute z-10 text-white ml-2 flex flex-row items-center">
@@ -646,33 +608,33 @@ export const MultipleImageField = ({
           </div>
           {/* Display how many files can be uploaded */}
           <p className="ml-2 italic">
-            {`${imageLimit - imageURLs.length}`} left
+            {`${imageLimit - imageData.length}`} left
           </p>
         </div>
 
         {/* Map over the images and display them */}
         <div className="flex flex-col">
           {/* Make a new line every five images */}
-          {Array.from({ length: Math.ceil(imageURLs.length / 5) }).map(
+          {Array.from({ length: Math.ceil(imageData.length / 5) }).map(
             (_, rowIndex) => (
               <div key={rowIndex} className="flex flex-row">
-                {imageURLs
+                {imageData
                   .slice(rowIndex * 5, rowIndex * 5 + 5)
-                  .map((imageURL, index) => (
+                  .map((imageData, index) => (
                     <div key={index} className="relative w-14 h-14">
                       {/* X icon, for deletion */}
                       <FontAwesomeIcon
                         className="z-10 h-4 w-4 absolute top-0 right-0 text-red-500"
                         icon={faX}
                         onClick={() =>
-                          handleDeleteImage(imageURL.path, index + rowIndex * 5)
+                          deleteImage(imageData.fileName)
                         }
                       />
 
                       {/* The image */}
                       <img
                         className="h-full w-full z-0"
-                        src={imageURL.url}
+                        src={imageData.downloadUrl}
                         alt={`DamageImage${index}`}
                       />
                     </div>
@@ -690,17 +652,17 @@ export const MultipleImageField = ({
 
 // -------------------------------- SINGLE IMAGE FIELD ----------------------------------
 interface singleImagefield {
-  id: string;
+  componentId: string;
   reportId: string;
   labelText: string;
   required: boolean;
   filePath: string;
-  setImage?: (image: string) => void;
+  setImage?: (image: {fileName: string;downloadUrl: string;} | null) => void;
   setIsLoading?: (isLoading: boolean) => void;
 }
 
 export const SingleImagefield = ({
-  id,
+  componentId,
   reportId,
   labelText,
   required,
@@ -709,108 +671,71 @@ export const SingleImagefield = ({
   setIsLoading,
 }: singleImagefield) => {
   const [disabled, setDisabled] = useState(false);
-  const [imageUrl, setImageUrl] = useState("");
+const [imageData, setImageData] = useState<{fileName: string;downloadUrl: string;} | null>(null);
   const [isError, setIsError] = useState<null | string>(null);
+  const normalizedFilePath = normalizeFilePath(filePath);
 
-  useEffect(() => {
-    if (setIsLoading) {
-      setIsLoading(disabled);
-    }
-  }, [disabled]);
-
-  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsError(null);
-    // Disable inputfield while handling the new images
+  const getImage = async () => {
     setDisabled(true);
-
-    // Check if files is empty
-    if (!e.target.files) {
-      setDisabled(false);
-      return;
-    }
-
-    // Make filelist to an array
-    let newImages = Array.from(e.target.files);
-
-    if (imageUrl.length + newImages.length > 1) {
-      // Calculate the remaining space and remove exceeding images
-      const remainingSpace = 1 - imageUrl.length;
-      newImages = trimArrayToLimit(remainingSpace, newImages);
-
-      // Set error so user understands why not all their images where uploaded.
-      setIsError("Image limit exceeded");
-    }
-
-    if (newImages.length > 0) {
-      await Promise.all(
-        newImages.map((image) => {
-          let imageBlob = new Blob([image], { type: image.type });
-          return uploadReportFile(reportId, filePath, imageBlob);
-        })
-      );
-    }
-
-    let imageInStorage: string;
-    try {
-      imageInStorage = await getReportFile(reportId, filePath);
-    } catch (error: any) {
-      setIsError(error.message);
-      setDisabled(false);
-      return;
-    }
-
-    setImageUrl(imageInStorage);
-
-    setDisabled(false);
-  };
-
-  useEffect(() => {
-    console.log(imageUrl);
-    if (setImage) {
-      setImage(imageUrl);
-    }
-  }, [imageUrl]);
-
-  async function getImg() {
-    setDisabled(true);
-    let imageInStorage: string;
-    try {
-      imageInStorage = await getReportFile(reportId, filePath);
-    } catch (error: any) {
-      setDisabled(false);
-      return;
-    }
-
-    setImageUrl(imageInStorage);
+    const image = await getDamageReportFileDownloadUrl(reportId, normalizedFilePath);
+    setImageData(image);
     setDisabled(false);
   }
 
   useEffect(() => {
-    try {
-      getImg();
-    } catch (error) {
+    setDisabled(true);
+    getImage()
+  }, [])
+
+  const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    setIsError(null);
+    setDisabled(true);
+    const fileList = e.target.files;
+    if (!fileList || fileList.length === 0) {
+      setDisabled(false);
+      return
+    }
+    if (imageData || fileList.length > 1) {
+      setIsError('Limit exceeded.')
+      setDisabled(false);
+      return
+    }
+
+    const file = fileList.item(0);
+    if (!file) {
+      setDisabled(false);
       return;
     }
-  }, []);
 
-  const handleDeleteImage = async (path: string) => {
+    const base64 = await convertFileToBase64(file);
+    await uploadFileToDamageReport(reportId, normalizedFilePath, base64, file.type as ValidMimeTypes)
+
+    await getImage()
+  }
+
+  const deleteImage = async (imagePath:string) => {
     setDisabled(true);
+    await requestDamageReportFileDeletion(reportId, imagePath)
+    await getImage();
+  }
 
-    await deleteReportFile(reportId, path);
-    setImageUrl("");
-    setIsError(null);
-
-    setDisabled(false);
-  };
+  useEffect(() =>{
+    if (setImage) {
+      setImage(imageData)
+    }
+  }, [imageData])
 
   return (
     <div>
-      <label htmlFor={id}></label>
-      <div id={id} className="flex flex-row items-center">
+      <label htmlFor={componentId}>
+        {labelText}
+      </label>
+      <div id={componentId} className="flex flex-row items-center">
+        
         {/* Custom designed input */}
         <div
           className={`w-36 relative flex items-center 
-        ${imageUrl.length > 0 ? "rounded-t-md rounded-r-md" : "rounded-md"}
+        ${imageData ? "rounded-t-md rounded-r-md" : "rounded-md"}
         ${disabled ? "bg-MainGreen-200" : "bg-MainGreen-300"}`}
         >
           <input
@@ -818,8 +743,8 @@ export const SingleImagefield = ({
             type="file"
             accept="image/png, image/jpeg"
             required={required}
-            disabled={imageUrl !== "" || disabled}
-            onChange={(e) => handleChange(e)}
+            disabled={imageData && true || disabled}
+            onChange={(e) => uploadImage(e)}
             multiple={false}
           />
           <div className="absolute z-10 text-white ml-2 flex flex-row items-center">
@@ -828,19 +753,19 @@ export const SingleImagefield = ({
           </div>
         </div>
       </div>
-      {imageUrl.length > 0 && (
+      {imageData && (
         <div className="relative w-20 h-20">
           {/* X icon, for deletion */}
           <FontAwesomeIcon
             className="z-10 h-4 w-4 absolute top-0 right-0 text-red-500"
             icon={faX}
-            onClick={() => handleDeleteImage(filePath)}
+            onClick={() => deleteImage(filePath)}
           />
 
           {/* The image */}
           <img
             className="h-full w-full z-0"
-            src={imageUrl}
+            src={imageData.downloadUrl}
             alt={`DamageImage`}
           />
         </div>

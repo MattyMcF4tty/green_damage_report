@@ -11,9 +11,8 @@ import { GetServerSidePropsContext, NextPage } from "next";
 import WitnessList from "@/components/otherPartys/witnessList";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { getServerSidePropsWithRedirect } from "@/utils/logic/misc";
-import { updateDamageReport } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
 import { PageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
-import { serverUpdateReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import { patchCustomerDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -73,7 +72,7 @@ const HowPage: NextPage<PageProps> = ({ data, images, id }) => {
     });
 
     try {
-      await serverUpdateReport(id, serverData);
+      await patchCustomerDamageReport(id, serverData.toPlainObject());
     } catch (error) {
       setAllowClick(true);
       return;

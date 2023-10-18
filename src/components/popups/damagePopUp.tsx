@@ -79,12 +79,12 @@ const DamagePopUp = ({
         <div>
           <MultipleImageField
             reportId={reportId}
-            id={"DamageImage"}
+            componentId={"DamageImage"}
             labelText="Please take picture of damage"
             required={false}
             folderPath={`GreenDamage/${position}/`}
             imageLimit={5}
-            setImages={setImages}
+            setImages={(image) => setImages(image.map((img) => {return img.fileName}))}
             setIsLoading={setIsLoading}
           />
         </div>

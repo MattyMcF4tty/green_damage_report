@@ -14,7 +14,7 @@ import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/custom
 import { getServerSidePropsWithRedirect } from "@/utils/logic/misc";
 import { PageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
 import { handleGetRenter } from "@/utils/logic/wunderfleetLogic/apiRoutes";
-import { serverUpdateReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import { patchCustomerDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -111,7 +111,7 @@ const What: NextPage<PageProps> = ({ data, id }) => {
     });
 
     try {
-      await serverUpdateReport(id, serverData);
+      await patchCustomerDamageReport(id, serverData.toPlainObject());
     } catch (error) {
       setAllowClick(true);
       return;

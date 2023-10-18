@@ -1,11 +1,9 @@
-import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import { getImages } from "@/firebase/clientApp";
 import ImageCarousel from "./imageCarousel";
 import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
-import { getReportFolder } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
+import { fetcDamageReportFolderFilesUrl } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 
 interface ExpandedReport3Props {
   setVisible: (visibility: boolean) => void;
@@ -18,13 +16,13 @@ const ExpandedReport3 = ({ setVisible, reports }: ExpandedReport3Props) => {
     data: AdminDamageReport;
   }>(reports[0]);
   const [currentImages, setCurrentImages] = useState<
-    { url: string; path: string }[]
+  {fileName: string; downloadUrl: string;}[]
   >([]);
 
   useEffect(() => {
     const fetchImages = async () => {
       setCurrentImages(
-        await getReportFolder(currentReport.id, "/OtherPartyDamages/")
+        await fetcDamageReportFolderFilesUrl(currentReport.id, "/OtherPartyDamages/")
       );
     };
 
@@ -768,7 +766,7 @@ const ExpandedReport3 = ({ setVisible, reports }: ExpandedReport3Props) => {
               currentImages.map((image, index) => (
                 <img
                   key={index}
-                  src={image.url}
+                  src={image.downloadUrl}
                   alt="DamageImage"
                   className="w-[15rem] h-[15rem]"
                 />

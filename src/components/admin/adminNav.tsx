@@ -1,4 +1,4 @@
-import { handleSignOut } from "@/utils/logic/firebaseLogic/apiRoutes";
+import { signOutUser } from "@/utils/logic/firebaseLogic/authenticationLogic/logic";
 import { faArrowRightFromBracket } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRouter } from "next/router";
@@ -8,7 +8,7 @@ const AdminNavbar = () => {
   const Router = useRouter();
 
   const handleLogOut = () => {
-    handleSignOut();
+    signOutUser();
     Router.push("/auth/signIn")
   };
 

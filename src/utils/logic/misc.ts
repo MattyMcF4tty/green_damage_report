@@ -1,11 +1,13 @@
-import { GetServerSidePropsContext } from "next";
+import { GetServerSidePropsContext, NextApiRequest } from "next";
 import AppError from "../schemas/miscSchemas/errorSchema";
-import { getCustomerDamageReport, getDamageReportIds, getReportFolder } from "./damageReportLogic.ts/damageReportHandling";
-import { CustomerDamageReport } from "../schemas/damageReportSchemas/customerReportSchema";
 import axios from "axios";
 import { AdminDamageReport } from "../schemas/damageReportSchemas/adminReportSchema";
+import { getDamageReportFolderDownloadUrls, getDamageReportIds } from "./damageReportLogic.ts/logic";
+import { base64Regex } from "./formattingLogic/regexs";
+import { ValidMimeTypes } from "../schemas/types";
+import { fecthCustomerDamageReport } from "./damageReportLogic.ts/apiRoutes";
 
-//TODO: Does not work on client side for some reason;s
+
 export const getEnvVariable = (key: string): string => {
     const value = process.env[key];
     if (!value) {
@@ -15,7 +17,7 @@ export const getEnvVariable = (key: string): string => {
 };
 
 
-export const generateId = async () => {
+export const generateDamageReportId = async () => {
     const dataList = await getDamageReportIds();
   
     const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
@@ -73,14 +75,12 @@ export const generateId = async () => {
   ) => {
     const id = context.query.id as string;
   
-    const damageReport = await getCustomerDamageReport(id);
+    const damageReport = await fecthCustomerDamageReport(id);
     const GreenMobilityImages: string[] = [];
   
-    const otherPartyImages = (
-      await getReportFolder(id, "OtherPartyDamages/")
-    ).map((file, index) => {
-      return file.url;
-    });
+    const otherPartyImages = (await getDamageReportFolderDownloadUrls(id, '/OtherPartyDamages/')).map((image) => {
+      return image.downloadUrl;
+    })
     const images: Record<string, string[]> = {
       GreenMobility: GreenMobilityImages,
       OtherParty: otherPartyImages,
@@ -250,17 +250,6 @@ export const reportSearch = (
     });
   };
 
-
-  export const base64ToBuffer = (base64: string, contentType: string = "") => {
-    const base64Regex = /^data:([a-zA-Z0-9]+\/[a-zA-Z0-9-.+]+).*,(.*)$/;
-    const matches = base64.match(base64Regex);
-    if (!matches || matches.length !== 3) {
-      throw new Error("Invalid input string format");
-    }
-    contentType = matches[1];
-    base64 = matches[2];
-    return Buffer.from(base64, "base64");
-  };
   
   export const arrayBufferToBlob = (
     arrayBuffer: ArrayBuffer,
@@ -303,3 +292,92 @@ export const reportSearch = (
   export const dateToString = (date:Date) => {
     return `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()} ${date.getDay()}-${date.getMonth()}-${date.getFullYear()}`
   }
+
+
+export const blobToBuffer = async (blob: Blob) => {
+  const arrayBuffer = await blob.arrayBuffer();
+  return Buffer.from(arrayBuffer);
+};
+
+
+export const normalizeFolderPath = (folderPath:string) => {
+  const normalizedFolderPath = folderPath.endsWith('/') ? folderPath : folderPath + '/';
+  return normalizedFolderPath;
+}
+
+export const normalizeFilePath = (filePath:string) => {
+  const normalizedFilePath = filePath.endsWith('/') ? filePath.slice(0, -1) : filePath;
+  return normalizedFilePath;
+}
+
+
+export const base64ToBuffer = (base64String: string): Buffer => {
+  try {
+    if (!verifyBase64String(base64String)) {
+      throw new Error('The provided string is not a valid Base64 string.');
+    }
+
+    const buffer = Buffer.from(base64String, 'base64');
+
+    console.log('Successfully converted Base64 to Buffer.');
+    return buffer;
+  } catch (error: any) {
+    console.error('Error converting Base64 to Buffer:', error.message || error);
+    throw new AppError('BASE64_CONVERSION_ERROR', 'Failed to convert base64 string to Buffer');
+  }
+};
+
+
+export const bufferToBase64 = (buffer: Buffer): string => {
+  try {
+      const base64 = buffer.toString('base64');
+      return base64;
+  } catch (error: any) {
+      console.error('Error converting Buffer to Base64:', error.message || error);
+      throw new AppError('BUFFER_CONVERSION_ERROR', 'Failed to convert Buffer to Base64.');
+  }
+};
+
+
+export const verifyBase64String = (base64string:string) => {
+  return base64Regex.test(base64string);
+}
+
+
+export const isValidFileData = (data: any): data is { name: string; mimeType: ValidMimeTypes; fileBase64: string }[] => {
+  if (!Array.isArray(data)) return false;
+
+  return data.every(file => 
+      typeof file.name === 'string' &&
+      typeof file.mimeType === 'string' && // You might have additional checks for valid mime types
+      Buffer.isBuffer(file.buffer)
+  );
+}
+
+
+export const readAsDataURL = (file: File): Promise<string> => {
+  return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = () => {
+          if (typeof reader.result === "string") {
+              resolve(reader.result);
+          } else {
+              reject(new Error('Expected result to be a string, but got an ArrayBuffer.'));
+          }
+      };
+
+      reader.onerror = error => reject(error);
+
+      reader.readAsDataURL(file);
+  });
+};
+
+export const convertFileToBase64 = async (file: File): Promise<string> => {
+  try {
+      return await readAsDataURL(file);
+  } catch (error:any) {
+      throw new Error(`Failed to convert file to base64: ${error.message}`);
+  }
+}
+

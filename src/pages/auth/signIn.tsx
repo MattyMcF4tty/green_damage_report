@@ -1,5 +1,4 @@
-import { Inputfield } from "@/components/custom_inputfields";
-import { handleSignIn } from "@/utils/logic/firebaseLogic/apiRoutes";
+import { signInUser } from "@/utils/logic/firebaseLogic/authenticationLogic/logic";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
@@ -19,12 +18,11 @@ const signInPage: NextPage = () => {
     setError(null);
     setSuccess(null);
 
-    const userSignedIn = await handleSignIn(email, password);
-
-    if (userSignedIn) {
+    try {
+      await signInUser(email, password);
       Router.push("/auth/admin/adminPage");
       setSuccess("Successfully signed in");
-    } else {
+    } catch (error:any) {
       setError("Email or Password is incorrect");
       setDisableButton(false);
     }

@@ -2,8 +2,7 @@ import { Inputfield } from "@/components/custom_inputfields";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import EmailPopUp from "@/components/popups/emailPopUp";
-import { requestDamageReportCreation } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
-import { queryDamageReports } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
+import { requestDamageReportCreation, requestQueryDamageReports } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 
 const IndexPage = () => {
   const router = useRouter();
@@ -16,10 +15,9 @@ const IndexPage = () => {
     e.preventDefault();
 
     // Check for ongoing reports with that email.
-    const ongoingReports = await queryDamageReports("userEmail", email);
+    setOngoingReports(await requestQueryDamageReports("userEmail", '==', email));
 
-    if (Object.keys(ongoingReports).length !== 0) {
-      setOngoingReports(Object.keys(ongoingReports));
+    if (ongoingReports.length > 0) {
       setShowPopUp(true);
       return;
     }

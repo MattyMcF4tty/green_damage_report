@@ -19,10 +19,11 @@ import { Vehicle } from "@/utils/schemas/incidentDetailSchemas/vehicleSchema";
 import { Biker } from "@/utils/schemas/incidentDetailSchemas/bikerSchema";
 import { Pedestrian } from "@/utils/schemas/incidentDetailSchemas/pedestrianSchema";
 import { IncidentObject } from "@/utils/schemas/incidentDetailSchemas/incidentObjectSchema";
-import { updateDamageReport, uploadReportFile } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
-import { getEnvVariable, getServerSidePropsWithRedirect } from "@/utils/logic/misc";
+import { blobToBase64, blobToBuffer, getServerSidePropsWithRedirect } from "@/utils/logic/misc";
 import { PageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
-import { serverUpdateReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import { uploadDamageReportFile } from "@/utils/logic/damageReportLogic.ts/logic";
+import { ValidMimeTypes } from "@/utils/schemas/types";
+import { patchCustomerDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -150,7 +151,7 @@ const WherePage: NextPage<PageProps> = ({ data, images, id }) => {
       const mapBlob: Blob = dataURItoBlob(dataUrl);
 
       console.log("map created");
-      await uploadReportFile(id, "Admin/map", mapBlob);
+      await uploadDamageReportFile(id, "Admin/map", await blobToBuffer(mapBlob), mapBlob.type as ValidMimeTypes);
       console.log("map done");
     }
 
@@ -197,7 +198,7 @@ const WherePage: NextPage<PageProps> = ({ data, images, id }) => {
     });
 
     try {
-      await serverUpdateReport(id, serverData);
+      await patchCustomerDamageReport(id, serverData.toPlainObject());
     } catch (error) {
       setAllowClick(true);
       return;
@@ -280,7 +281,7 @@ const WherePage: NextPage<PageProps> = ({ data, images, id }) => {
           <div className="mb-6 mt-4">
             <MultipleImageField
               reportId={id}
-              id="FrontImage"
+              componentId="FrontImage"
               labelText="Please take pictures of the damage to the other partys"
               required={false}
               imageLimit={20}

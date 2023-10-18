@@ -1,6 +1,6 @@
 import { useState } from "react";
 import DamagePopUp from "../popups/damagePopUp";
-import { deleteReportFile } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
+import { requestDamageReportFileDeletion } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 
 interface damageListProps {
   reportId: string;
@@ -42,7 +42,7 @@ const DamageList = ({ damages, setDamages, reportId }: damageListProps) => {
   const handleDelete = async (index: number) => {
     const updatedDamages = [...damages];
     try {
-      await deleteReportFile(reportId, `GreenDamage/${updatedDamages[index].position}`)
+      await requestDamageReportFileDeletion(reportId, `GreenDamage/${updatedDamages[index].position}`)
     } catch(error) {
       console.error(error)
     }

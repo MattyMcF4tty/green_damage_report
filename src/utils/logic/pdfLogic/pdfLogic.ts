@@ -1,9 +1,7 @@
-import { downloadToPc } from "../misc";
-import { getAdminDamageReport, getReportFile, getReportFolder } from "../damageReportLogic.ts/damageReportHandling";
-import { handleGetBase64FileFromStorage } from "../firebaseLogic/apiRoutes";
-import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
+import { fecthAdminDamageReport } from "../damageReportLogic.ts/apiRoutes";
+import { downloadDamageReportFile, downloadDamageReportFolder, getDamageReportFolderDownloadUrls } from "../damageReportLogic.ts/logic";
+import { bufferToBase64, downloadToPc } from "../misc";
 import createReportPDF from "./templates/reportPdfTemplate";
-import { fetchDamageReport } from "../damageReportLogic.ts/apiRoutes";
 import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
 
 export const handleGeneratePdf = async (id: string) => {
@@ -15,33 +13,23 @@ export const handleGeneratePdf = async (id: string) => {
     let map: string = ""; // Assuming handleDownloadImages returns an array of strings for maps
 
     try {
-      const otherPartyImageData = await getReportFolder(
-        id,
-        "/OtherPartyDamages/"
-      );
-      const otherPartyBase64 = await Promise.all(
-        otherPartyImageData.map(async (imageData) => {
-          const image = await handleGetBase64FileFromStorage(imageData.url);
-          return image;
-        })
-      );
-
-      console.log(otherPartyBase64);
+      const otherPartyImages = (await downloadDamageReportFolder(id, '/OtherPartyDamages/')).map((image) => {
+        return bufferToBase64(image.buffer)
+      })
 
       Images = {
         GreenMobility: [],
-        OtherParty: otherPartyBase64,
+        OtherParty: otherPartyImages,
       };
-      const mapUrl = await getReportFile(id, "/Admin/map");
-      map = await handleGetBase64FileFromStorage(mapUrl);
+      map = bufferToBase64((await downloadDamageReportFile(id, "/Admin/map")).buffer);
     } catch (error) {
       console.error(error);
     }
     
   const data = new AdminDamageReport();
-  data.updateFields(await getAdminDamageReport(id));
+  data.updateFields(await fecthAdminDamageReport(id));
 
-  const pdfBlob = await createReportPDF(data, Images, map);
+  const pdfBlob = await createReportPDF(data, Images, map, id);
 
   await downloadToPc(pdfBlob, `DamageReport_${id}`);;
 };

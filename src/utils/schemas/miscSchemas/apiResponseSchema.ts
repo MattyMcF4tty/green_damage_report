@@ -5,7 +5,7 @@ export interface ApiResponseSchema {
     data: {};
 }
 
-export class ApiResponse {
+export class ApiResponse implements ApiResponseSchema {
     status: string;
     messages: string[];
     errors: string[];

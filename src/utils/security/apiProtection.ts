@@ -10,19 +10,14 @@ export function checkOrigin(req: NextApiRequest, allowedOrigins: string[]): bool
 }
 
 
-export const checkMethod = (
+export const verifyMethod = (
     req: NextApiRequest,
-    res: NextApiResponse,
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE'
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH'
 ): boolean => {
     if (req.method !== method) {
-        res.status(405).json(new ApiResponse(
-            "METHOD_NOT_ALLOWED",
-            [],
-            ["Method is not allowed"],
-            {},
-        ));
         return false;
     }
     return true;
 }
+
+

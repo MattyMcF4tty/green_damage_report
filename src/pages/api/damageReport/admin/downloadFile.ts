@@ -1,15 +1,11 @@
-import { getDamageReport } from "@/utils/logic/damageReportLogic.ts/logic";
+import { downloadDamageReportFile, getDamageReportFileDownloadUrl } from "@/utils/logic/damageReportLogic.ts/logic";
 import { getSession, verifySessionToken } from "@/utils/logic/firebaseLogic/authenticationLogic/logic";
 import { AdminUser } from "@/utils/schemas/adminUserSchema";
-import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
-import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 import { verifyMethod } from "@/utils/security/apiProtection";
 import { NextApiRequest, NextApiResponse } from "next";
 
-
 export default async function (req:NextApiRequest, res:NextApiResponse) {
-
     // Verify method
     if (!verifyMethod(req, 'GET')) {
         return res.status(405).json(new ApiResponse(
@@ -52,14 +48,20 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         ));    
     }
 
-
-    const { reportId } = req.query;
+    const {reportId, filePath} = req.query;
     try {
         if (!reportId) {
             throw new Error('Missing reportId.')
         }
+        if (!filePath) {
+            throw new Error('Missing filePath.')
+        }
+
         if (typeof reportId !== 'string') {
-            throw new Error(`Expected reportId to be string but got ${typeof reportId}.`)
+            throw new Error(`Expected reportId to be string, but got ${typeof reportId}`)
+        }
+        if (typeof filePath !=='string') {
+            throw new Error(`Expected filePath to be string, but got ${typeof filePath}`)
         }
     } catch (error:any) {
         return res.status(400).json(new ApiResponse(
@@ -71,28 +73,23 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
     }
 
     try {
-        const damageReport = await getDamageReport(reportId)
+        const fileData = await downloadDamageReportFile(reportId, filePath)
 
-        const adminDamageReport = new AdminDamageReport();
-        adminDamageReport.updateFields(damageReport);
-
-        console.log('Admin user:', user, `fetched damagereport ${reportId}`)
         return res.status(200).json(new ApiResponse(
             'OK',
-            [`Successfully fetched damagereport ${reportId}.`],
+            ['Successfully downloaded file.'],
             [],
-            adminDamageReport.crypto('decrypt')
+            fileData
         ))
     } catch (error:any) {
-        switch(error.name) {
-            case 'NOT_FOUND':
-                return res.status(404).json(new ApiResponse(
-                    'OK',
-                    [error.message],
-                    [],
-                    {}
-                ))
-            default: 
+        if (error.name === 'NOT_FOUND') {
+            return res.status(404).json(new ApiResponse(
+                'OK',
+                [],
+                [error.message],
+                {}
+            ))
+        } else {
             return res.status(500).json(new ApiResponse(
                 'INTERNAL_ERROR',
                 [],

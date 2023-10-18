@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import EXIF from "exif-js";
-import { handleGetBase64FileFromStorage } from "../../firebaseLogic/apiRoutes";
 import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
+import { downloadDamageReportFolder } from "../../damageReportLogic.ts/logic";
 
 const addImageToPDF = (pdfDoc: jsPDF) => {
   const imageWidth = 80;
@@ -18,7 +18,8 @@ const addImageToPDF = (pdfDoc: jsPDF) => {
 const createReportPDF = async (
   data: AdminDamageReport,
   images: Record<string, string[]>,
-  map: string
+  map: string,
+  reportId:string
 ) => {
   const doc = new jsPDF();
 
@@ -1207,11 +1208,12 @@ const createReportPDF = async (
       doc.text("Images:", 15, currentY + 30);
 
       const imageUrl = damage.images[0];
-      const imageBase64 = await handleGetBase64FileFromStorage(imageUrl);
+      const imagesBase64 = await downloadDamageReportFolder(reportId, `/GreenDamage/${position}/`);
       currentY += 40; // Update as per actual space needed
       const imageHeight = 55; // Example height
 
-      const correctedImageBase64 = await getCorrectlyOrientedImage(imageBase64);
+      //TODO: FIIIIIIIXXXXX ----------------------------------------------
+/*       const correctedImageBase64 = await getCorrectlyOrientedImage(imagesBase64);
       doc.addImage(
         correctedImageBase64,
         "png",
@@ -1219,7 +1221,7 @@ const createReportPDF = async (
         currentY,
         55, // FIX
         imageHeight
-      );
+      ); */
       currentY += imageHeight + 20; // Add some padding
     }
   }

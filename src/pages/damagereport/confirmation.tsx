@@ -11,9 +11,8 @@ import {
   faPerson,
 } from "@fortawesome/free-solid-svg-icons";
 import { getServerSidePropsWithRedirect, handleSendEmail } from "@/utils/logic/misc";
-import { updateDamageReport } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
 import { PageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
-import { serverUpdateReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import { patchCustomerDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -34,7 +33,7 @@ const confirmationPage: NextPage<PageProps> = ({ data, images, id }) => {
     setAllowClick(false);
     serverData.updateFields({ finished: true });
     try {
-      await serverUpdateReport(id, serverData);
+      await patchCustomerDamageReport(id, serverData.toPlainObject());
     } catch (error) {
       setAllowClick(true);
       return;

@@ -1,4 +1,4 @@
-import { createNewDamageReport } from "@/utils/logic/damageReportLogic.ts/logic";
+import { queryDamageReports } from "@/utils/logic/damageReportLogic.ts/logic";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 import { verifyMethod } from "@/utils/security/apiProtection";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -15,14 +15,10 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         ))
     }
 
-    const { email } = req.body;
-
+    const {qVar, qOperation, qValue} = req.body;
     try {
-        if (!email) {
-            throw new Error('Missing email.')
-        }
-        if (typeof email !== 'string') {
-            throw new Error('Email is wrong format')
+        if (typeof qVar !== 'string') {
+            throw new Error(`Expected qVar to be string but got ${typeof qVar}`)
         }
     } catch (error:any) {
         return res.status(400).json(new ApiResponse(
@@ -34,13 +30,17 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
     }
 
     try {
-        const reportId = await createNewDamageReport(email);
+        const qResult = await queryDamageReports(qVar, qOperation, qValue)
 
-        return res.status(201).json(new ApiResponse(
-            'CREATED',
-            ['Damagereport created Successfully'],
+        const docIds = qResult.docs.map((doc) => {
+            return doc.id;
+        })
+
+        return res.status(200).json(new ApiResponse(
+            'OK',
+            [`Found ${docIds.length} report${docIds.length !== 1 && 's'} matching criteria.`],
             [],
-            {reportId: reportId}
+            {docIds: docIds}
         ))
     } catch (error:any) {
         return res.status(500).json(new ApiResponse(

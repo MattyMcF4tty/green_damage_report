@@ -1,12 +1,8 @@
-import { createDoc } from "@/firebase/clientApp";
-import { requestDamageReportCreation } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 import { handleSendEmail } from "@/utils/logic/misc";
 import { useEffect, useState } from "react";
 import { TextField } from "../custom_inputfields";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEnvelope, faMailForward } from "@fortawesome/free-solid-svg-icons";
-import sendEmail from "@/pages/api/sendEmail";
-import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
+import { faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
 
 interface SendMailPopUpProps {

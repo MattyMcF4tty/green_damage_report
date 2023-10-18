@@ -1,7 +1,6 @@
-import { createDoc } from "@/firebase/clientApp";
 import { requestDamageReportCreation } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 import { useRouter } from "next/router";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 
 interface EmailPopUpProps {
   setVisibility: (visible: boolean) => void;

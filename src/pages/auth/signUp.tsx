@@ -1,4 +1,4 @@
-import { Inputfield } from "@/components/custom_inputfields";
+/* import { Inputfield } from "@/components/custom_inputfields";
 import { handleSignUp, handleVerifyUser } from "@/utils/logic/firebaseLogic/apiRoutes";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
@@ -87,3 +87,4 @@ const SignUpPage: NextPage = () => {
 };
 
 export default SignUpPage;
+ */

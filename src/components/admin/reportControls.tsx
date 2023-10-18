@@ -6,11 +6,11 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useState } from "react";
-import { deleteReports } from "@/firebase/clientApp";
 import { handleGeneratePdf } from "@/utils/logic/pdfLogic/pdfLogic";
 import SendMailPopUp from "../popups/sendMailPopUp";
 import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
 import ExpandedReport3 from "./expandedReport3";
+import { requestDamageReportDeletion } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 
 interface ReportControls {
   selectedReports: { id: string; data: AdminDamageReport }[];
@@ -40,12 +40,11 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
 
   const handleDelete = async () => {
     /* Delete reports on server */
-    const selectedReportIDs: string[] = [];
-    selectedReports.map((report) => {
-      selectedReportIDs.push(report.id);
+    const deletionPromises = selectedReports.map(async(report) => {
+      requestDamageReportDeletion(report.id)
     });
 
-    await deleteReports(selectedReportIDs);
+    await Promise.all(deletionPromises)
 
     location.reload();
   };

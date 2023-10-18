@@ -1,54 +1,72 @@
-import { NextApiRequest, NextApiResponse } from "next";
+import { updateDamageReport } from "@/utils/logic/damageReportLogic.ts/logic";
+import { AdminDamageReportSchema } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
-import { updatePartialDamageReport } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
-import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
-import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
+import { verifyMethod } from "@/utils/security/apiProtection";
+import { NextApiRequest, NextApiResponse } from "next";
 
-export default async function (req: NextApiRequest, res: NextApiResponse) {
 
-    // Check method
-    if (req.method !== "POST") {
+export default async function (req:NextApiRequest, res:NextApiResponse) {
+    // Verify method
+    if (!verifyMethod(req, 'PATCH')) {
         return res.status(405).json(new ApiResponse(
-            "METHOD_NOT_ALLOWED",
+            'METHOD_NOT_ALLOWED',
             [],
-            ["Method is not allowed"],
-            {},
+            [`Api route only accepts PATCH and got ${req.method}.`],
+            {}
         ))
-    }    
+    }
 
-    // Check for user errors
-    const { reportData, reportId } = req.body;
-    let report = new CustomerDamageReport()
+
+    const { data } = req.body;
+    const { reportId } = req.query;
+    
     try {
-        if (!reportData) {
-            throw new Error("reportData is null")
+        if (!reportId) {
+            throw new Error('Missing reportId.');
         }
-        if (!reportId || typeof reportId !== 'string') {
-            throw new Error("ReportId is not correct type string")
+        if (typeof reportId !== 'string') {
+            throw new Error(`Expected reportId to be string but got ${typeof reportId}.`);
         }
-
-        try {
-            report.updateFields(reportData);
-        } catch (error:any) {
-            throw new Error("reportData does not match CustomerDamageReport")
+        if (!data) {
+            throw new Error('Missing data.');
         }
-
+        if (typeof data !== 'object') {
+            throw new Error(`Expected data to be object but got ${typeof data}.`);
+        }
     } catch (error:any) {
         return res.status(400).json(new ApiResponse(
-            "BAD_REQUEST",
+            'BAD_REQUEST',
             [],
             [error.message],
             {}
         ))
     }
 
-    const encryptedReport = report.crypto('encrypt')
-    await updatePartialDamageReport(reportId, encryptedReport)
+    try {
+        await updateDamageReport(reportId, data)
 
-    return res.status(200).json(new ApiResponse(
-        "OK",
-        [],
-        ["Report updated succesfully"],
-        {}
-    ))
+        return res.status(200).json(new ApiResponse(
+            'OK',
+            [`Successfully updated damagereport ${reportId}.`],
+            [],
+            {}
+        ))
+    } catch (error:any) {
+        switch (error.name) {
+            case 'NOT_FOUND':
+                return res.status(404).json(new ApiResponse(
+                    'OK',
+                    [`Document ${reportId} does not exist.`],
+                    [],
+                    {}
+                ))
+            default:
+                return res.status(500).json(new ApiResponse(
+                    'INTERNAL_ERROR',
+                    [],
+                    ['Something went wrong.'],
+                    {}
+                ))
+        }
+    }
 }

@@ -1,9 +1,16 @@
 import { cryptoText, decryptText, encryptText } from "@/utils/security/crypto";
 import { RenterSchema } from "../incidentDetailSchemas/renterSchema";
-import { CustomerDamageReport } from "./customerReportSchema";
+import { CustomerDamageReport, CustomerDamageReportSchema } from "./customerReportSchema";
 import { EventLog, EventLogSchema } from "../miscSchemas/eventLogSchema";
 
-export class AdminDamageReport extends CustomerDamageReport {
+export interface AdminDamageReportSchema extends CustomerDamageReportSchema {
+    renterInfo: RenterSchema;
+    eventLogs: EventLogSchema[];
+    reportId: number | null;
+}
+
+
+export class AdminDamageReport extends CustomerDamageReport implements AdminDamageReportSchema{
 
     renterInfo: RenterSchema;
     eventLogs: EventLogSchema[];

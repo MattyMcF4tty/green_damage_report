@@ -1,12 +1,9 @@
-import { updateDamageReport, updatePartialDamageReport } from "@/utils/logic/damageReportLogic.ts/damageReportHandling";
-import { updateFirestoreDoc } from "@/utils/logic/firebaseLogic/firestore";
+import { patchCustomerDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 import { getAge, isDateInRange } from "@/utils/logic/misc";
 import { dateToWunder, wunderToDate } from "@/utils/logic/wunderfleetLogic/wunderUtils";
 import { Renter } from "@/utils/schemas/incidentDetailSchemas/renterSchema";
-import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
-import AppError from "@/utils/schemas/miscSchemas/errorSchema";
-import { encryptObject, encryptText } from "@/utils/security/crypto";
+import { encryptText } from "@/utils/security/crypto";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
@@ -335,7 +332,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
 
     // Collecting renter data in object
     try {
-      await updatePartialDamageReport(reportId, {renterInfo: renterInfo.toPlainObject()})
+      await patchCustomerDamageReport(reportId, {renterInfo: renterInfo.toPlainObject()})
     } catch (error:any) {
       console.error(error);
       return res.status(500).json(new ApiResponse(
