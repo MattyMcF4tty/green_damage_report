@@ -8,97 +8,94 @@ import { verifyMethod } from "@/utils/security/apiProtection";
 import { NextApiRequest, NextApiResponse } from "next";
 
 
-export default async function (req:NextApiRequest, res:NextApiResponse) {
+export default async function (req: NextApiRequest, res: NextApiResponse) {
+  if (!checkMethod(req, res, "GET")) {
+    return;
+  }
 
-    // Verify method
-    if (!verifyMethod(req, 'GET')) {
-        return res.status(405).json(new ApiResponse(
-            'METHOD_NOT_ALLOWED',
-            [],
-            [`Api route only accepts GET and got ${req.method}.`],
-            {}
-        ))
-    } 
+  const { Authorization } = req.headers;
+  if (!Authorization) {
+    return res
+      .status(401)
+      .json(
+        new ApiResponse(
+          "UNAUTHORIZED",
+          [],
+          ["Missing authorization token."],
+          {}
+        )
+      );
+  } else if (typeof Authorization !== "string") {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(
+          "BAD_REQUEST",
+          [],
+          ["Authorization token is not valid type."],
+          {}
+        )
+      );
+  }
 
-    //Verify user
-    const sessionToken = getSession(req);
-    if (!sessionToken) {
-        return res.status(401).json(new ApiResponse(
-            'UNAUTHORIZED',
-            [],
-            ['Missing authorization.'],
-            {}
-        ))
-    }
-    if (typeof sessionToken !== 'string') {
-        return res.status(400).json(new ApiResponse(
-            'BAD_REQUEST',
-            [],
-            ['Invalid authorization format.'],
-            {}
-        ));    
-    }
+  const { reportId } = req.body;
+  if (!reportId || typeof reportId !== "string") {
+    return res
+      .status(400)
+      .json(
+        new ApiResponse(
+          "BAD_REQUEST",
+          [],
+          ["Report is null or not a string."],
+          {}
+        )
+      );
+  }
 
-    let user: AdminUser;
-    try {
-        const decodedToken = await verifySessionToken(sessionToken)
-        user = {email: decodedToken.email || 'Unkown', uid: decodedToken.uid}
-    } catch (error:any) {
-        return res.status(403).json(new ApiResponse(
-            'FORBIDDEN',
-            [],
-            ['You do not have permission to access this resource.'],
-            {}
-        ));    
-    }
-
-
-    const { reportId } = req.query;
-    try {
-        if (!reportId) {
-            throw new Error('Missing reportId.')
-        }
-        if (typeof reportId !== 'string') {
-            throw new Error(`Expected reportId to be string but got ${typeof reportId}.`)
-        }
-    } catch (error:any) {
-        return res.status(400).json(new ApiResponse(
-            'BAD_REQUEST',
-            [],
-            [error.message],
-            {}
-        ))
+  try {
+    await verifyAdmin(Authorization);
+  } catch (error: any) {
+    if (error.name === "UNEXPECTED") {
+      return res
+        .status(500)
+        .json(
+          new ApiResponse("INTERNAL_ERROR", [], ["Something went wrong."], {})
+        );
+    } else if (error.name === "TOO_MANY_REQUESTS") {
+      return res
+        .status(429)
+        .json(new ApiResponse(error.name, [], [error.message], {}));
     }
 
-    try {
-        const damageReport = await getDamageReport(reportId)
+    return res
+      .status(401)
+      .json(new ApiResponse(error.name, [], [error.message], {}));
+  }
 
-        const adminDamageReport = new AdminDamageReport();
-        adminDamageReport.updateFields(damageReport);
-
-        console.log('Admin user:', user, `fetched damagereport ${reportId}`)
-        return res.status(200).json(new ApiResponse(
-            'OK',
-            [`Successfully fetched damagereport ${reportId}.`],
-            [],
-            adminDamageReport.crypto('decrypt')
-        ))
-    } catch (error:any) {
-        switch(error.name) {
-            case 'NOT_FOUND':
-                return res.status(404).json(new ApiResponse(
-                    'OK',
-                    [error.message],
-                    [],
-                    {}
-                ))
-            default: 
-            return res.status(500).json(new ApiResponse(
-                'INTERNAL_ERROR',
-                [],
-                ['Something went wrong.'],
-                {}
-            ))
-        }
+  // Get report
+  let damageReport;
+  try {
+    damageReport = await getAdminDamageReport(reportId);
+  } catch (error: any) {
+    if (error.name === "NOT_FOUND") {
+      return res
+        .status(204)
+        .json(new ApiResponse("OK", [`Report: ${reportId} not found`], [], {}));
     }
+
+    console.error(`Error getting report with id: ${reportId}, ${error.code}`);
+    return res
+      .status(500)
+      .json(new ApiResponse("SERVER_ERROR", [], ["Something went wrong"], {}));
+  }
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        "OK",
+        [`Damage report ${reportId} fetched succesfully.`],
+        [],
+        damageReport.crypto("decrypt")
+      )
+    );
 }
