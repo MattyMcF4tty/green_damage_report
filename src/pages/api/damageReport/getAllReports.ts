@@ -1,8 +1,7 @@
-import { getFirestoreCollection } from "@/utils/logic/firebaseLogic/firestore";
-import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { NextApiRequest, NextApiResponse } from "next";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
+import { getFirestoreCollection } from "@/utils/logic/firebaseLogic/firestoreLogic/logic";
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
   //TODO: Make verify admin

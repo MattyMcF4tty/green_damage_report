@@ -1,3 +1,4 @@
+import { fecthAdminDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 import { getDamageReport } from "@/utils/logic/damageReportLogic.ts/logic";
 import { getSession, verifySessionToken } from "@/utils/logic/firebaseLogic/authenticationLogic/logic";
 import { AdminUser } from "@/utils/schemas/adminUserSchema";
@@ -9,9 +10,16 @@ import { NextApiRequest, NextApiResponse } from "next";
 
 
 export default async function (req: NextApiRequest, res: NextApiResponse) {
-  if (!checkMethod(req, res, "GET")) {
-    return;
-  }
+
+    // Verify method
+    if (!verifyMethod(req, 'GET')) {
+      return res.status(405).json(new ApiResponse(
+          'METHOD_NOT_ALLOWED',
+          [],
+          [`Api route only accepts GET and got ${req.method}.`],
+          {}
+      ))
+  } 
 
   const { Authorization } = req.headers;
   if (!Authorization) {
@@ -53,7 +61,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   }
 
   try {
-    await verifyAdmin(Authorization);
+    await verifySessionToken(Authorization);
   } catch (error: any) {
     if (error.name === "UNEXPECTED") {
       return res
@@ -75,11 +83,11 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   // Get report
   let damageReport;
   try {
-    damageReport = await getAdminDamageReport(reportId);
+    damageReport = await fecthAdminDamageReport(reportId);
   } catch (error: any) {
     if (error.name === "NOT_FOUND") {
       return res
-        .status(204)
+        .status(200)
         .json(new ApiResponse("OK", [`Report: ${reportId} not found`], [], {}));
     }
 

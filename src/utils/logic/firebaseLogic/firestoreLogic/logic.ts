@@ -1,4 +1,3 @@
-import { doc } from "firebase/firestore";
 import { getAdminFirestore } from "../initFirebaseAdmin"
 import AppError from "@/utils/schemas/miscSchemas/errorSchema";
 
