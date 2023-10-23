@@ -1,9 +1,6 @@
 import AppError from "@/utils/schemas/miscSchemas/errorSchema";
 import { getAdminAuth } from "../initFirebaseAdmin"
 import { NextApiRequest } from "next";
-import { getFirebaseAuth } from "../initFirebaseClient";
-import { signInWithEmailAndPassword } from "firebase/auth";
-import Cookies from "js-cookie";
 
 
 export const createNewUser = async (email:string, password:string) => {
@@ -46,36 +43,7 @@ export const verifySessionToken = async (idToken:string) => {
 };
 
 
-export const signOutUser = async () => {
-    revokeSessionToken();
-}
-
-export const signInUser = async (email: string, password: string) => {
-    const firebaseClientAuth = getFirebaseAuth();
-    try {
-        const userCredential = await signInWithEmailAndPassword(firebaseClientAuth, email, password);
-
-        const token = await userCredential.user.getIdToken();
-
-        setSessionToken(token)
-
-        // The signed-in user info can be accessed via userCredential.user
-        return userCredential.user;
-    } catch (error:any) {
-        console.error("Error signing in:", error.message);
-        throw error;
-    }
-};
-
 export const getSession = (req:NextApiRequest) => {
     const { sessionToken } = req.cookies;
     return sessionToken;
-}
-
-export const setSessionToken = async (sessionToken: string) => {
-    Cookies.set('sessionToken', sessionToken, { expires: 365 });  // token expires in 1 day
-}
-
-export const revokeSessionToken = async () => {
-    Cookies.remove('sessionToken');
 }

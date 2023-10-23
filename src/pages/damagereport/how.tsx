@@ -10,17 +10,41 @@ import { useRouter } from "next/router";
 import { GetServerSidePropsContext, NextPage } from "next";
 import WitnessList from "@/components/otherPartys/witnessList";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
-import { getServerSidePropsWithRedirect } from "@/utils/logic/misc";
-import { PageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
 import { patchCustomerDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import { DamageReportPageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
+import { getDamageReport, getDamageReportFolderDownloadUrls } from "@/utils/logic/damageReportLogic.ts/logic";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  return await getServerSidePropsWithRedirect(context);
+  const reportId = context.query.id as string;
+
+  const damageReport = new CustomerDamageReport();
+  damageReport.updateFields(await getDamageReport(reportId));
+
+  const otherPartyImageUrls = (await getDamageReportFolderDownloadUrls(reportId, '/OtherPartyDamages/')).map((image) => {
+    return image.downloadUrl;
+  })
+  
+  if (damageReport.isExpired() || damageReport.isFinished()) {
+    return {
+      redirect: {
+        destination: "/damagereport/reportfinished",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {
+      data: damageReport.toPlainObject(),
+      otherPartyImageUrls: otherPartyImageUrls,
+      id: reportId,
+    },
+  };
 };
 
-const HowPage: NextPage<PageProps> = ({ data, images, id }) => {
+const HowPage: NextPage<DamageReportPageProps> = ({ data, otherPartyImageUrls, id }) => {
   const router = useRouter();
   const serverData = new CustomerDamageReport();
   serverData.updateFields(data);

@@ -1,8 +1,8 @@
 import { CustomerDamageReport } from "../damageReportSchemas/customerReportSchema";
 
 
-export interface PageProps {
+export interface DamageReportPageProps {
     data: CustomerDamageReport;
-    images: Record<string, string[]>;
+    otherPartyImageUrls: string[];
     id: string;
 }

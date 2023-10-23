@@ -10,18 +10,43 @@ import {
   faCar,
   faPerson,
 } from "@fortawesome/free-solid-svg-icons";
-import { getServerSidePropsWithRedirect, handleSendEmail } from "@/utils/logic/misc";
-import { PageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
+import { handleSendEmail } from "@/utils/logic/misc";
+import { DamageReportPageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
 import { patchCustomerDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import { getDamageReport, getDamageReportFolderDownloadUrls } from "@/utils/logic/damageReportLogic.ts/logic";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  return await getServerSidePropsWithRedirect(context);
+  const reportId = context.query.id as string;
+
+  const damageReport = new CustomerDamageReport();
+  damageReport.updateFields(await getDamageReport(reportId));
+
+  const otherPartyImageUrls = (await getDamageReportFolderDownloadUrls(reportId, '/OtherPartyDamages/')).map((image) => {
+    return image.downloadUrl;
+  })
+  
+  if (damageReport.isExpired() || damageReport.isFinished()) {
+    return {
+      redirect: {
+        destination: "/damagereport/reportfinished",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {
+      data: damageReport.toPlainObject(),
+      otherPartyImageUrls: otherPartyImageUrls,
+      id: reportId,
+    },
+  };
 };
 
 
-const confirmationPage: NextPage<PageProps> = ({ data, images, id }) => {
+const confirmationPage: NextPage<DamageReportPageProps> = ({ data, otherPartyImageUrls, id }) => {
   const Router = useRouter();
   const serverData = new CustomerDamageReport();
   serverData.updateFields(data);
@@ -449,8 +474,8 @@ const confirmationPage: NextPage<PageProps> = ({ data, images, id }) => {
         Pictures of the damages to the other Partys involved
       </p>
       <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
-        {images && images["OtherParty"] && images["OtherParty"].length > 0 ? (
-          images["OtherParty"].map((image) => (
+        {otherPartyImageUrls.length > 0 ? (
+          otherPartyImageUrls.map((image) => (
             <img key={image} src={image} alt={image} className="w-1/2" />
           ))
         ) : (

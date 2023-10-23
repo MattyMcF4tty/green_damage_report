@@ -383,3 +383,65 @@ export const requestQueryDamageReports = async (variable:string, operation:Fireb
   console.log(responseJson.messages[0]);
   return responseJson.data.docIds as string[]
 }
+
+
+export const requestDamageReportFileDownload = async (reportId:string, filePath:string) => {
+  const appUrl = process.env.NEXT_PUBLIC_URL;
+  if (!appUrl) {
+    throw new AppError('INTERNAL_ERROR', 'NEXT_PUBLIC_URL is not defined in enviroment.')
+  }
+  
+  const query = {
+    reportId: reportId,
+    filePath: filePath
+  }
+
+  const response = await fetch(`${appUrl}/api/damageReport/admin/downloadFile`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(query)
+  })
+
+  const responseJson = await response.json();
+  if (!response.ok) {
+    throw new AppError(responseJson.status, responseJson.errors[0]);
+  }
+
+  return responseJson.data as {
+    name: string;
+    buffer: Buffer;
+    mimeType: string | null;
+  }
+}
+
+export const requestDamageReportFolderDownload = async (reportId:string, folderPath:string) => {
+  const appUrl = process.env.NEXT_PUBLIC_URL;
+  if (!appUrl) {
+    throw new AppError('INTERNAL_ERROR', 'NEXT_PUBLIC_URL is not defined in enviroment.')
+  }
+  
+  const query = {
+    folderPath: folderPath
+  }
+
+  const response = await fetch(`${appUrl}/api/damageReport/admin/downloadFile?reportId=${reportId}`, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(query)
+  })
+
+  const responseJson = await response.json();
+  if (!response.ok) {
+    throw new AppError(responseJson.status, responseJson.errors[0]);
+  }
+
+  return responseJson.data.fileData as {
+    name: string;
+    mimeType: string;
+    base64: string;
+  }[]
+}

@@ -1,4 +1,4 @@
-import { cryptoText, cryptoTextArray, decryptArray, encryptArray } from "@/utils/security/crypto";
+import { cryptoText, cryptoTextArray } from "@/utils/security/crypto";
 
 export interface DamageSchema {
     position: string | null;

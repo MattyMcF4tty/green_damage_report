@@ -1,6 +1,6 @@
 import { fecthAdminDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 import { getDamageReport } from "@/utils/logic/damageReportLogic.ts/logic";
-import { getSession, verifySessionToken } from "@/utils/logic/firebaseLogic/authenticationLogic/logic";
+import { getSession, verifySessionToken } from "@/utils/logic/firebaseLogic/authenticationLogic/serverLogic";
 import { AdminUser } from "@/utils/schemas/adminUserSchema";
 import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";

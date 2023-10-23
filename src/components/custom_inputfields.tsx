@@ -1,7 +1,7 @@
 /* import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";*/
 import React, { useEffect, useState, useRef } from "react";
 import usePlacesService from "react-google-autocomplete/lib/usePlacesAutocompleteService";
-import { convertFileToBase64, normalizeFilePath, normalizeFolderPath, trimArrayToLimit } from "@/utils/logic/misc";
+import { convertFileToBase64, normalizeFilePath, normalizeFolderPath } from "@/utils/logic/misc";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera, faX } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -9,15 +9,9 @@ import {
   formatNumberplate,
   formatSSN,
 } from "@/utils/logic/formattingLogic/formatters";
-import { fetcDamageReportFolderFilesUrl, requestDamageReportFileDeletion, uploadFileToDamageReport, uploadFolderToDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import { fetcDamageReportFileUrl, fetcDamageReportFolderFilesUrl, requestDamageReportFileDeletion, uploadFileToDamageReport, uploadFolderToDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 import { ValidMimeTypes } from "@/utils/schemas/types";
-import { position } from "html2canvas/dist/types/css/property-descriptors/position";
-import { getDamageReportFileDownloadUrl, getDamageReportFolderDownloadUrls } from "@/utils/logic/damageReportLogic.ts/logic";
 
-/* import usePlacesAutocomplete, {
-  getGeocode,
-  getLatLng,
-} from "use-places-autocomplete"; */
 
 /* -----Text inputfield------------------------------------------------------------- */
 interface InputfieldProps {
@@ -513,7 +507,7 @@ export const MultipleImageField = ({
 
   const getImages = async () => {
     setDisabled(true);
-    const fileData = await getDamageReportFolderDownloadUrls(reportId, normalizedFolderPath)
+    const fileData = await fetcDamageReportFolderFilesUrl(reportId, normalizedFolderPath)
     setImageData(fileData)
     setDisabled(false);
   }
@@ -677,7 +671,7 @@ const [imageData, setImageData] = useState<{fileName: string;downloadUrl: string
 
   const getImage = async () => {
     setDisabled(true);
-    const image = await getDamageReportFileDownloadUrl(reportId, normalizedFilePath);
+    const image = await fetcDamageReportFileUrl(reportId, normalizedFilePath);
     setImageData(image);
     setDisabled(false);
   }

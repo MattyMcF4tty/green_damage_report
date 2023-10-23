@@ -1,4 +1,4 @@
-import { getSession, verifySessionToken } from "@/utils/logic/firebaseLogic/authenticationLogic/logic";
+import { getSession, verifySessionToken } from "@/utils/logic/firebaseLogic/authenticationLogic/serverLogic";
 import { AdminUserSchema } from "@/utils/schemas/adminUserSchema";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 import { verifyMethod } from "@/utils/security/apiProtection";

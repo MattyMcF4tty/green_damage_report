@@ -1,14 +1,14 @@
-/* import { Inputfield } from "@/components/custom_inputfields";
-import { handleSignUp, handleVerifyUser } from "@/utils/logic/firebaseLogic/apiRoutes";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
+import { verifySessionToken } from "@/utils/logic/firebaseLogic/authenticationLogic/serverLogic";
+import { signInUser } from "@/utils/logic/firebaseLogic/authenticationLogic/clientLogic";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
   const token = context.req.cookies["AuthToken"];
-  const userVerified = await handleVerifyUser(token);
+  const userVerified = token ? await verifySessionToken(token) : false;
 
   if (!userVerified) {
     return {
@@ -29,7 +29,7 @@ const SignUpPage: NextPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const userSignedUp = await handleSignUp(email, password);
+    const userSignedUp = await signInUser(email, password);
     if (userSignedUp) {
       return Router.push("admin/adminPage");
     }
@@ -87,4 +87,3 @@ const SignUpPage: NextPage = () => {
 };
 
 export default SignUpPage;
- */

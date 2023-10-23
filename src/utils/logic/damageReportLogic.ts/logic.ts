@@ -1,5 +1,5 @@
 import { AdminDamageReport, AdminDamageReportSchema } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
-import { generateDamageReportId, getEnvVariable, normalizeFolderPath } from "../misc"
+import { getEnvVariable, normalizeFolderPath } from "../misc"
 import { createFirestoreDocument, deleteFirestoreDocument, getFirestoreCollection, getFirestoreCollectionDocIds, getFirestoreDocument, queryFirestoreCollection, updateFirestoreDocument } from "../firebaseLogic/firestoreLogic/logic";
 import AppError from "@/utils/schemas/miscSchemas/errorSchema";
 import { deleteFileFromStorage, deleteFolderFromStorage, downloadFileFromStorage, downloadFolderFilesFromStorage, getFileDownloadUrlFromStorage, getFolderFilesDownloadUrlsFromStorage, uploadFileToStorage, uploadFolderToStorage } from "../firebaseLogic/storageLogic/logic";
@@ -233,6 +233,27 @@ export const downloadDamageReportFolder = async(reportId:string, folderPath:stri
     }
 }
 
+export const generateDamageReportId = async () => {
+    const dataList = await getDamageReportIds();
+  
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  
+    /* Generates random id from chars and checks if this id is not already taken */
+    let id: string | null = null;
+    while (!id) {
+      const newId = Array.from(crypto.getRandomValues(new Uint16Array(16)))
+        .map((randomValue) => chars[randomValue % chars.length])
+        .join("");
+  
+      const existingId = dataList.find((docId: string) => docId === newId);
+  
+      if (!existingId) {
+        id = newId;
+      }
+    }
+  
+    return id;
+  };
 
 export const getDamageReportFolderDownloadUrls = async (reportId:string, folderPath:string) => {
     const damageReportFolder = getEnvVariable('DAMAGE_REPORT_STORAGE_FOLDER');

@@ -19,19 +19,43 @@ import { Vehicle } from "@/utils/schemas/incidentDetailSchemas/vehicleSchema";
 import { Biker } from "@/utils/schemas/incidentDetailSchemas/bikerSchema";
 import { Pedestrian } from "@/utils/schemas/incidentDetailSchemas/pedestrianSchema";
 import { IncidentObject } from "@/utils/schemas/incidentDetailSchemas/incidentObjectSchema";
-import { blobToBase64, blobToBuffer, getServerSidePropsWithRedirect } from "@/utils/logic/misc";
-import { PageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
-import { uploadDamageReportFile } from "@/utils/logic/damageReportLogic.ts/logic";
+import { blobToBase64 } from "@/utils/logic/misc";
+import { DamageReportPageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
 import { ValidMimeTypes } from "@/utils/schemas/types";
-import { patchCustomerDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import { patchCustomerDamageReport, uploadFileToDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import { getDamageReport, getDamageReportFolderDownloadUrls } from "@/utils/logic/damageReportLogic.ts/logic";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  return await getServerSidePropsWithRedirect(context);
+  const reportId = context.query.id as string;
+
+  const damageReport = new CustomerDamageReport();
+  damageReport.updateFields(await getDamageReport(reportId));
+
+  const otherPartyImageUrls = (await getDamageReportFolderDownloadUrls(reportId, '/OtherPartyDamages/')).map((image) => {
+    return image.downloadUrl;
+  })
+  
+  if (damageReport.isExpired() || damageReport.isFinished()) {
+    return {
+      redirect: {
+        destination: "/damagereport/reportfinished",
+        permanent: false,
+      },
+    };
+  }
+
+  return {
+    props: {
+      data: damageReport.toPlainObject(),
+      otherPartyImageUrls: otherPartyImageUrls,
+      id: reportId,
+    },
+  };
 };
 
-const WherePage: NextPage<PageProps> = ({ data, images, id }) => {
+const WherePage: NextPage<DamageReportPageProps> = ({ data, otherPartyImageUrls, id }) => {
   const router = useRouter();
   const serverData = new CustomerDamageReport();
   const mapsId = "MyGoogleMap";
@@ -63,12 +87,7 @@ const WherePage: NextPage<PageProps> = ({ data, images, id }) => {
     serverData.damageDescription
   );
 
-  const [greenImages, setGreenImages] = useState<string[] | null>(
-    images?.["GreenMobility"] || null
-  );
-  const [otherPartyImages, setOtherPartyImages] = useState<string[] | null>(
-    images?.["OtherParty"] || null
-  );
+  const [otherPartyImages, setOtherPartyImages] = useState<string[] | null>(otherPartyImageUrls);
 
   const [carInfo, setCarInfo] = useState(
     serverData.vehicleInfo.map(
@@ -151,7 +170,7 @@ const WherePage: NextPage<PageProps> = ({ data, images, id }) => {
       const mapBlob: Blob = dataURItoBlob(dataUrl);
 
       console.log("map created");
-      await uploadDamageReportFile(id, "Admin/map", await blobToBuffer(mapBlob), mapBlob.type as ValidMimeTypes);
+      await uploadFileToDamageReport(id, "Admin/map", await blobToBase64(mapBlob), mapBlob.type as ValidMimeTypes);
       console.log("map done");
     }
 

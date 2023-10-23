@@ -1,11 +1,8 @@
-import { GetServerSidePropsContext, NextApiRequest } from "next";
 import AppError from "../schemas/miscSchemas/errorSchema";
 import axios from "axios";
 import { AdminDamageReport } from "../schemas/damageReportSchemas/adminReportSchema";
-import { getDamageReportFolderDownloadUrls, getDamageReportIds } from "./damageReportLogic.ts/logic";
 import { base64Regex } from "./formattingLogic/regexs";
 import { ValidMimeTypes } from "../schemas/types";
-import { fecthCustomerDamageReport } from "./damageReportLogic.ts/apiRoutes";
 
 
 export const getEnvVariable = (key: string): string => {
@@ -15,29 +12,6 @@ export const getEnvVariable = (key: string): string => {
     }
     return value;
 };
-
-
-export const generateDamageReportId = async () => {
-    const dataList = await getDamageReportIds();
-  
-    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  
-    /* Generates random id from chars and checks if this id is not already taken */
-    let id: string | null = null;
-    while (!id) {
-      const newId = Array.from(crypto.getRandomValues(new Uint16Array(16)))
-        .map((randomValue) => chars[randomValue % chars.length])
-        .join("");
-  
-      const existingId = dataList.find((docId: string) => docId === newId);
-  
-      if (!existingId) {
-        id = newId;
-      }
-    }
-  
-    return id;
-  };
 
 
   export const GetUserPosition = () => {
@@ -70,41 +44,7 @@ export const generateDamageReportId = async () => {
     }
   };
 
-  export const getServerSidePropsWithRedirect = async (
-    context: GetServerSidePropsContext
-  ) => {
-    const id = context.query.id as string;
-  
-    const damageReport = await fecthCustomerDamageReport(id);
-    const GreenMobilityImages: string[] = [];
-  
-    const otherPartyImages = (await getDamageReportFolderDownloadUrls(id, '/OtherPartyDamages/')).map((image) => {
-      return image.downloadUrl;
-    })
-    const images: Record<string, string[]> = {
-      GreenMobility: GreenMobilityImages,
-      OtherParty: otherPartyImages,
-    };
-  
-    damageReport.isExpired();
-  
-    if (damageReport.isFinished()) {
-      return {
-        redirect: {
-          destination: "/damagereport/reportfinished",
-          permanent: false,
-        },
-      };
-    }
 
-    return {
-      props: {
-        data: damageReport.toPlainObject(),
-        images: images || null,
-        id: id,
-      },
-    };
-  };
 
 export const reportSearch = (
     reportList: { id: string; data: AdminDamageReport }[],
@@ -250,7 +190,7 @@ export const reportSearch = (
     });
   };
 
-  
+
   export const arrayBufferToBlob = (
     arrayBuffer: ArrayBuffer,
     contentType: string

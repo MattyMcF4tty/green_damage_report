@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import EXIF from "exif-js";
 import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
-import { downloadDamageReportFolder } from "../../damageReportLogic.ts/logic";
+import { requestDamageReportFolderDownload } from "../../damageReportLogic.ts/apiRoutes";
 
 const addImageToPDF = (pdfDoc: jsPDF) => {
   const imageWidth = 80;
@@ -1208,7 +1208,7 @@ const createReportPDF = async (
       doc.text("Images:", 15, currentY + 30);
 
       const imageUrl = damage.images[0];
-      const imagesBase64 = await downloadDamageReportFolder(reportId, `/GreenDamage/${position}/`);
+      const imagesBase64 = await requestDamageReportFolderDownload(reportId, `/GreenDamage/${position}/`);
       currentY += 40; // Update as per actual space needed
       const imageHeight = 55; // Example height
 

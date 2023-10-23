@@ -1,4 +1,4 @@
-import { signInUser } from "@/utils/logic/firebaseLogic/authenticationLogic/logic";
+import { signInUser } from "@/utils/logic/firebaseLogic/authenticationLogic/clientLogic";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import { useState } from "react";
