@@ -34,10 +34,10 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
     }
 
     try {
-        const damageReport = await getDamageReport(reportId)
-
         const customerDamageReport = new CustomerDamageReport();
-        customerDamageReport.updateFields(damageReport);
+        customerDamageReport.updateFields(await getDamageReport(reportId));
+        
+        console.log('piuaehrgopiuaehrgpoiherg:', customerDamageReport.crypto('decrypt'))
 
         return res.status(200).json(new ApiResponse(
             'OK',

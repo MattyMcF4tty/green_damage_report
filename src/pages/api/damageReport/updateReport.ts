@@ -1,5 +1,6 @@
 import { updateDamageReport } from "@/utils/logic/damageReportLogic.ts/logic";
 import { AdminDamageReportSchema } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
+import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 import { verifyMethod } from "@/utils/security/apiProtection";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -43,7 +44,10 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
     }
 
     try {
-        await updateDamageReport(reportId, data)
+        const damageReport = new CustomerDamageReport();
+        damageReport.updateFields(data);
+
+        await updateDamageReport(reportId, damageReport.crypto('encrypt'))
 
         return res.status(200).json(new ApiResponse(
             'OK',

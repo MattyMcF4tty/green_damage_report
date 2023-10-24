@@ -13,7 +13,7 @@ import PhoneNumber from "@/components/opposite_information/phoneForm";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { DamageReportPageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
 import { handleGetRenter } from "@/utils/logic/wunderfleetLogic/apiRoutes";
-import { patchCustomerDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import { fecthCustomerDamageReport, patchCustomerDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 import { getDamageReport, getDamageReportFolderDownloadUrls } from "@/utils/logic/damageReportLogic.ts/logic";
 
 export const getServerSideProps = async (
@@ -39,14 +39,14 @@ export const getServerSideProps = async (
 
   return {
     props: {
-      data: damageReport.toPlainObject(),
+      data: damageReport.crypto('decrypt'),
       otherPartyImageUrls: otherPartyImageUrls,
       id: reportId,
     },
   };
 };
 
-const What: NextPage<DamageReportPageProps> = ({ data, otherPartyImageUrls, id }) => {
+const What: NextPage<DamageReportPageProps> = ({data, otherPartyImageUrls, id }) => {
   const router = useRouter();
   const serverData = new CustomerDamageReport();
   serverData.updateFields(data);
@@ -114,6 +114,7 @@ const What: NextPage<DamageReportPageProps> = ({ data, otherPartyImageUrls, id }
 
     /* TODO: Make function that gets information about current driver from green server */
     if (showDriverInfoForm !== true) {
+      console.log(phoneNumber)
       const newDriverInfo = {
         firstName: firstName,
         lastName: lastName,
@@ -163,7 +164,7 @@ const What: NextPage<DamageReportPageProps> = ({ data, otherPartyImageUrls, id }
           labelText="
             Please enter the license plate of the GreenMobility car"
           id="greenCarNumberplateInput"
-          type="numberplate"
+          type="text"
           required={true}
           value={greenCarNumberplate}
           onChange={setgreenCarNumberplate}

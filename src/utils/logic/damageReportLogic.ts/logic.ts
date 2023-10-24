@@ -90,10 +90,10 @@ export const createNewDamageReport = async (email:string) => {
     }
 }
 
-
+ 
 export const updateDamageReport = async (reportId:string, data:Partial<AdminDamageReportSchema>) => {
     try {
-        const damageReportCol = getEnvVariable('DAMAGE_REPORT_FIRESTORE_COLLECTION');
+        const damageReportCol = getEnvVariable('DAMAGE_REPORT_FIRESTORE_COLLECTION'); 
 
         await updateFirestoreDocument(reportId, damageReportCol, data);
         console.log(`Successfully updated ${reportId} with:`, data);
@@ -268,8 +268,8 @@ export const getDamageReportFolderDownloadUrls = async (reportId:string, folderP
         console.log(`Successfully fetched ${fileDownloadUrls.length} download url${fileDownloadUrls.length !== 1 && 's'} from ${fullFilePath} in storage.`);
         return fileDownloadUrls;
     } catch (error:any) {
-        console.error(`Error fetching download urls from ${fullFilePath} in storage.`);
-        throw new AppError(error.name, error.message)
+        console.warn(`Error fetching download urls from ${fullFilePath} in storage.`);
+        return []
     }
 }
 

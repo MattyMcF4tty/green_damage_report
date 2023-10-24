@@ -19,6 +19,7 @@ const PhoneNumber = ({ value, onChange, labelText }: PhoneNumberProps) => {
   const [formattedPhoneNumber, setFormattedPhoneNumber] = useState<string>(
     value ? formatPhoneNumber(value) : ""
   );
+
   const [selectedCountry, setSelectedCountry] = useState<
     CountryCode | undefined
   >(undefined);

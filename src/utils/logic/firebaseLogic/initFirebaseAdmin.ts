@@ -1,6 +1,7 @@
 import AppError from "@/utils/schemas/miscSchemas/errorSchema";
 import admin from "firebase-admin";
 
+
 let firebaseAdmin: admin.app.App;
 
 export const getFirebaseAdmin = () => {

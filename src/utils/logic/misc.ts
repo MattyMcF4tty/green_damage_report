@@ -240,10 +240,16 @@ export const blobToBuffer = async (blob: Blob) => {
 };
 
 
-export const normalizeFolderPath = (folderPath:string) => {
-  const normalizedFolderPath = folderPath.endsWith('/') ? folderPath : folderPath + '/';
+export const normalizeFolderPath = (folderPath: string) => {
+  // add the ending '/' if it does not exists
+  let normalizedFolderPath = folderPath.endsWith('/') ? folderPath : folderPath + '/';
+  
+  // Remove the starting '/' if it exists
+  normalizedFolderPath = normalizedFolderPath.startsWith('/') ? normalizedFolderPath.substring(1) : normalizedFolderPath;
+
   return normalizedFolderPath;
 }
+
 
 export const normalizeFilePath = (filePath:string) => {
   const normalizedFilePath = filePath.endsWith('/') ? filePath.slice(0, -1) : filePath;

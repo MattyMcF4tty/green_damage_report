@@ -38,7 +38,7 @@ export const getServerSideProps = async (
 
   return {
     props: {
-      data: damageReport.toPlainObject(),
+      data: damageReport.crypto('decrypt'),
       otherPartyImageUrls: otherPartyImageUrls,
       id: reportId,
     },
