@@ -19,7 +19,7 @@ interface MultiImageInputProps {
 const MultiImageInput = ({componentId, reportId, imageLimit, labelText, required, folderPath, setIsLoading}:MultiImageInputProps) => {
     const [isRequired, setIsRequired] = useState(required ? required : false);
     const [imageData, setImageData] = useState<{fileName: string; downloadUrl: string;}[]>([]);
-    const [errorText, setErrorText] = useState<string | null>();
+    const [errorText, setErrorText] = useState<string | null>(null);
 
     const [disabled, setDisabled] = useState(false);
     const [limitReached, setLimitReached] = useState(imageLimit - imageData.length === 0);
@@ -34,9 +34,12 @@ const MultiImageInput = ({componentId, reportId, imageLimit, labelText, required
 
     // Check if limit is reached
     useEffect(() => {
-        setLimitReached(imageLimit - imageData.length === 0);
-        if (limitReached) {
+        if (imageLimit - imageData.length <= 0) {
+            setLimitReached(true);
             setErrorText('Limit has been reached.');
+        } else {
+            setLimitReached(false);
+            setErrorText(null);
         }
     }, [imageData]);
     
@@ -69,9 +72,17 @@ const MultiImageInput = ({componentId, reportId, imageLimit, labelText, required
             // Convert files to buffer and prepare data for upload.
             const filesBase64 = await Promise.all(trimmedFiles.map(file => fileToBase64(file)));
 
+            // Get the maximum index from the current file names
+            const maxIndex = imageData.reduce((max, data) => {
+                const match = data.fileName.match(/(\d+)/);
+                return match ? Math.max(max, parseInt(match[1])) : max;
+            }, -1);
+
             const fileData = filesBase64.map((fileBase64, index) => {
+
+                // I want to calculate which file this is. my file naming should be file0, file1, file2, file3...
                 return {
-                    name: `${folderName}${imageData.length + index}`,
+                    name: `${folderName}${maxIndex + 1 + index}`,
                     fileBase64: fileBase64
                 }; 
             });

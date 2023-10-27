@@ -6,34 +6,21 @@ import { verifyMethod } from "@/utils/security/apiProtection";
 import { fileTypeFromBuffer } from "file-type";
 import { NextApiRequest, NextApiResponse } from "next";
 
+//TODO: This apiRoute has not response messages on almost none if the responses. Fix it and the same for the handler
+
 export default async function (req:NextApiRequest, res:NextApiResponse) {
     // Verify method
     if (!verifyMethod(req, 'GET')) {
-        return res.status(405).json(new ApiResponse(
-            'METHOD_NOT_ALLOWED',
-            [],
-            [`Api route only accepts GET and got ${req.method}.`],
-            {}
-        ))
+        return res.status(405)
     } 
 
     //Verify user
     const sessionToken = getSession(req);
     if (!sessionToken) {
-        return res.status(401).json(new ApiResponse(
-            'UNAUTHORIZED',
-            [],
-            ['Missing authorization.'],
-            {}
-        ))
+        return res.status(401)
     }
     if (typeof sessionToken !== 'string') {
-        return res.status(400).json(new ApiResponse(
-            'BAD_REQUEST',
-            [],
-            ['Invalid authorization format.'],
-            {}
-        ));    
+        return res.status(400) 
     }
 
     let user: AdminUser;
@@ -41,12 +28,8 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         const decodedToken = await verifySessionToken(sessionToken)
         user = {email: decodedToken.email || 'Unkown', uid: decodedToken.uid}
     } catch (error:any) {
-        return res.status(403).json(new ApiResponse(
-            'FORBIDDEN',
-            [],
-            ['You do not have permission to access this resource.'],
-            {}
-        ));    
+        console.error(error)
+        return res.status(403)
     }
 
     const {reportId, filePath} = req.query;
@@ -65,12 +48,8 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
             throw new Error(`Expected filePath to be string, but got ${typeof filePath}`)
         }
     } catch (error:any) {
-        return res.status(400).json(new ApiResponse(
-            'BAD_REQUEST',
-            [],
-            [error.message],
-            {}
-        ))
+        console.error(error)
+        return res.status(400)
     }
 
     try {
@@ -89,20 +68,11 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
     res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
     return res.status(200).send(fileData.buffer);
     } catch (error:any) {
+        console.error(error)
         if (error.name === 'NOT_FOUND') {
-            return res.status(404).json(new ApiResponse(
-                'OK',
-                [],
-                [error.message],
-                {}
-            ))
+            return res.status(404)
         } else {
-            return res.status(500).json(new ApiResponse(
-                'INTERNAL_ERROR',
-                [],
-                ['Something went wrong.'],
-                {}
-            ))
+            return res.status(500)
         }
     }
 }

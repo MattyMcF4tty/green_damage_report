@@ -1,9 +1,7 @@
-import { fecthAdminDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 import { getDamageReport } from "@/utils/logic/damageReportLogic.ts/logic";
 import { getSession, verifySessionToken } from "@/utils/logic/firebaseLogic/authenticationLogic/serverLogic";
 import { AdminUser } from "@/utils/schemas/adminUserSchema";
 import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
-import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 import { verifyMethod } from "@/utils/security/apiProtection";
 import { NextApiRequest, NextApiResponse } from "next";
@@ -21,7 +19,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       ))
   } 
 
-  const { Authorization } = req.headers;
+  const Authorization = getSession(req);
   if (!Authorization) {
     return res
       .status(401)
@@ -46,7 +44,7 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       );
   }
 
-  const { reportId } = req.body;
+  const { reportId } = req.query;
   if (!reportId || typeof reportId !== "string") {
     return res
       .status(400)
@@ -81,9 +79,20 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
   }
 
   // Get report
-  let damageReport;
-  try {
-    damageReport = await fecthAdminDamageReport(reportId);
+  try { 
+    const damageReport = new AdminDamageReport();
+    damageReport.updateFields(await getDamageReport(reportId));
+
+    return res
+    .status(200)
+    .json(
+      new ApiResponse(
+        "OK",
+        [`Damage report ${reportId} fetched succesfully.`],
+        [],
+        damageReport.crypto("decrypt")
+      )
+    );
   } catch (error: any) {
     if (error.name === "NOT_FOUND") {
       return res
@@ -96,14 +105,4 @@ export default async function (req: NextApiRequest, res: NextApiResponse) {
       .status(500)
       .json(new ApiResponse("SERVER_ERROR", [], ["Something went wrong"], {}));
   }
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(
-        "OK",
-        [`Damage report ${reportId} fetched succesfully.`],
-        [],
-        damageReport.crypto("decrypt")
-      )
-    );
 }

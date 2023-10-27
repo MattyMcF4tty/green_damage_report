@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import EXIF from "exif-js";
 import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
-import { requestAdminDamageReportDownload } from "../../damageReportLogic.ts/apiRoutes";
+import { fetchAdminDamageReport, requestDamageReportFileDownload, requestDamageReportFolderDownload } from "../../damageReportLogic.ts/apiRoutes";
 
 const addImageToPDF = (pdfDoc: jsPDF) => {
   const imageWidth = 80;
@@ -17,9 +17,10 @@ const addImageToPDF = (pdfDoc: jsPDF) => {
 
 
 const createReportPDF = async (
-  data: AdminDamageReport,
   reportId:string
 ) => {
+  const data = await fetchAdminDamageReport(reportId);
+
   const doc = new jsPDF();
 
   // Start adding data to the PDF
@@ -235,7 +236,6 @@ const createReportPDF = async (
 
   // Police journal number
   let policeReportText = "No police report filed";
-  console.log("IUH  IUHIUHIUHIUHIUHIUHIUHIUHIUHIUHIUHIUHIUHUI", data);
   // Check if police report is filed
   if (data.policeReportExist) {
     // If yes, check whether a report number has been provided
@@ -1087,27 +1087,25 @@ const createReportPDF = async (
   currentY = 10;
 
   //get otherPartyImages
-  const otherPartyImages = await 
+  const otherPartyImages = await requestDamageReportFolderDownload(reportId, 'OtherPartyDamages/');
 
   // For OtherParty images
-  if (images["OtherParty"]) {
+  if (otherPartyImages.length > 0) {
     addImageSectionHeader("OtherParty Damage Images");
 
-    if (Array.isArray(images["OtherParty"])) {
-      for (const imageBase64 of images["OtherParty"]) {
-        const correctedImageBase64 = await getCorrectlyOrientedImage(
-          imageBase64
-        );
+    for (const image of otherPartyImages) {
+      const correctedImageBase64 = await getCorrectlyOrientedImage(
+        image.fileBase64
+      );
 
-        currentY = await addImageWithSpacingCheck(
-          correctedImageBase64,
-          "JPEG",
-          15,
-          currentY,
-          100,
-          100
-        );
-      }
+      currentY = await addImageWithSpacingCheck(
+        correctedImageBase64,
+        "JPEG",
+        15,
+        currentY,
+        100,
+        100
+      );
     }
   }
 
@@ -1115,7 +1113,7 @@ const createReportPDF = async (
   currentY = 10;
 
   //get map
-  const map = await requestAdminDamageReportDownload(reportId, 'Admin/map')
+  const map = await requestDamageReportFileDownload(reportId, '/Admin/map')
 
   if (map) {
     addImageSectionHeader("Map Images");
@@ -1152,6 +1150,7 @@ const createReportPDF = async (
   ): number {
     return 70 + damageDescriptionHeight; // Include headers, footers, and some buffer
   }
+
   if (data.damages) {
     for (const damage of data.damages) {
       const damagePositionDescriptionLines = doc.splitTextToSize(
@@ -1212,24 +1211,28 @@ const createReportPDF = async (
       // Images
       doc.text("Images:", 15, currentY + 30);
 
-      const imageUrl = damage.images[0];
-      const imagesBase64 = await requestDamageReportFolderDownload(
+      const imageData = await requestDamageReportFolderDownload(
         reportId,
         `/GreenDamage/${position}/`
       );
       currentY += 40; // Update as per actual space needed
       const imageHeight = 55; // Example height
 
-      //TODO: FIIIIIIIXXXXX ----------------------------------------------
-      /*       const correctedImageBase64 = await getCorrectlyOrientedImage(imagesBase64);
-      doc.addImage(
-        correctedImageBase64,
-        "png",
-        15,
-        currentY,
-        55, // FIX
-        imageHeight
-      ); */
+      //TODO: FIX har gjort så den download filerne og mapper igennem dem.
+      // Du skal bare sørge for at de ikke spawner oven på hinanden
+      // har fikset alt andet med at downloade billeder. Burde jeg, måske mangler 
+      await Promise.all(imageData.map(async(image) => {
+        console.log(image.name)
+        const correctedImageBase64 = await getCorrectlyOrientedImage(image.fileBase64);
+        doc.addImage(
+          correctedImageBase64,
+          "png",
+          15,
+          currentY,
+          55, // FIX
+          imageHeight
+        );
+      }));
       currentY += imageHeight + 20; // Add some padding
     }
   }

@@ -33,7 +33,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
     try {
         await deleteDamageReportFolder(reportId, folderPath);
 
-        return res.status(204).send(`Successfully deleted folder.`)
+        return res.status(204).end();
     } catch (error:any) {
         return res.status(500).send('Something went wrong.')
     }

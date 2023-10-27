@@ -5,7 +5,7 @@ import {
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import AppError from "@/utils/schemas/miscSchemas/errorSchema";
 import { ValidMimeTypes } from "@/utils/schemas/types";
-import { blobToBase64, normalizeFolderPath } from "../misc";
+import { blobToBase64, normalizeFilePath, normalizeFolderPath } from "../misc";
 
 export const fecthCustomerDamageReport = async (reportId: string) => {
   const appUrl = process.env.NEXT_PUBLIC_URL;
@@ -42,7 +42,7 @@ export const fecthCustomerDamageReport = async (reportId: string) => {
   }
 };
 
-export const fecthAdminDamageReport = async (reportId: string) => {
+export const fetchAdminDamageReport = async (reportId: string) => {
   const appUrl = process.env.NEXT_PUBLIC_URL;
   if (!appUrl) {
     throw new AppError(
@@ -64,6 +64,7 @@ export const fecthAdminDamageReport = async (reportId: string) => {
 
     const responseJson = await response.json();
     if (!response.ok) {
+      console.error(`${responseJson.status}:`, responseJson.erros[0])
       throw new AppError(responseJson.status, responseJson.erros[0]);
     }
 
@@ -308,7 +309,6 @@ export const requestDamageReportFileDeletion = async (
     throw new AppError(response.statusText, responseMessage);
   }
 
-  console.log(responseMessage)
   return;
 };
 
@@ -442,94 +442,15 @@ export const requestQueryDamageReports = async (
   return responseJson.data.docIds as string[];
 };
 
-export const requestDamageReportFileDownload = async (
-  reportId: string,
-  filePath: string
-) => {
-  const appUrl = process.env.NEXT_PUBLIC_URL;
-  if (!appUrl) {
-    throw new AppError(
-      "INTERNAL_ERROR",
-      "NEXT_PUBLIC_URL is not defined in enviroment."
-    );
-  }
-
-  const query = {
-    reportId: reportId,
-    filePath: filePath,
-  };
-
-  const response = await fetch(
-    `${appUrl}/api/damageReport/admin/downloadFile`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(query),
-    }
-  );
-
-  const responseJson = await response.json();
-  if (!response.ok) {
-    throw new AppError(responseJson.status, responseJson.errors[0]);
-  }
-
-  return responseJson.data as {
-    name: string;
-    buffer: Buffer;
-    mimeType: string | null;
-  };
-};
-
-export const requestDamageReportFolderDownload = async (
-  reportId: string,
-  folderPath: string
-) => {
-  const appUrl = process.env.NEXT_PUBLIC_URL;
-  if (!appUrl) {
-    throw new AppError(
-      "INTERNAL_ERROR",
-      "NEXT_PUBLIC_URL is not defined in enviroment."
-    );
-  }
-
-  const query = {
-    folderPath: folderPath,
-  };
-
-  const response = await fetch(
-    `${appUrl}/api/damageReport/admin/downloadFile?reportId=${reportId}`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(query),
-    }
-  );
-
-  const responseJson = await response.json();
-  if (!response.ok) {
-    throw new AppError(responseJson.status, responseJson.errors[0]);
-  }
-
-  return responseJson.data.fileData as {
-    name: string;
-    mimeType: string;
-    base64: string;
-  }[]
-}
-
-
-export const requestAdminDamageReportDownload = async (reportId: string, filePath: string) => {
+//TODO: Handle the bad responses, first need to fix the api route
+export const requestDamageReportFileDownload = async (reportId: string, filePath: string) => {
   const appUrl = process.env.NEXT_PUBLIC_URL;
   if (!appUrl) {
     throw new AppError('INTERNAL_ERROR', 'NEXT_PUBLIC_URL is not defined in environment.');
   }
 
-  // We're using a GET method for downloading the report
-  const response = await fetch(`${appUrl}/api/damageReport/admin/downloadReport?reportId=${reportId}&filePath=${filePath}`, {
+  const normalizedFilePath = normalizeFilePath(filePath);
+  const response = await fetch(`${appUrl}/api/damageReport/admin/downloadFile?reportId=${reportId}&filePath=${normalizedFilePath}`, {
     method: 'GET',
   });
 
@@ -540,11 +461,11 @@ export const requestAdminDamageReportDownload = async (reportId: string, filePat
   let fileName = '';
   
   if (contentDisposition) {
-      const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
-      const matches = filenameRegex.exec(contentDisposition);
-      if (matches != null && matches[1]) { 
-          fileName = matches[1].replace(/['"]/g, '');
-      }
+    const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+    const matches = filenameRegex.exec(contentDisposition);
+    if (matches != null && matches[1]) { 
+      fileName = matches[1].replace(/['"]/g, '');
+    }
   }
 
   if (!response.ok) {
@@ -559,3 +480,63 @@ export const requestAdminDamageReportDownload = async (reportId: string, filePat
 
   return fileData;
 }
+
+/** 
+ * @param reportId The report which files you need to download.
+ * @param folderPath Folder from which the files you want to download is from.
+ * @returns An object with name and fileBase64
+*/
+export const requestDamageReportFolderDownload = async (
+  reportId: string,
+  folderPath: string
+) => {
+  const appUrl = process.env.NEXT_PUBLIC_URL;
+  if (!appUrl) {
+    throw new AppError(
+      "INTERNAL_ERROR",
+      "NEXT_PUBLIC_URL is not defined in enviroment."
+    );
+  }
+  const normalizedFolderPath = normalizeFolderPath(folderPath);
+  console.log(`Requesting download of ${normalizedFolderPath}`)
+
+  const query = {
+    reportId: reportId,
+    folderPath: normalizedFolderPath,
+  };
+
+  const response = await fetch(
+    `${appUrl}/api/damageReport/getFolderFileNames`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(query),
+    }
+  );
+
+  const responseJson = await response.json();
+  if (!response.ok) {
+    throw new AppError(responseJson.status, responseJson.errors[0]);
+  }
+
+  const fileNames = responseJson.data.fileNames as string[];
+  const fileData: {
+    name: string;
+    fileBase64: string;
+  }[] = []
+
+  for (let i = 0; i < fileNames.length; i++) {
+    const fileName = fileNames[i];
+    const filePath = normalizeFilePath(normalizedFolderPath+fileName)
+    
+    const normalizedFilePath = normalizeFilePath(filePath);
+    const data = await requestDamageReportFileDownload(reportId, normalizedFilePath);
+    fileData.push(data)
+  }
+
+  console.log(fileData.map(file => file.name))
+
+  return fileData;
+};

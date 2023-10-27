@@ -32,9 +32,9 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
     selectedReports: { id: string; data: AdminDamageReport }[]
   ) => {
     setAllowPdf(false);
-    selectedReports.map(async (report) => {
+    await Promise.all(selectedReports.map(async (report) => {
       await handleGeneratePdf(report.id);
-    });
+    }));
     setAllowPdf(true);
   };
 
@@ -77,7 +77,7 @@ const ReportControls = ({ selectedReports }: ReportControls) => {
             handleInstallPDF(selectedReports);
           }
         }}
-        className="bg-white text-black px-4 py-2 rounded-xl border-[1px]  border-gray-300 hover:bg-MainGreen-300 hover:text-white duration-150 md:h-[3rem] md:w-[11rem]"
+        className="bg-white text-black px-4 py-2 rounded-xl border-[1px] disabled:bg-MainGreen-200 border-gray-300 hover:bg-MainGreen-300 hover:text-white duration-150 md:h-[3rem] md:w-[11rem]"
       >
         <FontAwesomeIcon icon={faCloudArrowDown} className="mr-2" />
         Download PDF
