@@ -12,7 +12,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { handleSendEmail } from "@/utils/logic/misc";
 import { DamageReportPageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
-import { fetcDamageReportFolderFilesUrl, patchCustomerDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import { fetchDamageReportFolderFilesUrl, patchCustomerDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 import { getDamageReport } from "@/utils/logic/damageReportLogic.ts/logic";
 import { Damage } from "@/utils/schemas/incidentDetailSchemas/damageSchema";
 
@@ -74,7 +74,7 @@ const confirmationPage: NextPage<DamageReportPageProps> = ({ data, id }) => {
   useEffect(() => {
     const getImages = async () => {
       const loadedDamages = await Promise.all(serverData.damages.map(async (damage) => {
-        const loadedDamage = await fetcDamageReportFolderFilesUrl(id, `/GreenDamage/${damage.position}/`)
+        const loadedDamage = await fetchDamageReportFolderFilesUrl(id, `/GreenDamage/${damage.position}/`)
 
         return new Damage(damage.position, damage.description, loadedDamage.map(damage => damage.downloadUrl));
       }))
@@ -82,7 +82,7 @@ const confirmationPage: NextPage<DamageReportPageProps> = ({ data, id }) => {
       updatedServerDataState.damages = loadedDamages;
       setServerDataState(updatedServerDataState)
 
-      setOtherPartyImageUrls((await fetcDamageReportFolderFilesUrl(id, '/OtherPartyDamages/')).map((image) => {
+      setOtherPartyImageUrls((await fetchDamageReportFolderFilesUrl(id, '/OtherPartyDamages/')).map((image) => {
         return image.downloadUrl;
       }))
     }

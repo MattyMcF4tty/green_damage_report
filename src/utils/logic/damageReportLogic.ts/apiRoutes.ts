@@ -2,6 +2,7 @@ import { AdminDamageReport, AdminDamageReportSchema } from "@/utils/schemas/dama
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import AppError from "@/utils/schemas/miscSchemas/errorSchema";
 import { ValidMimeTypes } from "@/utils/schemas/types";
+import { blobToBase64, normalizeFolderPath } from "../misc";
 
 export const fecthCustomerDamageReport = async (reportId:string) => {
   const appUrl = process.env.NEXT_PUBLIC_URL;
@@ -183,7 +184,7 @@ export const fetchAllDamageReports = async () => {
 }
 
 
-export const uploadFileToDamageReport = async(reportId:string, filePath:string, fileBase64:string, mimeType:ValidMimeTypes) => {
+export const uploadFileToDamageReport = async(reportId:string, filePath:string, fileBase64:string) => {
   const appUrl = process.env.NEXT_PUBLIC_URL;
   if (!appUrl) {
     throw new AppError('INTERNAL_ERROR', 'NEXT_PUBLIC_URL is not defined in enviroment.')
@@ -193,7 +194,6 @@ export const uploadFileToDamageReport = async(reportId:string, filePath:string, 
   const data = {
     filePath:filePath,
     fileBase64:fileBase64,
-    mimeType:mimeType
   }
 
   const response = await fetch(`${appUrl}/api/damageReport/uploadFile?reportId=${reportId}`, {
@@ -214,7 +214,7 @@ export const uploadFileToDamageReport = async(reportId:string, filePath:string, 
 }
 
 
-export const fetcDamageReportFileUrl = async (reportId:string, filePath:string) => {
+export const fetchDamageReportFileUrl = async (reportId:string, filePath:string) => {
   const appUrl = process.env.NEXT_PUBLIC_URL;
   if (!appUrl) {
     throw new AppError('INTERNAL_ERROR', 'NEXT_PUBLIC_URL is not defined in enviroment.')
@@ -249,17 +249,14 @@ export const requestDamageReportFileDeletion = async (reportId:string, filePath:
 
   const response = await fetch(`${appUrl}/api/damageReport/deleteFile?reportId=${reportId}&filePath=${filePath}`, {
     method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json'
-    },
   });
 
-  const responseJson = await response.json();
+  const responseMessage = await response.text();
   if (!response.ok) {
-    throw new AppError(responseJson.status, responseJson.errors[0]);
+    throw new AppError(response.statusText, responseMessage);
   }
 
-  console.log(responseJson.messages[0]);
+  console.log(responseMessage)
   return;
 }
 
@@ -268,36 +265,32 @@ export const uploadFolderToDamageReport = async (reportId:string, folderPath:str
   name: string;
   fileBase64: string;
 }[]) => {
-  
   const appUrl = process.env.NEXT_PUBLIC_URL;
   if (!appUrl) {
     throw new AppError('INTERNAL_ERROR', 'NEXT_PUBLIC_URL is not defined in enviroment.')
   }
 
-  const data = {
-    folderPath: folderPath,
-    fileData: fileData
+  const normalizedFolderPath = normalizeFolderPath(folderPath)
+  const errors: string[] = [];
+
+  for (let i = 0; i < fileData.length; i++) {
+    const file = fileData[i];
+    
+    try {
+      await uploadFileToDamageReport(reportId, normalizedFolderPath+file.name, file.fileBase64)    
+    } catch (error:any) {
+      errors.push(error.message)
+    }
   }
 
-  const response = await fetch(`${appUrl}/api/damageReport/uploadFolder?reportId=${reportId}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(data)
-  });
-
-  const responseJson = await response.json();
-  if (!response.ok) {
-    throw new AppError(responseJson.status, responseJson.errors[0]);
+  if (errors.length > 0) {
+    throw new AppError('UPLOAD_ERROR', `${errors.length} errors when uploading: ${errors}`)
   }
 
-  console.log(responseJson.messages[0]);
-  return;
 }
 
 
-export const fetcDamageReportFolderFilesUrl = async (reportId:string, folderPath:string) => {
+export const fetchDamageReportFolderFilesUrl = async (reportId:string, folderPath:string) => {
   const appUrl = process.env.NEXT_PUBLIC_URL;
   if (!appUrl) {
     throw new AppError('INTERNAL_ERROR', 'NEXT_PUBLIC_URL is not defined in enviroment.')
@@ -334,19 +327,16 @@ export const requestDamageReportFolderDeletion = async (reportId:string, folderP
     throw new AppError('INTERNAL_ERROR', 'NEXT_PUBLIC_URL is not defined in enviroment.')
   }
 
-  const response = await fetch(`${appUrl}/api/damageReport/getFolderUrls?reportId=${reportId}&folderPath=${folderPath}`, {
+  const response = await fetch(`${appUrl}/api/damageReport/deleteFolder?reportId=${reportId}&folderPath=${folderPath}`, {
     method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json'
-    },
   });
 
-  const responseJson = await response.json();
+  const responseMesage = await response.text();
   if (!response.ok) {
-    throw new AppError(responseJson.status, responseJson.errors[0]);
+    throw new AppError(response.statusText, responseMesage);
   }
 
-  console.log(responseJson.messages[0]);
+  console.log(responseMesage);
   return
 }
 
@@ -440,4 +430,43 @@ export const requestDamageReportFolderDownload = async (reportId:string, folderP
     mimeType: string;
     base64: string;
   }[]
+}
+
+
+export const requestAdminDamageReportDownload = async (reportId: string, filePath: string) => {
+  const appUrl = process.env.NEXT_PUBLIC_URL;
+  if (!appUrl) {
+    throw new AppError('INTERNAL_ERROR', 'NEXT_PUBLIC_URL is not defined in environment.');
+  }
+
+  // We're using a GET method for downloading the report
+  const response = await fetch(`${appUrl}/api/damageReport/admin/downloadReport?reportId=${reportId}&filePath=${filePath}`, {
+    method: 'GET',
+  });
+
+  // You can use response.blob() if you want to directly obtain the binary data for the report
+  const blobData = await response.blob();
+
+  const contentDisposition = response.headers.get("Content-Disposition");
+  let fileName = '';
+  
+  if (contentDisposition) {
+      const filenameRegex = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/;
+      const matches = filenameRegex.exec(contentDisposition);
+      if (matches != null && matches[1]) { 
+          fileName = matches[1].replace(/['"]/g, '');
+      }
+  }
+
+  if (!response.ok) {
+    const responseJson = await response.json()
+    throw new AppError(responseJson.status, responseJson.errors[0]);
+  }
+
+  const fileData = {
+    name: fileName,
+    fileBase64: await blobToBase64(blobData)
+  }
+
+  return fileData;
 }

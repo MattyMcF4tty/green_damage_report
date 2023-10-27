@@ -7,12 +7,7 @@ import { NextApiRequest, NextApiResponse } from "next";
 export default async function (req:NextApiRequest, res:NextApiResponse) {
     // Verify method
     if (!verifyMethod(req, 'DELETE')) {
-        return res.status(405).json(new ApiResponse(
-            'METHOD_NOT_ALLOWED',
-            [],
-            [`Api route only accepts DELETE and got ${req.method}.`],
-            {}
-        ))
+        return res.status(405).send(`Expected method DELETE but got ${req.method}`)
     } 
 
     const {reportId, filePath} = req.query;
@@ -31,29 +26,14 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
             throw new Error(`Expected filePath to be string, but got ${typeof filePath}`)
         }
     } catch (error:any) {
-        return res.status(400).json(new ApiResponse(
-            'BAD_REQUEST',
-            [],
-            [error.message],
-            {}
-        ))
+        return res.status(400).send(error.message)
     }
 
     try {
         await deleteDamageReportFile(reportId, filePath);
 
-        return res.status(204).json(new ApiResponse(
-            'NO_CONTENT',
-            ['Successfully deleted file.'],
-            [],
-            {}
-        ))
+        return res.status(204).send('Successfully deleted file');
     } catch (error:any) {
-        return res.status(500).json(new ApiResponse(
-            'INTERNAL_ERROR',
-            ['Something went wrong.'],
-            [],
-            {}
-        ))    
+        return res.status(500).send(error.message)
     }
 }

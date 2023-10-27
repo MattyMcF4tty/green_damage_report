@@ -16,7 +16,7 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
     } 
 
     const { reportId } = req.query;
-    const { filePath, fileBase64, mimeType} = req.body;
+    const { filePath, fileBase64} = req.body;
     try {
         if (!reportId) {
             throw new Error('Missing reportId.')
@@ -26,9 +26,6 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         }
         if (!fileBase64) {
             throw new Error('Missing fileBase64.')
-        }
-        if (!mimeType) {
-            throw new Error('Missing mimeType.')
         }
 
         if (typeof reportId !== 'string') {

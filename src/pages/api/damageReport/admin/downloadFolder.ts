@@ -1,6 +1,6 @@
-import { downloadDamageReportFolder, uploadDamageReportFolder } from "@/utils/logic/damageReportLogic.ts/logic";
+import { downloadDamageReportFolder } from "@/utils/logic/damageReportLogic.ts/logic";
 import { getSession, verifySessionToken } from "@/utils/logic/firebaseLogic/authenticationLogic/serverLogic";
-import { base64ToBuffer, bufferToBase64, isValidFileData } from "@/utils/logic/misc";
+import { bufferToBase64 } from "@/utils/logic/misc";
 import { AdminUser } from "@/utils/schemas/adminUserSchema";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 import { verifyMethod } from "@/utils/security/apiProtection";
@@ -84,7 +84,6 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         const convertedFileData = fileData.map((file) => {
             return {
                 name: file.name,
-                mimeType: file.mimeType,
                 base64: bufferToBase64(file.buffer)
             }
         })

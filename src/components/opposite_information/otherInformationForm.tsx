@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { TextField } from "../customeInputfields/custom_inputfields";
+import { TextField } from "../inputFields/custom_inputfields";
 import { IncidentObject } from "@/utils/schemas/incidentDetailSchemas/incidentObjectSchema";
 
 

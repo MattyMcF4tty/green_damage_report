@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { YesNo, Inputfield, TextField } from "../customeInputfields/custom_inputfields";
+import { YesNo, Inputfield, TextField } from "../inputFields/custom_inputfields";
 import PhoneNumber from "./phoneForm";
 import { Biker } from "@/utils/schemas/incidentDetailSchemas/bikerSchema";
 

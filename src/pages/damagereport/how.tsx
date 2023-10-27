@@ -3,7 +3,7 @@ import {
   TextField,
   Inputfield,
   YesNo,
-} from "@/components/customeInputfields/custom_inputfields";
+} from "@/components/inputFields/custom_inputfields";
 import NextButton from "@/components/buttons/next";
 import BackButton from "@/components/buttons/back";
 import { useRouter } from "next/router";

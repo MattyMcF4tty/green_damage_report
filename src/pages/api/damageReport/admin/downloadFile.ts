@@ -3,6 +3,7 @@ import { getSession, verifySessionToken } from "@/utils/logic/firebaseLogic/auth
 import { AdminUser } from "@/utils/schemas/adminUserSchema";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 import { verifyMethod } from "@/utils/security/apiProtection";
+import { fileTypeFromBuffer } from "file-type";
 import { NextApiRequest, NextApiResponse } from "next";
 
 export default async function (req:NextApiRequest, res:NextApiResponse) {
@@ -75,12 +76,18 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
     try {
         const fileData = await downloadDamageReportFile(reportId, filePath)
 
-        return res.status(200).json(new ApiResponse(
-            'OK',
-            ['Successfully downloaded file.'],
-            [],
-            fileData
-        ))
+    // Assuming you know the MIME type or can extract it from the filePath
+    const mimeType = await fileTypeFromBuffer(fileData.buffer); 
+    if (!mimeType) {
+        throw new Error(`File is missing mimeType: ${mimeType}`)
+    }
+
+
+    const fileName = fileData.name; // Extract the filename or define it
+
+    res.setHeader('Content-Type', mimeType.mime);
+    res.setHeader('Content-Disposition', `attachment; filename=${fileName}`);
+    return res.status(200).send(fileData.buffer);
     } catch (error:any) {
         if (error.name === 'NOT_FOUND') {
             return res.status(404).json(new ApiResponse(

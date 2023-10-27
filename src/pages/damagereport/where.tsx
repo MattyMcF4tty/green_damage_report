@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 import {
-  MultipleImageField,
   TextField,
   YesNo,
-} from "../../components/customeInputfields/custom_inputfields";
+} from "../../components/inputFields/custom_inputfields";
 import BackButton from "@/components/buttons/back";
 import NextButton from "@/components/buttons/next";
 import { GetServerSidePropsContext, NextPage } from "next";
@@ -21,9 +20,9 @@ import { Pedestrian } from "@/utils/schemas/incidentDetailSchemas/pedestrianSche
 import { IncidentObject } from "@/utils/schemas/incidentDetailSchemas/incidentObjectSchema";
 import { blobToBase64 } from "@/utils/logic/misc";
 import { DamageReportPageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
-import { ValidMimeTypes } from "@/utils/schemas/types";
 import { patchCustomerDamageReport, uploadFileToDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 import { getDamageReport, getDamageReportFolderDownloadUrls } from "@/utils/logic/damageReportLogic.ts/logic";
+import MultiImageInput from "@/components/inputFields/MultiImageInput";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -169,7 +168,7 @@ const WherePage: NextPage<DamageReportPageProps> = ({ data, id }) => {
       const mapBlob: Blob = dataURItoBlob(dataUrl);
 
       console.log("map created");
-      await uploadFileToDamageReport(id, "Admin/map", await blobToBase64(mapBlob), mapBlob.type as ValidMimeTypes);
+      await uploadFileToDamageReport(id, "Admin/map", await blobToBase64(mapBlob));
       console.log("map done");
     }
 
@@ -297,7 +296,7 @@ const WherePage: NextPage<DamageReportPageProps> = ({ data, id }) => {
 
           {/* Picture of damages to green car collection */}
           <div className="mb-6 mt-4">
-            <MultipleImageField
+            <MultiImageInput
               reportId={id}
               componentId="FrontImage"
               labelText="Please take pictures of the damage to the other partys"
