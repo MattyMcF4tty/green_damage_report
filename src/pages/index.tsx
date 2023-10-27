@@ -2,7 +2,10 @@ import { Inputfield } from "@/components/inputFields/custom_inputfields";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import EmailPopUp from "@/components/popups/emailPopUp";
-import { requestDamageReportCreation, requestQueryDamageReports } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import {
+  requestDamageReportCreation,
+  requestQueryDamageReports,
+} from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 
 const IndexPage = () => {
   const router = useRouter();
@@ -60,7 +63,7 @@ const IndexPage = () => {
 
         <div className="lg:mx-auto lg:w-[25rem]">
           <Inputfield
-            id="Email"
+            id="emailPattern"
             labelText="
 
           To access the damage report, please enter your email"
