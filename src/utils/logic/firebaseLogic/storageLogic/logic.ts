@@ -1,7 +1,8 @@
 import AppError from "@/utils/schemas/miscSchemas/errorSchema";
 import { getAdminStorage } from "../initFirebaseAdmin"
-import { normalizeFolderPath } from "../../misc";
+import { normalizeFilePath, normalizeFolderPath } from "../../misc";
 import { ValidMimeTypes } from "@/utils/schemas/types";
+import { fileTypeFromBuffer } from "file-type";
 
 export const createStorageFileRef = (filePath:string) => {
     const storage = getAdminStorage().bucket();
@@ -9,16 +10,18 @@ export const createStorageFileRef = (filePath:string) => {
 }
 
 
-export const uploadFileToStorage = async (filePath:string, mimeType:ValidMimeTypes, file:Buffer) => {
+export const uploadFileToStorage = async (filePath:string, fileBuffer:Buffer) => {
     const fileRef = createStorageFileRef(filePath);
+    const mimeType = (await fileTypeFromBuffer(fileBuffer))?.mime;
+
 
     try {
-        await fileRef.save(file, {
+        await fileRef.save(fileBuffer, {
             contentType: mimeType,
             resumable: false,
         })
 
-        console.log(`File uploaded to Firebase Storage at ${filePath}.`);
+        console.log(`Successfully uploaded file to ${filePath}, type: ${mimeType}, size: ${fileBuffer.byteLength} bytes`);
     } catch (error:any) {
         console.error(`Error uploading file to Firebase Storage at ${filePath}:`, error.message);
         throw new AppError(error.code, error.message);
@@ -110,15 +113,15 @@ export const getFolderFilesDownloadUrlsFromStorage = async (
     folderPath: string,
     expires: number
 ): Promise<Array<{ fileName: string; downloadUrl: string }>> => {
-    const storage = getAdminStorage().bucket();
-    
-    try {
-        const normalizedFolderPath = normalizeFolderPath(folderPath);
-        const [files] = await storage.getFiles({ prefix: normalizedFolderPath });
+    const normalizedFolderPath = normalizeFolderPath(folderPath);
 
-        const config: { action: 'read'; expires: number } = {
+    try {
+        const storage = getAdminStorage().bucket();
+
+        const [files] = await storage.getFiles({ prefix: normalizedFolderPath});
+        const config: { action: 'read'; expires: Date } = {
             action: 'read',
-            expires: expires,
+            expires: new Date(Date.now() + expires * 1000),
         };
 
         const urlPromises = files.map(async file => {
@@ -178,16 +181,17 @@ export const deleteFolderFromStorage = async (folderPath: string): Promise<void>
 
 export const uploadFolderToStorage = async (
     folderPath: string, 
-    fileData: {name: string, mimeType: ValidMimeTypes, buffer: Buffer}[]
+    fileData: {name: string, buffer: Buffer}[]
 ) => {
     const normalizedFolderPath = normalizeFolderPath(folderPath);
     const uploadSize: number = fileData.reduce((acc, file) => acc + file.buffer.byteLength, 0);   
 
     try {
         // Create an array of upload promises and wait for all of them to complete
-        const uploadPromises = fileData.map((file) => 
-            uploadFileToStorage(`${normalizedFolderPath}${file.name}`, file.mimeType, file.buffer)
-        );
+        const uploadPromises = fileData.map((file) => {
+            const normalizedFilePath = normalizeFilePath(`${normalizedFolderPath}${file.name}`)
+            uploadFileToStorage(`${normalizedFilePath}`, file.buffer)
+        });
         
         // Ensure all uploads are complete
         await Promise.all(uploadPromises);

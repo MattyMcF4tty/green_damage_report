@@ -4,7 +4,7 @@ import {
   Inputfield,
   YesNo,
   AddressField,
-} from "@/components/custom_inputfields";
+} from "@/components/customeInputfields/custom_inputfields";
 import { GetServerSidePropsContext, NextPage } from "next";
 import NextButton from "@/components/buttons/next";
 import BackButton from "@/components/buttons/back";
@@ -13,8 +13,8 @@ import PhoneNumber from "@/components/opposite_information/phoneForm";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { DamageReportPageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
 import { handleGetRenter } from "@/utils/logic/wunderfleetLogic/apiRoutes";
-import { fecthCustomerDamageReport, patchCustomerDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
-import { getDamageReport, getDamageReportFolderDownloadUrls } from "@/utils/logic/damageReportLogic.ts/logic";
+import { patchCustomerDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import { getDamageReport } from "@/utils/logic/damageReportLogic.ts/logic";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -23,10 +23,6 @@ export const getServerSideProps = async (
 
   const damageReport = new CustomerDamageReport();
   damageReport.updateFields(await getDamageReport(reportId));
-
-  const otherPartyImageUrls = (await getDamageReportFolderDownloadUrls(reportId, '/OtherPartyDamages/')).map((image) => {
-    return image.downloadUrl;
-  })
   
   if (damageReport.isExpired() || damageReport.isFinished()) {
     return {
@@ -40,13 +36,12 @@ export const getServerSideProps = async (
   return {
     props: {
       data: damageReport.crypto('decrypt'),
-      otherPartyImageUrls: otherPartyImageUrls,
       id: reportId,
     },
   };
 };
 
-const What: NextPage<DamageReportPageProps> = ({data, otherPartyImageUrls, id }) => {
+const What: NextPage<DamageReportPageProps> = ({data, id }) => {
   const router = useRouter();
   const serverData = new CustomerDamageReport();
   serverData.updateFields(data);

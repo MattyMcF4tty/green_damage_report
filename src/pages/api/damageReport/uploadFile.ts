@@ -40,9 +40,9 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         if (typeof fileBase64 !== 'string') {
             throw new Error(`Expected fileBase64 to be type string, got ${typeof fileBase64}.`)
         }
-        if (!verifyBase64String(fileBase64)) {
+/*         if (!verifyBase64String(fileBase64)) {
             throw new Error('fileBase64 is not a valid base64 string.')
-        }
+        } */
     } catch (error:any) {
         return res.status(400).json(new ApiResponse(
             'BAD_REQUEST',
@@ -56,10 +56,10 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
     try {
         const fileBuffer = base64ToBuffer(fileBase64);
 
-        await uploadDamageReportFile(reportId, filePath, fileBuffer, mimeType);
+        await uploadDamageReportFile(reportId, filePath, fileBuffer);
 
-        return res.status(201).json(new ApiResponse(
-            'CREATED',
+        return res.status(200).json(new ApiResponse(
+            'OK',
             ['File uploaded successfully.'],
             [],
             {}

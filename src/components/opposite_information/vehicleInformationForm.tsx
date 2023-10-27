@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "react-phone-number-input/style.css";
 import PhoneNumber from "./phoneForm";
-import { Inputfield } from "../custom_inputfields";
+import { Inputfield } from "../customeInputfields/custom_inputfields";
 import { Vehicle } from "@/utils/schemas/incidentDetailSchemas/vehicleSchema";
 
 interface carInfoFormProps {

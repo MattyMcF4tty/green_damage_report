@@ -20,6 +20,7 @@
     "axios": "^1.5.0",
     "crypto-js": "^4.1.1",
     "exif-js": "^2.3.0",
+    "file-type": "^18.5.0",
     "firebase": "^10.4.0",
     "firebase-admin": "^11.10.1",
     "fs": "^0.0.1-security",

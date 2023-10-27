@@ -3,7 +3,7 @@ import {
   MultipleImageField,
   TextField,
   YesNo,
-} from "../../components/custom_inputfields";
+} from "../../components/customeInputfields/custom_inputfields";
 import BackButton from "@/components/buttons/back";
 import NextButton from "@/components/buttons/next";
 import { GetServerSidePropsContext, NextPage } from "next";
@@ -55,7 +55,7 @@ export const getServerSideProps = async (
   };
 };
 
-const WherePage: NextPage<DamageReportPageProps> = ({ data, otherPartyImageUrls, id }) => {
+const WherePage: NextPage<DamageReportPageProps> = ({ data, id }) => {
   const router = useRouter();
   const serverData = new CustomerDamageReport();
   const mapsId = "MyGoogleMap";
@@ -87,7 +87,6 @@ const WherePage: NextPage<DamageReportPageProps> = ({ data, otherPartyImageUrls,
     serverData.damageDescription
   );
 
-  const [otherPartyImages, setOtherPartyImages] = useState<string[] | null>(otherPartyImageUrls);
 
   const [carInfo, setCarInfo] = useState(
     serverData.vehicleInfo.map(

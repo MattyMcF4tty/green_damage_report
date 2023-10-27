@@ -1,4 +1,4 @@
-import { Inputfield } from "@/components/custom_inputfields";
+import { Inputfield } from "@/components/customeInputfields/custom_inputfields";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import EmailPopUp from "@/components/popups/emailPopUp";

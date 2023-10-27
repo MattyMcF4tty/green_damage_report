@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { MultipleImageField, SingleImagefield, TextField } from "../custom_inputfields";
+import {TextField } from "../customeInputfields/custom_inputfields";
+import MultiImageInput from "../customeInputfields/MultiImageInput";
 
 interface DamagePopUpProps {
   reportId: string;
@@ -30,7 +31,6 @@ const DamagePopUp = ({
   const [images, setImages] = useState<string[]>(
     damage && damage.images ? damage.images : []
   );
-  const [currentImage, setCurrentImage] = useState<string>();
   const [isLoading, setIsLoading] = useState(false);
   const allowSave = damageDescription !== '' && !isLoading;
 
@@ -77,14 +77,13 @@ const DamagePopUp = ({
           onChange={setDamageDescription}
         />
         <div>
-          <MultipleImageField
+          <MultiImageInput
             reportId={reportId}
             componentId={"DamageImage"}
             labelText="Please take picture of damage"
             required={false}
             folderPath={`GreenDamage/${position}/`}
             imageLimit={5}
-            setImages={(image) => setImages(image.map((img) => {return img.fileName}))}
             setIsLoading={setIsLoading}
           />
         </div>

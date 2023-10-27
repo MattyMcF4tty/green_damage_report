@@ -259,12 +259,13 @@ export const normalizeFilePath = (filePath:string) => {
 
 export const base64ToBuffer = (base64String: string): Buffer => {
   try {
-    if (!verifyBase64String(base64String)) {
+/*     if (!verifyBase64String(base64String)) {
       throw new Error('The provided string is not a valid Base64 string.');
-    }
+    } */
 
-    const buffer = Buffer.from(base64String, 'base64');
-
+    const base64Data = base64String.split(',')[1];  // Split the base64 string at the comma and take the part after it.
+    const buffer = Buffer.from(base64Data || base64String, 'base64');  // Use the actual data part for conversion.
+    
     console.log('Successfully converted Base64 to Buffer.');
     return buffer;
   } catch (error: any) {
@@ -300,6 +301,25 @@ export const isValidFileData = (data: any): data is { name: string; mimeType: Va
   );
 }
 
+export const base64ToBlob = (base64String:string) => {
+  // Split the base64 string into data and MIME type
+  const parts = base64String.split(';');
+  const mime = parts[0].split(':')[1];
+  const data = parts[1].split(',')[1];
+
+  // Decode the base64 string
+  const byteCharacters = atob(data);
+
+  // Create a numeric byte array from the decoded string
+  const byteArray = new Uint8Array(byteCharacters.length);
+  for (let i = 0; i < byteCharacters.length; i++) {
+      byteArray[i] = byteCharacters.charCodeAt(i);
+  }
+
+  // Create and return the blob using the MIME type and byte array
+  return new Blob([byteArray], { type: mime });
+}
+
 
 export const readAsDataURL = (file: File): Promise<string> => {
   return new Promise((resolve, reject) => {
@@ -319,11 +339,50 @@ export const readAsDataURL = (file: File): Promise<string> => {
   });
 };
 
-export const convertFileToBase64 = async (file: File): Promise<string> => {
+export const fileToBase64 = async (file: File): Promise<string> => {
   try {
-      return await readAsDataURL(file);
+    const base64 = await readAsDataURL(file);
+      return base64;
   } catch (error:any) {
       throw new Error(`Failed to convert file to base64: ${error.message}`);
   }
 }
 
+export const fileToBuffer = (file: File): Promise<Buffer> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsArrayBuffer(file);
+
+    reader.onload = () => {
+      resolve(Buffer.from(reader.result as ArrayBuffer));
+    };
+
+    reader.onerror = (error) => {
+      reject(error);
+    };
+  });
+};
+
+
+export const fileListToFileArray = (fileList:FileList | null) => {
+  try {
+    const fileArray: File[] = [];
+
+    if (!fileList || fileList.length <= 0) {
+      return fileArray
+    }
+  
+    for (let index = 0; index < fileList.length; index++) {
+      const file = fileList.item(index);
+      if (!file) {
+        continue;
+      }
+  
+      fileArray.push(file);
+    }
+  
+    return fileArray;
+  } catch (error:any) {
+    throw new AppError('INTERNAL_ERROR', `Error converting FileList to file Array ${error.message}`)
+  }
+}

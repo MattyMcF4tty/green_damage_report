@@ -37,8 +37,6 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         const customerDamageReport = new CustomerDamageReport();
         customerDamageReport.updateFields(await getDamageReport(reportId));
         
-        console.log('piuaehrgopiuaehrgpoiherg:', customerDamageReport.crypto('decrypt'))
-
         return res.status(200).json(new ApiResponse(
             'OK',
             [`Successfully fetched damagereport ${reportId}.`],

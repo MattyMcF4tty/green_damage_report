@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import PhoneNumber from "./phoneForm";
-import { Inputfield, TextField } from "../custom_inputfields";
+import { Inputfield, TextField } from "../customeInputfields/custom_inputfields";
 import { Pedestrian } from "@/utils/schemas/incidentDetailSchemas/pedestrianSchema";
 
 interface PedestrianProps {

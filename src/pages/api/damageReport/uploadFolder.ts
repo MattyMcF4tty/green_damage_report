@@ -1,7 +1,8 @@
 import { uploadDamageReportFolder } from "@/utils/logic/damageReportLogic.ts/logic";
-import { base64ToBuffer, isValidFileData } from "@/utils/logic/misc";
+import { base64ToBuffer, isValidFileData, verifyBase64String } from "@/utils/logic/misc";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 import { verifyMethod } from "@/utils/security/apiProtection";
+import { fileTypeFromBuffer } from "file-type";
 import { NextApiRequest, NextApiResponse } from "next";
 
 
@@ -37,9 +38,20 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
         if (!fileData) {
             throw new Error('Missing fileData.')
         }
-        if (!isValidFileData(fileData)) {
-            throw new Error(`fileData is wrong format.`)
+        if (!Array.isArray(fileData)) {
+            throw new Error('FileData is not array.')
         }
+        fileData.map((dataObject, index) => {
+            if (!dataObject.name || typeof dataObject.name !== 'string') {
+                throw new Error(`${index} point in filedata has incorrect name format. Expected string got ${typeof dataObject.name}`)
+            }
+            if (!dataObject.fileBase64 || typeof dataObject.fileBase64 !== 'string') {
+                throw new Error(`${index} point in filedata has incorrect fileBase64 format. Expected String got ${typeof dataObject.name}`)
+            }
+/*             if (!verifyBase64String(dataObject.fileBase64)) {
+                throw new Error(`${index} point in filedata has incorrect base64.`)
+            } */
+        })
     } catch (error:any) {
         return res.status(400).json(new ApiResponse(
             'BAD_REQUEST',
@@ -50,22 +62,26 @@ export default async function (req:NextApiRequest, res:NextApiResponse) {
     }
 
     try {
-        const convertedFileData = fileData.map((file) => {
+        const convertedFileDataPromises = fileData.map(async (file) => {
+            const fileBuffer = base64ToBuffer(file.fileBase64);
+            const fileType = await fileTypeFromBuffer(fileBuffer);
+
             return {
-                name: file.name,
-                mimeType: file.mimeType,
-                buffer: base64ToBuffer(file.fileBase64)
-            }
-        })
-
-        await uploadDamageReportFolder(reportId, folderPath, convertedFileData)
-
+                name: `${file.name}.${fileType && fileType.ext ? fileType.ext  : ''}`,
+                buffer: fileBuffer
+            };
+        });
+        
+        const convertedFileData = await Promise.all(convertedFileDataPromises);
+        
+        await uploadDamageReportFolder(reportId, folderPath, convertedFileData);
+        
         return res.status(200).json(new ApiResponse(
             'OK',
             [],
             [`Successfully uploaded ${convertedFileData.length} file${convertedFileData.length !== 1 && 's'}`],
             {}
-        ))
+        ));        
     } catch (error:any) {
         return res.status(500).json(new ApiResponse(
             'INTERNAL_ERROR',
