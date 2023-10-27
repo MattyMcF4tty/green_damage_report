@@ -1,9 +1,8 @@
 import { AdminDamageReport, AdminDamageReportSchema } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
-import { getEnvVariable, normalizeFolderPath } from "../misc"
+import { getEnvVariable, normalizeFilePath, normalizeFolderPath } from "../misc"
 import { createFirestoreDocument, deleteFirestoreDocument, getFirestoreCollection, getFirestoreCollectionDocIds, getFirestoreDocument, queryFirestoreCollection, updateFirestoreDocument } from "../firebaseLogic/firestoreLogic/logic";
 import AppError from "@/utils/schemas/miscSchemas/errorSchema";
-import { deleteFileFromStorage, deleteFolderFromStorage, downloadFileFromStorage, downloadFolderFilesFromStorage, getFileDownloadUrlFromStorage, getFolderFilesDownloadUrlsFromStorage, uploadFileToStorage, uploadFolderToStorage } from "../firebaseLogic/storageLogic/logic";
-import { ValidMimeTypes } from "@/utils/schemas/types";
+import { deleteFileFromStorage, deleteFolderFromStorage, downloadFileFromStorage, downloadFolderFilesFromStorage, getFileDownloadUrlFromStorage, getFolderFilesDownloadUrlsFromStorage, uploadFileToStorage } from "../firebaseLogic/storageLogic/logic";
 
 
 export const getDamageReportIds = async () => {
@@ -195,7 +194,6 @@ export const uploadDamageReportFile = async (reportId:string, filePath:string, f
 
     try {
         await uploadFileToStorage(`${fullFilePath}`, fileBuffer);
-        console.log(`Successfully uploaded damage report file`);
     } catch (error:any) {
         console.error(`Error uploading file to ${fullFilePath}, size:${fileBuffer.byteLength} bytes, error:`, error);
         throw new AppError(error.name, error.message)
@@ -205,8 +203,9 @@ export const uploadDamageReportFile = async (reportId:string, filePath:string, f
 
 export const deleteDamageReportFile = async (reportId:string, filePath:string) => {
     const damageReportFolder = getEnvVariable('DAMAGE_REPORT_STORAGE_FOLDER');
-    const fullFilePath = `${damageReportFolder}/${reportId}/${filePath}`
+    const fullFilePath = normalizeFilePath(`${damageReportFolder}/${reportId}/${filePath}`);
 
+    console.log('deleteDamageReportFile:', fullFilePath)
     try {
         await deleteFileFromStorage(fullFilePath);
         console.log(`Successfully deleted file at ${fullFilePath} from storage.`);
@@ -260,8 +259,6 @@ export const getDamageReportFolderDownloadUrls = async (reportId:string, folderP
     const normalizedFolderPath = normalizeFolderPath(folderPath);
     const fullFilePath = `${damageReportFolder}/${reportId}/${normalizedFolderPath}`;
 
-
-    console.log('getDamageReportFolderDownloadUrls:', fullFilePath)
     try {
         const expireTimeInSeconds = 3600;
 
@@ -286,26 +283,6 @@ export const deleteDamageReportFolder = async (reportId:string, folderPath:strin
         console.log(`Successfully deleted folder at ${fullFilePath}`);
     } catch (error:any) {
         console.error(`Error deleting folder at ${fullFilePath}`);
-        throw new AppError(error.name, error.message);
-    }
-}
-
-
-export const uploadDamageReportFolder = async(reportId:string, folderPath:string, fileData: {
-    name: string;
-    buffer: Buffer;
-}[]) => {
-    const damageReportFolder = getEnvVariable('DAMAGE_REPORT_STORAGE_FOLDER');
-    const normalizedFolderPath = normalizeFolderPath(folderPath);
-    const fullFilePath = `${damageReportFolder}/${reportId}/${normalizedFolderPath}`;
-
-    try {
-        await uploadFolderToStorage(fullFilePath, fileData)
-
-        console.log(`Successfully uploaded ${fileData.length} file ${fileData.length !== 1 && 's'} to damage report ${reportId}.`)
-    } catch (error:any) {
-        console.log(`Error uploading ${fileData.length} file ${fileData.length !== 1 && 's'} to damage report ${reportId}:`, error)
-
         throw new AppError(error.name, error.message);
     }
 }

@@ -11,25 +11,29 @@ export const createStorageFileRef = (filePath:string) => {
 
 
 export const uploadFileToStorage = async (filePath:string, fileBuffer:Buffer) => {
-    const fileRef = createStorageFileRef(filePath);
-    const mimeType = (await fileTypeFromBuffer(fileBuffer))?.mime;
+    const fileType = (await fileTypeFromBuffer(fileBuffer));
+    if (!fileType) {
+        throw new AppError('BAD_REQUEST', `Invalid file type: ${fileType}`)
+    }
 
+    const normalizedFilePath = normalizeFilePath(filePath)
+    const fileRef = createStorageFileRef(normalizedFilePath);
 
     try {
         await fileRef.save(fileBuffer, {
-            contentType: mimeType,
+            contentType: fileType.mime,
             resumable: false,
         })
 
-        console.log(`Successfully uploaded file to ${filePath}, type: ${mimeType}, size: ${fileBuffer.byteLength} bytes`);
+        console.log(`Successfully uploaded file to ${normalizedFilePath}, type: ${fileType.mime}, size: ${fileBuffer.byteLength} bytes`);
     } catch (error:any) {
-        console.error(`Error uploading file to Firebase Storage at ${filePath}:`, error.message);
+        console.error(`Error uploading file to Firebase Storage at ${normalizedFilePath}:`, error.message);
         throw new AppError(error.code, error.message);
     }
 }
 
 
-export const downloadFileFromStorage = async (filePath: string): Promise<{ name: string; buffer: Buffer; mimeType: string | null }> => {
+export const downloadFileFromStorage = async (filePath: string): Promise<{ name: string; buffer: Buffer;}> => {
     const fileRef = createStorageFileRef(filePath);
 
     try {
@@ -45,7 +49,6 @@ export const downloadFileFromStorage = async (filePath: string): Promise<{ name:
         return {
             name: fileMetadata.name,
             buffer: fileBuffer,
-            mimeType: fileMetadata.contentType || null
         };
     } catch (error: any) {
         console.error(`Error retrieving file from Firebase Storage at ${filePath}:`, error.message);
@@ -66,7 +69,6 @@ export const downloadFolderFilesFromStorage = async (folderPath: string) => {
             return {
                 name: fileData.name,
                 buffer: fileData.buffer,
-                mimeType: fileData.mimeType!,
             };
         }));
 
@@ -126,9 +128,9 @@ export const getFolderFilesDownloadUrlsFromStorage = async (
 
         const urlPromises = files.map(async file => {
             const [signedUrl] = await file.getSignedUrl(config); 
-        
+            
             return {
-                fileName: file.name,
+                fileName: file.name.split('/').pop() || '',
                 downloadUrl: signedUrl
             };
         });
@@ -177,28 +179,3 @@ export const deleteFolderFromStorage = async (folderPath: string): Promise<void>
         throw new AppError(error.code, error.message);
     }
 };
-
-
-export const uploadFolderToStorage = async (
-    folderPath: string, 
-    fileData: {name: string, buffer: Buffer}[]
-) => {
-    const normalizedFolderPath = normalizeFolderPath(folderPath);
-    const uploadSize: number = fileData.reduce((acc, file) => acc + file.buffer.byteLength, 0);   
-
-    try {
-        // Create an array of upload promises and wait for all of them to complete
-        const uploadPromises = fileData.map((file) => {
-            const normalizedFilePath = normalizeFilePath(`${normalizedFolderPath}${file.name}`)
-            uploadFileToStorage(`${normalizedFilePath}`, file.buffer)
-        });
-        
-        // Ensure all uploads are complete
-        await Promise.all(uploadPromises);
-
-        console.log(`Successfully uploaded ${fileData.length} file${fileData.length !== 1 ? 's' : ''} to ${normalizedFolderPath}. Full size of upload: ${uploadSize} bytes.`);
-    } catch (error: any) {
-        console.error(`Error uploading ${fileData.length} file${fileData.length !== 1 ? 's' : ''} to ${normalizedFolderPath}:`, error);
-        throw new AppError(error.name, error.message);
-    }
-}

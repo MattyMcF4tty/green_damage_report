@@ -4,7 +4,7 @@ import {
   Inputfield,
   YesNo,
   AddressField,
-} from "@/components/customeInputfields/custom_inputfields";
+} from "@/components/inputFields/custom_inputfields";
 import { GetServerSidePropsContext, NextPage } from "next";
 import NextButton from "@/components/buttons/next";
 import BackButton from "@/components/buttons/back";

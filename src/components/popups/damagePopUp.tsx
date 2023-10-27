@@ -1,6 +1,6 @@
 import { useState } from "react";
-import {TextField } from "../customeInputfields/custom_inputfields";
-import MultiImageInput from "../customeInputfields/MultiImageInput";
+import {TextField } from "../inputFields/custom_inputfields";
+import MultiImageInput from "../inputFields/MultiImageInput";
 
 interface DamagePopUpProps {
   reportId: string;

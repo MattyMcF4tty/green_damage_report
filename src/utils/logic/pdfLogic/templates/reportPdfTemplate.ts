@@ -1,7 +1,7 @@
 import jsPDF from "jspdf";
 import EXIF from "exif-js";
 import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
-import { requestDamageReportFolderDownload } from "../../damageReportLogic.ts/apiRoutes";
+import { requestAdminDamageReportDownload } from "../../damageReportLogic.ts/apiRoutes";
 
 const addImageToPDF = (pdfDoc: jsPDF) => {
   const imageWidth = 80;
@@ -17,8 +17,6 @@ const addImageToPDF = (pdfDoc: jsPDF) => {
 
 const createReportPDF = async (
   data: AdminDamageReport,
-  images: Record<string, string[]>,
-  map: string,
   reportId:string
 ) => {
   const doc = new jsPDF();
@@ -1087,6 +1085,9 @@ const createReportPDF = async (
   const headerHeight = 20;
   currentY = 10;
 
+  //get otherPartyImages
+  const otherPartyImages = await 
+
   // For OtherParty images
   if (images["OtherParty"]) {
     addImageSectionHeader("OtherParty Damage Images");
@@ -1112,11 +1113,14 @@ const createReportPDF = async (
   doc.addPage();
   currentY = 10;
 
+  //get map
+  const map = await requestAdminDamageReportDownload(reportId, 'Admin/map')
+
   if (map) {
     addImageSectionHeader("Map Images");
 
     doc.addImage(
-      map,
+      map.fileBase64,
       "png",
       15,
       currentY,

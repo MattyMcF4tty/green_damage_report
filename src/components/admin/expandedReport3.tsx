@@ -1,9 +1,8 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faX } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import ImageCarousel from "./imageCarousel";
 import { AdminDamageReport } from "@/utils/schemas/damageReportSchemas/adminReportSchema";
-import { fetcDamageReportFolderFilesUrl } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import { fetchDamageReportFolderFilesUrl } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 
 interface ExpandedReport3Props {
   setVisible: (visibility: boolean) => void;
@@ -22,7 +21,7 @@ const ExpandedReport3 = ({ setVisible, reports }: ExpandedReport3Props) => {
   useEffect(() => {
     const fetchImages = async () => {
       setCurrentImages(
-        await fetcDamageReportFolderFilesUrl(currentReport.id, "/OtherPartyDamages/")
+        await fetchDamageReportFolderFilesUrl(currentReport.id, "/OtherPartyDamages/")
       );
     };
 

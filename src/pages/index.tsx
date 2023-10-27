@@ -1,4 +1,4 @@
-import { Inputfield } from "@/components/customeInputfields/custom_inputfields";
+import { Inputfield } from "@/components/inputFields/custom_inputfields";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import EmailPopUp from "@/components/popups/emailPopUp";
@@ -15,9 +15,11 @@ const IndexPage = () => {
     e.preventDefault();
 
     // Check for ongoing reports with that email.
-    setOngoingReports(await requestQueryDamageReports("userEmail", '==', email));
+    const fetchedReports = await requestQueryDamageReports("userEmail", '==', email)
+    // TODO: Make it possible to query for reports with email and not finished.
 
-    if (ongoingReports.length > 0) {
+    if (fetchedReports.length > 0) {
+      setOngoingReports(fetchedReports)
       setShowPopUp(true);
       return;
     }
