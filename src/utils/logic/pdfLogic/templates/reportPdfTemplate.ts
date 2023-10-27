@@ -15,12 +15,7 @@ const addImageToPDF = (pdfDoc: jsPDF) => {
   return pdfDoc;
 };
 
-const createReportPDF = async (
-  data: AdminDamageReport,
-  images: Record<string, string[]>,
-  map: string,
-  reportId:string
-) => {
+const createReportPDF = async (data: AdminDamageReport, reportId: string) => {
   const doc = new jsPDF();
 
   // Start adding data to the PDF
@@ -1208,12 +1203,15 @@ const createReportPDF = async (
       doc.text("Images:", 15, currentY + 30);
 
       const imageUrl = damage.images[0];
-      const imagesBase64 = await requestDamageReportFolderDownload(reportId, `/GreenDamage/${position}/`);
+      const imagesBase64 = await requestDamageReportFolderDownload(
+        reportId,
+        `/GreenDamage/${position}/`
+      );
       currentY += 40; // Update as per actual space needed
       const imageHeight = 55; // Example height
 
       //TODO: FIIIIIIIXXXXX ----------------------------------------------
-/*       const correctedImageBase64 = await getCorrectlyOrientedImage(imagesBase64);
+      /*       const correctedImageBase64 = await getCorrectlyOrientedImage(imagesBase64);
       doc.addImage(
         correctedImageBase64,
         "png",

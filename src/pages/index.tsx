@@ -2,7 +2,10 @@ import { Inputfield } from "@/components/customeInputfields/custom_inputfields";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import EmailPopUp from "@/components/popups/emailPopUp";
-import { requestDamageReportCreation, requestQueryDamageReports } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import {
+  requestDamageReportCreation,
+  requestQueryDamageReports,
+} from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 
 const IndexPage = () => {
   const router = useRouter();
@@ -15,7 +18,9 @@ const IndexPage = () => {
     e.preventDefault();
 
     // Check for ongoing reports with that email.
-    setOngoingReports(await requestQueryDamageReports("userEmail", '==', email));
+    setOngoingReports(
+      await requestQueryDamageReports("userEmail", "==", email)
+    );
 
     if (ongoingReports.length > 0) {
       setShowPopUp(true);
@@ -58,7 +63,7 @@ const IndexPage = () => {
 
         <div className="lg:mx-auto lg:w-[25rem]">
           <Inputfield
-            id="Email"
+            id="emailPattern"
             labelText="
 
           To access the damage report, please enter your email"
