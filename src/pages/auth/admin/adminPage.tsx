@@ -8,7 +8,7 @@ import { requestUserVerification } from "@/utils/logic/firebaseLogic/authenticat
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
 ) => {
-  try {
+  /* try {
     await requestUserVerification()
   } catch (error:any) {
     return {
@@ -17,7 +17,7 @@ export const getServerSideProps = async (
         permanent: false,
       },
     };
-  }
+  } */
 
   return { props: {} };
 };

@@ -1,10 +1,18 @@
 import AppError from "@/utils/schemas/miscSchemas/errorSchema";
 import admin from "firebase-admin";
 
-
 let firebaseAdmin: admin.app.App;
 
 export const getFirebaseAdmin = () => {
+  if (!firebaseAdmin) {
+    try {
+      const privateKey = process.env.FIREBASE_ADMIN_PRIVATE_KEY;
+      if (!privateKey) {
+        throw new AppError(
+          "INTERNAL_ERROR",
+          "FIREBASE_ADMIN_PRIVATE_KEY is not defined in enviroment."
+        );
+      }
 
     if (!firebaseAdmin) {
         try {
@@ -34,9 +42,10 @@ export const getFirebaseAdmin = () => {
             throw error; // Propagate the error so that calling code knows initialization failed.
         }
     }
+  }
 
-    return firebaseAdmin;
-}
+  return firebaseAdmin;
+};
 
 export const getAdminStorage = () => {
     try {
@@ -47,9 +56,9 @@ export const getAdminStorage = () => {
 }
 
 export const getAdminFirestore = () => {
-    return getFirebaseAdmin().firestore();
-}
+  return getFirebaseAdmin().firestore();
+};
 
 export const getAdminAuth = () => {
-    return getFirebaseAdmin().auth();
-}
+  return getFirebaseAdmin().auth();
+};
