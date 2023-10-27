@@ -2,7 +2,10 @@ import { Inputfield } from "@/components/inputFields/custom_inputfields";
 import { useRouter } from "next/router";
 import React, { useState } from "react";
 import EmailPopUp from "@/components/popups/emailPopUp";
-import { requestDamageReportCreation, requestQueryDamageReports } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import {
+  requestDamageReportCreation,
+  requestQueryDamageReports,
+} from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 
 const IndexPage = () => {
   const router = useRouter();
@@ -15,8 +18,14 @@ const IndexPage = () => {
     e.preventDefault();
 
     // Check for ongoing reports with that email.
+<<<<<<< HEAD
     const fetchedReports = await requestQueryDamageReports("userEmail", '==', email)
     // TODO: Make it possible to query for reports with email and not finished.
+=======
+    setOngoingReports(
+      await requestQueryDamageReports("userEmail", "==", email)
+    );
+>>>>>>> 685251b (pdf tissemand jeg elsker mænd)
 
     if (fetchedReports.length > 0) {
       setOngoingReports(fetchedReports)
@@ -60,7 +69,7 @@ const IndexPage = () => {
 
         <div className="lg:mx-auto lg:w-[25rem]">
           <Inputfield
-            id="Email"
+            id="emailPattern"
             labelText="
 
           To access the damage report, please enter your email"

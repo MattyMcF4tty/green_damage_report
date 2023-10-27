@@ -12,7 +12,11 @@ import WitnessList from "@/components/otherPartys/witnessList";
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { patchCustomerDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
 import { DamageReportPageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
-import { getDamageReport, getDamageReportFolderDownloadUrls } from "@/utils/logic/damageReportLogic.ts/logic";
+import {
+  getDamageReport,
+  getDamageReportFolderDownloadUrls,
+} from "@/utils/logic/damageReportLogic.ts/logic";
+import { Input } from "postcss";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -21,7 +25,7 @@ export const getServerSideProps = async (
 
   const damageReport = new CustomerDamageReport();
   damageReport.updateFields(await getDamageReport(reportId));
-  
+
   if (damageReport.isExpired() || damageReport.isFinished()) {
     return {
       redirect: {
@@ -33,7 +37,7 @@ export const getServerSideProps = async (
 
   return {
     props: {
-      data: damageReport.crypto('decrypt'),
+      data: damageReport.crypto("decrypt"),
       id: reportId,
     },
   };
@@ -96,7 +100,7 @@ const HowPage: NextPage<DamageReportPageProps> = ({ data, id }) => {
       setAllowClick(true);
       return;
     }
-    
+
     router.push(`where?id=${id}`);
   };
 
@@ -121,7 +125,17 @@ const HowPage: NextPage<DamageReportPageProps> = ({ data, id }) => {
 
       {/* Accident speed collection */}
       <div className="">
-        <Inputfield
+        <input
+          type="tel"
+          min="0"
+          value={greenDriverSpeed ? greenDriverSpeed : ""}
+          onChange={(e) => setGreenDriverSpeed(e.target.value)}
+          inputMode="numeric"
+          pattern="[0-9]*"
+          title="Non-negative integral number"
+        />
+
+        {/*       <Inputfield
           id="speedcollection"
           labelText="Please enter your speed for when the incident occurred"
           required={true}
@@ -129,7 +143,7 @@ const HowPage: NextPage<DamageReportPageProps> = ({ data, id }) => {
           value={greenDriverSpeed}
           onChange={setGreenDriverSpeed}
           placeHolder="km/h"
-        />
+        /> */}
       </div>
 
       {/* Police Report collection */}
@@ -189,7 +203,7 @@ const HowPage: NextPage<DamageReportPageProps> = ({ data, id }) => {
         </div>
 
         <div className="flex flex-row w-16 justify-end h-14 mr-10">
-          <NextButton disabled={!allowClick}/>
+          <NextButton disabled={!allowClick} />
         </div>
       </div>
     </form>
