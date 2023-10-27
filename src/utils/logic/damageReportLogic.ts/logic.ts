@@ -174,7 +174,8 @@ export const getDamageReportFileDownloadUrl = async (reportId:string, filePath:s
 
 export const downloadDamageReportFile = async (reportId:string, filePath:string) => {
     const damageReportFolder = getEnvVariable('DAMAGE_REPORT_STORAGE_FOLDER');
-    const fullFilePath = `${damageReportFolder}/${reportId}/${filePath}`
+    const normalizedFolderPath = normalizeFolderPath(`${damageReportFolder}/${reportId}/`)
+    const fullFilePath = normalizeFilePath(`${normalizedFolderPath}/${filePath}`)
 
     try {
         const fileBuffer= await downloadFileFromStorage(`${fullFilePath}`) 
@@ -190,7 +191,7 @@ export const downloadDamageReportFile = async (reportId:string, filePath:string)
 
 export const uploadDamageReportFile = async (reportId:string, filePath:string, fileBuffer:Buffer) => {
     const damageReportFolder = getEnvVariable('DAMAGE_REPORT_STORAGE_FOLDER');
-    const fullFilePath = `${damageReportFolder}/${reportId}/${filePath}`
+    const fullFilePath = normalizeFilePath(`${damageReportFolder}/${reportId}/${filePath}`)
 
     try {
         await uploadFileToStorage(`${fullFilePath}`, fileBuffer);
@@ -274,8 +275,8 @@ export const getDamageReportFolderDownloadUrls = async (reportId:string, folderP
 
 export const deleteDamageReportFolder = async (reportId:string, folderPath:string) => {
     const damageReportFolder = getEnvVariable('DAMAGE_REPORT_STORAGE_FOLDER');
-    const normalizedFolderPath = normalizeFolderPath(folderPath);
-    const fullFilePath = `${damageReportFolder}/${reportId}/${normalizedFolderPath}`;
+    const normalizedFolderPath = normalizeFolderPath(`/${reportId}/${folderPath}/`);
+    const fullFilePath = damageReportFolder + normalizedFolderPath;
 
     try {
         await deleteFolderFromStorage(fullFilePath);

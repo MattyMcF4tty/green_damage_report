@@ -241,18 +241,29 @@ export const blobToBuffer = async (blob: Blob) => {
 
 
 export const normalizeFolderPath = (folderPath: string) => {
-  // add the ending '/' if it does not exists
+  // Ensure the path ends with a '/'
   let normalizedFolderPath = folderPath.endsWith('/') ? folderPath : folderPath + '/';
   
-  // Remove the starting '/' if it exists
+  // Ensure the path does not start with a '/'
   normalizedFolderPath = normalizedFolderPath.startsWith('/') ? normalizedFolderPath.substring(1) : normalizedFolderPath;
+
+  // Replace double slashes with a single slash
+  normalizedFolderPath = normalizedFolderPath.replace(/\/+/g, '/');
 
   return normalizedFolderPath;
 }
 
 
-export const normalizeFilePath = (filePath:string) => {
-  const normalizedFilePath = filePath.endsWith('/') ? filePath.slice(0, -1) : filePath;
+export const normalizeFilePath = (filePath: string) => {
+  // Ensure the path does not end with a '/'
+  let normalizedFilePath = filePath.endsWith('/') ? filePath.slice(0, -1) : filePath;
+
+  // Ensure the path does not start with a '/'
+  normalizedFilePath = normalizedFilePath.startsWith('/') ? normalizedFilePath.substring(1) : normalizedFilePath;
+  
+  // Replace double slashes with a single slash
+  normalizedFilePath = normalizedFilePath.replace(/\/+/g, '/');
+
   return normalizedFilePath;
 }
 

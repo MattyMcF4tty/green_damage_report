@@ -1,6 +1,6 @@
 import AppError from "@/utils/schemas/miscSchemas/errorSchema";
 import { getAdminStorage } from "../initFirebaseAdmin"
-import { normalizeFilePath, normalizeFolderPath } from "../../misc";
+import { getEnvVariable, normalizeFilePath, normalizeFolderPath } from "../../misc";
 import { ValidMimeTypes } from "@/utils/schemas/types";
 import { fileTypeFromBuffer } from "file-type";
 
@@ -37,22 +37,31 @@ export const downloadFileFromStorage = async (filePath: string): Promise<{ name:
     const fileRef = createStorageFileRef(filePath);
 
     try {
-        if (!await fileRef.exists()) {
-            throw new AppError('NOT_FOUND', `No file were found at path ${filePath}`)
+        const [exists] = await fileRef.exists();
+
+        if (!exists) {
+            throw new AppError('FILE_NOT_FOUND', `No file was found at path ${filePath}`);
         }
 
         const [fileMetadata] = await fileRef.getMetadata();
         const [fileBuffer] = await fileRef.download(); 
 
         console.log(`File retrieved from Firebase Storage at ${filePath}.`);
-        
+        //TODO: make better handling if no file is found, all the way downstream
         return {
             name: fileMetadata.name,
             buffer: fileBuffer,
         };
     } catch (error: any) {
         console.error(`Error retrieving file from Firebase Storage at ${filePath}:`, error.message);
-        throw new AppError(error.code, error.message);
+        
+        // If it's the custom error for the file not being found, re-throw it
+        if (error instanceof AppError || error.code === 'FILE_NOT_FOUND') {
+            throw error;
+        }
+
+        // Handle other errors
+        throw new AppError(error.code || 'UNKNOWN_ERROR', error.message);
     }
 }
 
@@ -165,9 +174,10 @@ export const deleteFolderFromStorage = async (folderPath: string): Promise<void>
 
     try {
         // Ensure folderPath ends with a '/' if it does not have one.
-        const normalizedFolderPath = folderPath.endsWith('/') ? folderPath : `${folderPath}/`;
+        const normalizedFolderPath = normalizeFolderPath(folderPath);
+        console.log(normalizedFolderPath)
 
-        const [files] = await storage.getFiles({ prefix: normalizedFolderPath });
+        const files = await getFolderFilesMetaData(normalizedFolderPath)
         
         const deletePromises = files.map(file => file.delete());
 
@@ -179,3 +189,17 @@ export const deleteFolderFromStorage = async (folderPath: string): Promise<void>
         throw new AppError(error.code, error.message);
     }
 };
+
+
+export const getFolderFilesMetaData = async (folderPath:string) => {
+    const storage = getAdminStorage().bucket();
+    const fileFolder = getEnvVariable('DAMAGE_REPORT_STORAGE_FOLDER')
+    const normalizedFolderPath = normalizeFolderPath(`${fileFolder}/${folderPath}`);
+
+    try {
+        const [files] = await storage.getFiles({ prefix: normalizedFolderPath });
+        return files;
+    } catch (error:any) {
+        throw new AppError(error.code ? error.code : error.name, error.message)
+    }
+}
