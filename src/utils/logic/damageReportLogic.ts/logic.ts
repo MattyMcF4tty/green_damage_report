@@ -189,15 +189,15 @@ export const downloadDamageReportFile = async (reportId:string, filePath:string)
 }
 
 
-export const uploadDamageReportFile = async (reportId:string, filePath:string, fileBuffer:Buffer, mimeType:ValidMimeTypes) => {
+export const uploadDamageReportFile = async (reportId:string, filePath:string, fileBuffer:Buffer) => {
     const damageReportFolder = getEnvVariable('DAMAGE_REPORT_STORAGE_FOLDER');
     const fullFilePath = `${damageReportFolder}/${reportId}/${filePath}`
 
     try {
-        await uploadFileToStorage(`${fullFilePath}`, mimeType, fileBuffer);
-        console.log(`Successfully uploaded file to ${fullFilePath}, type: ${mimeType}, size: ${fileBuffer.byteLength} bytes`);
+        await uploadFileToStorage(`${fullFilePath}`, fileBuffer);
+        console.log(`Successfully uploaded damage report file`);
     } catch (error:any) {
-        console.error(`Error uploading file to ${fullFilePath}, type: ${mimeType}, size:${fileBuffer.byteLength} bytes, error:`, error);
+        console.error(`Error uploading file to ${fullFilePath}, size:${fileBuffer.byteLength} bytes, error:`, error);
         throw new AppError(error.name, error.message)
     }
 }
@@ -260,12 +260,13 @@ export const getDamageReportFolderDownloadUrls = async (reportId:string, folderP
     const normalizedFolderPath = normalizeFolderPath(folderPath);
     const fullFilePath = `${damageReportFolder}/${reportId}/${normalizedFolderPath}`;
 
+
+    console.log('getDamageReportFolderDownloadUrls:', fullFilePath)
     try {
         const expireTimeInSeconds = 3600;
 
         const fileDownloadUrls = await getFolderFilesDownloadUrlsFromStorage(fullFilePath, expireTimeInSeconds);
 
-        console.log(`Successfully fetched ${fileDownloadUrls.length} download url${fileDownloadUrls.length !== 1 && 's'} from ${fullFilePath} in storage.`);
         return fileDownloadUrls;
     } catch (error:any) {
         console.warn(`Error fetching download urls from ${fullFilePath} in storage.`);
@@ -292,7 +293,6 @@ export const deleteDamageReportFolder = async (reportId:string, folderPath:strin
 
 export const uploadDamageReportFolder = async(reportId:string, folderPath:string, fileData: {
     name: string;
-    mimeType: ValidMimeTypes;
     buffer: Buffer;
 }[]) => {
     const damageReportFolder = getEnvVariable('DAMAGE_REPORT_STORAGE_FOLDER');
@@ -302,9 +302,9 @@ export const uploadDamageReportFolder = async(reportId:string, folderPath:string
     try {
         await uploadFolderToStorage(fullFilePath, fileData)
 
-        console.log(`Successfully uploaded ${fileData.length} file${fileData.length !== 1 && 's'} to damage report ${reportId}.`)
+        console.log(`Successfully uploaded ${fileData.length} file ${fileData.length !== 1 && 's'} to damage report ${reportId}.`)
     } catch (error:any) {
-        console.log(`Error uploading ${fileData.length} file${fileData.length !== 1 && 's'} to damage report ${reportId}:`, error)
+        console.log(`Error uploading ${fileData.length} file ${fileData.length !== 1 && 's'} to damage report ${reportId}:`, error)
 
         throw new AppError(error.name, error.message);
     }

@@ -3,7 +3,7 @@ import BikeInfoForm from "../opposite_information/bikerInformationForm";
 import CarInfoForm from "../opposite_information/vehicleInformationForm";
 import OtherInfoForm from "../opposite_information/otherInformationForm";
 import PedestrianInfoForm from "../opposite_information/personInformationForm";
-import { Checkbox } from "../custom_inputfields";
+import { Checkbox } from "../customeInputfields/custom_inputfields";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBicycle,

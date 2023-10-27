@@ -1,7 +1,7 @@
 /* import { GoogleMap, Marker, useJsApiLoader } from "@react-google-maps/api";*/
 import React, { useEffect, useState, useRef } from "react";
 import usePlacesService from "react-google-autocomplete/lib/usePlacesAutocompleteService";
-import { convertFileToBase64, normalizeFilePath, normalizeFolderPath } from "@/utils/logic/misc";
+import { fileToBase64, fileToBuffer, normalizeFilePath, normalizeFolderPath } from "@/utils/logic/misc";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCamera, faX } from "@fortawesome/free-solid-svg-icons";
 import {
@@ -533,22 +533,20 @@ export const MultipleImageField = ({
       setIsError(`You have exceeded the limit.`);
     }
   
-    const fileData: {name:string, mimeType:ValidMimeTypes, fileBase64:string}[] = [];
+    const fileData: {name:string, fileBase64:string}[] = [];
     for (let index = 0; index < imagesToProcess; index++) {
       const file = files.item(index);
       if (!file) {
         continue;
       }
   
-      const base64 = await convertFileToBase64(file);
+      const fileBase64 = await fileToBase64(file);
       const thisFileData = {
         name: `${folderName}${index}`,
-        mimeType: file.type as ValidMimeTypes,
-        fileBase64: base64
+        fileBase64: fileBase64
       }
       fileData.push(thisFileData);
     }
-  
     await uploadFolderToDamageReport(reportId, normalizedFolderPath, fileData)
   
     await getImages()
@@ -701,7 +699,7 @@ const [imageData, setImageData] = useState<{fileName: string;downloadUrl: string
       return;
     }
 
-    const base64 = await convertFileToBase64(file);
+    const base64 = await fileToBase64(file);
     await uploadFileToDamageReport(reportId, normalizedFilePath, base64, file.type as ValidMimeTypes)
 
     await getImage()

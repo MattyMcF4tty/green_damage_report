@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { GetServerSidePropsContext, NextPage } from "next";
 import { useRouter } from "next/router";
 import BackButton from "@/components/buttons/back";
-import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
+import { CustomerDamageReport, CustomerDamageReportSchema } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faBicycle,
@@ -12,8 +12,9 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { handleSendEmail } from "@/utils/logic/misc";
 import { DamageReportPageProps } from "@/utils/schemas/miscSchemas/pagePropsSchema";
-import { patchCustomerDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
-import { getDamageReport, getDamageReportFolderDownloadUrls } from "@/utils/logic/damageReportLogic.ts/logic";
+import { fetcDamageReportFolderFilesUrl, patchCustomerDamageReport } from "@/utils/logic/damageReportLogic.ts/apiRoutes";
+import { getDamageReport } from "@/utils/logic/damageReportLogic.ts/logic";
+import { Damage } from "@/utils/schemas/incidentDetailSchemas/damageSchema";
 
 export const getServerSideProps = async (
   context: GetServerSidePropsContext
@@ -22,10 +23,6 @@ export const getServerSideProps = async (
 
   const damageReport = new CustomerDamageReport();
   damageReport.updateFields(await getDamageReport(reportId));
-
-  const otherPartyImageUrls = (await getDamageReportFolderDownloadUrls(reportId, '/OtherPartyDamages/')).map((image) => {
-    return image.downloadUrl;
-  })
   
   if (damageReport.isExpired() || damageReport.isFinished()) {
     return {
@@ -39,20 +36,20 @@ export const getServerSideProps = async (
   return {
     props: {
       data: damageReport.crypto('decrypt'),
-      otherPartyImageUrls: otherPartyImageUrls,
       id: reportId,
     },
   };
 };
 
 
-const confirmationPage: NextPage<DamageReportPageProps> = ({ data, otherPartyImageUrls, id }) => {
+const confirmationPage: NextPage<DamageReportPageProps> = ({ data, id }) => {
   const Router = useRouter();
   const serverData = new CustomerDamageReport();
   serverData.updateFields(data);
   const [allowClick, setAllowClick] = useState(true);
-
-  let [confirmVis, setConfirmVis] = useState(false);
+  const [confirmVis, setConfirmVis] = useState(false);
+  const [otherPartyImageUrls, setOtherPartyImageUrls] = useState<string[]>([])
+  const [serverDataState, setServerDataState] = useState<CustomerDamageReportSchema>(serverData)
 
   const handleSend = async () => {
     setAllowClick(false);
@@ -64,15 +61,34 @@ const confirmationPage: NextPage<DamageReportPageProps> = ({ data, otherPartyIma
       return;
     }
     /* TODO: EMAIL shouldnt be null, but might be. Create the correct action if email is null */
-    if (data.userEmail) {
+    if (serverDataState.userEmail) {
       await handleSendEmail(
-        data.userEmail,
+        serverDataState.userEmail,
         "GreenMobility Damage report",
-        `This is a confirmation that we have received your damage report for vehicle ${data.greenCarNumberPlate}. It will now be processed by our damage department. If you have any questions, please contact damage@greenmobility.com`
+        `This is a confirmation that we have received your damage report for vehicle ${serverDataState.greenCarNumberPlate}. It will now be processed by our damage department. If you have any questions, please contact damage@greenmobility.com`
       );
     }
     Router.push("thankyou");
   };
+
+  useEffect(() => {
+    const getImages = async () => {
+      const loadedDamages = await Promise.all(serverData.damages.map(async (damage) => {
+        const loadedDamage = await fetcDamageReportFolderFilesUrl(id, `/GreenDamage/${damage.position}/`)
+
+        return new Damage(damage.position, damage.description, loadedDamage.map(damage => damage.downloadUrl));
+      }))
+      let updatedServerDataState = serverDataState;
+      updatedServerDataState.damages = loadedDamages;
+      setServerDataState(updatedServerDataState)
+
+      setOtherPartyImageUrls((await fetcDamageReportFolderFilesUrl(id, '/OtherPartyDamages/')).map((image) => {
+        return image.downloadUrl;
+      }))
+    }
+
+    getImages()
+  }, [])
 
   return (
     <div className="flex flex-col">
@@ -107,14 +123,14 @@ const confirmationPage: NextPage<DamageReportPageProps> = ({ data, otherPartyIma
 
       {/* Driver information collected */}
       <p className="font-bold text-MainGreen-300 mb-2">Driver information</p>
-      {data.driverRenter ? (
+      {serverDataState.driverRenter ? (
         <div className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full grid grid-cols-2 gap-y-4 mb-6">
           {/* First name */}
           <div className="row-start-1 col-span-2 justify-center">
             <p className="text-xs italic">Name:</p>
             <p>
-              {data.driverInfo.firstName ? data.driverInfo.firstName : "-"}{" "}
-              {data.driverInfo.lastName ? data.driverInfo.lastName : ""}
+              {serverDataState.driverInfo.firstName ? serverDataState.driverInfo.firstName : "-"}{" "}
+              {serverDataState.driverInfo.lastName ? serverDataState.driverInfo.lastName : ""}
             </p>
           </div>
         </div>
@@ -124,43 +140,43 @@ const confirmationPage: NextPage<DamageReportPageProps> = ({ data, otherPartyIma
           <div className="row-start-1 col-span-1 justify-center">
             <p className="text-xs italic">Name:</p>
             <p>
-              {data.driverInfo.firstName ? data.driverInfo.firstName : "-"}{" "}
-              {data.driverInfo.lastName ? data.driverInfo.lastName : ""}
+              {serverDataState.driverInfo.firstName ? serverDataState.driverInfo.firstName : "-"}{" "}
+              {serverDataState.driverInfo.lastName ? serverDataState.driverInfo.lastName : ""}
             </p>
           </div>
 
           {/* Driving license number */}
           <div className="row-start-1 col-start-2">
             <p className="text-xs italic">Valid drivers license:</p>
-            {data.driverInfo.validDriversLicense ? <p>Yes</p> : <p>No</p>}
+            {serverDataState.driverInfo.validDriversLicense ? <p>Yes</p> : <p>No</p>}
           </div>
 
           {/* Phone number */}
           <div className="row-start-2 col-start-1">
             <p className="text-xs italic">Phone number:</p>
             <p>
-              {data.driverInfo.phoneNumber ? data.driverInfo.phoneNumber : "-"}
+              {serverDataState.driverInfo.phoneNumber ? serverDataState.driverInfo.phoneNumber : "-"}
             </p>
           </div>
 
           {/* Address */}
           <div className="row-start-2 col-start-2">
             <p className="text-xs italic">Address:</p>
-            <p>{data.driverInfo.address ? data.driverInfo.address : "-"}</p>
+            <p>{serverDataState.driverInfo.address ? serverDataState.driverInfo.address : "-"}</p>
           </div>
 
           {/* Email */}
           <div className="row-start-3 col-span-2">
             <p className="text-xs italic">Email:</p>
-            <p>{data.driverInfo.email ? data.driverInfo.email : "-"}</p>
+            <p>{serverDataState.driverInfo.email ? serverDataState.driverInfo.email : "-"}</p>
           </div>
 
           {/* Social security number */}
           <div className="row-start-4 col-start-1">
             <p className="text-xs italic">Social Security Number:</p>
             <p>
-              {data.driverInfo.socialSecurityNumber
-                ? data.driverInfo.socialSecurityNumber
+              {serverDataState.driverInfo.socialSecurityNumber
+                ? serverDataState.driverInfo.socialSecurityNumber
                 : "-"}
             </p>
           </div>
@@ -168,8 +184,8 @@ const confirmationPage: NextPage<DamageReportPageProps> = ({ data, otherPartyIma
           <div className="row-start-4 col-start-2">
             <p className="text-xs italic">Driving License Number:</p>
             <p>
-              {data.driverInfo.drivingLicenseNumber
-                ? data.driverInfo.drivingLicenseNumber
+              {serverDataState.driverInfo.drivingLicenseNumber
+                ? serverDataState.driverInfo.drivingLicenseNumber
                 : "-"}
             </p>
           </div>
@@ -182,21 +198,21 @@ const confirmationPage: NextPage<DamageReportPageProps> = ({ data, otherPartyIma
         {/* Date of accident */}
         <div className="row-start-1 col-start-1">
           <p className="text-xs italic">Date of accident:</p>
-          <p>{data.date ? data.date : "-"}</p>
+          <p>{serverDataState.date ? serverDataState.date : "-"}</p>
         </div>
 
         {/* Time of accident */}
         <div className="row-start-1 col-start-2">
           <p className="text-xs italic">Time of accident:</p>
-          <p>{data.time ? data.time : "-"}</p>
+          <p>{serverDataState.time ? serverDataState.time : "-"}</p>
         </div>
 
         {/* Police journal */}
         <div className="row-start-3 col-span-2">
           <p className="text-xs italic">Police journal number:</p>
           <p>
-            {data.policeReportNumber
-              ? data.policeReportNumber
+            {serverDataState.policeReportNumber
+              ? serverDataState.policeReportNumber
               : "No police report was filed"}
           </p>
         </div>
@@ -205,8 +221,8 @@ const confirmationPage: NextPage<DamageReportPageProps> = ({ data, otherPartyIma
         <div className="row-start-4 col-span-2">
           <p className="text-xs italic">Accident description:</p>
           <span className="break-words">
-            {data.accidentDescription
-              ? data.accidentDescription
+            {serverDataState.accidentDescription
+              ? serverDataState.accidentDescription
               : "No accident description provided"}
           </span>
         </div>
@@ -218,21 +234,21 @@ const confirmationPage: NextPage<DamageReportPageProps> = ({ data, otherPartyIma
         {/* Green car numberplate */}
         <div className="row-start-1 col-start-1">
           <p className="text-xs italic">Green car numberplate:</p>
-          <p>{data.greenCarNumberPlate ? data.greenCarNumberPlate : "-"}</p>
+          <p>{serverDataState.greenCarNumberPlate ? serverDataState.greenCarNumberPlate : "-"}</p>
         </div>
 
         {/* Speed */}
         <div className="row-start-1 col-start-2">
           <p className="text-xs italic">Speed:</p>
-          <p>{data.speed ? data.speed : "-"} km/h</p>
+          <p>{serverDataState.speed ? serverDataState.speed : "-"} km/h</p>
         </div>
 
         {/* Damage description */}
         <div className="row-start-2 col-span-2">
           <p className="text-xs italic">Damage description:</p>
           <span className="break-words">
-            {data.damageDescription
-              ? data.damageDescription
+            {serverDataState.damageDescription
+              ? serverDataState.damageDescription
               : "No damage description provided"}
           </span>
         </div>
@@ -245,18 +261,18 @@ const confirmationPage: NextPage<DamageReportPageProps> = ({ data, otherPartyIma
         Others involved in crash
       </p>
       <div className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6 flex flex-col">
-        {data.bikerInfo.length == 0 &&
-        data.vehicleInfo.length == 0 &&
-        data.otherObjectInfo.length == 0 &&
-        data.pedestrianInfo.length == 0 ? (
+        {serverDataState.bikerInfo.length == 0 &&
+        serverDataState.vehicleInfo.length == 0 &&
+        serverDataState.otherObjectInfo.length == 0 &&
+        serverDataState.pedestrianInfo.length == 0 ? (
           <div>
             <p>No others was involved in crash</p>
           </div>
         ) : (
           <div className="">
             <div className="w-full">
-              {data.bikerInfo.length > 0 &&
-                data.bikerInfo.map((currentBike, index) => (
+              {serverDataState.bikerInfo.length > 0 &&
+                serverDataState.bikerInfo.map((currentBike, index) => (
                   <div className="flex flex-row items-center">
                     <FontAwesomeIcon icon={faBicycle} />
                     <div
@@ -303,8 +319,8 @@ const confirmationPage: NextPage<DamageReportPageProps> = ({ data, otherPartyIma
 
             {/* Vehicle info */}
             <div className="w-full mt-4">
-              {data.vehicleInfo.length > 0 &&
-                data.vehicleInfo.map((currentVehicle, index) => (
+              {serverDataState.vehicleInfo.length > 0 &&
+                serverDataState.vehicleInfo.map((currentVehicle, index) => (
                   <div className="flex flex-row items-center">
                     <FontAwesomeIcon icon={faCar} />
                     <div
@@ -358,8 +374,8 @@ const confirmationPage: NextPage<DamageReportPageProps> = ({ data, otherPartyIma
             </div>
             <div>
               <div className="w-full mt-4">
-                {data.pedestrianInfo.length > 0 &&
-                  data.pedestrianInfo.map((currenPedestrian, index) => (
+                {serverDataState.pedestrianInfo.length > 0 &&
+                  serverDataState.pedestrianInfo.map((currenPedestrian, index) => (
                     <div className="flex flex-row items-center">
                       <FontAwesomeIcon icon={faPerson} />
                       <div
@@ -400,8 +416,8 @@ const confirmationPage: NextPage<DamageReportPageProps> = ({ data, otherPartyIma
             </div>
             <div>
               <div className="w-full mt-4">
-                {data.otherObjectInfo.length > 0 &&
-                  data.otherObjectInfo.map((currentObject, index) => (
+                {serverDataState.otherObjectInfo.length > 0 &&
+                  serverDataState.otherObjectInfo.map((currentObject, index) => (
                     <div className="flex flex-row items-center">
                       <FontAwesomeIcon icon={faBox} />
                       <div
@@ -439,8 +455,8 @@ const confirmationPage: NextPage<DamageReportPageProps> = ({ data, otherPartyIma
       {/* Witnesses information */}
       <p className="font-bold text-MainGreen-300 mb-2">Witnesses</p>
       <div className="rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
-        {data.witnesses.length > 0 ? (
-          data.witnesses.map((witness, index) => (
+        {serverDataState.witnesses.length > 0 ? (
+          serverDataState.witnesses.map((witness, index) => (
             <div
               key={index}
               className="grid grid-cols-2 gap-y-2 p-1 border-l-2 border-MainGreen-300 mb-3"
@@ -488,9 +504,9 @@ const confirmationPage: NextPage<DamageReportPageProps> = ({ data, otherPartyIma
         <p className="font-bold text-MainGreen-300 mb-2">
           Location for where the incident occurred
         </p>
-        {data.accidentAddress.length > 0 ? (
+        {serverDataState.accidentAddress.length > 0 ? (
           <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
-            {data.accidentAddress}
+            {serverDataState.accidentAddress}
           </div>
         ) : (
           <div className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6">
@@ -504,9 +520,9 @@ const confirmationPage: NextPage<DamageReportPageProps> = ({ data, otherPartyIma
           Positions of damages
         </p>
 
-        {serverData.damages.length > 0 ? (
+        {serverDataState.damages.length > 0 ? (
           <div>
-            {serverData.damages.map((damage, index) => (
+            {serverDataState.damages.map((damage, index) => (
               <div
                 className="flex flex-col rounded-lg bg-MainGreen-100 py-2 px-5 w-full mb-6"
                 key={index}

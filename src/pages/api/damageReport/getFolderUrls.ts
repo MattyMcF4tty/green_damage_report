@@ -1,7 +1,4 @@
-import { downloadDamageReportFolder, getDamageReportFolderDownloadUrls, uploadDamageReportFolder } from "@/utils/logic/damageReportLogic.ts/logic";
-import { getSession, verifySessionToken } from "@/utils/logic/firebaseLogic/authenticationLogic/serverLogic";
-import { base64ToBuffer, bufferToBase64, isValidFileData } from "@/utils/logic/misc";
-import { AdminUser } from "@/utils/schemas/adminUserSchema";
+import { getDamageReportFolderDownloadUrls } from "@/utils/logic/damageReportLogic.ts/logic";
 import { ApiResponse } from "@/utils/schemas/miscSchemas/apiResponseSchema";
 import { verifyMethod } from "@/utils/security/apiProtection";
 import { NextApiRequest, NextApiResponse } from "next";

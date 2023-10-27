@@ -3,7 +3,7 @@ import {
   TextField,
   Inputfield,
   YesNo,
-} from "@/components/custom_inputfields";
+} from "@/components/customeInputfields/custom_inputfields";
 import NextButton from "@/components/buttons/next";
 import BackButton from "@/components/buttons/back";
 import { useRouter } from "next/router";
@@ -21,10 +21,6 @@ export const getServerSideProps = async (
 
   const damageReport = new CustomerDamageReport();
   damageReport.updateFields(await getDamageReport(reportId));
-
-  const otherPartyImageUrls = (await getDamageReportFolderDownloadUrls(reportId, '/OtherPartyDamages/')).map((image) => {
-    return image.downloadUrl;
-  })
   
   if (damageReport.isExpired() || damageReport.isFinished()) {
     return {
@@ -38,13 +34,12 @@ export const getServerSideProps = async (
   return {
     props: {
       data: damageReport.crypto('decrypt'),
-      otherPartyImageUrls: otherPartyImageUrls,
       id: reportId,
     },
   };
 };
 
-const HowPage: NextPage<DamageReportPageProps> = ({ data, otherPartyImageUrls, id }) => {
+const HowPage: NextPage<DamageReportPageProps> = ({ data, id }) => {
   const router = useRouter();
   const serverData = new CustomerDamageReport();
   serverData.updateFields(data);

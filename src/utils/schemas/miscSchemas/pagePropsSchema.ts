@@ -3,6 +3,5 @@ import { CustomerDamageReport } from "../damageReportSchemas/customerReportSchem
 
 export interface DamageReportPageProps {
     data: CustomerDamageReport;
-    otherPartyImageUrls: string[];
     id: string;
 }

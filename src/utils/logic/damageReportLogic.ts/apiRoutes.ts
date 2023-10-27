@@ -2,7 +2,6 @@ import { AdminDamageReport, AdminDamageReportSchema } from "@/utils/schemas/dama
 import { CustomerDamageReport } from "@/utils/schemas/damageReportSchemas/customerReportSchema";
 import AppError from "@/utils/schemas/miscSchemas/errorSchema";
 import { ValidMimeTypes } from "@/utils/schemas/types";
-import { verifyBase64String } from "../misc";
 
 export const fecthCustomerDamageReport = async (reportId:string) => {
   const appUrl = process.env.NEXT_PUBLIC_URL;
@@ -190,9 +189,6 @@ export const uploadFileToDamageReport = async(reportId:string, filePath:string, 
     throw new AppError('INTERNAL_ERROR', 'NEXT_PUBLIC_URL is not defined in enviroment.')
   }
   
-  if (!verifyBase64String(fileBase64)) {
-    throw new AppError('INVALID_BASE64', 'fileBase64 is not valid base64.')
-  }
   
   const data = {
     filePath:filePath,
@@ -209,11 +205,11 @@ export const uploadFileToDamageReport = async(reportId:string, filePath:string, 
   });
 
   const responseJson = await response.json();
-  if (!responseJson.ok) {
+  if (!response.ok) {
     throw new AppError(responseJson.status, responseJson.errors[0])
   }
 
-  console.log(responseJson.message[0])
+  console.log(responseJson.messages[0])
   return;
 }
 
@@ -270,9 +266,9 @@ export const requestDamageReportFileDeletion = async (reportId:string, filePath:
 
 export const uploadFolderToDamageReport = async (reportId:string, folderPath:string, fileData:{
   name: string;
-  mimeType: ValidMimeTypes;
   fileBase64: string;
 }[]) => {
+  
   const appUrl = process.env.NEXT_PUBLIC_URL;
   if (!appUrl) {
     throw new AppError('INTERNAL_ERROR', 'NEXT_PUBLIC_URL is not defined in enviroment.')
