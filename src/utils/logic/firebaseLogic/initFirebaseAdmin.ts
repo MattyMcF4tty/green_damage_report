@@ -1,7 +1,6 @@
 import AppError from "@/utils/schemas/miscSchemas/errorSchema";
 import admin from "firebase-admin";
 
-
 let firebaseAdmin: admin.app.App;
 
 export const getFirebaseAdmin = () => {
@@ -35,8 +34,8 @@ export const getFirebaseAdmin = () => {
         }
     }
 
-    return firebaseAdmin;
-}
+  return firebaseAdmin;
+};
 
 export const getAdminStorage = () => {
     try {
@@ -47,9 +46,9 @@ export const getAdminStorage = () => {
 }
 
 export const getAdminFirestore = () => {
-    return getFirebaseAdmin().firestore();
-}
+  return getFirebaseAdmin().firestore();
+};
 
 export const getAdminAuth = () => {
-    return getFirebaseAdmin().auth();
-}
+  return getFirebaseAdmin().auth();
+};
