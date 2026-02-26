@@ -1,38 +1,43 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Green Damage Report
 
-## Getting Started
+Digitalt værktøj til indberetning af bilskader for GreenMobility. Systemet guider brugeren trin-for-trin gennem identifikation af bil, interaktiv skadesmarkering og fotodokumentation.
 
-First, run the development server:
+## 🛠 Funktionalitet
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+- **Bil-identifikation:** Henter renter/bruger-data automatisk (Wunderfleet integration).
+- **Interaktiv skadesoversigt:** Præcis markering af skader på bil-plantegninger (f.eks. Renault Zoe, Renault Kangoo).
+- **Dokumentation:** Billed-upload af skader samt indtastning af information på modpart og vidner.
+- **PDF Generering:** Automatisk generering af skadesrapport i PDF-format.
+- **Admin Dashboard:** Administration, sletning, søgning og eksport af indsendte rapporter.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 💻 Teknologier
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+- **Frontend:** Next.js (React), Tailwind CSS
+- **Backend & Database:** Firebase (Firestore, Storage, Auth), Next.js API Routes
+- **Validering:** Zod schemas
+- **Integrationer:** Wunderfleet API, Mapbox/Geocoding
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+## 🚀 Kom i gang (Lokal udvikling)
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+1. **Klon repoet og installér dependencies:**
+   ```bash
+   npm install
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+2. **Opsætning af miljøvariable:**
+   Opret en `.env.local` fil i roden af projektet. Den skal indeholde dine Firebase credentials, kort-API nøgler (Mapbox/Google) og Wunderfleet API nøgler.
 
-## Learn More
+3. **Start udviklingsserveren:**
+   ```bash
+   npm run dev
+   ```
+   Åbn [http://localhost:3000](http://localhost:3000) i din browser.
 
-To learn more about Next.js, take a look at the following resources:
+## 🏗 Projektstruktur
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- `/src/pages/api`: Backend API-routes (Wunderfleet, Firebase auth, PDF-generering, e-mail afsendelse).
+- `/src/pages/damagereport`: Siderne til selve indberetningsflowet (`/what`, `/where`, `/how`, osv.).
+- `/src/components`: Genbrugelige UI-komponenter, formularer og kort-addons.
+- `/src/components/carDrawings`: Logik og UI for interaktive bil-tegninger.
+- `/src/utils/logic`: Kerne-logik for Firebase-interaktion, PDF-bygger og Wunderfleet-kald.
+- `/src/utils/schemas`: schemas til validering af formularer og API-requests for at sikre dataintegritet.
